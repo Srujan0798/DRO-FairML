@@ -70,7 +70,7 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
         model_naive, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
         tau=tau, k=5, gamma=0.0,
-        batch_size=512, epochs=30, weight_decay=1e-4
+        epochs=30, weight_decay=1e-4
     )
 
     if verbose:
@@ -91,8 +91,7 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
         model_dro, alpha=alpha, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,
         tau=tau, beta=5.0, k=5, gamma=0.0,
-        K_inner=10, batch_size=256, epochs=50, weight_decay=1e-4,
-        adam_p=True
+        K_inner=10, epochs=30, weight_decay=1e-4
     )
 
     if verbose:
@@ -112,7 +111,7 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
 
 def run_all_experiments(datasets=['adult', 'credit', 'lsac'],
                         alphas=[0.0, 0.1, 0.2, 0.3, 0.4],
-                        n_seeds=10,
+                        n_seeds=5,
                         device='cpu',
                         output_dir='results'):
     """Run full experiment suite with checkpointing."""
@@ -205,7 +204,7 @@ if __name__ == '__main__':
     results = run_all_experiments(
         datasets=['adult', 'credit', 'lsac'],
         alphas=[0.0, 0.1, 0.2, 0.3, 0.4],
-        n_seeds=10,
+        n_seeds=5,
         device=device,
         output_dir='results'
     )

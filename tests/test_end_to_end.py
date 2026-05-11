@@ -24,9 +24,9 @@ def test_dro_fair_runs_without_error():
     X, y, a = _make_synthetic_data(n=200, d=5)
     model = MLPClassifier(5, hidden_dims=[16, 8], dropout=0.0)
     trainer = DroFairTrainer(
-        model, alpha=0.2, device='cpu', epochs=5, batch_size=64,
+        model, alpha=0.2, device='cpu', epochs=5,
         K_inner=10, lr_p=5e-3, tau=100.0, beta=5.0, k=3,
-        use_dp=True, use_if=True, adam_p=True
+        use_dp=True, use_if=True
     )
     history = trainer.fit(X, y, a, verbose=False)
     assert len(history['train_loss']) == 5
@@ -54,7 +54,7 @@ def test_dro_fair_p_weights_on_simplex():
     X, y, a = _make_synthetic_data(n=200, d=5)
     model = MLPClassifier(5, hidden_dims=[16, 8], dropout=0.0)
     trainer = DroFairTrainer(
-        model, alpha=0.2, device='cpu', epochs=3, batch_size=64,
+        model, alpha=0.2, device='cpu', epochs=3,
         K_inner=10, use_dp=True, use_if=True
     )
     trainer.fit(X, y, a, verbose=False)
@@ -74,7 +74,7 @@ def test_dro_fair_lambda_clamped():
     model = MLPClassifier(5, hidden_dims=[16, 8], dropout=0.0)
     lambda_max = 5.0
     trainer = DroFairTrainer(
-        model, alpha=0.2, device='cpu', epochs=10, batch_size=64,
+        model, alpha=0.2, device='cpu', epochs=10,
         K_inner=10, lambda_max=lambda_max, lr_lambda=1e-1,
         use_dp=True, use_if=True
     )
@@ -88,7 +88,7 @@ def test_tilted_loss_exact_formula():
     X, y, a = _make_synthetic_data(n=100, d=5)
     model = MLPClassifier(5, hidden_dims=[8], dropout=0.0)
     trainer = DroFairTrainer(
-        model, alpha=0.2, device='cpu', epochs=1, batch_size=100,
+        model, alpha=0.2, device='cpu', epochs=1,
         K_inner=1, beta=2.0
     )
 
@@ -113,7 +113,7 @@ def test_if_scaling_matches_paper():
     X, y, a = _make_synthetic_data(n=100, d=5)
     model = MLPClassifier(5, hidden_dims=[8], dropout=0.0)
     trainer = DroFairTrainer(
-        model, alpha=0.2, device='cpu', epochs=1, batch_size=100,
+        model, alpha=0.2, device='cpu', epochs=1,
         K_inner=1, k=5
     )
     trainer.n_samples = 100
@@ -156,7 +156,7 @@ def test_dro_vs_naive_produce_different_predictions():
     X, y, a = _make_synthetic_data(n=200, d=5)
 
     model1 = MLPClassifier(5, hidden_dims=[16, 8], dropout=0.0)
-    trainer1 = DroFairTrainer(model1, alpha=0.2, device='cpu', epochs=5, batch_size=64, K_inner=10)
+    trainer1 = DroFairTrainer(model1, alpha=0.2, device='cpu', epochs=5, K_inner=10)
     trainer1.fit(X, y, a, verbose=False)
     preds1 = trainer1.predict(X)
 

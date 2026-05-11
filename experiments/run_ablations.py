@@ -46,7 +46,7 @@ def run_ablation(dataset_name, alpha, seed, device='cpu'):
 
     # 1. Standard ML
     model = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
-    trainer = StandardMLTrainer(model, device=device, epochs=30, lr=1e-3, batch_size=512)
+    trainer = StandardMLTrainer(model, device=device, epochs=30, lr=1e-3)
     trainer.fit(X_tr, y_tr, X_val, y_val, verbose=False)
     preds = trainer.predict(X_test)
     results['standard_ml'] = {
@@ -57,7 +57,7 @@ def run_ablation(dataset_name, alpha, seed, device='cpu'):
 
     # 2. Naive-FAIR
     model = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
-    trainer = NaiveFairTrainer(model, device=device, epochs=30, tau=tau, k=5, batch_size=512)
+    trainer = NaiveFairTrainer(model, device=device, epochs=30, tau=tau, k=5)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['naive'] = {
@@ -69,7 +69,7 @@ def run_ablation(dataset_name, alpha, seed, device='cpu'):
     # 3. DRO-FAIR joint
     model = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
     trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=30, tau=tau, k=5,
-                             K_inner=10, batch_size=512, lr_p=5e-3, use_dp=True, use_if=True, adam_p=True)
+                             K_inner=10, lr_p=5e-3, use_dp=True, use_if=True)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['dro_joint'] = {
@@ -81,7 +81,7 @@ def run_ablation(dataset_name, alpha, seed, device='cpu'):
     # 4. DRO-FAIR DP-only
     model = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
     trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=30, tau=tau, k=5,
-                             K_inner=10, batch_size=512, lr_p=5e-3, use_dp=True, use_if=False, adam_p=True)
+                             K_inner=10, lr_p=5e-3, use_dp=True, use_if=False)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['dro_dp_only'] = {
@@ -93,7 +93,7 @@ def run_ablation(dataset_name, alpha, seed, device='cpu'):
     # 5. DRO-FAIR IF-only
     model = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
     trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=30, tau=tau, k=5,
-                             K_inner=10, batch_size=512, lr_p=5e-3, use_dp=False, use_if=True, adam_p=True)
+                             K_inner=10, lr_p=5e-3, use_dp=False, use_if=True)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['dro_if_only'] = {
