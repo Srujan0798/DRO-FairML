@@ -125,11 +125,14 @@ def test_if_scaling_matches_paper():
 
     if_loss = trainer._compute_if_loss_weighted(h_tilde, p_if, edge_i, edge_j, edge_dists)
 
-    # Manual computation with paper's scaling
+    # Manual computation with paper's scaling (including weights)
     h_i = h_tilde[edge_i]
     h_j = h_tilde[edge_j]
+    p_i = p_if[edge_i]
+    p_j = p_if[edge_j]
+    weights = (p_i + p_j) / 2.0
     violations = torch.nn.functional.relu(torch.abs(h_i - h_j) - edge_dists)
-    manual = violations.sum() / (100 - 1)
+    manual = (weights * violations).sum() / (100 - 1)
 
     assert torch.isclose(if_loss, manual, atol=1e-5)
 
