@@ -103,7 +103,7 @@ def main():
     
     datasets = ['adult', 'credit']
     alphas = [0.2, 0.3]
-    n_seeds = 10
+    n_seeds = 5
     
     all_results = []
     for dataset in datasets:
