@@ -104,12 +104,18 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     # === Naive-FAIR ===
     naive_start = time.time()
 
+    # Pretrain with standard ML to prevent degeneracy
+    model_pretrained = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
+    pretrainer = StandardMLTrainer(model_pretrained, device=device, epochs=15, lr=1e-3)
+    pretrainer.fit(X_train_c, y_train_c, verbose=False)
+
     model_naive = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
+    model_naive.load_state_dict(model_pretrained.state_dict())
     trainer_naive = NaiveFairTrainer(
         model_naive, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
         tau=tau_train, k=5, gamma=0.0,
-        epochs=30, weight_decay=1e-4
+        epochs=15, weight_decay=1e-4
     )
 
     if verbose:
@@ -140,11 +146,12 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     dro_start = time.time()
 
     model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
+    model_dro.load_state_dict(model_pretrained.state_dict())
     trainer_dro = DroFairTrainer(
         model_dro, alpha=alpha, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,
         tau=tau_train, beta=5.0, k=5, gamma=0.0,
-        K_inner=10, epochs=30, weight_decay=1e-4
+        K_inner=10, epochs=15, weight_decay=1e-4
     )
 
     if verbose:
