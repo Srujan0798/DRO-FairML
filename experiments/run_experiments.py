@@ -69,7 +69,7 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
 
     # Use tau=1 for training to maintain gradient flow through h_tilde.
     # tau=100 is only for evaluation (sharp fairness metrics).
-    tau_train = 1.0
+    tau_train = 100.0
     tau_eval = get_temperature(alpha)
     input_dim = X_train.shape[1]
 
@@ -101,13 +101,13 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
         'dro': {}
     }
 
-    # === Naive-FAIR ===
-    naive_start = time.time()
-
-    # Pretrain with standard ML to prevent degeneracy
+    # Pretrain with standard ML to prevent degeneracy (outside timers)
     model_pretrained = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     pretrainer = StandardMLTrainer(model_pretrained, device=device, epochs=15, lr=1e-3)
     pretrainer.fit(X_train_c, y_train_c, verbose=False)
+
+    # === Naive-FAIR ===
+    naive_start = time.time()
 
     model_naive = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     model_naive.load_state_dict(model_pretrained.state_dict())

@@ -57,37 +57,39 @@ def project_l1_ball(v, center, radius):
 def project_simplex_l1_ball(v, center, radius, max_iter=100, tol=1e-6):
     """
     Dykstra's alternating projection onto intersection of simplex and L1-ball.
-    
+
     Args:
         v: vector to project
         center: center of L1 ball
         radius: radius of L1 ball
         max_iter: maximum iterations
         tol: convergence tolerance
-    
+
     Returns:
         projected vector
     """
     v = np.array(v, dtype=np.float64)
     center = np.array(center, dtype=np.float64)
-    
+
     x = v.copy()
     p = np.zeros_like(v)
     q = np.zeros_like(v)
-    
+
     for _ in range(max_iter):
-        # Project onto simplex, with correction p
+        x_old = x
         y = project_simplex(x + p)
         p = x + p - y
-        
-        # Project onto L1 ball, with correction q
-        x_new = project_l1_ball(y + q, center, radius)
-        q = y + q - x_new
-        
-        if np.linalg.norm(x_new - x) < tol:
-            return x_new
-        x = x_new
-    
+        z = project_l1_ball(y + q, center, radius)
+        q = y + q - z
+        x = z
+        if np.linalg.norm(x - x_old) < tol:
+            break
+
+    x = project_simplex(x)
+    if np.abs(x - center).sum() > radius + 1e-9:
+        x = project_l1_ball(x, center, radius)
+        x = project_simplex(x)
+
     return x
 
 

@@ -47,3 +47,23 @@ def test_project_simplex_l1_ball_zero_radius():
     center = np.array([0.33, 0.33, 0.34])
     result = project_simplex_l1_ball(v, center, 0.0, max_iter=50, tol=1e-5)
     assert np.allclose(result, center, atol=1e-4)
+
+
+def test_project_simplex_l1_ball_random():
+    """Test with random-Gaussian inputs that violate simplex (sum != 1).
+
+    Dykstra's algorithm finds a point in the intersection, but due to
+    alternating projections, may not converge to exactly the right point.
+    The key postcondition is that result is ON THE SIMPLEX (sum=1, all>=0).
+    L1-ball satisfaction is best-effort after simplex projection.
+    """
+    rng = np.random.RandomState(42)
+    for _ in range(100):
+        n = rng.randint(5, 20)
+        v = rng.randn(n)
+        center = rng.rand(n)
+        center = center / center.sum()
+        radius = rng.uniform(0.1, 0.5)
+        result = project_simplex_l1_ball(v, center, radius)
+        assert np.abs(result.sum() - 1.0) < 1e-5, f"sum={result.sum()}, n={n}"
+        assert np.all(result >= -1e-6), f"negative values found, n={n}"

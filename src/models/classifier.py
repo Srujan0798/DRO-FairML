@@ -23,7 +23,7 @@ class MLPClassifier(nn.Module):
     def predict_proba(self, x, temperature=1.0):
         """Return soft predictions using sigmoid with temperature."""
         logits = self.forward(x)
-        return torch.sigmoid(logits / temperature)
+        return torch.sigmoid(logits * temperature)
     
     def predict(self, x):
         """Return hard binary predictions (threshold at 0.5)."""

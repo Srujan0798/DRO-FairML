@@ -44,7 +44,7 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
         get_dataset(dataset_name, random_state=seed)
 
     # tau=1 for training to prevent gradient vanishing
-    tau_train = 1.0
+    tau_train = 100.0
     input_dim = X_train.shape[1]
 
     # Train warm-start model for true adversarial attacks
