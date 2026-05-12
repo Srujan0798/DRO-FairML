@@ -3,14 +3,13 @@ Main experiment runner for DRO-FAIR project.
 Runs Naive-FAIR and DRO-FAIR on Adult, Credit, LSAC under adversarial corruption.
 Supports checkpointing to resume interrupted runs.
 
-Key fixes matching paper exactly:
-- K_inner = 10 (paper line 1794)
-- Temperature τ tuned by corruption level (τ=1 at α≥0.4, τ=100 otherwise; paper line 1797-1799)
-- Only training data is corrupted (val remains clean for hyperparameter monitoring)
-- Adam for p-updates enabled
-- 10 seeds (not 5) for proper statistical significance
-- Runtime measurement for each method
-- Test-time evaluation on BOTH clean and corrupted test data
+CRITICAL FIXES:
+1. True adversarial attacks: train warm-start model on clean data, then use it
+   for gradient-based PGD attacks (not just random heuristic noise).
+2. Paper uses σ(τ·f_θ(x)) [MULTIPLY], not division.
+3. 10 seeds for proper statistical significance.
+4. Runtime measurement for each method.
+5. Test-time evaluation on BOTH clean and corrupted test data.
 """
 
 import os
@@ -28,6 +27,7 @@ from src.models.classifier import MLPClassifier
 from src.corruption.adversarial import AdversarialCorruptor
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
+from src.training.standard_ml import StandardMLTrainer
 from src.evaluation.metrics import compute_accuracy, compute_dp_violation, compute_if_violation
 
 
@@ -37,14 +37,24 @@ def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
 
 
-def corrupt_test_data(X_test, y_test, a_test, alpha, seed, device='cpu'):
+def train_warm_start_model(X_train, y_train, a_train, input_dim, device='cpu', epochs=10):
+    """Train a quick standard model on clean data for PGD attacks."""
+    model = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
+    trainer = StandardMLTrainer(model, device=device, epochs=epochs, lr=1e-3)
+    trainer.fit(X_train, y_train, verbose=False)
+    return model
+
+
+def corrupt_test_data(X_test, y_test, a_test, alpha, seed, device='cpu', warm_model=None):
     """Apply adversarial corruption to test data (for test-time evaluation)."""
     corruptor = AdversarialCorruptor(
         alpha=alpha, epsilon=0.1, pgd_steps=5, pgd_step_size=0.02,
         feature_attack=True, label_flip=True, attr_flip=True,
         coordinated=True, random_state=seed + 1000
     )
-    X_test_c, y_test_c, a_test_c, _ = corruptor.corrupt(X_test, y_test, a_test, device=device)
+    X_test_c, y_test_c, a_test_c, _ = corruptor.corrupt(
+        X_test, y_test, a_test, model=warm_model, device=device
+    )
     return X_test_c, y_test_c, a_test_c
 
 
@@ -58,21 +68,27 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
         get_dataset(dataset_name, random_state=seed)
 
     tau = get_temperature(alpha)
+    input_dim = X_train.shape[1]
 
-    # Apply adversarial corruption to TRAINING data only
-    # Validation data stays clean for fair hyperparameter monitoring
+    # CRITICAL FIX: Train warm-start model for true adversarial attacks
+    warm_model = train_warm_start_model(
+        X_train, y_train, a_train, input_dim, device=device, epochs=10
+    )
+
+    # Apply adversarial corruption to TRAINING data using warm-start model (PGD)
     corruptor = AdversarialCorruptor(
         alpha=alpha, epsilon=0.1, pgd_steps=5, pgd_step_size=0.02,
         feature_attack=True, label_flip=True, attr_flip=True,
         coordinated=True, random_state=seed
     )
-
-    X_train_c, y_train_c, a_train_c, _ = corruptor.corrupt(X_train, y_train, a_train, device=device)
+    X_train_c, y_train_c, a_train_c, _ = corruptor.corrupt(
+        X_train, y_train, a_train, model=warm_model, device=device
+    )
 
     # Also corrupt test data for test-time adversarial evaluation
-    X_test_c, y_test_c, a_test_c = corrupt_test_data(X_test, y_test, a_test, alpha, seed, device)
-
-    input_dim = X_train.shape[1]
+    X_test_c, y_test_c, a_test_c = corrupt_test_data(
+        X_test, y_test, a_test, alpha, seed, device=device, warm_model=warm_model
+    )
 
     results = {
         'dataset': dataset_name,
@@ -238,10 +254,10 @@ def run_all_experiments(datasets=['adult', 'credit', 'lsac'],
 
     # Save runtimes
     runtime_data = {
-        'naive_mean': float(np.mean(naive_times)),
-        'naive_std': float(np.std(naive_times)),
-        'dro_mean': float(np.mean(dro_times)),
-        'dro_std': float(np.std(dro_times)),
+        'naive_mean': float(np.mean(naive_times)) if naive_times else 0,
+        'naive_std': float(np.std(naive_times)) if naive_times else 0,
+        'dro_mean': float(np.mean(dro_times)) if dro_times else 0,
+        'dro_std': float(np.std(dro_times)) if dro_times else 0,
         'overhead': float(np.mean(dro_times) / np.mean(naive_times)) if np.mean(naive_times) > 0 else 0,
         'n_experiments': len(naive_times)
     }

@@ -1,6 +1,10 @@
 """
 DRO-FAIR trainer (Algorithm 1 from the paper).
 Implements min-max Lagrangian with corruption-calibrated TV uncertainty sets.
+
+CRITICAL FIX: Paper uses h̃ = σ(τ·f_θ(x)) [MULTIPLY], not σ(f_θ(x)/τ) [DIVIDE].
+With τ=100, multiply makes predictions sharp (almost binary) so fairness
+constraints are meaningful. Division makes all predictions ≈0.5, killing fairness signal.
 """
 
 import numpy as np
@@ -131,7 +135,15 @@ class DroFairTrainer:
         )
 
     def fit(self, X, y, a, X_val=None, y_val=None, a_val=None, verbose=False):
-        """Train DRO-FAIR (Algorithm 1) — full-batch implementation."""
+        """Train DRO-FAIR (Algorithm 1) — full-batch implementation.
+        
+        Paper Algorithm 1 ordering (Page 33):
+        1. Forward pass with current θ
+        2. Compute losses with current p
+        3. Update θ (outer minimization)
+        4. Dual ascent on λ
+        5. Inner maximization: update p (K steps)
+        """
         n = len(X)
         self.n_samples = n
 
@@ -158,24 +170,25 @@ class DroFairTrainer:
         for epoch in range(self.epochs):
             self.model.train()
 
-            # Forward pass (full batch)
+            # Forward pass (full batch) — NO no_grad, gradients must flow
             logits = self.model(X_t)
-            h_tilde = torch.sigmoid(logits / self.tau)
+            # CRITICAL FIX: Paper uses σ(τ·f_θ(x)) [MULTIPLY], not division
+            h_tilde = torch.sigmoid(logits * self.tau)
 
-            # Classification loss (tilted BCE)
+            # Classification loss (tilted BCE on raw logits)
             per_sample_loss = F.binary_cross_entropy_with_logits(logits, y_t, reduction='none')
             L_tilt = self._compute_tilted_loss(per_sample_loss)
 
-            # DP violation
+            # DP violation — gradients flow through h_tilde
             g_dp = self._compute_dp_loss_weighted(h_tilde, a_t, p_dp_dict, group_mask_dict) if self.use_dp else torch.tensor(0.0, device=self.device)
 
-            # IF violation
+            # IF violation — gradients flow through h_tilde
             g_if = self._compute_if_loss_weighted(h_tilde, p_if, edge_i, edge_j, edge_dists) if self.use_if else torch.tensor(0.0, device=self.device)
 
             # Total Lagrangian
             total_loss = L_tilt + (lambda_dp * g_dp if self.use_dp else 0.0) + (lambda_if * g_if if self.use_if else 0.0)
 
-            # Update θ
+            # Update θ (outer minimization)
             opt_theta.zero_grad()
             total_loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
@@ -188,7 +201,7 @@ class DroFairTrainer:
                 if self.use_if:
                     lambda_if = torch.clamp(lambda_if + self.lr_lambda * g_if, 0, self.lambda_max)
 
-            # Inner maximization: update p weights (K steps)
+            # Inner maximization: update p weights (K steps) — AFTER θ update
             with torch.enable_grad():
                 for _ in range(self.K_inner):
                     if self.use_dp:

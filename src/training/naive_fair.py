@@ -2,8 +2,14 @@
 Naive-FAIR baseline: trains fairness-constrained model on corrupted data
 without robust reweighting (special case of DRO-FAIR with ρ=0).
 
-Matches paper structure: minibatch SGD for θ, full-batch fairness constraints.
+Matches paper structure: full-batch training with fairness constraints.
 Uses standard BCE (not tilted) — the tilted risk is specific to DRO-FAIR.
+
+CRITICAL FIXES:
+1. Full-batch training (no minibatch) so fairness gradients flow correctly.
+2. Removed torch.no_grad() around fairness computation.
+3. Dual ascent ONCE per epoch (not per minibatch).
+4. Fixed τ: use σ(τ·logits) [multiply] not σ(logits/τ) [divide].
 """
 
 import numpy as np
@@ -18,7 +24,7 @@ class NaiveFairTrainer:
 
     def __init__(self, model, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lambda_max=10.0, tau=100.0, k=5, gamma=0.0,
-                 batch_size=256, epochs=50, weight_decay=1e-4):
+                 epochs=50, weight_decay=1e-4):
         self.model = model.to(device)
         self.device = device
         self.lr_theta = lr_theta
@@ -27,7 +33,6 @@ class NaiveFairTrainer:
         self.tau = tau
         self.k = k
         self.gamma = gamma
-        self.batch_size = batch_size
         self.epochs = epochs
         self.weight_decay = weight_decay
         self.n_samples = None
@@ -85,7 +90,7 @@ class NaiveFairTrainer:
         return violations.sum() / (n - 1)
 
     def fit(self, X, y, a, X_val=None, y_val=None, a_val=None, verbose=False):
-        """Train Naive-FAIR model with minibatch SGD."""
+        """Train Naive-FAIR model with full-batch SGD."""
         n = len(X)
         self.n_samples = n
 
@@ -111,55 +116,37 @@ class NaiveFairTrainer:
         for epoch in range(self.epochs):
             self.model.train()
 
-            # Full forward pass for fairness constraints
+            # Forward pass (full batch) — gradients flow for fairness constraints
+            logits = self.model(X_t)
+            # CRITICAL FIX: Paper uses σ(τ·f_θ(x)) [MULTIPLY]
+            h_tilde = torch.sigmoid(logits * self.tau)
+
+            # Standard BCE on full data
+            cls_loss = F.binary_cross_entropy_with_logits(logits, y_t)
+
+            # Fairness constraints — gradients flow through h_tilde
+            g_dp = self._compute_dp_loss(h_tilde, a_t)
+            g_if = self._compute_if_loss(h_tilde, edge_i, edge_j, edge_dists)
+
+            # Total Lagrangian
+            total_loss = cls_loss + lambda_dp * g_dp + lambda_if * g_if
+
+            # Update θ
+            opt_theta.zero_grad()
+            total_loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            opt_theta.step()
+
+            # Dual ascent ONCE per epoch
             with torch.no_grad():
-                logits_full = self.model(X_t)
-                h_tilde_full = torch.sigmoid(logits_full / self.tau)
-
-            # Compute g_DP and g_IF on full data
-            g_dp = self._compute_dp_loss(h_tilde_full, a_t)
-            g_if = self._compute_if_loss(h_tilde_full, edge_i, edge_j, edge_dists)
-
-            # Minibatch SGD for θ
-            perm = torch.randperm(n)
-            epoch_loss = 0.0
-            n_batches = 0
-
-            for start in range(0, n, self.batch_size):
-                end = min(start + self.batch_size, n)
-                batch_idx = perm[start:end]
-
-                # Forward pass on minibatch
-                logits_batch = self.model(X_t[batch_idx])
-
-                # Standard BCE on minibatch
-                cls_loss = F.binary_cross_entropy_with_logits(
-                    logits_batch, y_t[batch_idx]
+                lambda_dp = torch.clamp(
+                    lambda_dp + self.lr_lambda * g_dp, 0, self.lambda_max
+                )
+                lambda_if = torch.clamp(
+                    lambda_if + self.lr_lambda * g_if, 0, self.lambda_max
                 )
 
-                # Total Lagrangian
-                total_loss = cls_loss + lambda_dp * g_dp + lambda_if * g_if
-
-                # Update θ
-                opt_theta.zero_grad()
-                total_loss.backward()
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-                opt_theta.step()
-
-                # Dual ascent on λ
-                with torch.no_grad():
-                    lambda_dp = torch.clamp(
-                        lambda_dp + self.lr_lambda * g_dp, 0, self.lambda_max
-                    )
-                    lambda_if = torch.clamp(
-                        lambda_if + self.lr_lambda * g_if, 0, self.lambda_max
-                    )
-
-                epoch_loss += total_loss.item()
-                n_batches += 1
-
-            avg_loss = epoch_loss / max(n_batches, 1)
-            history['train_loss'].append(avg_loss)
+            history['train_loss'].append(total_loss.item())
 
             # Validation every 5 epochs
             if X_val is not None and (epoch + 1) % 5 == 0:
@@ -174,7 +161,7 @@ class NaiveFairTrainer:
 
                 if verbose:
                     print(
-                        f"Epoch {epoch+1}/{self.epochs}: loss={avg_loss:.4f}, "
+                        f"Epoch {epoch+1}/{self.epochs}: loss={total_loss.item():.4f}, "
                         f"val_acc={metrics['accuracy']:.4f}, "
                         f"val_dp={metrics['dp_violation']:.4f}, "
                         f"val_if={metrics['if_violation']:.4f}"

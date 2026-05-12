@@ -8,6 +8,9 @@ Includes:
 - Coordinated label flips
 - Coordinated protected attribute flips
 - RandomCorruptor for baseline comparison
+
+CRITICAL FIX: Use local np.random.RandomState instead of global np.random.seed
+to prevent interference between multiple corruptor instances.
 """
 
 import numpy as np
@@ -18,6 +21,8 @@ import torch.nn as nn
 class AdversarialCorruptor:
     """
     Applies adversarial corruption to a fraction alpha of the data.
+    When model is provided, uses true gradient-based PGD attacks.
+    When model is None, uses FGSM-style heuristic attacks.
     """
     
     def __init__(self, alpha=0.2, epsilon=0.1, pgd_steps=5, pgd_step_size=0.02,
@@ -33,7 +38,7 @@ class AdversarialCorruptor:
             label_flip: whether to flip labels
             attr_flip: whether to flip protected attributes
             coordinated: whether attacks are coordinated (target minority group)
-            random_state: random seed
+            random_state: random seed for local RandomState
         """
         self.alpha = alpha
         self.epsilon = epsilon
@@ -43,9 +48,8 @@ class AdversarialCorruptor:
         self.label_flip = label_flip
         self.attr_flip = attr_flip
         self.coordinated = coordinated
-        self.random_state = random_state
-        if random_state is not None:
-            np.random.seed(random_state)
+        # CRITICAL FIX: Use local RandomState, not global seed
+        self.rng = np.random.RandomState(random_state)
     
     def corrupt(self, X, y, a, model=None, device='cpu'):
         """
@@ -79,13 +83,13 @@ class AdversarialCorruptor:
             
             corrupt_idx = []
             if n_minority_corrupt > 0:
-                corrupt_idx.extend(np.random.choice(minority_indices, n_minority_corrupt, replace=False))
+                corrupt_idx.extend(self.rng.choice(minority_indices, n_minority_corrupt, replace=False))
             if n_majority_corrupt > 0 and len(majority_indices) > 0:
-                corrupt_idx.extend(np.random.choice(majority_indices, n_majority_corrupt, replace=False))
+                corrupt_idx.extend(self.rng.choice(majority_indices, n_majority_corrupt, replace=False))
             corrupt_idx = np.array(corrupt_idx, dtype=np.int64)
         else:
             if n_corrupt > 0:
-                corrupt_idx = np.random.choice(n, n_corrupt, replace=False).astype(np.int64)
+                corrupt_idx = self.rng.choice(n, n_corrupt, replace=False).astype(np.int64)
             else:
                 corrupt_idx = np.array([], dtype=np.int64)
         
@@ -127,7 +131,7 @@ class AdversarialCorruptor:
                 target_label = 1 - int(y[idx])
                 direction = 2 * target_label - 1  # +1 if target=1, -1 if target=0
                 
-                noise = np.random.randn(X.shape[1])
+                noise = self.rng.randn(X.shape[1])
                 noise = noise / (np.linalg.norm(noise) + 1e-8)
                 
                 # Scale by column std and epsilon
@@ -217,8 +221,7 @@ class RandomCorruptor:
         self.feature_attack = feature_attack
         self.label_flip = label_flip
         self.attr_flip = attr_flip
-        if random_state is not None:
-            np.random.seed(random_state)
+        self.rng = np.random.RandomState(random_state)
     
     def corrupt(self, X, y, a, model=None, device='cpu'):
         """
@@ -239,7 +242,7 @@ class RandomCorruptor:
         
         # Uniform random selection (no coordinated targeting)
         if n_corrupt > 0:
-            corrupt_idx = np.random.choice(n, n_corrupt, replace=False).astype(np.int64)
+            corrupt_idx = self.rng.choice(n, n_corrupt, replace=False).astype(np.int64)
         else:
             corrupt_idx = np.array([], dtype=np.int64)
         
@@ -256,7 +259,7 @@ class RandomCorruptor:
             col_stds = np.std(X, axis=0, keepdims=True)
             col_stds[col_stds == 0] = 1.0
             for idx in corrupt_idx:
-                noise = np.random.randn(X.shape[1])
+                noise = self.rng.randn(X.shape[1])
                 X_c[idx] = X[idx] + self.epsilon * col_stds.squeeze() * noise
         
         # 2. Random label flips (uniform, not coordinated)
