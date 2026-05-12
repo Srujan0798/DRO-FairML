@@ -7,6 +7,7 @@ Includes:
 - FGSM/PGD-style attacks on numeric features
 - Coordinated label flips
 - Coordinated protected attribute flips
+- RandomCorruptor for baseline comparison
 """
 
 import numpy as np
@@ -42,6 +43,7 @@ class AdversarialCorruptor:
         self.label_flip = label_flip
         self.attr_flip = attr_flip
         self.coordinated = coordinated
+        self.random_state = random_state
         if random_state is not None:
             np.random.seed(random_state)
     
@@ -190,3 +192,80 @@ class AdversarialCorruptor:
         a_adv = a.copy()
         a_adv[corrupt_idx] = 1 - a_adv[corrupt_idx]
         return a_adv
+
+
+class RandomCorruptor:
+    """
+    Random corruption baseline for comparison with adversarial corruption.
+    Uses the same corruption fraction but applies random (non-adversarial) noise.
+    """
+    
+    def __init__(self, alpha=0.2, epsilon=0.1,
+                 feature_attack=True, label_flip=True, attr_flip=True,
+                 random_state=None):
+        """
+        Args:
+            alpha: corruption fraction
+            epsilon: std of Gaussian noise for feature perturbation
+            feature_attack: whether to add Gaussian noise to features
+            label_flip: whether to flip labels uniformly at random
+            attr_flip: whether to flip protected attributes uniformly at random
+            random_state: random seed
+        """
+        self.alpha = alpha
+        self.epsilon = epsilon
+        self.feature_attack = feature_attack
+        self.label_flip = label_flip
+        self.attr_flip = attr_flip
+        if random_state is not None:
+            np.random.seed(random_state)
+    
+    def corrupt(self, X, y, a, model=None, device='cpu'):
+        """
+        Apply random corruption to dataset.
+        
+        Args:
+            X: features (numpy array)
+            y: labels (numpy array)
+            a: protected attributes (numpy array)
+            model: unused (for API compatibility)
+            device: unused (for API compatibility)
+        
+        Returns:
+            X_c, y_c, a_c, corrupt_mask
+        """
+        n = len(X)
+        n_corrupt = int(self.alpha * n)
+        
+        # Uniform random selection (no coordinated targeting)
+        if n_corrupt > 0:
+            corrupt_idx = np.random.choice(n, n_corrupt, replace=False).astype(np.int64)
+        else:
+            corrupt_idx = np.array([], dtype=np.int64)
+        
+        corrupt_mask = np.zeros(n, dtype=bool)
+        if len(corrupt_idx) > 0:
+            corrupt_mask[corrupt_idx] = True
+        
+        X_c = X.copy()
+        y_c = y.copy()
+        a_c = a.copy()
+        
+        # 1. Random Gaussian feature noise
+        if self.feature_attack and len(corrupt_idx) > 0:
+            col_stds = np.std(X, axis=0, keepdims=True)
+            col_stds[col_stds == 0] = 1.0
+            for idx in corrupt_idx:
+                noise = np.random.randn(X.shape[1])
+                X_c[idx] = X[idx] + self.epsilon * col_stds.squeeze() * noise
+        
+        # 2. Random label flips (uniform, not coordinated)
+        if self.label_flip and len(corrupt_idx) > 0:
+            for idx in corrupt_idx:
+                y_c[idx] = 1 - int(y[idx])
+        
+        # 3. Random attribute flips (uniform, not coordinated)
+        if self.attr_flip and len(corrupt_idx) > 0:
+            a_c[corrupt_idx] = 1 - a_c[corrupt_idx]
+        
+        return X_c, y_c, a_c, corrupt_mask

@@ -30,7 +30,7 @@ training:
   batch_size: 256
   lr_theta: 1e-3
   lr_lambda: 5e-3
-  lr_p: 1e-2
+  lr_p: 5e-3
   lambda_max: 10.0
   weight_decay: 1e-4
   gradient_clip: 1.0

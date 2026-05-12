@@ -1,53 +1,83 @@
-"""Unit tests for adversarial corruption."""
+"""Tests for corruption modules."""
 
 import numpy as np
-from src.corruption.adversarial import AdversarialCorruptor
+import pytest
+from src.corruption.adversarial import AdversarialCorruptor, RandomCorruptor
 
 
 def test_corrupt_zero_alpha():
-    """Test that alpha=0 does not corrupt any samples."""
-    n = 100
-    X = np.random.randn(n, 5)
-    y = np.random.randint(0, 2, n).astype(np.float32)
-    a = np.random.randint(0, 2, n)
+    """When alpha=0, no corruption should occur."""
+    X = np.random.randn(100, 5)
+    y = np.random.randint(0, 2, 100).astype(np.float32)
+    a = np.random.randint(0, 2, 100)
     
     corruptor = AdversarialCorruptor(alpha=0.0, random_state=42)
     X_c, y_c, a_c, mask = corruptor.corrupt(X, y, a)
     
-    assert not np.any(mask)
     assert np.allclose(X, X_c)
     assert np.allclose(y, y_c)
     assert np.allclose(a, a_c)
+    assert mask.sum() == 0
 
 
 def test_corrupt_nonzero_alpha():
-    """Test that alpha>0 corrupts approximately alpha fraction."""
-    n = 1000
-    X = np.random.randn(n, 5)
-    y = np.random.randint(0, 2, n).astype(np.float32)
-    a = np.random.randint(0, 2, n)
+    """When alpha>0, some samples should be corrupted."""
+    X = np.random.randn(100, 5)
+    y = np.random.randint(0, 2, 100).astype(np.float32)
+    a = np.random.randint(0, 2, 100)
     
-    alpha = 0.2
-    corruptor = AdversarialCorruptor(alpha=alpha, random_state=42)
+    corruptor = AdversarialCorruptor(alpha=0.2, random_state=42)
     X_c, y_c, a_c, mask = corruptor.corrupt(X, y, a)
     
-    frac = mask.mean()
-    assert 0.15 <= frac <= 0.25  # Approximate due to randomness
-    assert not np.allclose(X, X_c) or not np.allclose(y, y_c) or not np.allclose(a, a_c)
+    assert mask.sum() == 20
+    # At least some features should change
+    assert not np.allclose(X, X_c)
 
 
 def test_corrupt_coordinated_targets_minority():
-    """Test that coordinated corruption targets minority group more."""
-    n = 1000
-    X = np.random.randn(n, 5)
-    y = np.random.randint(0, 2, n).astype(np.float32)
-    a = np.zeros(n, dtype=np.int64)
-    a[800:] = 1  # Group 1 is minority (20%)
+    """Coordinated corruption should target minority group more."""
+    X = np.random.randn(100, 5)
+    y = np.random.randint(0, 2, 100).astype(np.float32)
+    a = np.zeros(100, dtype=int)
+    a[70:] = 1  # 30% minority
     
-    alpha = 0.2
-    corruptor = AdversarialCorruptor(alpha=alpha, coordinated=True, random_state=42)
+    corruptor = AdversarialCorruptor(alpha=0.2, coordinated=True, random_state=42)
     X_c, y_c, a_c, mask = corruptor.corrupt(X, y, a)
     
-    minority_corrupt_rate = mask[a == 1].mean()
-    majority_corrupt_rate = mask[a == 0].mean()
-    assert minority_corrupt_rate > majority_corrupt_rate
+    minority_corrupted = mask[a == 1].sum()
+    majority_corrupted = mask[a == 0].sum()
+    
+    # Minority should have higher corruption rate
+    minority_rate = minority_corrupted / 30
+    majority_rate = majority_corrupted / 70
+    assert minority_rate > majority_rate
+
+
+def test_random_corruptor_basic():
+    """RandomCorruptor should apply uniform random corruption."""
+    X = np.random.randn(100, 5)
+    y = np.random.randint(0, 2, 100).astype(np.float32)
+    a = np.random.randint(0, 2, 100)
+    
+    corruptor = RandomCorruptor(alpha=0.2, random_state=42)
+    X_c, y_c, a_c, mask = corruptor.corrupt(X, y, a)
+    
+    assert mask.sum() == 20
+    assert not np.allclose(X, X_c)
+
+
+def test_random_vs_adversarial_difference():
+    """Adversarial and random corruption should produce different results."""
+    np.random.seed(123)
+    X = np.random.randn(100, 5)
+    y = np.random.randint(0, 2, 100).astype(np.float32)
+    a = np.random.randint(0, 2, 100)
+    
+    adv = AdversarialCorruptor(alpha=0.2, coordinated=True, random_state=42)
+    rand = RandomCorruptor(alpha=0.2, random_state=42)
+    
+    X_adv, y_adv, a_adv, _ = adv.corrupt(X.copy(), y.copy(), a.copy())
+    X_rand, y_rand, a_rand, _ = rand.corrupt(X.copy(), y.copy(), a.copy())
+    
+    # They should be different (different selection + different perturbations)
+    assert not np.allclose(X_adv, X_rand) or not np.allclose(y_adv, y_rand)
