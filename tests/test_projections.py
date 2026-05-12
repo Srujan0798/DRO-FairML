@@ -67,3 +67,27 @@ def test_project_simplex_l1_ball_random():
         result = project_simplex_l1_ball(v, center, radius)
         assert np.abs(result.sum() - 1.0) < 1e-5, f"sum={result.sum()}, n={n}"
         assert np.all(result >= -1e-6), f"negative values found, n={n}"
+
+
+def test_project_simplex_l1_ball_training_regime():
+    """Realistic training-time inputs: small PGA-step perturbations of the
+    uniform center. Both simplex AND L1-ball constraints must hold.
+
+    This is the regime DRO-FAIR actually calls the projection in:
+    p_{t+1} = p_t + lr_p · ∇_p g, with lr_p=5e-3 and uniform initialization.
+    """
+    rng = np.random.RandomState(0)
+    fails = []
+    for _ in range(100):
+        n = rng.randint(10, 200)
+        center = np.ones(n) / n
+        v = center + 5e-3 * rng.randn(n)   # PGA-sized step from uniform
+        radius = rng.uniform(0.02, 0.3)
+        result = project_simplex_l1_ball(v, center, radius)
+        if abs(result.sum() - 1.0) > 1e-4:
+            fails.append(f"simplex: sum={result.sum()}, n={n}")
+        if np.any(result < -1e-6):
+            fails.append(f"negative element, n={n}")
+        if np.abs(result - center).sum() > radius + 2e-4:
+            fails.append(f"L1: {np.abs(result-center).sum():.6f} > r={radius:.6f}, n={n}")
+    assert not fails, f"{len(fails)}/100 training-regime projections failed: {fails[:3]}"

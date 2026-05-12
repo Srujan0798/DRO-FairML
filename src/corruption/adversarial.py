@@ -167,8 +167,11 @@ class AdversarialCorruptor:
         y_adv = y.copy()
         
         # Compute current group-conditional positive rates
-        group0_pos = np.mean(y[a == 0])
-        group1_pos = np.mean(y[a == 1])
+        mask0 = (a == 0)
+        mask1 = (a == 1)
+        
+        group0_pos = np.mean(y[mask0]) if np.any(mask0) else 0.5
+        group1_pos = np.mean(y[mask1]) if np.any(mask1) else 0.5
         
         for idx in corrupt_idx:
             group = int(a[idx])

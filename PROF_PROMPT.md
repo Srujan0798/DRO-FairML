@@ -171,6 +171,27 @@ print('tau check: CORRECT')
 ```
 
 ```bash
+# Verify lambda initialization
+python3 -c "
+import inspect
+from src.training.dro_fair import DroFairTrainer
+from src.training.naive_fair import NaiveFairTrainer
+from src.models.classifier import MLPClassifier
+m = MLPClassifier(5)
+d = DroFairTrainer(m, alpha=0.2)
+n = NaiveFairTrainer(m)
+# Check lambda init values
+src_dro = inspect.getsource(DroFairTrainer.fit)
+src_naive = inspect.getsource(NaiveFairTrainer.fit)
+assert 'torch.tensor(0.0' in src_dro or 'lambda_dp = torch.tensor(0.' in src_dro, \
+    'DRO lambda_dp must initialize at 0.0'
+assert 'torch.tensor(0.0' in src_naive or 'lambda_dp = torch.tensor(0.' in src_naive, \
+    'Naive lambda_dp must initialize at 0.0'
+print('Lambda init check: CORRECT (0.0)')
+"
+```
+
+```bash
 # Verify algorithm order
 python3 -c "
 import inspect
@@ -378,6 +399,56 @@ print('\n=== INTERROGATION COMPLETE ===')
 PYEOF
 ```
 
+# CHECK 7: NaN/Inf in results
+print('\n=== NaN/Inf CHECK ===')
+nan_found = False
+for r in results:
+    for method in ['naive', 'dro']:
+        for eval_type in ['clean', 'corrupted']:
+            for metric in ['accuracy', 'dp_violation', 'if_violation']:
+                val = r[method][eval_type][metric]
+                if val != val or abs(val) == float('inf'):
+                    print(f'  NaN/Inf: {r["dataset"]} a={r["alpha"]} seed={r["seed"]} {method}.{eval_type}.{metric}={val}')
+                    nan_found = True
+if not nan_found:
+    print('  No NaN/Inf detected')
+
+# CHECK 8: Convergence (loss should not diverge)
+print('\n=== CONVERGENCE CHECK ===')
+# If results contain loss history, check it
+# Otherwise flag that convergence was not tracked
+print('  NOTE: Verify convergence by running a single experiment with verbose=True')
+print('  Loss should decrease or stabilize, not diverge upward.')
+
+# CHECK 9: Statistical significance (paired sign test)
+print('\n=== STATISTICAL SIGNIFICANCE ===')
+from scipy.stats import wilcoxon
+for ds in ['adult', 'credit', 'lsac']:
+    for alpha in [0.2, 0.3]:
+        subset = [r for r in results if r['dataset'] == ds and r['alpha'] == alpha]
+        if len(subset) < 5:
+            continue
+        naive_dp = [r['naive']['clean']['dp_violation'] for r in subset]
+        dro_dp = [r['dro']['clean']['dp_violation'] for r in subset]
+        diffs = [n - d for n, d in zip(naive_dp, dro_dp)]
+        if all(d == 0 for d in diffs):
+            print(f'  {ds} a={alpha}: identical DP — SUSPICIOUS')
+            continue
+        try:
+            stat, pval = wilcoxon(naive_dp, dro_dp, alternative='greater')
+            sig = 'YES (p<0.05)' if pval < 0.05 else f'NO (p={pval:.4f})'
+            print(f'  {ds} a={alpha}: DRO < Naive DP? {sig}')
+        except Exception as e:
+            print(f'  {ds} a={alpha}: wilcoxon failed: {e}')
+
+# CHECK 10: Reproducibility (same seed = same result)
+print('\n=== REPRODUCIBILITY CHECK ===')
+print('  Run two experiments with same seed and compare:')
+print('  python3 -c "from experiments.run_experiments import run_single_experiment; ')
+print('    r1 = run_single_experiment(\"adult\", 0.2, 42); ')
+print('    r2 = run_single_experiment(\"adult\", 0.2, 42); ')
+print('    assert r1[\"dro\"][\"clean\"][\"accuracy\"] == r2[\"dro\"][\"clean\"][\"accuracy\"]"')
+
 **WHAT TO DO WITH RESULTS:**
 
 | Finding | Severity | Action |
@@ -387,6 +458,9 @@ PYEOF
 | Any accuracy below 0.60 | CRITICAL | Training collapse. Agent must tune hyperparams. |
 | Alpha=0 gap above 0.03 | HIGH | DRO should match Naive without corruption. |
 | DRO overhead below 1.5x | MODERATE | Inner max loop may not be running properly. |
+| NaN/Inf in any result value | CRITICAL | Training exploded. Check gradient clipping, learning rates. |
+| Wilcoxon p>0.05 on all datasets | HIGH | DRO advantage not statistically significant. |
+| Non-reproducible (same seed differs) | HIGH | Global random state leaking. Fix all RNG seeds. |
 | Non-monotone Naive DP | LOW | Expected with adversarial corruption (stochastic). |
 
 ---
@@ -543,6 +617,163 @@ print('Data leakage test: PASSED')
 PYEOF
 ```
 
+### Stress Test 7: Reproducibility (same seed = same output)
+
+```bash
+python3 << 'PYEOF'
+import sys, numpy as np, torch
+sys.path.insert(0, '.')
+from experiments.run_experiments import run_single_experiment
+
+r1 = run_single_experiment('adult', 0.2, seed=42, device='cpu', verbose=False)
+r2 = run_single_experiment('adult', 0.2, seed=42, device='cpu', verbose=False)
+
+for method in ['naive', 'dro']:
+    for metric in ['accuracy', 'dp_violation', 'if_violation']:
+        v1 = r1[method]['clean'][metric]
+        v2 = r2[method]['clean'][metric]
+        assert v1 == v2, f'Reproducibility FAIL: {method}.{metric} = {v1} vs {v2}'
+
+print('Reproducibility stress test: PASSED')
+PYEOF
+```
+
+### Stress Test 8: No NaN/Inf in training
+
+```bash
+python3 << 'PYEOF'
+import sys, numpy as np, torch
+sys.path.insert(0, '.')
+from src.models.classifier import MLPClassifier
+from src.training.dro_fair import DroFairTrainer
+
+rng = np.random.RandomState(42)
+X = rng.randn(200, 5).astype(np.float32)
+a = (rng.rand(200) > 0.5).astype(np.int64)
+y = ((X[:, 0] + 0.5 * a + 0.1 * rng.randn(200)) > 0).astype(np.float32)
+
+model = MLPClassifier(5, hidden_dims=[16, 8], dropout=0.0)
+trainer = DroFairTrainer(model, alpha=0.3, device='cpu', epochs=20, K_inner=10, tau=1.0, beta=5.0)
+hist = trainer.fit(X, y, a, verbose=False)
+
+for i, loss in enumerate(hist['train_loss']):
+    assert loss == loss, f'NaN at epoch {i}'
+    assert abs(loss) != float('inf'), f'Inf at epoch {i}'
+
+# Check model params
+for name, param in model.named_parameters():
+    assert not torch.isnan(param).any(), f'NaN in parameter {name}'
+    assert not torch.isinf(param).any(), f'Inf in parameter {name}'
+
+print('NaN/Inf stress test: PASSED')
+PYEOF
+```
+
+### Stress Test 9: Deliverables quality (not just existence)
+
+```bash
+python3 << 'PYEOF'
+import os, json
+
+deliverables = {
+    'results/all_results.json': 'JSON with 150 experiments',
+    'results/table1.csv': 'Table 1 CSV',
+    'results/table1.tex': 'Table 1 LaTeX',
+}
+
+for path, desc in deliverables.items():
+    if not os.path.exists(path):
+        print(f'  MISSING: {path} ({desc})')
+        continue
+    size = os.path.getsize(path)
+    if size < 100:
+        print(f'  EMPTY/TINY: {path} is only {size} bytes')
+        continue
+    print(f'  OK: {path} ({size:,} bytes)')
+
+# Check figures directory
+fig_dir = 'results/figures'
+if os.path.exists(fig_dir):
+    figs = [f for f in os.listdir(fig_dir) if f.endswith(('.png', '.pdf'))]
+    print(f'  Figures: {len(figs)} files in {fig_dir}')
+    for fig in figs:
+        fpath = os.path.join(fig_dir, fig)
+        fsize = os.path.getsize(fpath)
+        if fsize < 1000:
+            print(f'    SUSPECT: {fig} is only {fsize} bytes (corrupt/empty?)')
+        else:
+            print(f'    OK: {fig} ({fsize:,} bytes)')
+else:
+    print(f'  MISSING: {fig_dir}/ directory')
+
+# Validate JSON structure
+if os.path.exists('results/all_results.json'):
+    data = json.load(open('results/all_results.json'))
+    required_keys = {'dataset', 'alpha', 'seed', 'naive', 'dro'}
+    for r in data[:3]:
+        missing = required_keys - set(r.keys())
+        if missing:
+            print(f'  BAD SCHEMA: missing keys {missing}')
+            break
+    else:
+        print(f'  Schema: OK ({len(data)} entries)')
+
+# Validate LaTeX table is compilable
+if os.path.exists('results/table1.tex'):
+    tex = open('results/table1.tex').read()
+    if '\\begin{tabular}' not in tex and '\\begin{table}' not in tex:
+        print('  BAD TEX: no tabular/table environment found')
+    elif 'NaN' in tex or 'nan' in tex or 'inf' in tex:
+        print('  BAD TEX: contains NaN/inf values')
+    else:
+        print('  LaTeX: OK (valid structure)')
+
+print('Deliverables quality check: COMPLETE')
+PYEOF
+```
+
+### Stress Test 10: Ablation results validation
+
+```bash
+python3 << 'PYEOF'
+import os, json, numpy as np
+
+path = 'results/ablation_full.json'
+if not os.path.exists(path):
+    print('No ablation results found. Agent must run run_ablations.py first.')
+    exit(0)
+
+data = json.load(open(path))
+print(f'Ablation experiments: {len(data)}')
+
+# Key check: DRO_joint should beat standard_ml on DP
+for ds in ['adult', 'credit']:
+    for alpha in [0.2, 0.3]:
+        subset = [r for r in data if r['dataset'] == ds and r['alpha'] == alpha]
+        if not subset:
+            continue
+        std_dp = np.mean([r['standard_ml']['dp_violation'] for r in subset])
+        dro_dp = np.mean([r['dro_joint']['dp_violation'] for r in subset])
+        naive_dp = np.mean([r['naive']['dp_violation'] for r in subset])
+        dp_only_dp = np.mean([r['dro_dp_only']['dp_violation'] for r in subset])
+        if_only_dp = np.mean([r['dro_if_only']['dp_violation'] for r in subset])
+
+        print(f'{ds} a={alpha}:')
+        print(f'  Standard ML DP={std_dp:.4f}')
+        print(f'  Naive       DP={naive_dp:.4f}')
+        print(f'  DRO joint   DP={dro_dp:.4f}')
+        print(f'  DRO DP-only DP={dp_only_dp:.4f}')
+        print(f'  DRO IF-only DP={if_only_dp:.4f}')
+
+        if dro_dp > std_dp:
+            print(f'  WARNING: DRO joint has worse DP than unconstrained!')
+        if dp_only_dp > dro_dp * 1.5:
+            print(f'  WARNING: DP-only variant much worse than joint')
+
+print('Ablation validation: COMPLETE')
+PYEOF
+```
+
 ---
 
 ## STEP 6: VERDICT + FINDINGS + DIRECTIVES
@@ -558,6 +789,11 @@ After completing all steps, produce your output in EXACTLY this format:
 |  Results: {exist with Z experiments / empty}                  |
 |  Algorithm order: {CORRECT / WRONG}                           |
 |  tau: {CORRECT (100) / WRONG (1)}                             |
+|  Lambda init: {CORRECT (0.0) / WRONG (1.0)}                  |
+|  NaN/Inf: {NONE / FOUND}                                     |
+|  Reproducibility: {VERIFIED / FAILED / NOT TESTED}            |
+|  Statistical significance: {X}/6 pairs (Wilcoxon p<0.05)     |
+|  Convergence: {STABLE / DIVERGING}                            |
 |  Stress tests: {X}/{Y} passed                                |
 +--------------------------------------------------------------+
 |  FINDINGS (ordered by severity):                              |
@@ -602,27 +838,37 @@ After completing all steps, produce your output in EXACTLY this format:
 2. Algorithm order matches paper (theta then lambda then inner max)
 3. tau=100 default (not 1)
 4. h_tilde uses multiply (not divide)
-5. 150 results exist
-6. DRO beats Naive on DP at 6 or more of 9 comparisons (alpha 0.1-0.3 times 3 datasets)
-7. No SE=0 degeneracy
-8. All stress tests pass
-9. All deliverables exist (CSV, LaTeX, figures)
-10. Theory verification passes
+5. Lambda initialized at 0.0 (not 1.0)
+6. 150 results exist
+7. DRO beats Naive on DP at 6 or more of 9 comparisons (alpha 0.1-0.3 times 3 datasets)
+8. No SE=0 degeneracy
+9. No NaN/Inf in any result value
+10. All stress tests pass (10/10)
+11. All deliverables exist AND are valid (CSV, LaTeX compilable, figures non-empty)
+12. Theory verification passes
+13. Reproducibility verified (same seed = same output)
+14. Statistical significance on at least 3/6 dataset-alpha pairs (Wilcoxon p<0.05)
+15. Training converges (loss does not diverge)
 
 **CONDITIONAL PASS** -- Almost there, minor issues:
 
 - 1-2 stress tests fail on edge cases
 - DRO wins 5/9 DP comparisons (close)
 - Missing 1-2 deliverables
+- Wilcoxon significant on 2/6 pairs (borderline)
 
 **FAIL** -- Any of these:
 
 - Tests fail
 - Algorithm order wrong
 - tau=1 for training
+- Lambda initialized at 1.0
 - Results do not exist
+- NaN/Inf in results
 - DRO loses to Naive on DP in majority of cases
 - Degeneracy detected
+- Non-reproducible across identical seeds
+- Training loss diverges
 
 ---
 
@@ -661,7 +907,7 @@ These are the subtle issues that separate A-grade from B-grade work. Check all o
 
 6. **Gradient clipping at 1.0:** Applied to theta updates. Paper mentions gradient clipping (line 1793). This is correct but the clip value (1.0) is a hyperparameter not specified in the paper.
 
-7. **Lambda initialized at 1.0:** Code initializes lambda_dp and lambda_if at 1.0, not 0.0. Paper says "lambda_DP, lambda_IF gets lambda_0" without specifying lambda_0. Starting at 1.0 means the model immediately penalizes fairness violations heavily. Starting at 0.0 would let the model learn accuracy first, then gradually enforce fairness. Try both and compare.
+7. **Lambda initialization:** Must be 0.0 (standard in constrained optimization). Starting at 1.0 penalizes fairness violations immediately before the model learns anything useful, causing instability. Starting at 0.0 lets the model learn accuracy first, then dual ascent gradually enforces fairness. If the agent left lambda_dp or lambda_if initialized at 1.0, this is a BUG. Verify with: `grep -n 'torch.tensor(1.0' src/training/dro_fair.py src/training/naive_fair.py`
 
 8. **Full-batch vs minibatch:** Paper Algorithm 1 has "for each minibatch M" (line 5). Code uses full-batch. Full-batch is acceptable for these dataset sizes (18K-45K) but differs from the paper description. On GPU with large data, minibatch would be needed.
 
@@ -683,6 +929,11 @@ These are errors the agent (shishya) commonly makes. Catch them.
 | Says "DRO beats Naive" but only checked 1 dataset | Require all 3 datasets, all 3 non-zero alphas = 9 comparisons |
 | Fixes algorithm order but leaves wrong docstring | Read the docstring of fit() |
 | Claims accuracy is good but there is no fairness tradeoff | If DRO acc is close to Naive acc AND DRO DP is close to Naive DP, the DRO component is not doing anything |
+| Results contain NaN or Inf | `grep -c 'NaN\|Inf\|nan\|inf' results/all_results.json` must return 0 |
+| Training loss diverges but agent ignores it | Check loss history: last epoch loss should be < first epoch * 1.2 |
+| Claims statistical significance without running test | Must show Wilcoxon paired test output with p-values |
+| Forgets to install scipy for statistical tests | `pip install scipy` must be in setup instructions |
+| Lambda still initialized at 1.0 after claiming fix | `grep 'torch.tensor(1.0' src/training/*.py` must return nothing |
 
 ---
 
@@ -733,14 +984,20 @@ When the project reaches PASS, write:
 |  [Y] Algorithm 1 matches paper (theta->lambda->inner max)    |
 |  [Y] All formulas correct (DP, IF, tilted loss, radii)       |
 |  [Y] Temperature: sigma(tau*logits) with tau=100 (multiply)  |
+|  [Y] Lambda initialized at 0.0 (correct)                    |
 |  [Y] Dykstra projection onto simplex intersect L1-ball       |
 |  [Y] {X}/{X} tests pass                                      |
 |  [Y] 150 experiments complete (3x5x10)                       |
 |  [Y] DRO beats Naive on DP at {W}/9 corruption levels        |
 |  [Y] No degeneracy (all SE > 0)                              |
+|  [Y] No NaN/Inf in any result                                |
 |  [Y] PGD adversarial attacks verified                        |
 |  [Y] No data leakage                                         |
-|  [Y] All deliverables present                                |
+|  [Y] Reproducible (same seed = same output)                  |
+|  [Y] Statistically significant ({X}/6 Wilcoxon p<0.05)      |
+|  [Y] Training converges (loss stable/decreasing)             |
+|  [Y] All deliverables present AND valid                      |
+|  [Y] Ablation results validated                              |
 |                                                               |
 |  RECOMMENDATION: Ready for submission to professor.           |
 |                                                               |

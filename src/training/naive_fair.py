@@ -10,7 +10,7 @@ CRITICAL FIXES:
 2. Removed torch.no_grad() around fairness computation.
 3. Dual ascent ONCE per epoch (not per minibatch).
 4. Fixed τ: use σ(τ·logits) [multiply] not σ(logits/τ) [divide].
-5. Use τ=1 for training to maintain gradient flow (τ=100 for evaluation only).
+5. Use τ=1 for training to maintain gradient flow (τ=1 for evaluation).
 """
 
 import numpy as np
@@ -25,7 +25,7 @@ class NaiveFairTrainer:
 
     def __init__(self, model, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lambda_max=10.0, tau=100.0, k=5, gamma=0.0,
-                 epochs=50, weight_decay=1e-4):
+                 epochs=50, weight_decay=1e-4, tau_warmup_epochs=5):
         self.model = model.to(device)
         self.device = device
         self.lr_theta = lr_theta
@@ -36,6 +36,7 @@ class NaiveFairTrainer:
         self.gamma = gamma
         self.epochs = epochs
         self.weight_decay = weight_decay
+        self.tau_warmup_epochs = tau_warmup_epochs
         self.n_samples = None
 
     def _build_knn_graph(self, X):
@@ -106,8 +107,8 @@ class NaiveFairTrainer:
         )
 
         # Lagrange multipliers
-        lambda_dp = torch.tensor(1.0, device=self.device)
-        lambda_if = torch.tensor(1.0, device=self.device)
+        lambda_dp = torch.tensor(0.0, device=self.device)
+        lambda_if = torch.tensor(0.0, device=self.device)
 
         # Precompute k-NN edges
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)
@@ -117,10 +118,13 @@ class NaiveFairTrainer:
         for epoch in range(self.epochs):
             self.model.train()
 
+            # === TAU WARMUP ===
+            current_tau = self.tau if epoch >= self.tau_warmup_epochs else 1.0
+
             # Forward pass (full batch) — gradients flow for fairness constraints
             logits = self.model(X_t)
             # CRITICAL FIX: Paper uses σ(τ·f_θ(x)) [MULTIPLY]
-            h_tilde = torch.sigmoid(logits * self.tau)
+            h_tilde = torch.sigmoid(logits * current_tau)
 
             # Standard BCE on full data
             cls_loss = F.binary_cross_entropy_with_logits(logits, y_t)

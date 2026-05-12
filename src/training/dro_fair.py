@@ -9,8 +9,9 @@ constraints are meaningful. Division makes all predictions ≈0.5, killing fairn
 TRAINING FIX: Use τ=1 for training to maintain gradient flow through h̃.
 Evaluation still uses τ=100 for sharp fairness metrics.
 
-ALGORITHM FIX: Inner maximization (p-update, K steps) must run BEFORE θ update,
-so θ is optimized against the current worst-case p, not stale p from previous epoch.
+ALGORITHM FIX: Per paper Algorithm 1 (page 33), order is:
+θ update (outer min) → λ dual ascent → inner maximization on p (K steps).
+Inner max runs AFTER θ update so p adapts to the updated model.
 """
 
 import numpy as np
@@ -27,7 +28,7 @@ class DroFairTrainer:
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lr_p=5e-3, lambda_max=10.0, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=50, weight_decay=1e-4,
-                 use_dp=True, use_if=True):
+                 use_dp=True, use_if=True, tau_warmup_epochs=5):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -44,6 +45,7 @@ class DroFairTrainer:
         self.weight_decay = weight_decay
         self.use_dp = use_dp
         self.use_if = use_if
+        self.tau_warmup_epochs = tau_warmup_epochs
         self.rho_dp = None
         self.rho_if = None
         self.n_samples = None
@@ -144,11 +146,11 @@ class DroFairTrainer:
         """Train DRO-FAIR (Algorithm 1) — full-batch implementation.
         
         Paper Algorithm 1 ordering (Page 33):
-        1. Inner maximization: update p (K steps)
-        2. Forward pass with current θ
-        3. Compute losses with updated p
-        4. Update θ (outer minimization)
-        5. Dual ascent on λ
+        1. Forward pass: logits = self.model(X_t); h_tilde = sigmoid(logits * tau)
+        2. Compute losses: L_tilt, g_dp, g_if, total_loss
+        3. Theta update: opt_theta.zero_grad(); total_loss.backward(); opt_theta.step()
+        4. Dual ascent: lambda_dp += lr_lambda * g_dp (clamped); lambda_if += ...
+        5. Inner max: K steps of projected gradient ascent on p_dp and p_if
         """
         n = len(X)
         self.n_samples = n
@@ -166,8 +168,8 @@ class DroFairTrainer:
         self.p_if_center = torch.ones(n, device=self.device) / n
 
         opt_theta = torch.optim.AdamW(self.model.parameters(), lr=self.lr_theta, weight_decay=self.weight_decay)
-        lambda_dp = torch.tensor(1.0, device=self.device)
-        lambda_if = torch.tensor(1.0, device=self.device)
+        lambda_dp = torch.tensor(0.0, device=self.device)
+        lambda_if = torch.tensor(0.0, device=self.device)
 
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)
 
@@ -176,9 +178,12 @@ class DroFairTrainer:
         for epoch in range(self.epochs):
             self.model.train()
 
+            # === TAU WARMUP ===
+            current_tau = self.tau if epoch >= self.tau_warmup_epochs else 1.0
+
             # === STEP 1: FORWARD PASS ===
             logits = self.model(X_t)
-            h_tilde = torch.sigmoid(logits * self.tau)
+            h_tilde = torch.sigmoid(logits * current_tau)
 
             # === STEP 2: COMPUTE LOSSES ===
             per_sample_loss = F.binary_cross_entropy_with_logits(logits, y_t, reduction='none')

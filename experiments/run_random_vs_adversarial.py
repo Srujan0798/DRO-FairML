@@ -95,7 +95,7 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
         trainer_naive = NaiveFairTrainer(
             model_naive, device=device,
             lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
-            tau=tau_train, k=5, gamma=0.0, epochs=15, weight_decay=1e-4
+            tau=tau_train, k=5, gamma=0.0, epochs=15, weight_decay=1e-4, tau_warmup_epochs=5
         )
         trainer_naive.fit(X_tr, y_tr, a_tr, X_val=X_val, y_val=y_val, a_val=a_val, verbose=False)
         preds_naive = trainer_naive.predict(X_test)
@@ -112,7 +112,7 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
             model_dro, alpha=alpha, device=device,
             lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,
             tau=tau_train, beta=5.0, k=5, gamma=0.0,
-            K_inner=10, epochs=15, weight_decay=1e-4
+            K_inner=10, epochs=15, weight_decay=1e-4, tau_warmup_epochs=5
         )
         trainer_dro.fit(X_tr, y_tr, a_tr, X_val=X_val, y_val=y_val, a_val=a_val, verbose=False)
         preds_dro = trainer_dro.predict(X_test)
