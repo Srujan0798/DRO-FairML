@@ -23,11 +23,20 @@ from src.models.classifier import MLPClassifier
 from src.corruption.adversarial import AdversarialCorruptor, RandomCorruptor
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
+from src.training.standard_ml import StandardMLTrainer
 from src.evaluation.metrics import compute_accuracy, compute_dp_violation, compute_if_violation
 
 
 def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
+
+
+def train_warm_start(X_train, y_train, input_dim, device='cpu', epochs=10):
+    """Train a quick standard model for PGD attacks."""
+    model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
+    trainer = StandardMLTrainer(model, device=device, epochs=epochs, lr=1e-3)
+    trainer.fit(X_train, y_train, verbose=False)
+    return model
 
 
 def run_comparison(dataset_name, alpha, seed, device='cpu'):
@@ -49,14 +58,15 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
         X_train, y_train, a_train
     )
     
-    # --- Adversarial corruption ---
+    # --- Adversarial corruption with warm-start model ---
+    warm_model = train_warm_start(X_train, y_train, input_dim, device=device, epochs=10)
     adv_corruptor = AdversarialCorruptor(
         alpha=alpha, epsilon=0.1, pgd_steps=5, pgd_step_size=0.02,
         feature_attack=True, label_flip=True, attr_flip=True,
         coordinated=True, random_state=seed
     )
     X_train_adv, y_train_adv, a_train_adv, _ = adv_corruptor.corrupt(
-        X_train, y_train, a_train, device=device
+        X_train, y_train, a_train, model=warm_model, device=device
     )
     
     results = {
@@ -74,7 +84,7 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
         res = {'naive': {}, 'dro': {}}
         
         # Naive-FAIR
-        model_naive = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
+        model_naive = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
         trainer_naive = NaiveFairTrainer(
             model_naive, device=device,
             lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
@@ -89,7 +99,7 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
         }
         
         # DRO-FAIR
-        model_dro = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
+        model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
         trainer_dro = DroFairTrainer(
             model_dro, alpha=alpha, device=device,
             lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,

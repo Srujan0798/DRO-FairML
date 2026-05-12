@@ -41,7 +41,7 @@ def run_demo(dataset='adult', alpha=0.2, seed=42, epochs=20):
     print("Training Naive-FAIR...")
     model_naive = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
     trainer_naive = NaiveFairTrainer(model_naive, device=device, epochs=epochs,
-                                     tau=100.0, beta=5.0, k=5, gamma=0.0)
+                                     tau=1.0, beta=5.0, k=5, gamma=0.0)
     trainer_naive.fit(X_train_c, y_train_c, a_train_c, X_val_c, y_val_c, a_val_c, verbose=True)
     
     preds_naive = trainer_naive.predict(X_test)
@@ -59,7 +59,7 @@ def run_demo(dataset='adult', alpha=0.2, seed=42, epochs=20):
     print("Training DRO-FAIR...")
     model_dro = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
     trainer_dro = DroFairTrainer(model_dro, alpha=alpha, device=device, epochs=epochs,
-                                 tau=100.0, beta=5.0, k=5, gamma=0.0, K_inner=10)
+                                 tau=1.0, beta=5.0, k=5, gamma=0.0, K_inner=10)
     trainer_dro.fit(X_train_c, y_train_c, a_train_c, X_val_c, y_val_c, a_val_c, verbose=True)
     
     preds_dro = trainer_dro.predict(X_test)

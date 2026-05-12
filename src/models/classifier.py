@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 class MLPClassifier(nn.Module):
-    def __init__(self, input_dim, hidden_dims=[64, 32], dropout=0.1):
+    def __init__(self, input_dim, hidden_dims=[128, 64], dropout=0.1):
         super().__init__()
         layers = []
         prev_dim = input_dim

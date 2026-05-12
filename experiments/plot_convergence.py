@@ -32,13 +32,13 @@ def plot_convergence(dataset='adult', alpha=0.2, seed=42, output_dir='figures'):
     input_dim = X_train.shape[1]
     
     # Naive-FAIR
-    model_naive = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
-    trainer_naive = NaiveFairTrainer(model_naive, device='cpu', epochs=30, tau=100.0, k=5)
+    model_naive = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
+    trainer_naive = NaiveFairTrainer(model_naive, device='cpu', epochs=30, tau=1.0, k=5)
     hist_naive = trainer_naive.fit(X_tr, y_tr, a_tr, X_va, y_va, a_va, verbose=False)
     
     # DRO-FAIR
-    model_dro = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
-    trainer_dro = DroFairTrainer(model_dro, alpha=alpha, device='cpu', epochs=30, tau=100.0, k=5,
+    model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
+    trainer_dro = DroFairTrainer(model_dro, alpha=alpha, device='cpu', epochs=30, tau=1.0, k=5,
                                  K_inner=5, lr_p=5e-3)
     hist_dro = trainer_dro.fit(X_tr, y_tr, a_tr, X_va, y_va, a_va, verbose=False)
     

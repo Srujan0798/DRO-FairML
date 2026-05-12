@@ -5,6 +5,12 @@ Implements min-max Lagrangian with corruption-calibrated TV uncertainty sets.
 CRITICAL FIX: Paper uses h̃ = σ(τ·f_θ(x)) [MULTIPLY], not σ(f_θ(x)/τ) [DIVIDE].
 With τ=100, multiply makes predictions sharp (almost binary) so fairness
 constraints are meaningful. Division makes all predictions ≈0.5, killing fairness signal.
+
+TRAINING FIX: Use τ=1 for training to maintain gradient flow through h̃.
+Evaluation still uses τ=100 for sharp fairness metrics.
+
+ALGORITHM FIX: Inner maximization (p-update, K steps) must run BEFORE θ update,
+so θ is optimized against the current worst-case p, not stale p from previous epoch.
 """
 
 import numpy as np
@@ -19,7 +25,7 @@ class DroFairTrainer:
     """DRO-FAIR trainer with robust fairness guarantees."""
 
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
-                 lr_p=5e-3, lambda_max=10.0, tau=100.0, beta=5.0, k=5, gamma=0.0,
+                 lr_p=5e-3, lambda_max=10.0, tau=1.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=50, weight_decay=1e-4,
                  use_dp=True, use_if=True):
         self.model = model.to(device)
@@ -138,11 +144,11 @@ class DroFairTrainer:
         """Train DRO-FAIR (Algorithm 1) — full-batch implementation.
         
         Paper Algorithm 1 ordering (Page 33):
-        1. Forward pass with current θ
-        2. Compute losses with current p
-        3. Update θ (outer minimization)
-        4. Dual ascent on λ
-        5. Inner maximization: update p (K steps)
+        1. Inner maximization: update p (K steps)
+        2. Forward pass with current θ
+        3. Compute losses with updated p
+        4. Update θ (outer minimization)
+        5. Dual ascent on λ
         """
         n = len(X)
         self.n_samples = n
@@ -170,7 +176,36 @@ class DroFairTrainer:
         for epoch in range(self.epochs):
             self.model.train()
 
-            # Forward pass (full batch) — NO no_grad, gradients must flow
+            # === STEP 1: INNER MAXIMIZATION (before θ update) ===
+            # Compute h_tilde with current θ for p-updates
+            with torch.no_grad():
+                logits_for_p = self.model(X_t)
+                h_tilde_for_p = torch.sigmoid(logits_for_p * self.tau)
+
+            with torch.enable_grad():
+                for _ in range(self.K_inner):
+                    if self.use_dp:
+                        for j in [0, 1]:
+                            p_j = p_dp_dict[j].clone().detach().requires_grad_(True)
+                            p_temp = {0: p_dp_dict[0].detach(), 1: p_dp_dict[1].detach()}
+                            p_temp[j] = p_j
+                            dp_loss = self._compute_dp_loss_weighted(h_tilde_for_p, a_t, p_temp, group_mask_dict)
+                            dp_loss.backward()
+                            if p_j.grad is not None:
+                                with torch.no_grad():
+                                    p_dp_dict[j] = p_j + self.lr_p * p_j.grad
+                                    p_dp_dict[j] = self._project_dp_weights(p_dp_dict[j], self.p_dp_center[j], self.rho_dp[j])
+
+                    if self.use_if:
+                        p_if_grad = p_if.clone().detach().requires_grad_(True)
+                        if_loss = self._compute_if_loss_weighted(h_tilde_for_p, p_if_grad, edge_i, edge_j, edge_dists)
+                        if_loss.backward()
+                        if p_if_grad.grad is not None:
+                            with torch.no_grad():
+                                p_if = p_if_grad + self.lr_p * p_if_grad.grad
+                                p_if = self._project_if_weights(p_if, self.p_if_center, self.rho_if)
+
+            # === STEP 2-3: FORWARD + COMPUTE LOSSES with updated p ===
             logits = self.model(X_t)
             # CRITICAL FIX: Paper uses σ(τ·f_θ(x)) [MULTIPLY], not division
             h_tilde = torch.sigmoid(logits * self.tau)
@@ -188,42 +223,18 @@ class DroFairTrainer:
             # Total Lagrangian
             total_loss = L_tilt + (lambda_dp * g_dp if self.use_dp else 0.0) + (lambda_if * g_if if self.use_if else 0.0)
 
-            # Update θ (outer minimization)
+            # === STEP 4: UPDATE θ (outer minimization) ===
             opt_theta.zero_grad()
             total_loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
             opt_theta.step()
 
-            # Dual ascent
+            # === STEP 5: DUAL ASCENT ===
             with torch.no_grad():
                 if self.use_dp:
                     lambda_dp = torch.clamp(lambda_dp + self.lr_lambda * g_dp, 0, self.lambda_max)
                 if self.use_if:
                     lambda_if = torch.clamp(lambda_if + self.lr_lambda * g_if, 0, self.lambda_max)
-
-            # Inner maximization: update p weights (K steps) — AFTER θ update
-            with torch.enable_grad():
-                for _ in range(self.K_inner):
-                    if self.use_dp:
-                        for j in [0, 1]:
-                            p_j = p_dp_dict[j].clone().detach().requires_grad_(True)
-                            p_temp = {0: p_dp_dict[0].detach(), 1: p_dp_dict[1].detach()}
-                            p_temp[j] = p_j
-                            dp_loss = self._compute_dp_loss_weighted(h_tilde.detach(), a_t, p_temp, group_mask_dict)
-                            dp_loss.backward()
-                            if p_j.grad is not None:
-                                with torch.no_grad():
-                                    p_dp_dict[j] = p_j + self.lr_p * p_j.grad
-                                    p_dp_dict[j] = self._project_dp_weights(p_dp_dict[j], self.p_dp_center[j], self.rho_dp[j])
-
-                    if self.use_if:
-                        p_if_grad = p_if.clone().detach().requires_grad_(True)
-                        if_loss = self._compute_if_loss_weighted(h_tilde.detach(), p_if_grad, edge_i, edge_j, edge_dists)
-                        if_loss.backward()
-                        if p_if_grad.grad is not None:
-                            with torch.no_grad():
-                                p_if = p_if_grad + self.lr_p * p_if_grad.grad
-                                p_if = self._project_if_weights(p_if, self.p_if_center, self.rho_if)
 
             history['train_loss'].append(total_loss.item())
 

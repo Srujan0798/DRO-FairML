@@ -39,7 +39,7 @@ def get_temperature(alpha):
 
 def train_warm_start_model(X_train, y_train, a_train, input_dim, device='cpu', epochs=10):
     """Train a quick standard model on clean data for PGD attacks."""
-    model = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
+    model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     trainer = StandardMLTrainer(model, device=device, epochs=epochs, lr=1e-3)
     trainer.fit(X_train, y_train, verbose=False)
     return model
@@ -67,7 +67,10 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
         get_dataset(dataset_name, random_state=seed)
 
-    tau = get_temperature(alpha)
+    # Use tau=1 for training to maintain gradient flow through h_tilde.
+    # tau=100 is only for evaluation (sharp fairness metrics).
+    tau_train = 1.0
+    tau_eval = get_temperature(alpha)
     input_dim = X_train.shape[1]
 
     # CRITICAL FIX: Train warm-start model for true adversarial attacks
@@ -101,11 +104,11 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     # === Naive-FAIR ===
     naive_start = time.time()
 
-    model_naive = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
+    model_naive = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     trainer_naive = NaiveFairTrainer(
         model_naive, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
-        tau=tau, k=5, gamma=0.0,
+        tau=tau_train, k=5, gamma=0.0,
         epochs=30, weight_decay=1e-4
     )
 
@@ -136,11 +139,11 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     # === DRO-FAIR ===
     dro_start = time.time()
 
-    model_dro = MLPClassifier(input_dim, hidden_dims=[64, 32], dropout=0.1)
+    model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     trainer_dro = DroFairTrainer(
         model_dro, alpha=alpha, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,
-        tau=tau, beta=5.0, k=5, gamma=0.0,
+        tau=tau_train, beta=5.0, k=5, gamma=0.0,
         K_inner=10, epochs=30, weight_decay=1e-4
     )
 
