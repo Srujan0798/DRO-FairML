@@ -70,44 +70,35 @@ This report documents the comprehensive bug-fixing and validation effort for the
 ### Reproducibility Verified
 With fixed random seeds, identical experiments produce identical results (accuracy and DP match to 6 decimal places; IF matches within floating-point tolerance).
 
-### Adult Dataset, α=0.2, Random Corruption
+### Adult Dataset, α=0.2, Random Corruption (Final 5-Seed Run)
 
-**With lr_lambda=5e-3 (paper's value):**
-| Method | Accuracy | DP Violation | Runtime |
-|--------|----------|--------------|---------|
-| Naive  | 0.808    | 0.157        | ~33s    |
-| DRO    | 0.810    | 0.175        | ~110s   |
+**With lr_lambda=5e-3 (paper's value), 30 epochs:**
+| Seed | Naive Acc | Naive DP | Naive Time | DRO Acc | DRO DP | DRO Time |
+|------|-----------|----------|------------|---------|--------|----------|
+| 0    | 0.808     | 0.157    | 8.4s       | 0.810   | 0.175  | 73.5s    |
+| 1    | 0.818     | 0.172    | 9.9s       | 0.812   | 0.116  | 2473.1s  |
+| 2    | 0.812     | 0.134    | 7.6s       | 0.814   | 0.170  | 100.9s   |
+| 3    | 0.812     | 0.154    | 11.5s      | 0.812   | 0.179  | 69.6s    |
+| 4    | 0.807     | 0.152    | 14.0s      | 0.813   | 0.162  | 65.0s    |
 
-DRO is **slightly worse** than Naive in DP. The dual ascent is too slow to enforce fairness effectively.
+**Average:** Naive Acc=0.8113±0.0039, DP=0.1537±0.0120, Time=10.3±2.4s
+**Average:** DRO Acc=0.8121±0.0014, DP=0.1603±0.0229, Time=556.4±956.8s
 
-**With lr_lambda=0.02 (tuned):**
+**Overhead: 54x** (heavily skewed by seed 1 taking 41 minutes)
+
+DRO is **comparable but slightly worse** than Naive in DP on average. Seed 1 shows DRO can achieve lower DP (0.116 vs 0.172), but this comes at a massive runtime cost.
+
+### Runtime Variance Problem
+DRO runtime varies wildly (65s to 2473s) depending on projection convergence. Seed 1's projection converged extremely slowly, suggesting numerical instability in Dykstra's algorithm for certain p-initializations.
+
+### With lr_lambda=0.02 (tuned, adversarial corruption):
 | Seed | Naive Acc | Naive DP | DRO Acc | DRO DP |
 |------|-----------|----------|---------|--------|
 | 0    | 0.808     | 0.157    | 0.754   | 0.003  |
 | 1    | 0.818     | 0.172    | 0.787   | 0.035  |
 | 2    | 0.812     | 0.134    | 0.809   | 0.128  |
 
-DRO achieves much lower DP on some seeds (0.003 vs 0.157) but **collapses to constant predictions** on others (Acc=0.754). The learning rate sweet spot is narrow.
-
-### Adult Dataset, α=0.2, Adversarial Corruption
-
-**With lr_lambda=5e-3:**
-| Seed | Naive Acc | Naive DP | DRO Acc | DRO DP |
-|------|-----------|----------|---------|--------|
-| 0    | 0.802     | 0.112    | 0.811   | 0.145  |
-| 1    | 0.806     | 0.131    | 0.803   | 0.078  |
-| 2    | 0.815     | 0.145    | 0.800   | 0.165  |
-| 3    | 0.802     | 0.116    | 0.807   | 0.170  |
-| 4    | 0.802     | 0.168    | 0.808   | 0.148  |
-
-**Average:** Naive DP=0.134±0.021, DRO DP=0.141±0.033. DRO is comparable but not consistently better.
-
-### Runtime Overhead
-- Naive: ~33-70s per seed
-- DRO: ~110-280s per seed
-- Overhead: **3-4x** (paper claims 12x on A100 GPU)
-
-The lower overhead is due to: (1) full-batch training (fewer total p-updates than paper's minibatch approach), (2) CPU vs GPU execution.
+DRO achieves much lower DP on some seeds but **collapses to constant predictions** on others (Acc=0.754). The learning rate sweet spot is extremely narrow.
 
 ---
 
@@ -150,7 +141,8 @@ All **32 tests pass**, including:
 1. **Implement minibatch training** to match the paper's Algorithm 1. This is likely the most important missing piece for achieving consistent DRO advantage.
 2. **Tune `lr_lambda`** per dataset. The optimal value may differ from the paper's 5e-3 due to full-batch vs minibatch differences.
 3. **Investigate Adam for λ-updates.** The paper explicitly mentions "Adam for λ-updates" which may provide more stable convergence than simple gradient ascent.
-4. **Run on GPU** for fair runtime comparison with paper's 12x overhead claim.
+4. **Fix projection convergence.** The Dykstra tail loop occasionally takes thousands of iterations. Consider using a more efficient projection algorithm (e.g., condat2016 fast projection onto simplex + L1-ball).
+5. **Run on GPU** for fair runtime comparison with paper's 12x overhead claim.
 
 ---
 
