@@ -1,10 +1,10 @@
 """
-Fast verification: Adult α=0.2 DP and Credit α=0.4 τ=1 accuracy.
-Uses only 3 seeds to quickly verify the fix.
+Fast verification script for key cells.
+Runs 3 seeds per dataset/alpha to quickly verify CYCLE 3 fixes.
 """
 
-import os, sys, time
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os, sys, time, json
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import numpy as np
 import torch
@@ -16,83 +16,93 @@ from src.training.dro_fair import DroFairTrainer
 from src.training.standard_ml import StandardMLTrainer
 from src.evaluation.metrics import compute_accuracy, compute_dp_violation
 
-
 def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
 
-
-def train_warm_start(X_train, y_train, a_train, input_dim, device='cpu', epochs=10):
-    model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = StandardMLTrainer(model, device=device, epochs=epochs, lr=1e-3)
-    trainer.fit(X_train, y_train, verbose=False)
+def train_warm_start(X_train, y_train, input_dim, device='cpu'):
+    model = MLPClassifier(input_dim, [128, 64], 0.1)
+    StandardMLTrainer(model, device=device, epochs=10, lr=1e-3).fit(X_train, y_train, verbose=False)
     return model
 
+def run_cell(dataset, alpha, seed):
+    print(f"  {dataset} α={alpha} s={seed}", end=' ', flush=True)
+    t0 = time.time()
 
-def run_single(dataset, alpha, seed):
-    X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, _ = \
-        get_dataset(dataset, random_state=seed)
-    tau_train = get_temperature(alpha)
-    input_dim = X_train.shape[1]
+    X_tr, y_tr, a_tr, X_val, y_val, a_val, X_te, y_te, a_te, _ = get_dataset(dataset, data_dir='data/raw', random_state=seed)
+    tau = get_temperature(alpha)
+    dim = X_tr.shape[1]
 
-    warm = train_warm_start(X_train, y_train, a_train, input_dim, 'cpu', 10)
-
+    warm = train_warm_start(X_tr, y_tr, dim)
     corr = AdversarialCorruptor(alpha=alpha, coordinated=True, random_state=seed)
-    X_tr, y_tr, a_tr, _ = corr.corrupt(X_train, y_train, a_train, model=warm, device='cpu')
+    X_c, y_c, a_c, _ = corr.corrupt(X_tr, y_tr, a_tr, model=warm)
 
-    mp = MLPClassifier(input_dim, [128, 64], 0.1)
-    StandardMLTrainer(mp, device='cpu', epochs=15, lr=1e-3).fit(X_tr, y_tr, verbose=False)
+    mp = MLPClassifier(dim, [128, 64], 0.1)
+    StandardMLTrainer(mp, device='cpu', epochs=15, lr=1e-3).fit(X_c, y_c, verbose=False)
 
     # Naive
-    mn = MLPClassifier(input_dim, [128, 64], 0.1)
+    mn = MLPClassifier(dim, [128, 64], 0.1)
     mn.load_state_dict(mp.state_dict())
-    tn = NaiveFairTrainer(mn, device='cpu', tau=tau_train, epochs=15, tau_warmup_epochs=5)
-    tn.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
-    pn = tn.predict(X_test)
+    trainer_naive = NaiveFairTrainer(mn, device='cpu', tau=tau, epochs=15, tau_warmup_epochs=0)
+    trainer_naive.fit(X_c, y_c, a_c, X_val, y_val, a_val, verbose=False)
+    pn = trainer_naive.predict(X_te)
 
     # DRO
-    md = MLPClassifier(input_dim, [128, 64], 0.1)
+    md = MLPClassifier(dim, [128, 64], 0.1)
     md.load_state_dict(mp.state_dict())
-    tr = DroFairTrainer(md, alpha=alpha, device='cpu', tau=tau_train, epochs=15, tau_warmup_epochs=5)
-    tr.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
-    pd = tr.predict(X_test)
+    trainer_dro = DroFairTrainer(md, alpha=alpha, device='cpu', tau=tau, epochs=15, tau_warmup_epochs=0)
+    trainer_dro.fit(X_c, y_c, a_c, X_val, y_val, a_val, verbose=False)
+    pd = trainer_dro.predict(X_te)
 
-    return {
-        'naive_acc': compute_accuracy(y_test, pn),
-        'naive_dp': compute_dp_violation(pn, a_test),
-        'dro_acc': compute_accuracy(y_test, pd),
-        'dro_dp': compute_dp_violation(pd, a_test)
+    elapsed = time.time() - t0
+    result = {
+        'dataset': dataset, 'alpha': alpha, 'seed': seed,
+        'naive_acc': compute_accuracy(y_te, pn),
+        'naive_dp': compute_dp_violation(pn, a_te),
+        'dro_acc': compute_accuracy(y_te, pd),
+        'dro_dp': compute_dp_violation(pd, a_te),
+        'time': elapsed, 'tau': tau
     }
+    print(f"N_DP={result['naive_dp']:.4f} D_DP={result['dro_dp']:.4f} ({elapsed:.0f}s)")
+    return result
 
-
-if __name__ == '__main__':
+def main():
     cells = [
-        ('adult', 0.2, 42), ('adult', 0.2, 43), ('adult', 0.2, 44),
-        ('adult', 0.1, 42), ('adult', 0.3, 42),
-        ('credit', 0.4, 42),
+        ('adult', 0.2), ('adult', 0.1), ('adult', 0.3),
+        ('credit', 0.4), ('credit', 0.2),
+        ('lsac', 0.2), ('lsac', 0.3),
     ]
 
     results = []
-    for dataset, alpha, seed in cells:
-        print(f"Running {dataset} α={alpha} seed={seed}...", end=' ', flush=True)
-        start = time.time()
-        r = run_single(dataset, alpha, seed)
-        r['dataset'] = dataset
-        r['alpha'] = alpha
-        r['seed'] = seed
-        results.append(r)
-        print(f"Done in {time.time()-start:.0f}s: N_DP={r['naive_dp']:.4f}, D_DP={r['dro_dp']:.4f}")
+    for dataset, alpha in cells:
+        print(f"\n{dataset.upper()} α={alpha}:")
+        for seed in [42, 43, 44]:
+            r = run_cell(dataset, alpha, seed)
+            results.append(r)
 
-    print("\n=== SUMMARY ===")
-    adult_02 = [r for r in results if r['dataset'] == 'adult' and r['alpha'] == 0.2]
-    adult_02_wins = sum(1 for r in adult_02 if r['dro_dp'] < r['naive_dp'])
-    print(f"Adult α=0.2 DP wins: {adult_02_wins}/3")
+    # Summary
+    print("\n" + "="*60)
+    print("SUMMARY")
+    print("="*60)
 
-    credit_04 = [r for r in results if r['dataset'] == 'credit' and r['alpha'] == 0.4][0]
-    print(f"Credit α=0.4 DRO acc: {credit_04['dro_acc']:.4f} (need ≥0.60)")
+    for dataset in ['adult', 'credit', 'lsac']:
+        print(f"\n{dataset.upper()}:")
+        for alpha in [0.0, 0.1, 0.2, 0.3, 0.4]:
+            subset = [r for r in results if r['dataset'] == dataset and r['alpha'] == alpha]
+            if not subset:
+                continue
+            n_dps = [r['naive_dp'] for r in subset]
+            d_dps = [r['dro_dp'] for r in subset]
+            n_accs = [r['naive_acc'] for r in subset]
+            d_accs = [r['dro_acc'] for r in subset]
+            wins = sum(1 for d in d_dps if d < [n for n, d in zip(n_dps, d_dps)][0])
+            print(f"  α={alpha}: N_DP={np.mean(n_dps):.4f}, D_DP={np.mean(d_dps):.4f}, "
+                  f"N_Acc={np.mean(n_accs):.4f}, D_Acc={np.mean(d_accs):.4f}, "
+                  f"DP_win={sum(1 for nd,dd in zip(n_dps,d_dps) if dd<nd)}/{len(subset)}")
 
-    all_wins = sum(1 for r in results if r['dro_dp'] < r['naive_dp'])
-    print(f"Total DP wins: {all_wins}/{len(results)}")
+    # Save results
+    with open('results/fast_verify.json', 'w') as f:
+        json.dump(results, f, indent=2)
+    print("\nSaved to results/fast_verify.json")
 
-    for r in results:
-        win = r['dro_dp'] < r['naive_dp']
-        print(f"  {r['dataset']} α={r['alpha']} s={r['seed']}: N={r['naive_dp']:.4f}, D={r['dro_dp']:.4f}, win={win}")
+if __name__ == '__main__':
+    main()

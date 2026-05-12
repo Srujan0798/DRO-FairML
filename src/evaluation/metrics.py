@@ -73,7 +73,7 @@ def compute_if_violation(X, y_pred, a=None, k=5, gamma=0.0, metric='euclidean'):
     k_eff = min(k, n - 1)
     
     # Fit k-NN
-    nbrs = NearestNeighbors(n_neighbors=k_eff + 1, metric=metric).fit(X)
+    nbrs = NearestNeighbors(n_neighbors=k_eff + 1, metric=metric, n_jobs=1).fit(X)
     distances, indices = nbrs.kneighbors(X)
     
     # Skip self (first neighbor)

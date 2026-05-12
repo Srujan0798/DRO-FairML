@@ -43,7 +43,7 @@ class NaiveFairTrainer:
         """Precompute k-NN graph and neighbor pair tensors for fast IF."""
         n = len(X)
         k_eff = min(self.k, n - 1)
-        nbrs = NearestNeighbors(n_neighbors=k_eff + 1).fit(X)
+        nbrs = NearestNeighbors(n_neighbors=k_eff + 1, n_jobs=1).fit(X)
         distances, indices = nbrs.kneighbors(X)
 
         edges_i = []

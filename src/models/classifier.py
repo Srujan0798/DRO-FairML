@@ -18,6 +18,8 @@ class MLPClassifier(nn.Module):
         self.network = nn.Sequential(*layers)
         
     def forward(self, x):
+        if not isinstance(x, torch.Tensor):
+            x = torch.tensor(x, dtype=torch.float32)
         return self.network(x).squeeze(-1)
     
     def predict_proba(self, x, temperature=1.0):
@@ -27,5 +29,7 @@ class MLPClassifier(nn.Module):
     
     def predict(self, x):
         """Return hard binary predictions (threshold at 0.5)."""
+        if not isinstance(x, torch.Tensor):
+            x = torch.tensor(x, dtype=torch.float32)
         probs = torch.sigmoid(self.forward(x))
-        return (probs >= 0.5).float()
+        return (probs >= 0.5).cpu().numpy()

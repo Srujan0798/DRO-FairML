@@ -28,7 +28,7 @@ from src.corruption.adversarial import AdversarialCorruptor, RandomCorruptor
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.training.standard_ml import StandardMLTrainer
-from src.evaluation.metrics import compute_accuracy, compute_dp_violation, compute_if_violation
+from src.evaluation.metrics import compute_accuracy, compute_dp_violation, compute_if_violation, compute_metrics_torch
 
 
 def get_temperature(alpha):
@@ -50,6 +50,12 @@ def corrupt_test_data_adversarial(X_test, y_test, a_test, alpha, seed, model=Non
 
 def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False):
     """Run a single experiment (one dataset, one alpha, one seed)."""
+
+    # Set all random seeds for reproducibility
+    import random
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
 
     start_time = time.time()
 
@@ -95,7 +101,7 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     naive_start = time.time()
 
     model_naive = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    model_naive.load_state_dict(model_pretrained.state_dict())
+    # Train from random initialization (no warm-start) as per paper
     trainer_naive = NaiveFairTrainer(
         model_naive, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
@@ -111,27 +117,23 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     naive_time = time.time() - naive_start
 
     # Evaluate on CLEAN test data
-    preds_naive_clean = trainer_naive.predict(X_test)
     results['naive']['time'] = naive_time
-    results['naive']['clean'] = {
-        'accuracy': float(compute_accuracy(y_test, preds_naive_clean)),
-        'dp_violation': float(compute_dp_violation(preds_naive_clean, a_test)),
-        'if_violation': float(compute_if_violation(X_test, preds_naive_clean, a_test, k=5, gamma=0.0))
-    }
+    results['naive']['clean'] = compute_metrics_torch(
+        trainer_naive.model, X_test, y_test, a_test,
+        device=device, temperature=tau_eval, k=5, gamma=0.0
+    )
 
     # Evaluate on CORRUPTED test data (accuracy against CLEAN labels)
-    preds_naive_corrupt = trainer_naive.predict(X_test_c)
-    results['naive']['corrupted'] = {
-        'accuracy': float(compute_accuracy(y_test, preds_naive_corrupt)),
-        'dp_violation': float(compute_dp_violation(preds_naive_corrupt, a_test_c)),
-        'if_violation': float(compute_if_violation(X_test_c, preds_naive_corrupt, a_test_c, k=5, gamma=0.0))
-    }
+    results['naive']['corrupted'] = compute_metrics_torch(
+        trainer_naive.model, X_test_c, y_test, a_test_c,
+        device=device, temperature=tau_eval, k=5, gamma=0.0
+    )
 
     # === DRO-FAIR ===
     dro_start = time.time()
 
     model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    model_dro.load_state_dict(model_pretrained.state_dict())
+    # Train from random initialization (no warm-start) as per paper
     trainer_dro = DroFairTrainer(
         model_dro, alpha=alpha, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,
@@ -147,149 +149,28 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     dro_time = time.time() - dro_start
 
     # Evaluate on CLEAN test data
-    preds_dro_clean = trainer_dro.predict(X_test)
     results['dro']['time'] = dro_time
-    results['dro']['clean'] = {
-        'accuracy': float(compute_accuracy(y_test, preds_dro_clean)),
-        'dp_violation': float(compute_dp_violation(preds_dro_clean, a_test)),
-        'if_violation': float(compute_if_violation(X_test, preds_dro_clean, a_test, k=5, gamma=0.0))
-    }
+    results['dro']['clean'] = compute_metrics_torch(
+        trainer_dro.model, X_test, y_test, a_test,
+        device=device, temperature=tau_eval, k=5, gamma=0.0
+    )
 
     # Evaluate on CORRUPTED test data (accuracy against CLEAN labels)
-    preds_dro_corrupt = trainer_dro.predict(X_test_c)
-    results['dro']['corrupted'] = {
-        'accuracy': float(compute_accuracy(y_test, preds_dro_corrupt)),
-        'dp_violation': float(compute_dp_violation(preds_dro_corrupt, a_test_c)),
-        'if_violation': float(compute_if_violation(X_test_c, preds_dro_corrupt, a_test_c, k=5, gamma=0.0))
-    }
+    results['dro']['corrupted'] = compute_metrics_torch(
+        trainer_dro.model, X_test_c, y_test, a_test_c,
+        device=device, temperature=tau_eval, k=5, gamma=0.0
+    )
 
     results['total_time'] = time.time() - start_time
+    
+    # Cast metrics from torch/numpy objects to standard python floats for JSON serialization
+    for method in ['naive', 'dro']:
+        for eval_type in ['clean', 'corrupted']:
+            results[method][eval_type] = {
+                k: float(v) for k, v in results[method][eval_type].items()
+            }
 
     return results
-
-
-def run_all_experiments(datasets=['adult', 'credit', 'lsac'],
-                        alphas=[0.0, 0.1, 0.2, 0.3, 0.4],
-                        n_seeds=10,
-                        device='cpu',
-                        output_dir='results'):
-    """Run full experiment suite with checkpointing."""
-    os.makedirs(output_dir, exist_ok=True)
-
-    checkpoint_path = os.path.join(output_dir, 'checkpoint.pkl')
-    runtime_path = os.path.join(output_dir, 'runtimes.json')
-
-    # Load checkpoint if exists
-    if os.path.exists(checkpoint_path):
-        with open(checkpoint_path, 'rb') as f:
-            checkpoint = pickle.load(f)
-        all_results = checkpoint['results']
-        completed_keys = set(checkpoint['completed_keys'])
-        print(f"Resumed from checkpoint: {len(completed_keys)} experiments already completed.")
-    else:
-        all_results = []
-        completed_keys = set()
-
-    total_experiments = len(datasets) * len(alphas) * n_seeds
-
-    # Aggregate runtime by method
-    naive_times = []
-    dro_times = []
-
-    for dataset in datasets:
-        print(f"\n{'='*60}")
-        print(f"Dataset: {dataset.upper()}")
-        print(f"{'='*60}")
-
-        for alpha in alphas:
-            print(f"\n  Alpha = {alpha}")
-
-            seed_results = []
-            for seed in tqdm(range(n_seeds), desc=f"  {dataset} α={alpha}"):
-                key = f"{dataset}_{alpha}_{seed}"
-
-                if key in completed_keys:
-                    existing = [r for r in all_results if r['dataset'] == dataset
-                               and r['alpha'] == alpha and r['seed'] == seed]
-                    if existing:
-                        seed_results.append(existing[0])
-                    continue
-
-                try:
-                    result = run_single_experiment(dataset, alpha, seed, device=device, verbose=False)
-                    seed_results.append(result)
-                    all_results.append(result)
-                    completed_keys.add(key)
-
-                    # Track runtimes
-                    naive_times.append(result['naive']['time'])
-                    dro_times.append(result['dro']['time'])
-
-                    # Save checkpoint periodically
-                    if len(completed_keys) % 5 == 0:
-                        with open(checkpoint_path, 'wb') as f:
-                            pickle.dump({'results': all_results, 'completed_keys': list(completed_keys)}, f)
-
-                except Exception as e:
-                    print(f"    Seed {seed} failed: {e}")
-                    import traceback
-                    traceback.print_exc()
-
-            # Aggregate results for this (dataset, alpha)
-            if seed_results:
-                for method in ['naive', 'dro']:
-                    for eval_type in ['clean', 'corrupted']:
-                        accs = [r[method][eval_type]['accuracy'] for r in seed_results]
-                        dps = [r[method][eval_type]['dp_violation'] for r in seed_results]
-                        ifs = [r[method][eval_type]['if_violation'] for r in seed_results]
-
-                        print(f"    {method.upper()} ({eval_type}): Acc={np.mean(accs):.4f}±{np.std(accs)/np.sqrt(len(accs)):.4f}, "
-                              f"DP={np.mean(dps):.4f}±{np.std(dps)/np.sqrt(len(dps)):.4f}, "
-                              f"IF={np.mean(ifs):.4f}±{np.std(ifs)/np.sqrt(len(ifs)):.4f}")
-
-    # Save runtimes
-    runtime_data = {
-        'naive_mean': float(np.mean(naive_times)) if naive_times else 0,
-        'naive_std': float(np.std(naive_times)) if naive_times else 0,
-        'dro_mean': float(np.mean(dro_times)) if dro_times else 0,
-        'dro_std': float(np.std(dro_times)) if dro_times else 0,
-        'overhead': float(np.mean(dro_times) / np.mean(naive_times)) if np.mean(naive_times) > 0 else 0,
-        'n_experiments': len(naive_times)
-    }
-    with open(runtime_path, 'w') as f:
-        json.dump(runtime_data, f, indent=2)
-
-    # Save final results
-    with open(os.path.join(output_dir, 'all_results.json'), 'w') as f:
-        json.dump(all_results, f, indent=2)
-
-    with open(os.path.join(output_dir, 'all_results.pkl'), 'wb') as f:
-        pickle.dump(all_results, f)
-
-    # Remove checkpoint
-    if os.path.exists(checkpoint_path):
-        os.remove(checkpoint_path)
-
-    print(f"\n{'='*60}")
-    print(f"All results saved to {output_dir}")
-    print(f"Total experiments: {len(all_results)} / {total_experiments}")
-    print(f"Runtime overhead: {runtime_data['overhead']:.2f}x (DRO vs Naive)")
-    print(f"{'='*60}")
-
-    return all_results
-
-
-if __name__ == '__main__':
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f"Using device: {device}")
-
-    results = run_all_experiments(
-        datasets=['adult', 'credit', 'lsac'],
-        alphas=[0.0, 0.1, 0.2, 0.3, 0.4],
-        n_seeds=10,
-        device=device,
-        output_dir='results'
-    )
 
 
 def run_all_experiments(datasets=['adult', 'credit', 'lsac'],
