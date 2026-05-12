@@ -134,10 +134,10 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
         'if_violation': float(compute_if_violation(X_test, preds_naive_clean, a_test, k=5, gamma=0.0))
     }
 
-    # Evaluate on CORRUPTED test data
+    # Evaluate on CORRUPTED test data (accuracy against CLEAN labels)
     preds_naive_corrupt = trainer_naive.predict(X_test_c)
     results['naive']['corrupted'] = {
-        'accuracy': float(compute_accuracy(y_test_c, preds_naive_corrupt)),
+        'accuracy': float(compute_accuracy(y_test, preds_naive_corrupt)),
         'dp_violation': float(compute_dp_violation(preds_naive_corrupt, a_test_c)),
         'if_violation': float(compute_if_violation(X_test_c, preds_naive_corrupt, a_test_c, k=5, gamma=0.0))
     }
@@ -170,10 +170,10 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
         'if_violation': float(compute_if_violation(X_test, preds_dro_clean, a_test, k=5, gamma=0.0))
     }
 
-    # Evaluate on CORRUPTED test data
+    # Evaluate on CORRUPTED test data (accuracy against CLEAN labels)
     preds_dro_corrupt = trainer_dro.predict(X_test_c)
     results['dro']['corrupted'] = {
-        'accuracy': float(compute_accuracy(y_test_c, preds_dro_corrupt)),
+        'accuracy': float(compute_accuracy(y_test, preds_dro_corrupt)),
         'dp_violation': float(compute_dp_violation(preds_dro_corrupt, a_test_c)),
         'if_violation': float(compute_if_violation(X_test_c, preds_dro_corrupt, a_test_c, k=5, gamma=0.0))
     }
