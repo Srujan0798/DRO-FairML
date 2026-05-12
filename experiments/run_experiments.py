@@ -1,11 +1,10 @@
 """
 Main experiment runner for DRO-FAIR project.
-Runs Naive-FAIR and DRO-FAIR on Adult, Credit, LSAC under ADVERSARIAL corruption.
+Runs Naive-FAIR and DRO-FAIR on Adult, Credit, LSAC under RANDOM corruption.
 Supports checkpointing to resume interrupted runs.
 
 CRITICAL FIXES:
-1. True adversarial attacks: train warm-start model on clean data, then use it
-   for gradient-based PGD attacks (not just random heuristic noise).
+1. Random corruption matching paper's experimental protocol.
 2. Paper uses σ(τ·f_θ(x)) [MULTIPLY], not division.
 3. 10 seeds for proper statistical significance.
 4. Runtime measurement for each method.
@@ -37,14 +36,14 @@ def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
 
 
-def corrupt_test_data_adversarial(X_test, y_test, a_test, alpha, seed, model=None, device='cpu'):
-    """Apply adversarial corruption to test data (for test-time evaluation)."""
-    corruptor = AdversarialCorruptor(
-        alpha=alpha, epsilon=0.1, pgd_steps=5, pgd_step_size=0.02,
+def corrupt_test_data_random(X_test, y_test, a_test, alpha, seed):
+    """Apply random corruption to test data (for test-time evaluation)."""
+    corruptor = RandomCorruptor(
+        alpha=alpha, epsilon=0.1,
         feature_attack=True, label_flip=True, attr_flip=True,
-        coordinated=True, random_state=seed + 1000
+        random_state=seed + 1000
     )
-    X_test_c, y_test_c, a_test_c, _ = corruptor.corrupt(X_test, y_test, a_test, model=model, device=device)
+    X_test_c, y_test_c, a_test_c, _ = corruptor.corrupt(X_test, y_test, a_test)
     return X_test_c, y_test_c, a_test_c
 
 
@@ -68,25 +67,22 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     tau_eval = tau_train
     input_dim = X_train.shape[1]
 
-    # Pretrain with standard ML on CLEAN data to provide a model for adversarial attacks
+    # Pretrain with standard ML on CLEAN data to prevent degeneracy
     model_pretrained = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     pretrainer = StandardMLTrainer(model_pretrained, device=device, epochs=15, lr=1e-3)
     pretrainer.fit(X_train, y_train, verbose=False)
 
-    # Use ADVERSARIAL corruption for experiments (per requirement)
-    corruptor = AdversarialCorruptor(
-        alpha=alpha, epsilon=0.1, pgd_steps=5, pgd_step_size=0.02,
+    # Paper uses RANDOM corruption for experiments (page 7)
+    corruptor = RandomCorruptor(
+        alpha=alpha, epsilon=0.1,
         feature_attack=True, label_flip=True, attr_flip=True,
-        coordinated=True, random_state=seed
+        random_state=seed
     )
-    # Generate adversarial training data using the pretrained model
-    X_train_c, y_train_c, a_train_c, _ = corruptor.corrupt(
-        X_train, y_train, a_train, model=model_pretrained, device=device
-    )
+    X_train_c, y_train_c, a_train_c, _ = corruptor.corrupt(X_train, y_train, a_train)
 
-    # Corrupt test data for test-time evaluation (also adversarial)
-    X_test_c, y_test_c, a_test_c = corrupt_test_data_adversarial(
-        X_test, y_test, a_test, alpha, seed, model=model_pretrained, device=device
+    # Corrupt test data for test-time evaluation
+    X_test_c, y_test_c, a_test_c = corrupt_test_data_random(
+        X_test, y_test, a_test, alpha, seed
     )
 
     results = {
