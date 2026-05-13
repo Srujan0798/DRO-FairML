@@ -7,7 +7,7 @@ training:
   lr_theta: 0.001
   lr_lambda: 0.005
   lr_p: 0.005
-  lambda_max: 10.0
+  lambda_max: 2.0
   tau: 100.0
   beta: 5.0
   k: 5

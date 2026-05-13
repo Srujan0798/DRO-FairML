@@ -51,12 +51,19 @@ class DroFairTrainer:
         self.n_samples = None
 
     def _compute_radii(self, a):
-        """Compute corruption-calibrated TV radii."""
+        """Compute corruption-calibrated TV radii with bias-corrected group proportions."""
         n = len(a)
-        pi = np.array([np.mean(a == j) for j in [0, 1]])
+        pi_obs = np.array([np.mean(a == j) for j in [0, 1]])
+        pi_clean = np.zeros(2)
+        for j in [0, 1]:
+            if self.alpha != 0.5:
+                pi_clean[j] = (pi_obs[j] - self.alpha) / (1 - 2 * self.alpha)
+            else:
+                pi_clean[j] = pi_obs[j]
+            pi_clean[j] = np.clip(pi_clean[j], 0.0, 1.0)
         rho_dp = []
         for j in [0, 1]:
-            denom = (1 - self.alpha) * pi[j] + self.alpha
+            denom = (1 - self.alpha) * pi_clean[j] + self.alpha
             rho_dp.append(self.alpha / denom if denom > 0 else 1.0)
         rho_if = 2 * self.alpha - self.alpha ** 2
         return rho_dp, rho_if

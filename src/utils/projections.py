@@ -93,7 +93,7 @@ def project_simplex_l1_ball(v, center, radius, max_iter=100, tol=1e-5):
             break
 
     # Tail loop: alternate simplex ↔ L1 ball until both constraints hold
-    for _ in range(50):
+    for _ in range(500):
         x = project_simplex(x)
         l1_excess = np.abs(x - center).sum() - radius
         if l1_excess <= 1e-9:

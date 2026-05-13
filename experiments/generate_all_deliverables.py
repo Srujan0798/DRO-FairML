@@ -59,9 +59,7 @@ def main():
 
     if len(results) < 150:
         print(f"   WARNING: Expected 150, got {len(results)}. Some experiments may be missing.")
-        response = input("   Continue anyway? (y/n): ")
-        if response.lower() != 'y':
-            return 1
+        print("   Continuing with available results...")
 
     # 1. Generate tables and plots
     success = True
