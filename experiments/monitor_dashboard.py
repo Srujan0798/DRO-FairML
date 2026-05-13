@@ -57,7 +57,8 @@ def main():
 
     print(f"\n{'='*70}")
     print(f"  TOTAL: {total_done}/150 seeds ({100*total_done/150:.1f}%)")
-    print(f"  DRO wins: {total_wins}/{total_seeds} ({100*total_wins/total_seeds:.0f}% of evaluated)")
+    pct = 100*total_wins/total_seeds if total_seeds > 0 else 0
+    print(f"  DRO wins: {total_wins}/{total_seeds} ({pct:.0f}% of evaluated)")
     print(f"{'='*70}")
 
 if __name__ == '__main__':
