@@ -1,16 +1,18 @@
-.PHONY: help install test demo experiments results clean
+.PHONY: help install test monitor experiments results deliverables review clean
 
 help:
-	@echo "DRO-FAIR Project Makefile"
+	@echo "DRO-FAIR Project"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  install      - Install Python dependencies"
-	@echo "  test         - Run unit tests"
-	@echo "  demo         - Run quick demo (single dataset, single seed)"
-	@echo "  experiments  - Run full experiment suite"
-	@echo "  results      - Generate tables and plots from existing results"
-	@echo "  full         - Run experiments then generate results"
-	@echo "  clean        - Remove generated files and caches"
+	@echo "  install       - Install Python dependencies"
+	@echo "  test          - Run unit tests"
+	@echo "  monitor       - Check experiment progress"
+	@echo "  experiments   - Run full experiment suite (150 exps)"
+	@echo "  results       - Generate tables and plots from existing results"
+	@echo "  deliverables  - Generate ALL deliverables (tables + plots + ablations + theory)"
+	@echo "  review        - Run professor review simulator (self-grade)"
+	@echo "  full          - Run experiments then generate results"
+	@echo "  clean         - Remove Python cache files"
 
 install:
 	python3 -m pip install -r requirements.txt
@@ -18,14 +20,20 @@ install:
 test:
 	python3 -m pytest tests/ -v
 
-demo:
-	python3 main.py --run-experiments --datasets adult --alphas 0.2 --n-seeds 1
+monitor:
+	python3 experiments/monitor_progress.py
 
 experiments:
-	python3 main.py --run-experiments
+	python3 experiments/run_experiments.py --n_seeds 10
 
 results:
 	python3 main.py --generate-results
+
+deliverables:
+	python3 experiments/generate_all_deliverables.py
+
+review:
+	python3 experiments/professor_review_simulator.py
 
 full:
 	python3 main.py --full-pipeline
@@ -35,4 +43,4 @@ clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type f -name "*.pth" -delete
 	find . -type f -name "*.pt" -delete
-	rm -rf results/ figures/ data/raw/ .pytest_cache/
+	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
