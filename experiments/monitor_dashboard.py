@@ -38,7 +38,31 @@ def main():
     total_wins = 0
     total_seeds = 0
 
-    for ds in DATASETS:
+    # Adult (parallel-by-alpha)
+    print(f"\n[ADULT] (parallel by alpha)")
+    adult_done = 0
+    adult_wins = 0
+    adult_total = 0
+    for alpha in ALPHAS:
+        cp = load_checkpoint(f'results/adult_a{alpha}/checkpoint.pkl')
+        if cp:
+            n = len(cp['completed_keys'])
+            wins = sum(1 for r in cp['results'] if r['dro']['clean']['dp_violation'] < r['naive']['clean']['dp_violation'])
+            adult_done += n
+            adult_wins += wins
+            adult_total += len(cp['results'])
+            print(f"  α={alpha}: {n:2d}/10 seeds, DRO wins {wins}/{n}")
+    if adult_total == 0:
+        print("  No checkpoints yet")
+    pct = adult_done / 50 * 100
+    bar = "█" * int(pct / 5) + "░" * (20 - int(pct / 5))
+    print(f"  Total: [{bar}] {adult_done}/50 ({pct:.1f}%), wins={adult_wins}/{adult_total}")
+    total_done += adult_done
+    total_wins += adult_wins
+    total_seeds += adult_total
+
+    # Credit and LSAC (single-process)
+    for ds in ['credit', 'lsac']:
         print(f"\n[{ds.upper()}]")
         cp = load_checkpoint(f'results/full_{ds}/checkpoint.pkl')
         if cp:
@@ -50,7 +74,7 @@ def main():
             pct = n / 50 * 100
             bar = "█" * int(pct / 5) + "░" * (20 - int(pct / 5))
             print(f"  Progress: [{bar}] {n}/50 ({pct:.1f}%)")
-            print(f"  DRO wins: {wins}/{n} ({100*wins/n:.0f}%)")
+            print(f"  DRO wins: {wins}/{n}")
             print(format_results(cp))
         else:
             print("  No checkpoint yet")
