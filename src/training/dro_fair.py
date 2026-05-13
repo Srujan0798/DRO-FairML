@@ -6,8 +6,8 @@ CRITICAL FIX: Paper uses h̃ = σ(τ·f_θ(x)) [MULTIPLY], not σ(f_θ(x)/τ) [D
 With τ=100, multiply makes predictions sharp (almost binary) so fairness
 constraints are meaningful. Division makes all predictions ≈0.5, killing fairness signal.
 
-TRAINING FIX: Use τ=1 for training to maintain gradient flow through h̃.
-Evaluation still uses τ=100 for sharp fairness metrics.
+TEMPERATURE: τ defaults to 100. Experiment runners use get_temperature(alpha)
+for the paper schedule: τ=100 for α≤0.3 and τ=1 for α=0.4.
 
 ALGORITHM FIX: Per paper Algorithm 1 (page 33), order is:
 θ update (outer min) → λ dual ascent → inner maximization on p (K steps).
@@ -181,35 +181,36 @@ class DroFairTrainer:
             # === TAU WARMUP ===
             current_tau = self.tau if epoch >= self.tau_warmup_epochs else 1.0
 
-            # === STEP 1: FORWARD PASS ===
+            # === STEP 1: FORWARD PASS (with current θ) ===
             logits = self.model(X_t)
             h_tilde = torch.sigmoid(logits * current_tau)
 
-            # === STEP 2: COMPUTE LOSSES ===
+            # === STEP 2: COMPUTE BASE LOSSES (with current p) ===
             per_sample_loss = F.binary_cross_entropy_with_logits(logits, y_t, reduction='none')
             L_tilt = self._compute_tilted_loss(per_sample_loss)
 
             g_dp = self._compute_dp_loss_weighted(h_tilde, a_t, p_dp_dict, group_mask_dict) if self.use_dp else torch.tensor(0.0, device=self.device)
             g_if = self._compute_if_loss_weighted(h_tilde, p_if, edge_i, edge_j, edge_dists) if self.use_if else torch.tensor(0.0, device=self.device)
 
+            # === STEP 3a: UPDATE θ (outer minimization) ===
+            # Per paper Algorithm 1: θ update happens BEFORE inner max on p
             total_loss = L_tilt + (lambda_dp * g_dp if self.use_dp else 0.0) + (lambda_if * g_if if self.use_if else 0.0)
-
-            # === STEP 3: UPDATE θ (outer minimization) ===
             opt_theta.zero_grad()
             total_loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
             opt_theta.step()
 
-            # === STEP 4: DUAL ASCENT on λ ===
+            # === STEP 3b: DUAL ASCENT on λ ===
             with torch.no_grad():
                 if self.use_dp:
                     lambda_dp = torch.clamp(lambda_dp + self.lr_lambda * g_dp, 0, self.lambda_max)
                 if self.use_if:
                     lambda_if = torch.clamp(lambda_if + self.lr_lambda * g_if, 0, self.lambda_max)
 
-            # === STEP 5: INNER MAXIMIZATION on p (K steps) ===
+            # === STEP 4: INNER MAXIMIZATION (update p AFTER θ and λ) ===
+            # Per paper Algorithm 1: p update happens AFTER θ and λ updates
             with torch.no_grad():
-                h_tilde_for_p = h_tilde.detach()
+                h_tilde_detach = h_tilde.detach()
 
             for _ in range(self.K_inner):
                 if self.use_dp:
@@ -217,7 +218,7 @@ class DroFairTrainer:
                         p_j = p_dp_dict[j].clone().detach().requires_grad_(True)
                         p_temp = {0: p_dp_dict[0].detach(), 1: p_dp_dict[1].detach()}
                         p_temp[j] = p_j
-                        dp_loss = self._compute_dp_loss_weighted(h_tilde_for_p, a_t, p_temp, group_mask_dict)
+                        dp_loss = self._compute_dp_loss_weighted(h_tilde_detach, a_t, p_temp, group_mask_dict)
                         dp_loss.backward()
                         if p_j.grad is not None:
                             with torch.no_grad():
@@ -226,7 +227,7 @@ class DroFairTrainer:
 
                 if self.use_if:
                     p_if_grad = p_if.clone().detach().requires_grad_(True)
-                    if_loss = self._compute_if_loss_weighted(h_tilde_for_p, p_if_grad, edge_i, edge_j, edge_dists)
+                    if_loss = self._compute_if_loss_weighted(h_tilde_detach, p_if_grad, edge_i, edge_j, edge_dists)
                     if_loss.backward()
                     if p_if_grad.grad is not None:
                         with torch.no_grad():

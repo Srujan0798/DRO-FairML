@@ -13,22 +13,22 @@ help:
 	@echo "  clean        - Remove generated files and caches"
 
 install:
-	pip install -r requirements.txt
+	python3 -m pip install -r requirements.txt
 
 test:
-	python -m pytest tests/ -v || python test_quick.py
+	python3 -m pytest tests/ -v
 
 demo:
-	python scripts/demo.py --dataset adult --alpha 0.2 --epochs 20
+	python3 main.py --run-experiments --datasets adult --alphas 0.2 --n-seeds 1
 
 experiments:
-	python main.py --run-experiments
+	python3 main.py --run-experiments
 
 results:
-	python main.py --generate-results
+	python3 main.py --generate-results
 
 full:
-	python main.py --full-pipeline
+	python3 main.py --full-pipeline
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

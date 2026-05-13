@@ -1,54 +1,28 @@
-# DRO-FAIR Default Configuration
-
-# Dataset settings
-datasets:
-  - adult
-  - credit
-  - lsac
-
-data_dir: data/raw
-
-# Corruption settings
-alphas: [0.0, 0.1, 0.2, 0.3, 0.4]
-corruption:
-  epsilon: 0.1
-  pgd_steps: 5
-  pgd_step_size: 0.02
-  coordinated: true
-  feature_attack: true
-  label_flip: true
-  attr_flip: true
-
-# Model architecture
 model:
-  hidden_dims: [128, 64]
+  hidden_dims:
+  - 128
+  - 64
   dropout: 0.1
-
-# Training hyperparameters
 training:
-  epochs: 30
-  batch_size: 256
-  lr_theta: 1e-3
-  lr_lambda: 5e-3
-  lr_p: 5e-3
-  lambda_max: 10.0
-  weight_decay: 1e-4
-  gradient_clip: 1.0
-
-# DRO-FAIR specific
-dro:
-  K_inner: 10
-  beta: 5.0
+  lr_theta: 0.001
+  lr_lambda: 0.005
+  lr_p: 0.005
+  lambda_max: 2.0
   tau: 100.0
+  beta: 5.0
   k: 5
   gamma: 0.0
-
-# Evaluation
-evaluation:
-  n_seeds: 10
-  test_size: 0.2
-  val_size: 0.15
-
-# Output
-output_dir: results
-figures_dir: figures
+  K_inner: 10
+  epochs: 60
+  weight_decay: 0.0001
+  tau_warmup_epochs: 5
+corruption:
+  alpha:
+  - 0.0
+  - 0.1
+  - 0.2
+  - 0.3
+  - 0.4
+  epsilon: 0.1
+  mode: adversarial
+  coordinated: true

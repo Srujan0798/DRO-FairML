@@ -10,7 +10,7 @@ CRITICAL FIXES:
 2. Removed torch.no_grad() around fairness computation.
 3. Dual ascent ONCE per epoch (not per minibatch).
 4. Fixed τ: use σ(τ·logits) [multiply] not σ(logits/τ) [divide].
-5. Use τ=1 for training to maintain gradient flow (τ=1 for evaluation).
+5. Use the same τ schedule for training/evaluation as the experiment runner.
 """
 
 import numpy as np

@@ -1,10 +1,10 @@
 """
 Main experiment runner for DRO-FAIR project.
-Runs Naive-FAIR and DRO-FAIR on Adult, Credit, LSAC under RANDOM corruption.
+Runs Naive-FAIR and DRO-FAIR on Adult, Credit, LSAC under ADVERSARIAL corruption.
 Supports checkpointing to resume interrupted runs.
 
 CRITICAL FIXES:
-1. Random corruption matching paper's experimental protocol.
+1. Adversarial corruption replacing the paper's random noise protocol.
 2. Paper uses σ(τ·f_θ(x)) [MULTIPLY], not division.
 3. 10 seeds for proper statistical significance.
 4. Runtime measurement for each method.
@@ -23,7 +23,7 @@ import time
 from tqdm import tqdm
 from src.data.datasets import get_dataset
 from src.models.classifier import MLPClassifier
-from src.corruption.adversarial import AdversarialCorruptor, RandomCorruptor
+from src.corruption.adversarial import AdversarialCorruptor
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.training.standard_ml import StandardMLTrainer
@@ -36,14 +36,16 @@ def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
 
 
-def corrupt_test_data_random(X_test, y_test, a_test, alpha, seed):
-    """Apply random corruption to test data (for test-time evaluation)."""
-    corruptor = RandomCorruptor(
+def corrupt_test_data_adversarial(X_test, y_test, a_test, alpha, seed, model, device):
+    """Apply adversarial corruption to test data for test-time evaluation."""
+    corruptor = AdversarialCorruptor(
         alpha=alpha, epsilon=0.1,
         feature_attack=True, label_flip=True, attr_flip=True,
-        random_state=seed + 1000
+        coordinated=True, random_state=seed + 1000
     )
-    X_test_c, y_test_c, a_test_c, _ = corruptor.corrupt(X_test, y_test, a_test)
+    X_test_c, y_test_c, a_test_c, _ = corruptor.corrupt(
+        X_test, y_test, a_test, model=model, device=device
+    )
     return X_test_c, y_test_c, a_test_c
 
 
@@ -72,17 +74,19 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     pretrainer = StandardMLTrainer(model_pretrained, device=device, epochs=15, lr=1e-3)
     pretrainer.fit(X_train, y_train, verbose=False)
 
-    # Paper uses RANDOM corruption for experiments (page 7)
-    corruptor = RandomCorruptor(
+    # Project variant: replace the paper's random corruption with adversarial noise.
+    corruptor = AdversarialCorruptor(
         alpha=alpha, epsilon=0.1,
         feature_attack=True, label_flip=True, attr_flip=True,
-        random_state=seed
+        coordinated=True, random_state=seed
     )
-    X_train_c, y_train_c, a_train_c, _ = corruptor.corrupt(X_train, y_train, a_train)
+    X_train_c, y_train_c, a_train_c, _ = corruptor.corrupt(
+        X_train, y_train, a_train, model=model_pretrained, device=device
+    )
 
     # Corrupt test data for test-time evaluation
-    X_test_c, y_test_c, a_test_c = corrupt_test_data_random(
-        X_test, y_test, a_test, alpha, seed
+    X_test_c, y_test_c, a_test_c = corrupt_test_data_adversarial(
+        X_test, y_test, a_test, alpha, seed, model_pretrained, device
     )
 
     results = {
@@ -100,9 +104,9 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     # Train from random initialization (no warm-start) as per paper
     trainer_naive = NaiveFairTrainer(
         model_naive, device=device,
-        lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
+        lr_theta=1e-3, lr_lambda=5e-3, lambda_max=2.0,
         tau=tau_train, k=5, gamma=0.0,
-        epochs=30, weight_decay=1e-4, tau_warmup_epochs=5
+        epochs=60, weight_decay=1e-4, tau_warmup_epochs=5
     )
 
     if verbose:
@@ -132,9 +136,9 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     # Train from random initialization (no warm-start) as per paper
     trainer_dro = DroFairTrainer(
         model_dro, alpha=alpha, device=device,
-        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,
+        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=2.0,
         tau=tau_train, beta=5.0, k=5, gamma=0.0,
-        K_inner=10, epochs=30, weight_decay=1e-4
+        K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=5
     )
 
     if verbose:
@@ -281,13 +285,21 @@ def run_all_experiments(datasets=['adult', 'credit', 'lsac'],
 
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--datasets', nargs='+', default=['adult', 'credit', 'lsac'])
+    parser.add_argument('--alphas', type=float, nargs='+', default=[0.0, 0.1, 0.2, 0.3, 0.4])
+    parser.add_argument('--n_seeds', type=int, default=10)
+    parser.add_argument('--output_dir', type=str, default='results')
+    args = parser.parse_args()
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}")
 
     results = run_all_experiments(
-        datasets=['adult', 'credit', 'lsac'],
-        alphas=[0.0, 0.1, 0.2, 0.3, 0.4],
-        n_seeds=10,
+        datasets=args.datasets,
+        alphas=args.alphas,
+        n_seeds=args.n_seeds,
         device=device,
-        output_dir='results'
+        output_dir=args.output_dir
     )

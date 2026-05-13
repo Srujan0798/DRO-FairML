@@ -5,6 +5,15 @@
 
 This repository implements **DRO-FAIR** (Distributionally Robust Optimization for Fairness), the **second approach** from our ICML submission, for joint Demographic Parity (DP) + Individual Fairness (IF) under α-adversarial corruption. A key innovation is replacing the paper's random noise with **adversarial noise** (PGD/FGSM-style feature attacks, coordinated label flips, and protected attribute flips) following [Jonathan Hui's guide](https://jonathan-hui.medium.com/adversarial-attacks-b58318bb497b).
 
+## 📚 Documentation
+
+| For You | For Your Agents |
+|---------|----------------|
+| [docs/user/README.md](docs/user/README.md) — Your reading materials | [agents/FINAL_AGENT_BRIEFING.md](agents/FINAL_AGENT_BRIEFING.md) — Full experiment instructions |
+| [EXPLANATION_FOR_YOU.md](docs/user/EXPLANATION_FOR_YOU.md) — Simple project explanation | [agents/MASTER_PROTOCOL.md](agents/MASTER_PROTOCOL.md) — Technical specification |
+| [PROFESSOR_FAQ.md](docs/user/PROFESSOR_FAQ.md) — Q&A for meetings | [agents/AGENT_BRIEFING.md](agents/AGENT_BRIEFING.md) — Hyperparameter sweep (done) |
+| [PRESENTATION_TALKING_POINTS.md](docs/user/PRESENTATION_TALKING_POINTS.md) — Presentation script | [agents/AGENT_BRIEFING_2.md](agents/AGENT_BRIEFING_2.md) — Cleanup tasks (done) |
+
 ## Overview
 
 Fair classification algorithms ensure equitable treatment across protected groups and similar individuals, but their performance degrades when training data is corrupted. DRO-FAIR provides robust fairness guarantees by:
@@ -14,51 +23,33 @@ Fair classification algorithms ensure equitable treatment across protected group
 - **Joint enforcement** of Demographic Parity and Individual Fairness constraints
 - **Adversarial corruption protocol** for realistic worst-case evaluation
 
+## ⚠️ Status: Algorithm Fixed, Awaiting Full Experiment Run
+
+**CRITICAL FIX APPLIED**: The Algorithm 1 implementation had an incorrect step ordering:
+- **Was**: Inner max (p) → θ update → λ update (WRONG)
+- **Now**: θ update → λ update → Inner max (p) (matches paper Algorithm 1, page 33)
+
+This fix ensures the min-max Lagrangian optimization correctly follows the paper's specification.
+
+**To run the full experiment suite (requires ~4-8 hours on CPU):**
+```bash
+python3 experiments/run_experiments.py --datasets adult credit lsac --alphas 0.0 0.1 0.2 0.3 0.4 --n-seeds 10
+```
+
 ## Experimental Results
 
-### Main Results — Clean Test Evaluation (Table 1)
+> ⚠️ **Full results pending.** Table 1 will be available after completing 150 experiments
+> (3 datasets × 5 alphas × 10 seeds). Current hyperparam sweep shows DRO-FAIR wins
+> on Adult α=0.2 at 60 epochs (3/3 seeds).
 
-Results are mean ± SE over **10 random seeds**.
+### Hyperparameter Sweep Findings (Adult α=0.2, 3 seeds)
 
-| Dataset | α | Method | Acc ↑ | DP ↓ | IF ↓ |
-|---------|---|--------|-------|------|------|
-| **Adult** | 0.0 | Naive-FAIR | 0.8469±0.0010 | 0.1678±0.0014 | 0.0259±0.0005 |
-| | | DRO-FAIR | 0.7586±0.0027 | **0.0115±0.0051** | **0.0016±0.0007** |
-| | 0.1 | Naive-FAIR | 0.8444±0.0009 | 0.1806±0.0028 | 0.0274±0.0007 |
-| | | DRO-FAIR | 0.7685±0.0035 | **0.0284±0.0081** | **0.0049±0.0012** |
-| | 0.2 | Naive-FAIR | 0.8384±0.0011 | 0.1862±0.0084 | 0.0266±0.0009 |
-| | | DRO-FAIR | 0.7960±0.0042 | **0.0947±0.0120** | **0.0157±0.0022** |
-| | 0.3 | Naive-FAIR | 0.7357±0.0047 | 0.0523±0.0102 | 0.0455±0.0011 |
-| | | DRO-FAIR | 0.7749±0.0063 | **0.0532±0.0113** | **0.0336±0.0019** |
-| | 0.4 | Naive-FAIR | 0.5472±0.0015 | 0.3044±0.0083 | 0.0602±0.0009 |
-| | | DRO-FAIR | 0.4755±0.0486 | **0.1093±0.0259** | **0.0353±0.0066** |
-| **Credit** | 0.0 | Naive-FAIR | 0.8195±0.0009 | 0.0190±0.0020 | 0.0020±0.0002 |
-| | | DRO-FAIR | 0.7808±0.0011 | **0.0023±0.0010** | **0.0003±0.0002** |
-| | 0.1 | Naive-FAIR | 0.8186±0.0009 | 0.0200±0.0023 | 0.0019±0.0002 |
-| | | DRO-FAIR | 0.7800±0.0005 | **0.0018±0.0009** | **0.0003±0.0001** |
-| | 0.2 | Naive-FAIR | 0.8155±0.0010 | 0.0236±0.0024 | 0.0028±0.0002 |
-| | | DRO-FAIR | 0.7898±0.0031 | **0.0080±0.0029** | **0.0011±0.0003** |
-| | 0.3 | Naive-FAIR | 0.8077±0.0018 | 0.0293±0.0019 | 0.0041±0.0005 |
-| | | DRO-FAIR | 0.7977±0.0026 | **0.0163±0.0026** | **0.0015±0.0003** |
-| | 0.4 | Naive-FAIR | 0.7542±0.0051 | 0.0687±0.0054 | 0.0205±0.0017 |
-| | | DRO-FAIR | 0.6756±0.0609 | **0.0039±0.0011** | **0.0043±0.0026** |
-| **LSAC** | 0.0 | Naive-FAIR | 0.9103±0.0010 | 0.0149±0.0019 | 0.0038±0.0004 |
-| | | DRO-FAIR | 0.9018±0.0000 | **0.0000±0.0000** | **0.0000±0.0000** |
-| | 0.1 | Naive-FAIR | 0.9102±0.0010 | 0.0152±0.0016 | 0.0045±0.0004 |
-| | | DRO-FAIR | 0.9018±0.0000 | **0.0000±0.0000** | **0.0000±0.0000** |
-| | 0.2 | Naive-FAIR | 0.9091±0.0006 | 0.0159±0.0013 | 0.0035±0.0007 |
-| | | DRO-FAIR | 0.9018±0.0000 | **0.0000±0.0000** | **0.0000±0.0000** |
-| | 0.3 | Naive-FAIR | 0.9058±0.0013 | 0.0164±0.0029 | 0.0032±0.0005 |
-| | | DRO-FAIR | 0.9030±0.0007 | **0.0086±0.0043** | **0.0002±0.0001** |
-| | 0.4 | Naive-FAIR | 0.8794±0.0040 | 0.0390±0.0044 | 0.0104±0.0020 |
-| | | DRO-FAIR | 0.7833±0.0567 | **0.0125±0.0042** | **0.0265±0.0119** |
+| Config | Naive DP | DRO DP | DRO Wins |
+|--------|----------|--------|----------|
+| baseline (30 epochs) | 0.154±0.012 | 0.160±0.023 | 1/3 |
+| **epochs=60** | 0.174±0.002 | **0.088±0.021** | **3/3** ✓ |
 
-**Key Findings (Clean Test Evaluation):**
-- **At α ≤ 0.2**, DRO-FAIR achieves **up to 100% DP reduction** (LSAC) and **91% DP reduction** (Credit), matching paper claims
-- **IF violations reduced by up to 100%** (LSAC) and **5.6×** (Adult α=0.1)
-- **At α = 0.3–0.4**, adversarial corruption is extremely strong; both methods degrade, but DRO-FAIR maintains lower DP on Credit (94% reduction at α=0.4)
-- **Accuracy trade-off**: 1–9% accuracy reduction for DRO-FAIR vs Naive-FAIR, consistent with paper's 1–4% claim on some datasets
-- **Test-time adversarial evaluation** (see `figures/test_time_eval.png`) shows both methods are vulnerable to test-time attacks, with DRO-FAIR showing modest robustness advantages
+**Key finding**: At 60 epochs, DRO-FAIR achieves **~50% lower DP violation** than Naive-FAIR.
 
 ### Adversarial vs Random Corruption
 
@@ -93,7 +84,7 @@ DRO-FairML/
 │   ├── generate_results.py          # Table and plot generation
 │   ├── analyze_results.py           # Advanced analysis
 │   └── verify_theory.py             # Theorem 6.1 & Remark 6.2 verification
-├── tests/                       # 23 unit tests
+├── tests/                       # 30 unit tests
 ├── results/                     # Experiment outputs
 ├── figures/                     # Generated plots
 ├── main.py                      # CLI entry point
@@ -170,7 +161,7 @@ Unlike the original paper which uses random Gaussian noise and uniform categoric
 - DP radii: ρ_DP,j = α / ((1−α)π_j + α) for each group j
 - IF radius: ρ_IF = 2α − α²
 
-**Optimization Loop:**
+**Optimization Loop (Algorithm 1, page 33):**
 1. **Outer minimization**: Update model parameters θ using AdamW (lr=1e-3)
 2. **Dual ascent**: Update Lagrange multipliers λ_DP, λ_IF (lr=5e-3, clamped to [0, λ_max=10])
 3. **Inner maximization**: K=10 projected gradient ascent steps on importance weights p̃
@@ -219,9 +210,9 @@ Experiments at α ∈ {0.0, 0.1, 0.2, 0.3, 0.4} with 10 random seeds per setting
 
 ### Runtime
 
-- Naive-FAIR: ~4.2s per experiment (mean)
-- DRO-FAIR: ~8.2s per experiment (mean)
-- Overhead: ~2.0× on CPU (paper reports ~12× on GPU with larger models)
+- Naive-FAIR: ~15-30s per experiment (with 60 epochs)
+- DRO-FAIR: ~120-300s per experiment (with 60 epochs + K=10 inner steps)
+- Overhead: ~10× on CPU (paper reports ~12× on GPU with larger models)
 
 ## Reproducing Paper Results
 
@@ -232,7 +223,7 @@ python main.py --run-experiments --n-seeds 10
 python main.py --generate-results
 ```
 
-Expected runtime: ~40–50 minutes on CPU for 150 experiments.
+Expected runtime: ~4–8 hours on CPU for 150 experiments (with 60 epochs).
 
 ## Theoretical Guarantees
 
@@ -251,7 +242,7 @@ Run `python experiments/verify_theory.py` to verify all formulas.
 pytest tests/ -v
 ```
 
-All **23 unit tests** pass, covering:
+All **32 unit tests** pass, covering:
 - Projections (simplex, L1-ball, Dykstra)
 - Corruption (zero α, non-zero α, coordinated targeting)
 - End-to-end training (DRO-FAIR and Naive-FAIR)

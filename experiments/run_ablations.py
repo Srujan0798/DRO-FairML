@@ -72,7 +72,7 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 2. Naive-FAIR
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = NaiveFairTrainer(model, device=device, epochs=30, tau=tau_train, k=5, tau_warmup_epochs=5)
+    trainer = NaiveFairTrainer(model, device=device, epochs=60, tau=tau_train, k=5, tau_warmup_epochs=5)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['naive'] = {
@@ -83,7 +83,7 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 3. DRO-FAIR joint
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=30, tau=tau_train, k=5,
+    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
                              K_inner=10, lr_p=5e-3, use_dp=True, use_if=True, tau_warmup_epochs=5)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
@@ -95,7 +95,7 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 4. DRO-FAIR DP-only
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=30, tau=tau_train, k=5,
+    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
                              K_inner=10, lr_p=5e-3, use_dp=True, use_if=False, tau_warmup_epochs=5)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
@@ -107,7 +107,7 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 5. DRO-FAIR IF-only
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=30, tau=tau_train, k=5,
+    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
                              K_inner=10, lr_p=5e-3, use_dp=False, use_if=True, tau_warmup_epochs=5)
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
