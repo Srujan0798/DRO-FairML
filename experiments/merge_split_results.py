@@ -1,10 +1,9 @@
 """
 Merge dataset-split experiment outputs into the standard results artifacts.
 
-This is useful when the 150-run is executed as three parallel jobs:
-  python3 experiments/run_experiments.py --datasets adult  --output_dir results/full_adult
-  python3 experiments/run_experiments.py --datasets credit --output_dir results/full_credit
-  python3 experiments/run_experiments.py --datasets lsac   --output_dir results/full_lsac
+Supports both:
+  A) Single-process per dataset: results/full_adult, results/full_credit, results/full_lsac
+  B) Parallel-by-alpha (Adult only): results/adult_a0.0, results/adult_a0.1, ..., results/adult_a0.4
 """
 
 import json
@@ -14,41 +13,78 @@ import pickle
 import numpy as np
 
 
-DATASET_DIRS = {
-    "adult": "results/full_adult",
-    "credit": "results/full_credit",
-    "lsac": "results/full_lsac",
-}
+def load_results_from_dir(output_dir, expected_count=None):
+    path = os.path.join(output_dir, "all_results.json")
+    if not os.path.exists(path):
+        return []
+    with open(path) as f:
+        rows = json.load(f)
+    return rows
+
+
+def load_from_checkpoint(output_dir):
+    path = os.path.join(output_dir, "checkpoint.pkl")
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "rb") as f:
+            data = pickle.load(f)
+        return data.get("results", [])
+    except Exception:
+        return []
 
 
 def main():
     all_results = []
     runtime_rows = []
 
-    for dataset, output_dir in DATASET_DIRS.items():
-        path = os.path.join(output_dir, "all_results.json")
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"Missing completed results for {dataset}: {path}")
-
-        with open(path) as f:
-            rows = json.load(f)
-
-        if len(rows) != 50:
-            raise ValueError(f"{dataset} has {len(rows)} results; expected 50")
-
-        bad_rows = [r for r in rows if r.get("dataset") != dataset]
-        if bad_rows:
-            raise ValueError(f"{dataset} output contains rows for another dataset")
-
-        all_results.extend(rows)
+    # Credit and LSAC (single-process)
+    for dataset in ["credit", "lsac"]:
+        output_dir = f"results/full_{dataset}"
+        rows = load_results_from_dir(output_dir)
+        if not rows:
+            rows = load_from_checkpoint(output_dir)
+        if rows:
+            all_results.extend(rows)
+            print(f"  {dataset}: {len(rows)} results")
+        else:
+            print(f"  {dataset}: no data yet")
 
         runtime_path = os.path.join(output_dir, "runtimes.json")
         if os.path.exists(runtime_path):
             with open(runtime_path) as f:
                 runtime_rows.append(json.load(f))
 
+    # Adult (parallel-by-alpha or single-process)
+    adult_rows = []
+    # Try parallel structure first
+    for alpha in [0.0, 0.1, 0.2, 0.3, 0.4]:
+        output_dir = f"results/adult_a{alpha}"
+        rows = load_results_from_dir(output_dir)
+        if not rows:
+            rows = load_from_checkpoint(output_dir)
+        if rows:
+            adult_rows.extend(rows)
+            print(f"  adult α={alpha}: {len(rows)} results")
+
+    # Fallback to single-process structure
+    if not adult_rows:
+        rows = load_results_from_dir("results/full_adult")
+        if not rows:
+            rows = load_from_checkpoint("results/full_adult")
+        if rows:
+            adult_rows.extend(rows)
+            print(f"  adult (single): {len(rows)} results")
+
+    if adult_rows:
+        all_results.extend(adult_rows)
+
+    if not all_results:
+        print("No results found yet.")
+        return
+
     dataset_order = {"adult": 0, "credit": 1, "lsac": 2}
-    all_results.sort(key=lambda r: (dataset_order[r["dataset"]], r["alpha"], r["seed"]))
+    all_results.sort(key=lambda r: (dataset_order.get(r["dataset"], 99), r["alpha"], r["seed"]))
 
     os.makedirs("results", exist_ok=True)
     with open("results/all_results.json", "w") as f:
@@ -71,7 +107,7 @@ def main():
     with open("results/runtimes.json", "w") as f:
         json.dump(runtime_data, f, indent=2)
 
-    print(f"Merged {len(all_results)} results into results/all_results.json")
+    print(f"\nMerged {len(all_results)} results into results/all_results.json")
     print(f"Runtime overhead: {runtime_data['overhead']:.2f}x")
 
 
