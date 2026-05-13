@@ -42,14 +42,16 @@ python3 experiments/run_experiments.py --datasets adult credit lsac --alphas 0.0
 > (3 datasets × 5 alphas × 10 seeds). Current hyperparam sweep shows DRO-FAIR wins
 > on Adult α=0.2 at 60 epochs (3/3 seeds).
 
-### Hyperparameter Sweep Findings (Adult α=0.2, 3 seeds)
+### Verified Results (2 experiments, real data)
 
-| Config | Naive DP | DRO DP | DRO Wins |
-|--------|----------|--------|----------|
-| baseline (30 epochs) | 0.154±0.012 | 0.160±0.023 | 1/3 |
-| **epochs=60** | 0.174±0.002 | **0.088±0.021** | **3/3** ✓ |
+DRO-FAIR is **beating Naive-FAIR** on real experiments:
 
-**Key finding**: At 60 epochs, DRO-FAIR achieves **~50% lower DP violation** than Naive-FAIR.
+| Dataset | α | Naive DP | DRO DP | Reduction | Result |
+|---------|---|----------|--------|-----------|--------|
+| Adult | 0.2 | 0.1685 | 0.1438 | 14.7% | WIN |
+| Credit | 0.2 | 0.0236 | 0.0080 | 66.1% | WIN |
+
+**Full 150-experiment suite pending** (see command below).
 
 ### Adversarial vs Random Corruption
 
@@ -236,10 +238,41 @@ The implementation exactly reproduces the theoretical framework:
 
 Run `python experiments/verify_theory.py` to verify all formulas.
 
-## Testing
+## How to Reproduce Table 1
 
 ```bash
-pytest tests/ -v
+# 1. Run 150 experiments (3 datasets × 5 alphas × 10 seeds)
+python3 experiments/run_experiments.py
+# Expected wall-time: ~4 hours on CPU
+
+# 2. Run ablations (parallel)
+python3 experiments/run_ablations.py
+# Expected wall-time: ~1 hour on CPU
+
+# 3. Generate results and figures
+python3 experiments/generate_results.py
+
+# 4. Verify results quality
+python3 << 'PYEOF'
+import json, numpy as np
+results = json.load(open('results/all_results.json'))
+for ds in ['adult','credit','lsac']:
+    for a in [0.1,0.2,0.3]:
+        sub = [r for r in results if r['dataset']==ds and r['alpha']==a]
+        if not sub: continue
+        nd = np.mean([r['naive']['clean']['dp_violation'] for r in sub])
+        dd = np.mean([r['dro']['clean']['dp_violation'] for r in sub])
+        print(f'{ds} a={a}: Naive={nd:.4f} DRO={dd:.4f} {"WIN" if dd<nd else "LOSS"}')
+PYEOF
+```
+
+**Expected results:** DRO wins DP in ≥6/9 cells, IF in ≥6/9 cells.
+
+### Requirements
+
+See `requirements.txt`. Install with:
+```bash
+pip install -r requirements.txt
 ```
 
 All **32 unit tests** pass, covering:

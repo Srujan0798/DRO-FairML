@@ -144,13 +144,13 @@ class DroFairTrainer:
 
     def fit(self, X, y, a, X_val=None, y_val=None, a_val=None, verbose=False):
         """Train DRO-FAIR (Algorithm 1) — full-batch implementation.
-        
+
         Paper Algorithm 1 ordering (Page 33):
-        1. Forward pass: logits = self.model(X_t); h_tilde = sigmoid(logits * tau)
-        2. Compute losses: L_tilt, g_dp, g_if, total_loss
-        3. Theta update: opt_theta.zero_grad(); total_loss.backward(); opt_theta.step()
-        4. Dual ascent: lambda_dp += lr_lambda * g_dp (clamped); lambda_if += ...
-        5. Inner max: K steps of projected gradient ascent on p_dp and p_if
+        1. Forward pass: logits = model(X); h_tilde = sigmoid(logits * tau)
+        2. Compute losses: L_tilt, g_dp, g_if with current p
+        3. Theta update: total_loss.backward(); opt_theta.step()
+        4. Dual ascent: lambda += lr_lambda * g (clamped to lambda_max)
+        5. Inner maximization: K steps of projected gradient ascent on p (after θ update)
         """
         n = len(X)
         self.n_samples = n
