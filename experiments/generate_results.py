@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import json
+import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -192,15 +193,18 @@ def plot_main_results(results, output_dir='figures'):
             for alpha in alphas:
                 subset = [r for r in results if r['dataset'] == dataset and r['alpha'] == alpha]
                 if not subset:
-                    continue
+                    naive_means.append(0)
+                    dro_means.append(0)
+                    naive_stds.append(0)
+                    dro_stds.append(0)
+                else:
+                    naive_vals = [r['naive']['clean'][metric] for r in subset]
+                    dro_vals = [r['dro']['clean'][metric] for r in subset]
 
-                naive_vals = [r['naive']['clean'][metric] for r in subset]
-                dro_vals = [r['dro']['clean'][metric] for r in subset]
-
-                naive_means.append(np.mean(naive_vals))
-                dro_means.append(np.mean(dro_vals))
-                naive_stds.append(np.std(naive_vals) / np.sqrt(len(naive_vals)))
-                dro_stds.append(np.std(dro_vals) / np.sqrt(len(dro_vals)))
+                    naive_means.append(np.mean(naive_vals))
+                    dro_means.append(np.mean(dro_vals))
+                    naive_stds.append(np.std(naive_vals) / np.sqrt(len(naive_vals)))
+                    dro_stds.append(np.std(dro_vals) / np.sqrt(len(dro_vals)))
 
             x = np.arange(len(alphas))
             width = 0.35
@@ -301,7 +305,10 @@ def main():
     latex = generate_latex_table(results)
     with open('results/table1_latex.tex', 'w') as f:
         f.write(latex)
+    with open('results/table1.tex', 'w') as f:
+        f.write(latex)
     print("Saved results/table1_latex.tex")
+    print("Saved results/table1.tex")
 
     # Save table1_results.csv
     lines = ["dataset,alpha,method,acc_mean,acc_std,dp_mean,dp_std,if_mean,if_std"]
@@ -312,12 +319,22 @@ def main():
 
     with open('results/table1_results.csv', 'w') as f:
         f.write("\n".join(lines))
+    with open('results/table1.csv', 'w') as f:
+        f.write("\n".join(lines))
     print("Saved results/table1_results.csv")
+    print("Saved results/table1.csv")
 
     # Generate figures
     try:
         plot_main_results(results)
         plot_test_time_eval(results)
+        os.makedirs('results/figures', exist_ok=True)
+        for name in ['main_results.png', 'main_results.pdf',
+                     'test_time_eval.png', 'test_time_eval.pdf']:
+            src = os.path.join('figures', name)
+            if os.path.exists(src):
+                shutil.copy2(src, os.path.join('results/figures', name))
+        print("Saved results/figures/")
     except Exception as e:
         print(f"Warning: Could not generate figures: {e}")
 

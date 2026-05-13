@@ -45,7 +45,7 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
     X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
         get_dataset(dataset_name, random_state=seed)
     
-    tau_train = 100.0
+    tau_train = get_temperature(alpha)
     input_dim = X_train.shape[1]
     
     # --- Random corruption ---
@@ -77,12 +77,6 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
         'adversarial': {}
     }
     
-    # Pretrain to prevent degeneracy
-    from src.training.standard_ml import StandardMLTrainer
-    model_pretrained = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    pretrainer = StandardMLTrainer(model_pretrained, device=device, epochs=15, lr=1e-3)
-    pretrainer.fit(X_train, y_train, verbose=False)
-
     for corruption_type, X_tr, y_tr, a_tr in [
         ('random', X_train_rand, y_train_rand, a_train_rand),
         ('adversarial', X_train_adv, y_train_adv, a_train_adv)
@@ -91,11 +85,10 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
         
         # Naive-FAIR
         model_naive = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-        model_naive.load_state_dict(model_pretrained.state_dict())
         trainer_naive = NaiveFairTrainer(
             model_naive, device=device,
-            lr_theta=1e-3, lr_lambda=5e-3, lambda_max=10.0,
-            tau=tau_train, k=5, gamma=0.0, epochs=15, weight_decay=1e-4, tau_warmup_epochs=5
+            lr_theta=1e-3, lr_lambda=5e-3, lambda_max=2.0,
+            tau=tau_train, k=5, gamma=0.0, epochs=60, weight_decay=1e-4, tau_warmup_epochs=5
         )
         trainer_naive.fit(X_tr, y_tr, a_tr, X_val=X_val, y_val=y_val, a_val=a_val, verbose=False)
         preds_naive = trainer_naive.predict(X_test)
@@ -107,12 +100,11 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
         
         # DRO-FAIR
         model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-        model_dro.load_state_dict(model_pretrained.state_dict())
         trainer_dro = DroFairTrainer(
             model_dro, alpha=alpha, device=device,
-            lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=10.0,
+            lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=2.0,
             tau=tau_train, beta=5.0, k=5, gamma=0.0,
-            K_inner=10, epochs=15, weight_decay=1e-4, tau_warmup_epochs=5
+            K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=5
         )
         trainer_dro.fit(X_tr, y_tr, a_tr, X_val=X_val, y_val=y_val, a_val=a_val, verbose=False)
         preds_dro = trainer_dro.predict(X_test)

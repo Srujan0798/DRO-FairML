@@ -72,7 +72,10 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 2. Naive-FAIR
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = NaiveFairTrainer(model, device=device, epochs=60, tau=tau_train, k=5, tau_warmup_epochs=5)
+    trainer = NaiveFairTrainer(
+        model, device=device, epochs=60, tau=tau_train, k=5,
+        lr_lambda=5e-3, lambda_max=2.0, tau_warmup_epochs=5
+    )
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['naive'] = {
@@ -83,8 +86,11 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 3. DRO-FAIR joint
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
-                             K_inner=10, lr_p=5e-3, use_dp=True, use_if=True, tau_warmup_epochs=5)
+    trainer = DroFairTrainer(
+        model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
+        K_inner=10, lr_lambda=5e-3, lr_p=5e-3, lambda_max=2.0,
+        use_dp=True, use_if=True, tau_warmup_epochs=5
+    )
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['dro_joint'] = {
@@ -95,8 +101,11 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 4. DRO-FAIR DP-only
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
-                             K_inner=10, lr_p=5e-3, use_dp=True, use_if=False, tau_warmup_epochs=5)
+    trainer = DroFairTrainer(
+        model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
+        K_inner=10, lr_lambda=5e-3, lr_p=5e-3, lambda_max=2.0,
+        use_dp=True, use_if=False, tau_warmup_epochs=5
+    )
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['dro_dp_only'] = {
@@ -107,8 +116,11 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
     # 5. DRO-FAIR IF-only
     model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-    trainer = DroFairTrainer(model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
-                             K_inner=10, lr_p=5e-3, use_dp=False, use_if=True, tau_warmup_epochs=5)
+    trainer = DroFairTrainer(
+        model, alpha=alpha, device=device, epochs=60, tau=tau_train, k=5,
+        K_inner=10, lr_lambda=5e-3, lr_p=5e-3, lambda_max=2.0,
+        use_dp=False, use_if=True, tau_warmup_epochs=5
+    )
     trainer.fit(X_tr, y_tr, a_tr, X_val, y_val, a_val, verbose=False)
     preds = trainer.predict(X_test)
     results['dro_if_only'] = {
@@ -121,12 +133,20 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Run DRO-FAIR ablation studies.")
+    parser.add_argument('--datasets', nargs='+', default=['adult', 'credit'])
+    parser.add_argument('--alphas', type=float, nargs='+', default=[0.2, 0.3])
+    parser.add_argument('--n_seeds', type=int, default=10)
+    parser.add_argument('--output', type=str, default='results/ablation_full.json')
+    args = parser.parse_args()
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Device: {device}")
 
-    datasets = ['adult', 'credit']
-    alphas = [0.2, 0.3]
-    n_seeds = 10
+    datasets = args.datasets
+    alphas = args.alphas
+    n_seeds = args.n_seeds
 
     all_results = []
     for dataset in datasets:
@@ -147,10 +167,12 @@ def main():
                       f"DP={np.mean(dps):.4f}±{np.std(dps)/np.sqrt(len(dps)):.4f}, "
                       f"IF={np.mean(ifs):.4f}±{np.std(ifs)/np.sqrt(len(ifs)):.4f}")
 
-    os.makedirs('results', exist_ok=True)
-    with open('results/ablation_full.json', 'w') as f:
+    output_dir = os.path.dirname(args.output)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    with open(args.output, 'w') as f:
         json.dump(all_results, f, indent=2)
-    print("\nSaved to results/ablation_full.json")
+    print(f"\nSaved to {args.output}")
 
 
 if __name__ == '__main__':

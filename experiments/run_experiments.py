@@ -230,10 +230,10 @@ def run_all_experiments(datasets=['adult', 'credit', 'lsac'],
                     naive_times.append(result['naive']['time'])
                     dro_times.append(result['dro']['time'])
 
-                    # Save checkpoint periodically
-                    if len(completed_keys) % 5 == 0:
-                        with open(checkpoint_path, 'wb') as f:
-                            pickle.dump({'results': all_results, 'completed_keys': list(completed_keys)}, f)
+                    # Save after each completed seed. A full run is multi-hour, and
+                    # losing 1-4 completed seeds on interruption is too expensive.
+                    with open(checkpoint_path, 'wb') as f:
+                        pickle.dump({'results': all_results, 'completed_keys': list(completed_keys)}, f)
 
                 except Exception as e:
                     print(f"    Seed {seed} failed: {e}")

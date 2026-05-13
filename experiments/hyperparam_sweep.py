@@ -26,7 +26,7 @@ from datetime import datetime
 
 from src.data.datasets import get_dataset
 from src.models.classifier import MLPClassifier
-from src.corruption.adversarial import RandomCorruptor
+from src.corruption.adversarial import AdversarialCorruptor
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.training.standard_ml import StandardMLTrainer
@@ -53,7 +53,7 @@ def run_single_config(dataset_name, alpha, seed, config_name, config,
     tau = 1.0 if alpha >= 0.4 else 100.0
     
     # Corrupt training data (random corruption, matching paper protocol)
-    corruptor = RandomCorruptor(
+    corruptor = AdversarialCorruptor(
         alpha=alpha, epsilon=0.1,
         feature_attack=True, label_flip=True, attr_flip=True,
         random_state=seed

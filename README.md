@@ -42,16 +42,26 @@ python3 experiments/run_experiments.py --datasets adult credit lsac --alphas 0.0
 > (3 datasets × 5 alphas × 10 seeds). Current hyperparam sweep shows DRO-FAIR wins
 > on Adult α=0.2 at 60 epochs (3/3 seeds).
 
-### Verified Results (2 experiments, real data)
+### Current Results (41/150 experiments complete, running in background)
 
-DRO-FAIR is **beating Naive-FAIR** on real experiments:
+Experiments are running via screen sessions. Results so far:
 
-| Dataset | α | Naive DP | DRO DP | Reduction | Result |
-|---------|---|----------|--------|-----------|--------|
-| Adult | 0.2 | 0.1685 | 0.1438 | 14.7% | WIN |
-| Credit | 0.2 | 0.0236 | 0.0080 | 66.1% | WIN |
+| Dataset | α | n | Naive DP | DRO DP | Reduction | Wins |
+|---------|---|---|----------|--------|-----------|------|
+| Adult | 0.0 | 7 | 0.1775 | 0.1727 | +2.7% | 5/7 |
+| Credit | 0.0 | 10 | 0.0217 | 0.0242 | -11.2% | 3/10 |
+| Credit | 0.1 | 2 | 0.0250 | 0.0231 | +7.5% | 1/2 |
+| LSAC | 0.0 | 10 | 0.0223 | 0.0229 | -2.7% | 5/10 |
+| LSAC | 0.1 | 10 | 0.0214 | 0.0111 | **+48.2%** | **10/10** ✓ |
+| LSAC | 0.2 | 2 | 0.0342 | 0.0000 | **+100%** | **2/2** ✓ |
 
-**Full 150-experiment suite pending** (see command below).
+**Overall: 26/41 DRO wins (63%)**
+
+LSAC α=0.1 shows strongest DRO advantage (48% DP reduction, 10/10 wins).
+Credit α=0.0 still problematic — DRO not winning there yet.
+Full 150-experiment suite will determine statistical significance.
+
+**Running experiments via:** `screen -ls` → `screen -r dro_full_<dataset>`
 
 ### Adversarial vs Random Corruption
 
