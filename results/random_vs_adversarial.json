@@ -1,0 +1,350 @@
+[
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "random": {
+      "naive": {
+        "accuracy": 0.824212271973466,
+        "dp_violation": 0.17064744234085083,
+        "if_violation": 0.02142620232172471
+      },
+      "dro": {
+        "accuracy": 0.8069651741293532,
+        "dp_violation": 0.09900935739278793,
+        "if_violation": 0.015257048092868989
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.8275290215588723,
+        "dp_violation": 0.12262340635061264,
+        "if_violation": 0.03175234936428966
+      },
+      "dro": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "random": {
+      "naive": {
+        "accuracy": 0.822996130458817,
+        "dp_violation": 0.14997518062591553,
+        "if_violation": 0.02074074074074074
+      },
+      "dro": {
+        "accuracy": 0.808955223880597,
+        "dp_violation": 0.08958151191473007,
+        "if_violation": 0.013952459922609177
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.8222222222222222,
+        "dp_violation": 0.13900579512119293,
+        "if_violation": 0.030381426202321725
+      },
+      "dro": {
+        "accuracy": 0.8063018242122719,
+        "dp_violation": 0.29306191205978394,
+        "if_violation": 0.0359093421779989
+      }
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 2,
+    "random": {
+      "naive": {
+        "accuracy": 0.8216694306246545,
+        "dp_violation": 0.16120074689388275,
+        "if_violation": 0.021934770591487008
+      },
+      "dro": {
+        "accuracy": 0.7971254836926479,
+        "dp_violation": 0.06086450815200806,
+        "if_violation": 0.01072415699281371
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.8270867882808182,
+        "dp_violation": 0.15431582927703857,
+        "if_violation": 0.03100055279159757
+      },
+      "dro": {
+        "accuracy": 0.824212271973466,
+        "dp_violation": 0.1079443022608757,
+        "if_violation": 0.028678828081813157
+      }
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 0,
+    "random": {
+      "naive": {
+        "accuracy": 0.8260917634051962,
+        "dp_violation": 0.17349474132061005,
+        "if_violation": 0.020386954118297402
+      },
+      "dro": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.7723604201216141,
+        "dp_violation": 0.002278149127960205,
+        "if_violation": 0.036771697070204536
+      },
+      "dro": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "random": {
+      "naive": {
+        "accuracy": 0.8276395798783859,
+        "dp_violation": 0.17269816994667053,
+        "if_violation": 0.019126589275843008
+      },
+      "dro": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.7638474295190714,
+        "dp_violation": 0.02965247631072998,
+        "if_violation": 0.040375898286346044
+      },
+      "dro": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 2,
+    "random": {
+      "naive": {
+        "accuracy": 0.8151464897733555,
+        "dp_violation": 0.16324719786643982,
+        "if_violation": 0.017844112769485904
+      },
+      "dro": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.7849640685461581,
+        "dp_violation": 0.020964115858078003,
+        "if_violation": 0.0402432283029298
+      },
+      "dro": {
+        "accuracy": 0.24853510226644554,
+        "dp_violation": 0.0018824338912963867,
+        "if_violation": 0.00015478164731896074
+      }
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 0,
+    "random": {
+      "naive": {
+        "accuracy": 0.8155,
+        "dp_violation": 0.014576524496078491,
+        "if_violation": 0.0022333333333333333
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.8116666666666666,
+        "dp_violation": 0.019410021603107452,
+        "if_violation": 0.004166666666666667
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 1,
+    "random": {
+      "naive": {
+        "accuracy": 0.8108333333333333,
+        "dp_violation": 0.025906652212142944,
+        "if_violation": 0.0008333333333333334
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.8161666666666667,
+        "dp_violation": 0.033597372472286224,
+        "if_violation": 0.0024
+      },
+      "dro": {
+        "accuracy": 0.8055,
+        "dp_violation": 0.023634180426597595,
+        "if_violation": 0.004266666666666667
+      }
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 2,
+    "random": {
+      "naive": {
+        "accuracy": 0.812,
+        "dp_violation": 0.02788890153169632,
+        "if_violation": 0.0023
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.814,
+        "dp_violation": 0.03443288803100586,
+        "if_violation": 0.0020666666666666667
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 0,
+    "random": {
+      "naive": {
+        "accuracy": 0.8121666666666667,
+        "dp_violation": 0.02074383944272995,
+        "if_violation": 0.0023666666666666667
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.7973333333333333,
+        "dp_violation": 0.02568238228559494,
+        "if_violation": 0.011933333333333334
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 1,
+    "random": {
+      "naive": {
+        "accuracy": 0.8173333333333334,
+        "dp_violation": 0.023551851511001587,
+        "if_violation": 0.0024
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.8065,
+        "dp_violation": 0.046845950186252594,
+        "if_violation": 0.0072
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 2,
+    "random": {
+      "naive": {
+        "accuracy": 0.8125,
+        "dp_violation": 0.02800733596086502,
+        "if_violation": 0.0015
+      },
+      "dro": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "adversarial": {
+      "naive": {
+        "accuracy": 0.7925,
+        "dp_violation": 0.04490619897842407,
+        "if_violation": 0.011
+      },
+      "dro": {
+        "accuracy": 0.7795,
+        "dp_violation": 0.004813498817384243,
+        "if_violation": 0.0
+      }
+    }
+  }
+]
