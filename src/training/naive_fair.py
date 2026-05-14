@@ -24,8 +24,8 @@ class NaiveFairTrainer:
     """Naive-FAIR trainer enforcing DP + IF on corrupted data."""
 
     def __init__(self, model, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
-                 lambda_max=10.0, tau=100.0, k=5, gamma=0.0,
-                 epochs=50, weight_decay=1e-4, tau_warmup_epochs=5):
+                 lambda_max=2.0, tau=100.0, k=5, gamma=0.0,
+                 epochs=60, weight_decay=1e-4, tau_warmup_epochs=5):
         self.model = model.to(device)
         self.device = device
         self.lr_theta = lr_theta

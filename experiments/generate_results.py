@@ -311,9 +311,9 @@ def main():
     print("Saved results/table1.tex")
 
     # Save table1_results.csv
-    lines = ["dataset,alpha,method,acc_mean,acc_std,dp_mean,dp_std,if_mean,if_std"]
+    lines = ["dataset,alpha,method,eval_type,acc_mean,acc_std,dp_mean,dp_std,if_mean,if_std"]
     for row in table_data:
-        lines.append(f"{row['dataset']},{row['alpha']},{row['method']},{row['acc_mean']:.4f},"
+        lines.append(f"{row['dataset']},{row['alpha']},{row['method']},{row['eval']},{row['acc_mean']:.4f},"
                     f"{row['acc_std']:.4f},{row['dp_mean']:.4f},{row['dp_std']:.4f},"
                     f"{row['if_mean']:.4f},{row['if_std']:.4f}")
 

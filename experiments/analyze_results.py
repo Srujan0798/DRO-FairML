@@ -39,8 +39,8 @@ def analyze_dp_if_tradeoff(results, output_dir='figures'):
             for alpha in alphas:
                 filtered = [r for r in results if r['dataset'] == dataset and r['alpha'] == alpha]
                 if filtered:
-                    dps = [r[method]['dp_violation'] for r in filtered]
-                    ifs = [r[method]['if_violation'] for r in filtered]
+                    dps = [r[method]['clean']['dp_violation'] for r in filtered]
+                    ifs = [r[method]['clean']['if_violation'] for r in filtered]
                     dp_vals.append(np.mean(dps))
                     if_vals.append(np.mean(ifs))
             
@@ -82,8 +82,8 @@ def analyze_robustness_heatmap(results, output_dir='figures'):
             for a_idx, alpha in enumerate(alphas):
                 filtered = [r for r in results if r['dataset'] == dataset and r['alpha'] == alpha]
                 if filtered:
-                    naive_vals = [r['naive'][metric] for r in filtered]
-                    dro_vals = [r['dro'][metric] for r in filtered]
+                    naive_vals = [r['naive']['clean'][metric] for r in filtered]
+                    dro_vals = [r['dro']['clean'][metric] for r in filtered]
                     
                     if metric == 'accuracy':
                         # For accuracy, positive = DRO is better
@@ -126,10 +126,10 @@ def analyze_seed_stability(results, output_dir='figures'):
                 continue
             
             seeds = [r['seed'] for r in filtered]
-            naive_acc = [r['naive']['accuracy'] for r in filtered]
-            dro_acc = [r['dro']['accuracy'] for r in filtered]
-            naive_dp = [r['naive']['dp_violation'] for r in filtered]
-            dro_dp = [r['dro']['dp_violation'] for r in filtered]
+            naive_acc = [r['naive']['clean']['accuracy'] for r in filtered]
+            dro_acc = [r['dro']['clean']['accuracy'] for r in filtered]
+            naive_dp = [r['naive']['clean']['dp_violation'] for r in filtered]
+            dro_dp = [r['dro']['clean']['dp_violation'] for r in filtered]
             
             ax.plot(seeds, naive_acc, 'o-', label='Naive Acc', color='C0')
             ax.plot(seeds, dro_acc, 's-', label='DRO Acc', color='C1')
@@ -178,9 +178,9 @@ def generate_latex_table(results, output_dir='results'):
             for dataset in datasets:
                 filtered = [r for r in results if r['dataset'] == dataset and r['alpha'] == alpha]
                 if filtered:
-                    accs = [r[method_key]['accuracy'] for r in filtered]
-                    dps = [r[method_key]['dp_violation'] for r in filtered]
-                    ifs = [r[method_key]['if_violation'] for r in filtered]
+                    accs = [r[method_key]['clean']['accuracy'] for r in filtered]
+                    dps = [r[method_key]['clean']['dp_violation'] for r in filtered]
+                    ifs = [r[method_key]['clean']['if_violation'] for r in filtered]
                     
                     acc_str = f"{np.mean(accs):.3f} $\\pm$ {np.std(accs)/np.sqrt(len(accs)):.3f}"
                     dp_str = f"{np.mean(dps):.3f} $\\pm$ {np.std(dps)/np.sqrt(len(dps)):.3f}"
