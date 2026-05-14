@@ -431,6 +431,34 @@ print(f'DRO wins: {wins}/9 (expected: 6+/9)')
 print(f'Reductions: {red}')
 "
 
+8.4 VERIFY STATISTICAL SIGNIFICANCE (CRITICAL)
+Run Wilcoxon signed-rank test:
+python3 -c "
+from scipy.stats import wilcoxon
+import json
+
+with open('results/all_results.json') as f:
+    results = json.load(f)
+
+print('Statistical Significance Tests (Wilcoxon signed-rank):')
+print('=' * 60)
+for ds in ['adult', 'credit', 'lsac']:
+    for alpha in [0.1, 0.2, 0.3, 0.4]:
+        subset = [r for r in results if r['dataset']==ds and r['alpha']==alpha]
+        if len(subset) >= 5:
+            naive_dps = [r['naive']['clean']['dp_violation'] for r in subset]
+            dro_dps = [r['dro']['clean']['dp_violation'] for r in subset]
+            try:
+                stat, p = wilcoxon(naive_dps, dro_dps)
+                sig = 'YES' if p < 0.05 else 'NO'
+                winner = 'DRO' if p < 0.05 and sum(dro_dps)/len(dro_dps) < sum(naive_dps)/len(naive_dps) else 'Naive'
+                print(f'{ds} α={alpha}: p={p:.4f} sig={sig} winner={winner}')
+            except Exception as e:
+                print(f'{ds} α={alpha}: ERROR - {e}')
+print('=' * 60)
+print('Note: sig=YES only if p<0.05 AND DRO actually won')
+"
+
 ================================================================================
 PHASE 9: FINAL REPORT GENERATION (30 minutes)
 ================================================================================

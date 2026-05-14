@@ -155,7 +155,39 @@ For results to be VALID, ALL must be true:
 □ Credit α=0.4 DRO accuracy ≥ 0.70 (constraint from paper)
 □ No prediction collapse (all accuracies > 0.75)
 
-If ANY of these fail, the project FAILS.
+**STATISTICAL SIGNIFICANCE (CRITICAL GAP — MUST CHECK)**
+Run Wilcoxon signed-rank test for each (dataset, alpha):
+- H0: median(naive_dp - dro_dp) = 0
+- H1: median(naive_dp - dro_dp) ≠ 0
+- Use scipy.stats.wilcoxon from scipy
+- Report p-value for each comparison
+- Significant if p < 0.05
+- Report: "DRO significantly better at α=X if p<0.05"
+
+Example code to run:
+```python
+from scipy.stats import wilcoxon
+import json
+
+with open('results/all_results.json') as f:
+    results = json.load(f)
+
+for ds in ['adult', 'credit', 'lsac']:
+    for alpha in [0.1, 0.2, 0.3, 0.4]:
+        subset = [r for r in results if r['dataset']==ds and r['alpha']==alpha]
+        naive_dps = [r['naive']['clean']['dp_violation'] for r in subset]
+        dro_dps = [r['dro']['clean']['dp_violation'] for r in subset]
+        stat, p = wilcoxon(naive_dps, dro_dps)
+        sig = "SIGNIFICANT" if p < 0.05 else "not significant"
+        print(f'{ds} α={alpha}: p={p:.4f} ({sig})')
+```
+
+If ANY comparison claims "DRO beats Naive" but p≥0.05:
+- Mark as "insufficient evidence"
+- Do NOT claim victory unless p<0.05
+- This is how real research works
+
+If results to be VALID and statistical tests pass, the project FAILS.
 
 ================================================================================
 PHASE 5: DEFENSE READINESS TEST (1 hour)
