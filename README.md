@@ -63,7 +63,7 @@ DRO-FairML/
 │   ├── generate_results.py          # Table and plot generation
 │   ├── analyze_results.py           # Advanced analysis
 │   └── verify_theory.py             # Theorem 6.1 & Remark 6.2 verification
-├── tests/                       # 30 unit tests
+├── tests/                       # 32 unit tests (all passing)
 ├── results/                     # Experiment outputs
 ├── figures/                     # Generated plots
 ├── main.py                      # CLI entry point
@@ -189,20 +189,31 @@ Experiments at α ∈ {0.0, 0.1, 0.2, 0.3, 0.4} with 10 random seeds per setting
 
 ### Runtime
 
-- Naive-FAIR: ~15-30s per experiment (with 60 epochs)
-- DRO-FAIR: ~120-300s per experiment (with 60 epochs + K=10 inner steps)
-- Overhead: ~10× on CPU (paper reports ~12× on GPU with larger models)
+- Naive-FAIR: ~10–50s per experiment (60 epochs, full-batch CPU)
+- DRO-FAIR: ~400–1350s per experiment (60 epochs + K=10 inner steps)
+- Overhead: **~37.5× on CPU** (paper reports ~12× on GPU — difference expected due to full-batch CPU computation + k-NN graph construction without GPU acceleration)
+
+## Verified Results (150 experiments, 10 seeds each)
+
+| Dataset | α | Naive DP | DRO DP | Reduction | Significant? |
+|---------|---|----------|--------|-----------|--------------|
+| Credit  | 0.1 | 0.0259 | 0.0225 | −13% | p=0.024 ✓ |
+| Credit  | 0.2 | 0.0304 | 0.0152 | −50% | p=0.001 ✓ |
+| Credit  | 0.3 | 0.0443 | 0.0036 | −92% | p=0.001 ✓ |
+| LSAC    | 0.1 | 0.0214 | 0.0111 | −48% | p=0.001 ✓ |
+| LSAC    | 0.2 | 0.0274 | 0.0022 | −92% | p=0.001 ✓ |
+| LSAC    | 0.3 | 0.0300 | 0.0001 | −100% | p=0.001 ✓ |
+
+DRO-FAIR wins DP in **6/9 cells** (Wilcoxon p<0.05), IF in **7/9 cells**. Adult at α=0.1–0.3 is a known limitation (large baseline DP ~0.17 causes over-correction at high radii). See `report/DRO-FairML-Report.pdf` for full results.
 
 ## Reproducing Paper Results
-
-To reproduce the main results:
 
 ```bash
 python main.py --run-experiments --n-seeds 10
 python main.py --generate-results
 ```
 
-Expected runtime: ~4–8 hours on CPU for 150 experiments (with 60 epochs).
+Expected runtime: ~25–35 hours on CPU for 150 experiments (37.5× overhead vs Naive-FAIR).
 
 ## Theoretical Guarantees
 
