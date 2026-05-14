@@ -221,7 +221,7 @@ The implementation exactly reproduces the theoretical framework:
 
 - **Theorem 4.2**: DP radii ρ_DP,j = α / ((1−α)π_j + α)
 - **Remark 4.2**: IF radius ρ_IF = 2α − α²
-- **Theorem 6.1**: DRO-FAIR guarantees (ε_DP + ε_IF)-fairness with high probability
+- **Theorem 6.1**: DRO-FAIR guarantees (ε_DP + ε_IF)-fairness under random TV-ball corruption (paper's setting). Under our adversarial extension: empirically holds on Credit and LSAC (6 significant wins each, p<0.05); does **not** hold on Adult at α=0.1–0.3 due to the adversarial feedback loop described below.
 - **Remark 6.2**: Radii → 0 as α → 0; radii are monotonically increasing in α
 
 Run `python experiments/verify_theory.py` to verify all formulas.

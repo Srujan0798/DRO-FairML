@@ -418,12 +418,15 @@ for fname, caption in [
 # Section 5 — Theory
 story.append(Paragraph("5. Theoretical Verification", h1_style))
 story.append(Paragraph(
-    "All theoretical guarantees verified numerically (15/15 checks passed):", body_style))
+    "Theoretical formulas verified numerically (radii, bias-correction, monotonicity). "
+    "Theorem 6.1 empirical outcome noted per dataset:", body_style))
 story.append(Spacer(1, 0.1*cm))
 for item in [
     "✓ Theorem 4.2 (DP radii): ρ<sub>DP,j</sub> = α / ((1−α)π<sub>j</sub> + α) — verified on all 3 datasets × 5 α",
     "✓ Theorem 4.3 (IF radius): ρ<sub>IF</sub> = 2α − α² — verified",
-    "✓ Theorem 6.1 (fairness guarantee): DRO achieves lower clean-test fairness violation than Naive at all α > 0",
+    "✓/✗ Theorem 6.1 (fairness guarantee): Empirically holds on Credit (6 sig. wins) and LSAC (6 sig. wins); "
+      "<b>does not hold on Adult</b> at α=0.1–0.3 due to adversarial feedback loop — DRO DP > Naive DP. "
+      "Note: Theorem 6.1 was proven for random TV-ball corruption; our adversarial extension is empirical.",
     "✓ Remark 6.2 (monotonicity): Radii increase monotonically with α; ρ → 0 as α → 0",
     "✓ Bias-corrected proportions: π<sub>j</sub> = (π̂<sub>j</sub> − α) / (1 − 2α), clipped to [0,1]",
 ]:
@@ -474,12 +477,13 @@ for item in [
       "training data has an even larger apparent DP signal. The DRO inner maximization responds "
       "by pushing importance weights to extremes, making the Lagrange multiplier λ_DP grow large. "
       "This produces an over-penalization feedback loop: the model is forced to equalize group "
-      "rates so aggressively that it collapses to near-random predictions (~49% accuracy at α=0.3), "
-      "eliminating both accuracy and any meaningful DP signal. This is not a training instability "
-      "bug — it is a fundamental tension between conservative TV radii calibrated for adversarial "
-      "worst-case and datasets with inherently large group disparities. The Naive baseline at α=0.3 "
-      "benefits from the adversarial coordination accidentally reducing the high-DP majority-class "
-      "predictions, creating a misleadingly low DP number. "
+      "rates so aggressively that it collapses to near-random predictions — <b>6 of 10 seeds produce "
+      "accuracy below 0.45 (range 24.8%–40.2%), only 4 seeds produce working models (75%–82%)</b>. "
+      "Mean accuracy is 49.5%, which is near random for binary classification. "
+      "This is not a training instability bug — it is a fundamental tension between conservative TV radii "
+      "calibrated for adversarial worst-case and datasets with inherently large group disparities. "
+      "The Naive baseline at α=0.3 benefits from the adversarial coordination accidentally reducing "
+      "the high-DP majority-class predictions, creating a misleadingly low DP number. "
       "Mitigation approaches: dataset-adaptive λ_max, warm-starting λ at a positive value, or "
       "tighter radius calibration using empirical group-specific α estimates.",
     "<b>Binary protected attribute only.</b> Extension to multi-group requires per-group radii.",
@@ -493,12 +497,15 @@ story.append(Spacer(1, 0.3*cm))
 story.append(Paragraph("8. Conclusion", h1_style))
 story.append(Paragraph(
     "We implemented DRO-FAIR with exact paper-specified hyperparameters and verified all "
-    "four theoretical guarantees. Our adversarial corruption extension provides a strictly "
-    "harder evaluation than random noise. Across 150 experiments, DRO-FAIR reduces DP in 6/9 "
-    "and IF in 7/9 evaluation cells. On LSAC, near-perfect fairness is achieved at α=0.3 with "
-    "<0.2% accuracy loss. On Credit, DP reductions reach 92% at α=0.3. The method struggles "
-    "on Adult at high α — an honest limitation of conservative uncertainty set calibration under "
-    "adversarial corruption on datasets with inherently large group rate disparity.",
+    "theoretical formulas (radii, bias-correction, Dykstra projection). Our adversarial corruption "
+    "extension provides a strictly harder evaluation than the paper's random noise. Across 150 "
+    "experiments (3 datasets × 5 α × 10 seeds), DRO-FAIR reduces DP in 6/9 and IF in 7/9 evaluation "
+    "cells at α=0.1–0.3. On LSAC, near-perfect fairness is achieved at α=0.3 with <0.2% accuracy "
+    "loss. On Credit, DP reductions reach 92% at α=0.3. The method fails on Adult at α≥0.3 — "
+    "6/10 seeds collapse to near-random accuracy (25–40%) due to the adversarial feedback loop "
+    "amplifying Adult's inherently large baseline DP. Theorem 6.1's guarantee, proven for random "
+    "TV-ball corruption, does not empirically transfer to Adult under our adversarial attack. "
+    "This is an honest, documented finding, not a code error.",
     body_style))
 story.append(Spacer(1, 0.5*cm))
 story.append(PageBreak())
