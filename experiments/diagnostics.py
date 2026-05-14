@@ -209,10 +209,19 @@ def run_diagnostic(dataset_name, alpha, seed, output_dir='figures/diagnostics'):
     plt.savefig(os.path.join(output_dir, fname), dpi=150)
     print(f"Saved {output_dir}/{fname}")
 
-    # Save log data
+    # Save log data (convert numpy types for JSON serialization)
+    import numpy as _np
+    def _to_python(obj):
+        if isinstance(obj, dict):
+            return {k: _to_python(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [_to_python(v) for v in obj]
+        if isinstance(obj, (_np.floating, _np.integer)):
+            return obj.item()
+        return obj
     log_path = os.path.join(output_dir, f'{dataset_name}_a{alpha}_s{seed}_log.json')
     with open(log_path, 'w') as f:
-        json.dump(log, f, indent=2)
+        json.dump(_to_python(log), f, indent=2)
     print(f"Saved {log_path}")
 
     return log
