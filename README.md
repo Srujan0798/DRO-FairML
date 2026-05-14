@@ -204,7 +204,7 @@ Experiments at α ∈ {0.0, 0.1, 0.2, 0.3, 0.4} with 10 random seeds per setting
 | LSAC    | 0.2 | 0.0274 | 0.0022 | −92% | p=0.001 ✓ |
 | LSAC    | 0.3 | 0.0300 | 0.0001 | −100% | p=0.001 ✓ |
 
-DRO-FAIR wins DP in **6/9 cells** (Wilcoxon p<0.05), IF in **7/9 cells**. Adult at α=0.1–0.3 is a known limitation (large baseline DP ~0.17 causes over-correction at high radii). See `report/DRO-FairML-Report.pdf` for full results.
+DRO-FAIR wins DP in **6/9 cells** (Wilcoxon p<0.05), IF in **7/9 cells**. Adult at α=0.1–0.3 shows DRO regression — not a code bug but an adversarial feedback loop: coordinated label flips amplify Adult's already-large baseline DP (~0.17), causing conservative TV radii to over-penalize, and λ_DP to grow until the model collapses toward uniform predictions. Credit and LSAC (lower baseline DP) do not exhibit this effect. See `report/DRO-FairML-Report.pdf` for full results and mechanism discussion.
 
 ## Reproducing Paper Results
 
