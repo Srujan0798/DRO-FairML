@@ -5,15 +5,6 @@
 
 This repository implements **DRO-FAIR** (Distributionally Robust Optimization for Fairness), the **second approach** from our ICML submission, for joint Demographic Parity (DP) + Individual Fairness (IF) under α-adversarial corruption. A key innovation is replacing the paper's random noise with **adversarial noise** (PGD/FGSM-style feature attacks, coordinated label flips, and protected attribute flips) following [Jonathan Hui's guide](https://jonathan-hui.medium.com/adversarial-attacks-b58318bb497b).
 
-## 📚 Documentation
-
-| For You | For Your Agents |
-|---------|----------------|
-| [docs/user/README.md](docs/user/README.md) — Your reading materials | [agents/FINAL_AGENT_BRIEFING.md](agents/FINAL_AGENT_BRIEFING.md) — Full experiment instructions |
-| [EXPLANATION_FOR_YOU.md](docs/user/EXPLANATION_FOR_YOU.md) — Simple project explanation | [agents/MASTER_PROTOCOL.md](agents/MASTER_PROTOCOL.md) — Technical specification |
-| [PROFESSOR_FAQ.md](docs/user/PROFESSOR_FAQ.md) — Q&A for meetings | [agents/AGENT_BRIEFING.md](agents/AGENT_BRIEFING.md) — Hyperparameter sweep (done) |
-| [PRESENTATION_TALKING_POINTS.md](docs/user/PRESENTATION_TALKING_POINTS.md) — Presentation script | [agents/AGENT_BRIEFING_2.md](agents/AGENT_BRIEFING_2.md) — Cleanup tasks (done) |
-
 ## Overview
 
 Fair classification algorithms ensure equitable treatment across protected groups and similar individuals, but their performance degrades when training data is corrupted. DRO-FAIR provides robust fairness guarantees by:
@@ -23,45 +14,21 @@ Fair classification algorithms ensure equitable treatment across protected group
 - **Joint enforcement** of Demographic Parity and Individual Fairness constraints
 - **Adversarial corruption protocol** for realistic worst-case evaluation
 
-## ⚠️ Status: Algorithm Fixed, Awaiting Full Experiment Run
+## Reproducing Results
 
-**CRITICAL FIX APPLIED**: The Algorithm 1 implementation had an incorrect step ordering:
-- **Was**: Inner max (p) → θ update → λ update (WRONG)
-- **Now**: θ update → λ update → Inner max (p) (matches paper Algorithm 1, page 33)
-
-This fix ensures the min-max Lagrangian optimization correctly follows the paper's specification.
-
-**To run the full experiment suite (requires ~4-8 hours on CPU):**
 ```bash
-python3 experiments/run_experiments.py --datasets adult credit lsac --alphas 0.0 0.1 0.2 0.3 0.4 --n-seeds 10
+# Run 150 experiments (3 datasets x 5 alphas x 10 seeds)
+python3 experiments/run_robust.py
+
+# Generate Table 1, figures, and statistics
+python3 experiments/generate_all_deliverables.py
+
+# Run ablation studies
+python3 experiments/run_ablations.py
+
+# Run random vs adversarial comparison
+python3 experiments/run_random_vs_adversarial.py
 ```
-
-## Experimental Results
-
-> ⚠️ **Full results pending.** Table 1 will be available after completing 150 experiments
-> (3 datasets × 5 alphas × 10 seeds). Current hyperparam sweep shows DRO-FAIR wins
-> on Adult α=0.2 at 60 epochs (3/3 seeds).
-
-### Current Results (41/150 experiments complete, running in background)
-
-Experiments are running via screen sessions. Results so far:
-
-| Dataset | α | n | Naive DP | DRO DP | Reduction | Wins |
-|---------|---|---|----------|--------|-----------|------|
-| Adult | 0.0 | 7 | 0.1775 | 0.1727 | +2.7% | 5/7 |
-| Credit | 0.0 | 10 | 0.0217 | 0.0242 | -11.2% | 3/10 |
-| Credit | 0.1 | 2 | 0.0250 | 0.0231 | +7.5% | 1/2 |
-| LSAC | 0.0 | 10 | 0.0223 | 0.0229 | -2.7% | 5/10 |
-| LSAC | 0.1 | 10 | 0.0214 | 0.0111 | **+48.2%** | **10/10** ✓ |
-| LSAC | 0.2 | 2 | 0.0342 | 0.0000 | **+100%** | **2/2** ✓ |
-
-**Overall: 26/41 DRO wins (63%)**
-
-LSAC α=0.1 shows strongest DRO advantage (48% DP reduction, 10/10 wins).
-Credit α=0.0 still problematic — DRO not winning there yet.
-Full 150-experiment suite will determine statistical significance.
-
-**Running experiments via:** `screen -ls` → `screen -r dro_full_<dataset>`
 
 ### Adversarial vs Random Corruption
 
@@ -175,7 +142,7 @@ Unlike the original paper which uses random Gaussian noise and uniform categoric
 
 **Optimization Loop (Algorithm 1, page 33):**
 1. **Outer minimization**: Update model parameters θ using AdamW (lr=1e-3)
-2. **Dual ascent**: Update Lagrange multipliers λ_DP, λ_IF (lr=5e-3, clamped to [0, λ_max=10])
+2. **Dual ascent**: Update Lagrange multipliers λ_DP, λ_IF (lr=5e-3, clamped to [0, λ_max=2.0])
 3. **Inner maximization**: K=10 projected gradient ascent steps on importance weights p̃
    - Projection via Dykstra's alternating projection algorithm onto simplex ∩ ℓ₁-ball
    - L₁ radius = 2ρ (TV distance → L1 ball)
@@ -247,43 +214,6 @@ The implementation exactly reproduces the theoretical framework:
 - **Remark 6.2**: Radii → 0 as α → 0; radii are monotonically increasing in α
 
 Run `python experiments/verify_theory.py` to verify all formulas.
-
-## How to Reproduce Table 1
-
-```bash
-# 1. Run 150 experiments (3 datasets × 5 alphas × 10 seeds)
-python3 experiments/run_experiments.py
-# Expected wall-time: ~4 hours on CPU
-
-# 2. Run ablations (parallel)
-python3 experiments/run_ablations.py
-# Expected wall-time: ~1 hour on CPU
-
-# 3. Generate results and figures
-python3 experiments/generate_results.py
-
-# 4. Verify results quality
-python3 << 'PYEOF'
-import json, numpy as np
-results = json.load(open('results/all_results.json'))
-for ds in ['adult','credit','lsac']:
-    for a in [0.1,0.2,0.3]:
-        sub = [r for r in results if r['dataset']==ds and r['alpha']==a]
-        if not sub: continue
-        nd = np.mean([r['naive']['clean']['dp_violation'] for r in sub])
-        dd = np.mean([r['dro']['clean']['dp_violation'] for r in sub])
-        print(f'{ds} a={a}: Naive={nd:.4f} DRO={dd:.4f} {"WIN" if dd<nd else "LOSS"}')
-PYEOF
-```
-
-**Expected results:** DRO wins DP in ≥6/9 cells, IF in ≥6/9 cells.
-
-### Requirements
-
-See `requirements.txt`. Install with:
-```bash
-pip install -r requirements.txt
-```
 
 All **32 unit tests** pass, covering:
 - Projections (simplex, L1-ball, Dykstra)
