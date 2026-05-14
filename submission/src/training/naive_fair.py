@@ -140,7 +140,7 @@ class NaiveFairTrainer:
             # Update θ
             opt_theta.zero_grad()
             total_loss.backward()
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.5)
             opt_theta.step()
             lr_scheduler.step()
 

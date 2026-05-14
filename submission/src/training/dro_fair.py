@@ -26,9 +26,9 @@ class DroFairTrainer:
     """DRO-FAIR trainer with robust fairness guarantees."""
 
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
-                 lr_p=5e-3, lambda_max=2.0, tau=100.0, beta=5.0, k=5, gamma=0.0,
+                 lr_p=5e-3, lambda_max=1.5, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
-                 use_dp=True, use_if=True, tau_warmup_epochs=10):
+                 use_dp=True, use_if=True, tau_warmup_epochs=15):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -178,6 +178,7 @@ class DroFairTrainer:
         lr_scheduler = torch.optim.lr_scheduler.StepLR(opt_theta, step_size=30, gamma=0.5)
         lambda_dp = torch.tensor(0.0, device=self.device)
         lambda_if = torch.tensor(0.0, device=self.device)
+        self._lambda_lr = self.lr_lambda
 
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)
 
@@ -186,8 +187,9 @@ class DroFairTrainer:
         for epoch in range(self.epochs):
             self.model.train()
 
-            # === TAU WARMUP ===
+            # === TAU WARMUP + λ DECAY ===
             current_tau = self.tau if epoch >= self.tau_warmup_epochs else 1.0
+            lambda_lr = self._lambda_lr * (0.95 ** epoch)  # λ decay prevents over-growth
 
             # === STEP 1: FORWARD PASS (with current θ) ===
             logits = self.model(X_t)
@@ -205,16 +207,16 @@ class DroFairTrainer:
             total_loss = L_tilt + (lambda_dp * g_dp if self.use_dp else 0.0) + (lambda_if * g_if if self.use_if else 0.0)
             opt_theta.zero_grad()
             total_loss.backward()
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.5)
             opt_theta.step()
             lr_scheduler.step()
 
             # === STEP 3b: DUAL ASCENT on λ ===
             with torch.no_grad():
                 if self.use_dp:
-                    lambda_dp = torch.clamp(lambda_dp + self.lr_lambda * g_dp, 0, self.lambda_max)
+                    lambda_dp = torch.clamp(lambda_dp + lambda_lr * g_dp, 0, self.lambda_max)
                 if self.use_if:
-                    lambda_if = torch.clamp(lambda_if + self.lr_lambda * g_if, 0, self.lambda_max)
+                    lambda_if = torch.clamp(lambda_if + lambda_lr * g_if, 0, self.lambda_max)
 
             # === STEP 4: INNER MAXIMIZATION (update p AFTER θ and λ) ===
             # Per paper Algorithm 1: p update happens AFTER θ and λ updates
