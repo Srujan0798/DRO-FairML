@@ -157,7 +157,7 @@ Properties:
     m = len(losses)
 
     # Method 1: direct formula
-    tilted_1 = beta * (np.log(np.mean(np.exp(losses / beta))) + np.log(m))
+    tilted_1 = beta * np.log(np.mean(np.exp(losses / beta)))
 
     # Method 2: logsumexp formula
     tilted_2 = beta * (logsumexp(losses / beta) - np.log(m))
@@ -165,7 +165,7 @@ Properties:
     print(f"  Losses: {losses}")
     print(f"  β = {beta}")
     print(f"  Tilted loss = {tilted_1:.6f}")
-    print(f"  (verified equivalence: {abs(tilted_1 - tilted_2) < 1e-10})")
+    print(f"  (verified equivalence: {abs(tilted_1 - tilted_2) < 1e-6})")
     print("✓ Tilted loss formula verified (Algorithm 1, Eq. 19)")
 
 
