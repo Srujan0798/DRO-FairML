@@ -102,14 +102,14 @@ class DroFairTrainer:
         """Project onto simplex ∩ L1-ball (TV distance → L1 radius = 2ρ)."""
         p_np = p.detach().cpu().numpy()
         center_np = center.detach().cpu().numpy()
-        proj = project_simplex_l1_ball(p_np, center_np, 2 * radius, max_iter=50, tol=1e-5)
+        proj = project_simplex_l1_ball(p_np, center_np, 2 * radius, max_iter=500, tol=1e-5)
         return torch.tensor(proj, dtype=p.dtype, device=p.device)
 
     def _project_if_weights(self, p, center, radius):
         """Project global IF weights onto simplex ∩ L1-ball."""
         p_np = p.detach().cpu().numpy()
         center_np = center.detach().cpu().numpy()
-        proj = project_simplex_l1_ball(p_np, center_np, 2 * radius, max_iter=50, tol=1e-5)
+        proj = project_simplex_l1_ball(p_np, center_np, 2 * radius, max_iter=500, tol=1e-5)
         return torch.tensor(proj, dtype=p.dtype, device=p.device)
 
     def _compute_dp_loss_weighted(self, h_tilde, a, p_dp_dict, group_mask_dict):
