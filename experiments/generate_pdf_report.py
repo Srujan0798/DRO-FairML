@@ -643,13 +643,30 @@ if os.path.exists("results/random_vs_adversarial.json"):
 # Diagnostic plot
 if os.path.exists("figures/diagnostics/adult_a0.2_s42_diagnostic.png"):
     story.append(PageBreak())
-    story.append(Paragraph("12. Training Diagnostics (Adult α=0.2, seed=42)", h1_style))
+    story.append(Paragraph("12. Training Diagnostics (All Datasets, α=0.2, seed=42)", h1_style))
     story.append(Paragraph(
-        "Per-epoch training dynamics showing λ values, p-weight entropy, loss curves, and validation metrics.",
+        "Per-epoch training dynamics: λ trajectories, fairness violations, group prediction rates, "
+        "and loss/accuracy curves. Collected with full epoch-level logging on the DRO-FAIR trainer.",
         body_style))
     story.append(Spacer(1, 0.2*cm))
-    story.append(Image("figures/diagnostics/adult_a0.2_s42_diagnostic.png", width=16*cm, height=10*cm))
-    story.append(Spacer(1, 0.2*cm))
+    for ds_diag, diag_label in [
+        ("adult",  "Adult"),
+        ("credit", "Credit"),
+        ("lsac",   "LSAC"),
+    ]:
+        fpath = f"figures/diagnostics/{ds_diag}_a0.2_s42_diagnostic.png"
+        if os.path.exists(fpath):
+            story.append(Paragraph(f"<b>{diag_label} α=0.2</b>", h2_style))
+            story.append(Image(fpath, width=16*cm, height=9*cm))
+            story.append(Spacer(1, 0.2*cm))
+    if os.path.exists("figures/diagnostics/group_rates_comparison.png"):
+        story.append(Paragraph("<b>Group Rate Comparison Across Datasets (α=0.2)</b>", h2_style))
+        story.append(Paragraph(
+            "Group 0 vs Group 1 mean prediction rates per epoch. "
+            "Shaded area = DP gap (|rate_1 − rate_0|). DRO drives rates toward equality over training.",
+            body_style))
+        story.append(Image("figures/diagnostics/group_rates_comparison.png", width=16*cm, height=6*cm))
+        story.append(Spacer(1, 0.2*cm))
 
 story.append(HRFlowable(width="100%", thickness=0.5, color=colors.grey))
 story.append(Spacer(1, 0.2*cm))
