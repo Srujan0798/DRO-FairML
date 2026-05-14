@@ -106,9 +106,9 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     # Train from random initialization (no warm-start) as per paper
     trainer_naive = NaiveFairTrainer(
         model_naive, device=device,
-        lr_theta=1e-3, lr_lambda=5e-3, lambda_max=2.0,
+        lr_theta=1e-3, lr_lambda=5e-3, lambda_max=1.5,
         tau=tau_train, k=5, gamma=0.0,
-        epochs=60, weight_decay=1e-4, tau_warmup_epochs=10
+        epochs=60, weight_decay=1e-4, tau_warmup_epochs=15
     )
 
     if verbose:
@@ -138,9 +138,9 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     # Train from random initialization (no warm-start) as per paper
     trainer_dro = DroFairTrainer(
         model_dro, alpha=alpha, device=device,
-        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=2.0,
+        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=1.5,
         tau=tau_train, beta=5.0, k=5, gamma=0.0,
-        K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=10
+        K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15
     )
 
     if verbose:
