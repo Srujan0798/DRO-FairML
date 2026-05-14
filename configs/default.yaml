@@ -15,7 +15,7 @@ training:
   K_inner: 10
   epochs: 60
   weight_decay: 0.0001
-  tau_warmup_epochs: 5
+  tau_warmup_epochs: 10
 corruption:
   alpha:
   - 0.0

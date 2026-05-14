@@ -99,7 +99,7 @@ Demand justification for:
 - epochs=60 (paper used 60? or did you pick this?)
 - K_inner=10 (paper used 10?)
 - lr_lambda=5e-3 (why this exact value?)
-- tau_warmup_epochs=5 (was this in the paper?)
+- tau_warmup_epochs=10 (was this in the paper?)
 
 ### 10. HONESTY CHECK
 - Ask: "Did you use AI tools?" — grade the honest answer

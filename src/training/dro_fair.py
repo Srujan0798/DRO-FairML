@@ -28,7 +28,7 @@ class DroFairTrainer:
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lr_p=5e-3, lambda_max=2.0, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
-                 use_dp=True, use_if=True, tau_warmup_epochs=5):
+                 use_dp=True, use_if=True, tau_warmup_epochs=10):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -175,6 +175,7 @@ class DroFairTrainer:
         self.p_if_center = torch.ones(n, device=self.device) / n
 
         opt_theta = torch.optim.AdamW(self.model.parameters(), lr=self.lr_theta, weight_decay=self.weight_decay)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(opt_theta, step_size=30, gamma=0.5)
         lambda_dp = torch.tensor(0.0, device=self.device)
         lambda_if = torch.tensor(0.0, device=self.device)
 
@@ -206,6 +207,7 @@ class DroFairTrainer:
             total_loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
             opt_theta.step()
+            lr_scheduler.step()
 
             # === STEP 3b: DUAL ASCENT on λ ===
             with torch.no_grad():

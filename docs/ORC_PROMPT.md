@@ -131,7 +131,7 @@ Demand justification for EVERY hyperparameter:
 | lr_p | 5e-3 | Why same as lr_lambda? |
 | beta | 5 | Paper used 5? What happens at beta→∞? beta→0? |
 | tau | 100 | Paper used 100? What happens at tau→0? |
-| tau_warmup_epochs | 5 | Was this in the paper? Who added it? Why 5 not 3 or 10? |
+| tau_warmup_epochs | 10 | Was this in the paper? Who added it? Why 10 not 5? |
 | epsilon | 0.1 | How did you pick 0.1? Did you sweep? |
 
 If the answer is "I don't know" or "an AI agent picked it" for ANY of these,

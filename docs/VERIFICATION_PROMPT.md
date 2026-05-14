@@ -302,7 +302,7 @@ training:
   K_inner: 10
   epochs: 60
   weight_decay: 0.0001
-  tau_warmup_epochs: 5
+  tau_warmup_epochs: 10
 corruption:
   alpha: [0.0, 0.1, 0.2, 0.3, 0.4]
   epsilon: 0.1
@@ -315,7 +315,7 @@ Grep run_experiments.py for these values:
 - epochs should be 60
 - lambda_max should be 2.0
 - K_inner should be 10
-- tau_warmup_epochs should be 5
+- tau_warmup_epochs should be 10
 
 ================================================================================
 PHASE 5: DATA FILES VERIFICATION (30 minutes)
