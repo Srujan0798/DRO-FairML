@@ -102,8 +102,8 @@ def compute_if_violation(X, y_pred, a=None, k=5, gamma=0.0, metric='euclidean'):
     if total_pairs == 0:
         return 0.0
     
-    # Return fraction of violating pairs (matches paper's definition)
-    return violation_count / total_pairs
+    # Return weighted sum normalized by (n-1) — matches training metric (dro_fair.py:140)
+    return total_magnitude / (n - 1) if n > 1 else 0.0
 
 
 def compute_metrics_torch(model, X, y, a, device='cpu', temperature=1.0, k=5, gamma=0.0):
