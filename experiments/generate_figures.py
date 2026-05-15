@@ -102,10 +102,11 @@ def mean_se(vals):
 # Figure 1 — Main Results (3 × 3)
 # ─────────────────────────────────────────────────────────────────────────────
 def fig1_main_results(results):
-    fig, axes = plt.subplots(3, 3, figsize=(15, 11), constrained_layout=True)
+    fig, axes = plt.subplots(3, 3, figsize=(15, 12))
+    fig.subplots_adjust(top=0.92, hspace=0.38, wspace=0.30)
     fig.suptitle(
-        'DRO-FAIR vs Naive-FAIR — Clean Test Set (mean ± 1 SE, n=10 seeds)',
-        fontsize=13, fontweight='bold', y=1.01,
+        'DRO-FAIR vs Naive-FAIR — Clean Test Set (mean ± 1 SE, n = 10 seeds)',
+        fontsize=13, fontweight='bold', y=0.97,
     )
 
     metrics = ['accuracy', 'dp_violation', 'if_violation']
@@ -364,13 +365,20 @@ def fig4_significance_matrix(results):
 # Figure 5 — Accuracy–Fairness Tradeoff
 # ─────────────────────────────────────────────────────────────────────────────
 def fig5_accuracy_fairness_tradeoff(results):
-    fig, axes = plt.subplots(1, 3, figsize=(14, 4.2), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4.8))
+    fig.subplots_adjust(top=0.86, bottom=0.14, wspace=0.30, right=0.88)
     fig.suptitle(
-        'Accuracy–Fairness Tradeoff (mean over 10 seeds, clean test; each point = one α level)',
+        'Accuracy–Fairness Tradeoff  (mean over 10 seeds, clean test)',
         fontsize=12, fontweight='bold')
 
     markers = {0.0: 'o', 0.1: 's', 0.2: '^', 0.3: 'D', 0.4: 'X'}
     sizes   = {0.0: 65,  0.1: 75,  0.2: 85,  0.3: 95,  0.4: 105}
+    # Per-panel label offsets to avoid collision (dx, dy in points)
+    offsets = {
+        'adult':  {0.0:(6,4), 0.1:(6,-10), 0.2:(6,4), 0.3:(-30,-12), 0.4:(6,4)},
+        'credit': {0.0:(6,4), 0.1:(6,-10), 0.2:(6,4), 0.3:(6,4), 0.4:(-30,-12)},
+        'lsac':   {0.0:(6,4), 0.1:(6,-10), 0.2:(6,4), 0.3:(6,4), 0.4:(-30,-12)},
+    }
 
     for col, ds in enumerate(DATASETS):
         ax = axes[col]
@@ -388,21 +396,27 @@ def fig5_accuracy_fairness_tradeoff(results):
                        marker=markers[alpha], zorder=4, edgecolors='white', lw=0.8)
             ax.scatter(da, dd, color=DRO_COLOR, s=sizes[alpha],
                        marker=markers[alpha], zorder=4, edgecolors='white', lw=0.8)
+            dx, dy = offsets[ds].get(alpha, (6, 4))
             ax.annotate(f'α={alpha}', (da, dd),
-                        textcoords='offset points', xytext=(5, 3),
-                        fontsize=7.5, color=DRO_COLOR)
+                        textcoords='offset points', xytext=(dx, dy),
+                        fontsize=7, color=DRO_COLOR,
+                        arrowprops=dict(arrowstyle='-', color=DRO_COLOR,
+                                        lw=0.4, shrinkA=0, shrinkB=3)
+                        if abs(dx) > 10 or abs(dy) > 10 else None)
 
         ax.set_xlabel('Accuracy ↑', fontsize=10)
         ax.set_ylabel('DP Violation ↓', fontsize=10)
         ax.set_title(DS_LABELS[ds], fontsize=11, fontweight='bold')
 
+    # Shared legend to the right of figure
     naive_p = mpatches.Patch(color=NAIVE_COLOR, label='Naive-FAIR')
     dro_p   = mpatches.Patch(color=DRO_COLOR,   label='DRO-FAIR')
     alpha_lines = [plt.Line2D([0],[0], marker=markers[a], color='gray',
-                              linestyle='None', ms=7, label=f'α={a}')
+                              linestyle='None', ms=6, label=f'α={a}')
                    for a in ALPHAS]
-    axes[2].legend(handles=[naive_p, dro_p] + alpha_lines,
-                   loc='upper right', fontsize=8, ncol=2)
+    fig.legend(handles=[naive_p, dro_p] + alpha_lines,
+               loc='center right', fontsize=8, framealpha=0.9,
+               bbox_to_anchor=(0.99, 0.5))
 
     fig.savefig(f'{OUT}/fig5_accuracy_fairness_tradeoff.png')
     fig.savefig(f'{OUT}/fig5_accuracy_fairness_tradeoff.pdf')
@@ -514,9 +528,11 @@ def fig7_summary(results):
             ax.text(i, w + 0.07, f'{w}/3', ha='center', va='bottom',
                     fontsize=11, color=DRO_COLOR, fontweight='bold')
 
-        if ax_idx == 1:
-            ax.legend(fontsize=9, loc='upper right')
+        if ax_idx == 0:
+            ax.legend(fontsize=8, loc='upper center', ncol=3,
+                      bbox_to_anchor=(1.1, -0.15), framealpha=0.9)
 
+    fig.subplots_adjust(bottom=0.22)
     fig.savefig(f'{OUT}/fig7_summary_win_rates.png')
     fig.savefig(f'{OUT}/fig7_summary_win_rates.pdf')
     plt.close()
