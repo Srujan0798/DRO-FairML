@@ -1,9 +1,19 @@
 # DRO-FAIR: Robust Individual and Group Fair Classification
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://github.com/Srujan0798/DRO-FairML/actions/workflows/tests.yml/badge.svg)](https://github.com/Srujan0798/DRO-FairML/actions/workflows/tests.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Experiments](https://img.shields.io/badge/experiments-150-orange.svg)](results/)
 
-This repository implements **DRO-FAIR** (Distributionally Robust Optimization for Fairness), the **second approach** from our ICML submission, for joint Demographic Parity (DP) + Individual Fairness (IF) under α-adversarial corruption. A key innovation is replacing the paper's random noise with **adversarial noise** (PGD/FGSM-style feature attacks, coordinated label flips, and protected attribute flips) following [Jonathan Hui's guide](https://jonathan-hui.medium.com/adversarial-attacks-b58318bb497b).
+> **Distributionally Robust Optimization for joint Demographic Parity + Individual Fairness under adversarial data corruption**
+
+This repository implements **DRO-FAIR** (Algorithm 1 from the ICML submission) for joint Demographic Parity (DP) + Individual Fairness (IF) under α-adversarial corruption. Our key contribution replaces the paper's random noise with **adversarial noise** — PGD/FGSM-style feature attacks, coordinated label flips, and minority-targeted attribute flips — providing a 2–5x harder evaluation at the same corruption level α.
+
+<p align="center">
+  <img src="figures/fig1_main_results.png" width="100%" alt="Main Results: DRO-FAIR vs Naive-FAIR across datasets and corruption levels"/>
+</p>
+<p align="center"><em>DRO-FAIR (green) vs Naive-FAIR (red) across all datasets, metrics, and corruption levels. Error bars = ±1 SE over 10 seeds.</em></p>
 
 ## Overview
 
@@ -74,7 +84,7 @@ DRO-FairML/
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/Srujan0798/DRO-FairML.git
 cd DRO-FairML
 
 # Create virtual environment
@@ -205,6 +215,31 @@ Experiments at α ∈ {0.0, 0.1, 0.2, 0.3, 0.4} with 10 random seeds per setting
 | LSAC    | 0.3 | 0.0300 | 0.0001 | −100% | p=0.001 ✓ |
 
 DRO-FAIR wins DP in **6/9 cells** (Wilcoxon p<0.05), IF in **7/9 cells**. Adult at α=0.1–0.3 shows DRO regression — not a code bug but an adversarial feedback loop: coordinated label flips amplify Adult's already-large baseline DP (~0.17), causing conservative TV radii to over-penalize, and λ_DP to grow until the model collapses toward uniform predictions. Credit and LSAC (lower baseline DP) do not exhibit this effect. See `report/DRO-FairML-Report.pdf` for full results and mechanism discussion.
+
+<details>
+<summary><strong>More Figures (click to expand)</strong></summary>
+
+<p align="center">
+  <img src="figures/fig2_dp_reduction_heatmap.png" width="70%" alt="DP Reduction Heatmap"/>
+  <br><em>DP violation reduction (%) — DRO-FAIR vs Naive-FAIR</em>
+</p>
+
+<p align="center">
+  <img src="figures/fig5_accuracy_fairness_tradeoff.png" width="70%" alt="Accuracy-Fairness Tradeoff"/>
+  <br><em>Accuracy vs DP violation Pareto frontier</em>
+</p>
+
+<p align="center">
+  <img src="figures/fig4_significance_matrix.png" width="70%" alt="Statistical Significance"/>
+  <br><em>Wilcoxon signed-rank p-value matrix</em>
+</p>
+
+<p align="center">
+  <img src="figures/fig6_seed_stability.png" width="70%" alt="Seed Stability"/>
+  <br><em>Stability across 10 random seeds</em>
+</p>
+
+</details>
 
 ## Reproducing Paper Results
 
