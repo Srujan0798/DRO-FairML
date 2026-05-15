@@ -12,10 +12,12 @@
 \usepackage{array}
 \usepackage{colortbl}
 \usepackage[table]{xcolor}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{float}
 \usepackage{natbib}
 \usepackage{enumitem}
 \usepackage{microtype}
@@ -333,9 +335,42 @@ Table~\ref{tab:main_results} reports mean over 10 seeds on the clean test set.
 \textcolor{dro}{Green} cells = DRO-FAIR lower (better);
 \textcolor{naive}{red} cells = DRO-FAIR higher (worse).
 
-\input{../results/table1.tex}
+\begin{table}[H]
+\centering\small
+\caption{Main Results: DRO-FAIR vs Naive-FAIR under Adversarial Corruption (clean test, mean over 10 seeds).}
+\label{tab:main_results}
+\rowcolors{2}{gray!8}{white}
+\begin{tabular}{llC{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}}
+\toprule
+\rowcolor{hdrblue!90}
+\color{white}\textbf{Dataset} & \color{white}$\alpha$ &
+\multicolumn{3}{c}{\color{white}\textbf{Naive-FAIR}} &
+\multicolumn{3}{c}{\color{white}\textbf{DRO-FAIR}} \\
+\rowcolor{hdrblue!70}
+& & \color{white}Acc & \color{white}DP & \color{white}IF & \color{white}Acc & \color{white}DP & \color{white}IF \\
+\midrule
+Adult  & 0.0 & 0.822 & 0.176 & 0.024 & 0.823 & 0.172 & 0.025 \\
+Adult  & 0.1 & 0.826 & 0.159 & 0.025 & 0.826 & \cellcolor{lossred}0.176 & 0.026 \\
+Adult  & 0.2 & 0.825 & 0.136 & 0.030 & 0.796 & \cellcolor{lossred}0.167 & \cellcolor{wingreen}0.022 \\
+Adult  & 0.3 & 0.777 & 0.013 & 0.036 & \cellcolor{lossred}0.495 & \cellcolor{lossred}0.039 & \cellcolor{wingreen}0.014 \\
+Adult  & 0.4 & 0.644 & 0.055 & 0.000 & 0.639 & \cellcolor{wingreen}0.034 & 0.000 \\
+\midrule
+Credit & 0.0 & 0.809 & 0.022 & 0.001 & 0.810 & 0.024 & 0.002 \\
+Credit & 0.1 & 0.810 & 0.026 & 0.002 & 0.810 & \cellcolor{wingreen}0.022 & 0.002 \\
+Credit & 0.2 & 0.812 & 0.030 & 0.002 & 0.793 & \cellcolor{wingreen}0.015 & 0.002 \\
+Credit & 0.3 & 0.801 & 0.044 & 0.007 & 0.782 & \cellcolor{wingreen}0.004 & \cellcolor{wingreen}0.000 \\
+Credit & 0.4 & 0.738 & 0.027 & 0.000 & 0.747 & \cellcolor{wingreen}0.016 & 0.000 \\
+\midrule
+LSAC   & 0.0 & 0.907 & 0.022 & 0.001 & 0.908 & 0.023 & 0.001 \\
+LSAC   & 0.1 & 0.907 & 0.021 & 0.001 & 0.906 & \cellcolor{wingreen}0.011 & \cellcolor{wingreen}0.000 \\
+LSAC   & 0.2 & 0.906 & 0.027 & 0.001 & 0.903 & \cellcolor{wingreen}0.002 & \cellcolor{wingreen}0.000 \\
+LSAC   & 0.3 & 0.903 & 0.030 & 0.006 & 0.902 & \cellcolor{wingreen}0.000 & \cellcolor{wingreen}0.000 \\
+LSAC   & 0.4 & 0.862 & 0.012 & 0.000 & 0.875 & \cellcolor{wingreen}0.006 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{figure}[p]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig1_main_results.pdf}
   \caption{\textbf{Main results.}
@@ -490,6 +525,14 @@ not genuine fairness improvement.
 \end{figure}
 
 \subsection{Robustness: Clean vs.\ Corrupted Test}
+
+Figure~\ref{fig:robustness} compares $\Delta_{\mathrm{DP}}$ evaluated on
+clean vs.\ adversarially corrupted test sets.  A robust method should show
+a small gap between the two evaluations.  DRO-FAIR achieves this on
+Credit and LSAC: the clean-to-corrupted DP increase is $<0.005$ across all
+$\alpha$, while Naive-FAIR shows larger degradation under test-time attack.
+On Adult, both methods degrade substantially at high $\alpha$ due to the
+feedback loop discussed above.
 
 \begin{figure}[htbp]
   \centering
