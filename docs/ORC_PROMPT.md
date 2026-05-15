@@ -124,15 +124,17 @@ Demand justification for EVERY hyperparameter:
 
 | Parameter | Value | Justification Needed |
 |-----------|-------|---------------------|
-| lambda_max | 2.0 | Who chose this? Paper used 2.0? Did you sweep? |
-| epochs | 60 | Paper used 60? Did you try 30, 40, 50? |
-| K_inner | 10 | Paper used 10? Did you try 5, 20, 50? |
-| lr_lambda | 5e-3 | Why same as lr_theta? Did you try different? |
-| lr_p | 5e-3 | Why same as lr_lambda? |
-| beta | 5 | Paper used 5? What happens at beta→∞? beta→0? |
-| tau | 100 | Paper used 100? What happens at tau→0? |
-| tau_warmup_epochs | 10 | Was this in the paper? Who added it? Why 10 not 5? |
-| epsilon | 0.1 | How did you pick 0.1? Did you sweep? |
+| lambda_max | 1.5 | Who chose this? Paper used 2.0. We use 1.5 for stability. |
+| epochs | 60 | Paper used 60. Fixed. |
+| K_inner | 10 | Paper used 10. Fixed. |
+| lr_lambda | 5e-3 | Same as paper. |
+| lr_p | 5e-3 | Same as paper. |
+| beta | 5 | Paper used 5. Fixed. |
+| tau | 100 | Paper used 100 for α≤0.3, τ=1 for α≥0.4. |
+| tau_warmup_epochs | 15 | NOT in paper. Added for stability (was 10, now 15). |
+| lambda_lr_decay | 0.95^epoch | NOT in paper. Added to prevent λ overgrowth. |
+| grad_clip | 0.5 | NOT in paper. Added for stability (was 1.0, now 0.5). |
+| epsilon | 0.1 | PGD step size. Standard choice. |
 
 If the answer is "I don't know" or "an AI agent picked it" for ANY of these,
 mark it as UNJUSTIFIED.

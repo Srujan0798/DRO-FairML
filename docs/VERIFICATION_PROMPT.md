@@ -26,7 +26,7 @@ WHAT WE KNOW ABOUT THE CODEBASE:
 - Inner gradient uses ∇g NOT λ∇g (verified correct)
 - Bias-corrected radii was FIXED per Appendix F
 - Dykstra projection is mathematically CORRECT (verified by external review)
-- lambda_max=2.0 (NOT 10.0 - 10.0 caused prediction collapse)
+- lambda_max=1.5 (NOT 10.0 - 10.0 caused prediction collapse, reduced from 2.0 to 1.5 for stability)
 
 ================================================================================
 PHASE 1: ENVIRONMENT & SETUP VERIFICATION (30 minutes)
@@ -100,7 +100,7 @@ Find _compute_radii method. Verify:
 
 E. TAU WARMUP
 Find tau warmup logic:
-- If epoch < tau_warmup_epochs: use tau=1.0
+- If epoch < tau_warmup_epochs: use tau=1.0 (warmup period for stability)
 - Else: use tau from config (100.0 for α≤0.3)
 
 F. DYKKSTRA PROJECTION CALLS
@@ -294,7 +294,7 @@ training:
   lr_theta: 0.001
   lr_lambda: 0.005
   lr_p: 0.005
-  lambda_max: 2.0       ← CRITICAL: NOT 10.0
+  lambda_max: 1.5       ← CRITICAL: NOT 10.0
   tau: 100.0
   beta: 5.0
   k: 5
@@ -302,7 +302,7 @@ training:
   K_inner: 10
   epochs: 60
   weight_decay: 0.0001
-  tau_warmup_epochs: 10
+  tau_warmup_epochs: 15
 corruption:
   alpha: [0.0, 0.1, 0.2, 0.3, 0.4]
   epsilon: 0.1
@@ -313,9 +313,9 @@ corruption:
 
 Grep run_experiments.py for these values:
 - epochs should be 60
-- lambda_max should be 2.0
+- lambda_max should be 1.5
 - K_inner should be 10
-- tau_warmup_epochs should be 10
+- tau_warmup_epochs should be 15
 
 ================================================================================
 PHASE 5: DATA FILES VERIFICATION (30 minutes)

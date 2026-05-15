@@ -19,30 +19,34 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # ── Style ────────────────────────────────────────────────────────────────────
-plt.style.use('seaborn-v0_8-whitegrid')
+# Use 'seaborn-v0_8-paper' for authentic publication look
+plt.style.use('seaborn-v0_8-paper')
 plt.rcParams.update({
-    'font.family':          'DejaVu Sans',
-    'font.size':            10,
-    'axes.titlesize':       11,
-    'axes.labelsize':       10,
-    'axes.titleweight':     'bold',
+    'font.family':          'serif',
+    'font.serif':           ['Times New Roman', 'Times', 'DejaVu Serif'],
+    'font.size':            11,
+    'axes.titlesize':       12,
+    'axes.labelsize':       11,
+    'axes.titleweight':     'normal',
     'axes.spines.top':      False,
     'axes.spines.right':    False,
-    'axes.linewidth':       0.8,
-    'grid.alpha':           0.25,
-    'grid.linestyle':       '--',
-    'grid.linewidth':       0.6,
-    'legend.framealpha':    0.92,
-    'legend.fontsize':      9,
-    'legend.edgecolor':     '0.8',
+    'axes.linewidth':       1.0,
+    'grid.alpha':           0.4,
+    'grid.linestyle':       '-',
+    'grid.linewidth':       0.5,
+    'legend.framealpha':    0.95,
+    'legend.fontsize':      10,
+    'legend.edgecolor':     '0.6',
     'figure.dpi':           150,
     'savefig.dpi':          300,
     'savefig.bbox':         'tight',
-    'savefig.pad_inches':   0.12,
+    'savefig.pad_inches':   0.15,
     'xtick.direction':      'out',
     'ytick.direction':      'out',
-    'xtick.major.size':     3,
-    'ytick.major.size':     3,
+    'xtick.major.size':     4,
+    'ytick.major.size':     4,
+    'lines.linewidth':      2.0,
+    'lines.markersize':     6,
 })
 
 # Colorblind-safe palette (Wong 2011)
