@@ -25,8 +25,8 @@
 \usepackage{mdframed}
 
 % ── Colour palette ────────────────────────────────────────────────────────────
-\definecolor{dro}{RGB}{0,158,115}        % teal / DRO-FAIR
-\definecolor{naive}{RGB}{213,94,0}       % vermillion / Naive-FAIR
+\definecolor{dro}{RGB}{42,110,63}        % forest green / DRO-FAIR
+\definecolor{naive}{RGB}{196,82,50}      % muted red-brown / Naive-FAIR
 \definecolor{hdrblue}{RGB}{38,77,140}    % header blue
 \definecolor{wingreen}{RGB}{209,245,220} % win highlight
 \definecolor{lossred}{RGB}{255,224,224}  % loss highlight
@@ -338,13 +338,12 @@ Table~\ref{tab:main_results} reports mean over 10 seeds on the clean test set.
 \begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig1_main_results.pdf}
-  \caption{\textbf{Figure~1: Main results.}
-    DRO-FAIR (\textcolor{dro}{teal}) vs Naive-FAIR (\textcolor{naive}{vermillion})
+  \caption{\textbf{Main results.}
+    DRO-FAIR (\textcolor{dro}{green}) vs Naive-FAIR (\textcolor{naive}{red})
     across all datasets and metrics on the clean test set.
-    Shaded bands $=\pm 1\,\mathrm{SE}$.
+    Error bars $=\pm 1\,\mathrm{SE}$ ($n{=}10$ seeds).
     Significance markers above DRO line: $*p{<}0.05$,\;
-    $**p{<}0.01$,\; $***p{<}0.001$ (Wilcoxon one-sided).
-    Grey band at $\alpha=0$ $=$ no-corruption baseline.}
+    $**p{<}0.01$,\; $***p{<}0.001$ (Wilcoxon one-sided).}
   \label{fig:main_results}
 \end{figure}
 
@@ -395,10 +394,10 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig2_dp_reduction_heatmap.pdf}
-  \caption{\textbf{Figure~2: DP Reduction Heatmap.}
+  \caption{\textbf{DP Reduction Heatmap.}
     Percentage DP reduction of DRO-FAIR over Naive-FAIR.
     Colour scale capped at $\pm 100\%$; exact value shown.
-    $\triangle$ marks Adult $\alpha=0.3$ cell where DRO collapses ($-206\%$,
+    Adult $\alpha=0.3$ cell shows DRO collapse ($-206\%$,
     colour clipped to $-100\%$ for readability).}
   \label{fig:heatmap}
 \end{figure}
@@ -406,10 +405,10 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig4_significance_matrix.pdf}
-  \caption{\textbf{Figure~3: Statistical Significance Matrix.}
-    \textcolor{dro}{Teal} $=$ DRO significantly better;
-    \textcolor{naive}{orange} $=$ Naive significantly better;
-    grey $=$ no significant difference.
+  \caption{\textbf{Statistical Significance Matrix.}
+    \textcolor{dro}{Green} $=$ DRO significantly better;
+    \textcolor{naive}{red} $=$ Naive significantly better;
+    grey $=$ not significant.
     DRO wins 6/9 DP cells, 7/9 IF cells at $\alpha\in\{0.1,0.2,0.3\}$.}
   \label{fig:sigmatrix}
 \end{figure}
@@ -421,7 +420,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig5_accuracy_fairness_tradeoff.pdf}
-  \caption{\textbf{Figure~4: Accuracy--Fairness Tradeoff.}
+  \caption{\textbf{Accuracy--Fairness Tradeoff.}
     Lower-right $=$ high accuracy + low DP (ideal).
     DRO-FAIR moves toward lower DP on Credit/LSAC with minimal accuracy loss.
     Adult $\alpha=0.3$ (DRO) is a clear outlier.}
@@ -431,9 +430,9 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig7_summary_win_rates.pdf}
-  \caption{\textbf{Figure~5: Win-Rate Summary.}
+  \caption{\textbf{Win-Rate Summary.}
     DRO significantly better in 6/9 DP comparisons and 7/9 IF comparisons
-    ($\alpha\in\{0.1,0.2,0.3\}$).}
+    at $\alpha\in\{0.1,0.2,0.3\}$, Wilcoxon $p<0.05$.}
   \label{fig:winrates}
 \end{figure}
 
@@ -483,9 +482,9 @@ not genuine fairness improvement.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig6_seed_stability.pdf}
-  \caption{\textbf{Figure~6: Seed Stability Boxplots.}
-    Per-seed DRO-FAIR accuracy (10 seeds).
-    Adult $\alpha=0.3$ shows extreme bimodal distribution.
+  \caption{\textbf{Seed Stability.}
+    Per-seed DRO-FAIR accuracy ($n{=}10$).
+    Adult $\alpha=0.3$ shows high variance due to model collapse.
     Credit and LSAC remain stable across all $\alpha$.}
   \label{fig:stability}
 \end{figure}
@@ -495,9 +494,9 @@ not genuine fairness improvement.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig3_robustness_clean_vs_corrupted.pdf}
-  \caption{\textbf{Figure~7: Clean vs.\ Corrupted Test.}
-    DP violation on clean (\textcolor{dro}{solid}) vs.\ adversarially
-    corrupted (\textcolor{naive}{dashed}) test sets.
+  \caption{\textbf{Clean vs.\ Corrupted Test.}
+    $\Delta_{\mathrm{DP}}$ on clean (solid) vs.\ adversarially
+    corrupted (dashed) test sets.
     DRO-FAIR shows smaller clean/corrupted gap on Credit/LSAC.}
   \label{fig:robustness}
 \end{figure}

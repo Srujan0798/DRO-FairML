@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Publication-quality figure generation for DRO-FairML.
-300 DPI, colorblind-safe palette, ICML-submission aesthetics.
+Figure generation for DRO-FairML — ICML submission style.
+Matches the typographic conventions of top ML venues:
+  Computer Modern math, minimal chrome, proper error bars, restrained palette.
 """
 
 import os, sys, json
@@ -9,8 +10,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.gridspec as gridspec
+import matplotlib.ticker as ticker
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.stats import wilcoxon
 import warnings
@@ -18,71 +18,95 @@ warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-# ── Style ────────────────────────────────────────────────────────────────────
-# Use 'seaborn-v0_8-paper' for authentic publication look
-plt.style.use('seaborn-v0_8-paper')
+# ── ICML-style rcParams ─────────────────────────────────────────────────────
 plt.rcParams.update({
-    'font.family':          'serif',
-    'font.serif':           ['Times New Roman', 'Times', 'DejaVu Serif'],
-    'font.size':            11,
-    'axes.titlesize':       12,
-    'axes.labelsize':       11,
-    'axes.titleweight':     'normal',
-    'axes.spines.top':      False,
-    'axes.spines.right':    False,
-    'axes.linewidth':       1.0,
-    'grid.alpha':           0.4,
-    'grid.linestyle':       '-',
-    'grid.linewidth':       0.5,
-    'legend.framealpha':    0.95,
-    'legend.fontsize':      10,
-    'legend.edgecolor':     '0.6',
-    'figure.dpi':           150,
-    'savefig.dpi':          300,
-    'savefig.bbox':         'tight',
-    'savefig.pad_inches':   0.15,
-    'xtick.direction':      'out',
-    'ytick.direction':      'out',
-    'xtick.major.size':     4,
-    'ytick.major.size':     4,
-    'lines.linewidth':      2.0,
-    'lines.markersize':     6,
+    'font.family':        'serif',
+    'font.serif':         ['CMU Serif', 'Computer Modern Roman', 'Latin Modern Roman',
+                           'DejaVu Serif', 'Times New Roman'],
+    'mathtext.fontset':   'cm',          # Computer Modern math
+    'font.size':          8,
+    'axes.titlesize':     9,
+    'axes.labelsize':     8,
+    'axes.titleweight':   'normal',
+    'axes.spines.top':    False,
+    'axes.spines.right':  False,
+    'axes.linewidth':     0.6,
+    'axes.labelpad':      3,
+    'grid.alpha':         0.3,
+    'grid.linewidth':     0.4,
+    'grid.linestyle':     '--',
+    'legend.frameon':     True,
+    'legend.framealpha':  0.85,
+    'legend.fontsize':    7,
+    'legend.edgecolor':   '0.8',
+    'legend.handlelength': 1.5,
+    'legend.handletextpad': 0.4,
+    'figure.dpi':         150,
+    'savefig.dpi':        300,
+    'savefig.bbox':       'tight',
+    'savefig.pad_inches': 0.05,
+    'xtick.direction':    'in',
+    'ytick.direction':    'in',
+    'xtick.major.size':   3,
+    'ytick.major.size':   3,
+    'xtick.minor.size':   1.5,
+    'ytick.minor.size':   1.5,
+    'xtick.major.pad':    2,
+    'ytick.major.pad':    2,
+    'xtick.labelsize':    7,
+    'ytick.labelsize':    7,
+    'lines.linewidth':    1.2,
+    'lines.markersize':   4,
+    'errorbar.capsize':   2,
 })
 
-# Colorblind-safe palette (Wong 2011)
-NAIVE_COLOR   = '#D55E00'   # vermillion
-DRO_COLOR     = '#009E73'   # bluish green
-CLEAN_COLOR   = '#0072B2'   # blue
-CORRUPT_COLOR = '#E69F00'   # orange
-ALPHAS        = [0.0, 0.1, 0.2, 0.3, 0.4]
-DATASETS      = ['adult', 'credit', 'lsac']
-DS_LABELS     = {'adult': 'Adult', 'credit': 'Credit', 'lsac': 'LSAC'}
-METRIC_LABELS = {
-    'accuracy':     'Accuracy ↑',
-    'dp_violation': 'DP Violation ↓',
-    'if_violation': 'IF Violation ↓',
-}
-OUT = 'figures'
+# Two-color palette (muted, print-safe, accessible)
+C_NAIVE = '#c45232'   # muted red-brown
+C_DRO   = '#2a6e3f'   # muted forest green
+C_CLEAN = '#2b5c8a'   # steel blue
+C_CORR  = '#d4880f'   # dark gold
+
+ALPHAS   = [0.0, 0.1, 0.2, 0.3, 0.4]
+DATASETS = ['adult', 'credit', 'lsac']
+DS_LABEL = {'adult': 'Adult', 'credit': 'Credit', 'lsac': 'LSAC'}
+OUT      = 'figures'
+
+# ICML text width: 6.75 in (full), 3.25 in (single column)
+FULL_W   = 6.75
+COL_W    = 3.25
 
 
+# ── Data helpers ─────────────────────────────────────────────────────────────
 def load_results():
     with open('results/all_results.json') as f:
         return json.load(f)
 
 
-def wilcoxon_p(a_vals, b_vals):
+def _get(results, ds, alpha, method, metric, ev='clean'):
+    recs = [r for r in results if r['dataset'] == ds and abs(r['alpha'] - alpha) < 1e-6]
+    return [r[method][ev][metric] for r in recs] if recs else []
+
+
+def _ms(vals):
+    if not vals:
+        return np.nan, np.nan
+    a = np.array(vals, dtype=float)
+    return np.mean(a), np.std(a, ddof=1) / np.sqrt(len(a))
+
+
+def _wilcox(a, b):
     try:
-        if len(a_vals) < 3 or np.allclose(a_vals, b_vals):
+        if len(a) < 3 or np.allclose(a, b):
             return 1.0
-        _, p = wilcoxon(a_vals, b_vals)
+        _, p = wilcoxon(a, b)
         return p
     except Exception:
         return 1.0
 
 
-def stars(p, dro_mean, naive_mean):
-    """Stars only when DRO is better (lower)."""
-    if dro_mean >= naive_mean:
+def _sig_marker(p, dro_m, naive_m):
+    """Return significance marker only when DRO is better (lower)."""
+    if dro_m >= naive_m:
         return ''
     if p < 0.001: return '***'
     if p < 0.01:  return '**'
@@ -90,474 +114,429 @@ def stars(p, dro_mean, naive_mean):
     return ''
 
 
-def get_vals(results, dataset, alpha, method, metric, eval_t='clean'):
-    recs = [r for r in results if r['dataset'] == dataset and abs(r['alpha'] - alpha) < 1e-6]
-    return [r[method][eval_t][metric] for r in recs] if recs else []
-
-
-def mean_se(vals):
-    if not vals or all(np.isnan(v) for v in vals):
-        return np.nan, np.nan
-    a = np.array(vals, dtype=float)
-    return np.mean(a), np.std(a) / np.sqrt(len(a))
+def _save(fig, name):
+    os.makedirs(OUT, exist_ok=True)
+    fig.savefig(f'{OUT}/{name}.pdf')
+    fig.savefig(f'{OUT}/{name}.png')
+    plt.close(fig)
+    print(f'  {name}')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 1 — Main Results (3 × 3)
+# Figure 1 — Main results (3 datasets x 3 metrics)
 # ─────────────────────────────────────────────────────────────────────────────
-def fig1_main_results(results):
-    fig, axes = plt.subplots(3, 3, figsize=(15, 12))
-    fig.subplots_adjust(top=0.92, hspace=0.38, wspace=0.30)
-    fig.suptitle(
-        'DRO-FAIR vs Naive-FAIR — Clean Test Set (mean ± 1 SE, n = 10 seeds)',
-        fontsize=13, fontweight='bold', y=0.97,
-    )
-
+def fig1(results):
     metrics = ['accuracy', 'dp_violation', 'if_violation']
+    ylabels = {
+        'accuracy':     'Accuracy',
+        'dp_violation': r'$\Delta_{\mathrm{DP}}$',
+        'if_violation': r'$\mathcal{L}_{\mathrm{IF}}$',
+    }
+
+    fig, axes = plt.subplots(3, 3, figsize=(FULL_W, 5.8))
+    fig.subplots_adjust(hspace=0.48, wspace=0.40, top=0.93, bottom=0.07, left=0.10)
+
+    x = np.array(ALPHAS)
 
     for row, ds in enumerate(DATASETS):
-        for col, metric in enumerate(metrics):
+        for col, met in enumerate(metrics):
             ax = axes[row, col]
-            n_m, n_se, d_m, d_se, smarks = [], [], [], [], []
+            nm, nse, dm, dse = [], [], [], []
 
             for alpha in ALPHAS:
-                nv = get_vals(results, ds, alpha, 'naive', metric)
-                dv = get_vals(results, ds, alpha, 'dro',   metric)
-                nm, nse = mean_se(nv)
-                dm, dse = mean_se(dv)
-                n_m.append(nm); n_se.append(nse)
-                d_m.append(dm); d_se.append(dse)
-                p = wilcoxon_p(nv, dv)
-                smarks.append(stars(p, dm, nm))
+                nv = _get(results, ds, alpha, 'naive', met)
+                dv = _get(results, ds, alpha, 'dro',   met)
+                n_m, n_s = _ms(nv)
+                d_m, d_s = _ms(dv)
+                nm.append(n_m); nse.append(n_s)
+                dm.append(d_m); dse.append(d_s)
 
-            x = np.array(ALPHAS)
-            n_m  = np.array(n_m,  float)
-            n_se = np.array(n_se, float)
-            d_m  = np.array(d_m,  float)
-            d_se = np.array(d_se, float)
+            nm  = np.array(nm);  nse = np.array(nse)
+            dm  = np.array(dm);  dse = np.array(dse)
 
-            ax.plot(x, n_m, 'o-', color=NAIVE_COLOR, lw=2, ms=5,
-                    label='Naive-FAIR', zorder=4)
-            ax.fill_between(x, n_m - n_se, n_m + n_se,
-                            color=NAIVE_COLOR, alpha=0.13, zorder=2)
-            ax.plot(x, d_m, 's-', color=DRO_COLOR, lw=2, ms=5,
-                    label='DRO-FAIR', zorder=4)
-            ax.fill_between(x, d_m - d_se, d_m + d_se,
-                            color=DRO_COLOR, alpha=0.13, zorder=2)
+            # Error bars with caps (not shaded bands)
+            ax.errorbar(x, nm, yerr=nse, fmt='o-', color=C_NAIVE,
+                        ms=3.5, lw=1.1, capsize=2, capthick=0.8,
+                        label='Naive-Fair', zorder=3)
+            ax.errorbar(x, dm, yerr=dse, fmt='s-', color=C_DRO,
+                        ms=3.5, lw=1.1, capsize=2, capthick=0.8,
+                        label='DRO-Fair', zorder=3)
 
-            # Significance stars above the higher of the two lines
-            ylo, yhi = ax.get_ylim()
-            span = yhi - ylo if yhi > ylo else 1
-            for i, (xi, mk) in enumerate(zip(x, smarks)):
-                if mk:
-                    ypos = max(n_m[i], d_m[i]) + 0.04 * span
-                    ax.text(xi, ypos, mk, ha='center', va='bottom',
-                            fontsize=9, color=DRO_COLOR, fontweight='bold')
+            # Significance markers
+            for i, alpha in enumerate(ALPHAS):
+                nv = _get(results, ds, alpha, 'naive', met)
+                dv = _get(results, ds, alpha, 'dro',   met)
+                p = _wilcox(nv, dv)
+                s = _sig_marker(p, dm[i], nm[i])
+                if s:
+                    ymax = max(nm[i] + nse[i], dm[i] + dse[i])
+                    span = ax.get_ylim()[1] - ax.get_ylim()[0]
+                    if span == 0: span = 1
+                    ax.text(alpha, ymax + 0.02 * span, s,
+                            ha='center', va='bottom', fontsize=6,
+                            color=C_DRO)
 
-            # Grey band for α=0 baseline
-            ax.axvspan(-0.02, 0.02, color='gray', alpha=0.07, zorder=1)
-
-            ax.set_xlabel('Corruption level α', fontsize=9)
-            ax.set_ylabel(METRIC_LABELS[metric], fontsize=9)
             ax.set_xticks(ALPHAS)
-            # Every cell gets "Dataset — Metric" title
-            ax.set_title(f'{DS_LABELS[ds]} — {METRIC_LABELS[metric]}',
-                         fontsize=10, fontweight='bold')
+            ax.set_xlabel(r'$\alpha$')
+            ax.set_ylabel(ylabels[met])
+            ax.set_xlim(-0.03, 0.43)
+
+            # Row labels on far left edge (no overlap with ylabel)
+            if col == 0:
+                ax.annotate(DS_LABEL[ds], xy=(-0.50, 0.5),
+                            xycoords='axes fraction', fontsize=9,
+                            fontweight='bold', ha='center', va='center',
+                            rotation=90)
+
+            # Column headers on top row
+            if row == 0:
+                ax.set_title(ylabels[met], fontsize=9)
 
             if row == 0 and col == 2:
-                ax.legend(loc='upper right', framealpha=0.9)
+                ax.legend(loc='best', fontsize=6.5)
 
-    for ax in axes.flat:
-        ax.set_xlim(-0.04, 0.44)
-
-    os.makedirs(OUT, exist_ok=True)
-    fig.savefig(f'{OUT}/fig1_main_results.png')
-    fig.savefig(f'{OUT}/fig1_main_results.pdf')
-    plt.close()
-    print('  ✓ fig1_main_results')
+    _save(fig, 'fig1_main_results')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 2 — DP Reduction Heatmap
+# Figure 2 — DP reduction heatmap
 # ─────────────────────────────────────────────────────────────────────────────
-def fig2_dp_reduction_heatmap(results):
-    dp_red   = np.full((3, 5), np.nan)
-    p_mat    = np.ones((3, 5))
-    raw_red  = np.full((3, 5), np.nan)   # uncapped for text
+def fig2(results):
+    raw  = np.full((3, 5), np.nan)
+    clip = np.full((3, 5), np.nan)
+    pmat = np.ones((3, 5))
 
     for i, ds in enumerate(DATASETS):
         for j, alpha in enumerate(ALPHAS):
-            nv = get_vals(results, ds, alpha, 'naive', 'dp_violation')
-            dv = get_vals(results, ds, alpha, 'dro',   'dp_violation')
-            if not nv:
-                continue
+            nv = _get(results, ds, alpha, 'naive', 'dp_violation')
+            dv = _get(results, ds, alpha, 'dro',   'dp_violation')
+            if not nv: continue
             nm, dm = np.mean(nv), np.mean(dv)
-            raw = (nm - dm) / max(nm, 1e-9) * 100
-            raw_red[i, j]  = raw
-            dp_red[i, j]   = np.clip(raw, -100, 100)   # cap for colorscale
-            p_mat[i, j]    = wilcoxon_p(nv, dv)
+            r = (nm - dm) / max(nm, 1e-9) * 100
+            raw[i, j]  = r
+            clip[i, j] = np.clip(r, -100, 100)
+            pmat[i, j] = _wilcox(nv, dv)
 
-    fig, ax = plt.subplots(figsize=(9.5, 3.8), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(FULL_W * 0.65, 2.0))
 
-    # Custom diverging colormap: red→white→green
+    # Diverging: brown-white-green (not traffic-light red/green)
     cmap = LinearSegmentedColormap.from_list(
-        'rwg', ['#C0392B', '#F5F5F5', '#1E8449'], N=256)
-    im = ax.imshow(dp_red, cmap=cmap, vmin=-100, vmax=100, aspect='auto')
-    ax.grid(False)
+        'bwg', ['#a8432e', '#f7f7f7', '#2a6e3f'], N=256)
+    im = ax.imshow(clip, cmap=cmap, vmin=-100, vmax=100, aspect='auto')
 
-    cbar = plt.colorbar(im, ax=ax, pad=0.02, fraction=0.03)
-    cbar.set_label('DP Reduction (%)  positive → DRO wins', fontsize=9)
-    cbar.ax.tick_params(labelsize=8)
+    cbar = plt.colorbar(im, ax=ax, pad=0.03, fraction=0.04, shrink=0.9)
+    cbar.set_label(r'$\Delta_{\mathrm{DP}}$ reduction (%)', fontsize=7)
+    cbar.ax.tick_params(labelsize=6)
 
     ax.set_xticks(range(5))
-    ax.set_xticklabels([f'α={a}' for a in ALPHAS], fontsize=10)
+    ax.set_xticklabels([fr'$\alpha={a}$' for a in ALPHAS])
     ax.set_yticks(range(3))
-    ax.set_yticklabels([DS_LABELS[d] for d in DATASETS], fontsize=11, fontweight='bold')
-    ax.set_title(
-        'DRO-FAIR DP Reduction over Naive-FAIR\n'
-        '(capped ±100 % for color; exact value shown  |  * p<0.05  ** p<0.01  *** p<0.001)',
-        fontsize=10, fontweight='bold')
+    ax.set_yticklabels([DS_LABEL[d] for d in DATASETS])
+    ax.tick_params(length=0)
+    ax.grid(False)
 
     for i in range(3):
         for j in range(5):
-            p   = p_mat[i, j]
-            val = raw_red[i, j]
-            if np.isnan(val):
-                continue
-            st  = ('***' if p < 0.001 else ('**' if p < 0.01 else ('*' if p < 0.05 else '')))
-            # White text on dark cells, black on light
-            bg  = dp_red[i, j]
-            tc  = 'white' if abs(bg) > 60 else 'black'
-            # Mark extreme Adult α=0.3 cell differently
-            suffix = '' if abs(val) <= 100 else ' ⚠'
-            ax.text(j, i, f'{val:+.0f}%{suffix}\n{st}',
-                    ha='center', va='center', fontsize=9.5,
-                    color=tc, fontweight='bold')
+            v = raw[i, j]
+            if np.isnan(v): continue
+            p  = pmat[i, j]
+            st = ('***' if p < 0.001 else '**' if p < 0.01 else '*' if p < 0.05 else '')
+            tc = 'white' if abs(clip[i, j]) > 55 else 'black'
+            txt = f'{v:+.0f}%' if abs(v) <= 999 else f'{v:+.0f}'
+            ax.text(j, i, f'{txt}\n{st}', ha='center', va='center',
+                    fontsize=6.5, color=tc)
 
     ax.set_frame_on(False)
-    fig.savefig(f'{OUT}/fig2_dp_reduction_heatmap.png')
-    fig.savefig(f'{OUT}/fig2_dp_reduction_heatmap.pdf')
-    plt.close()
-    print('  ✓ fig2_dp_reduction_heatmap')
+    _save(fig, 'fig2_dp_reduction_heatmap')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 3 — Clean vs Corrupted Robustness
+# Figure 3 — Clean vs corrupted test robustness
 # ─────────────────────────────────────────────────────────────────────────────
-def fig3_robustness(results):
-    fig, axes = plt.subplots(2, 3, figsize=(14, 7), constrained_layout=True)
-    fig.suptitle(
-        'Robustness: DP Violation on Clean vs Adversarially Corrupted Test Set',
-        fontsize=12, fontweight='bold')
+def fig3(results):
+    fig, axes = plt.subplots(2, 3, figsize=(FULL_W, 3.6))
+    fig.subplots_adjust(hspace=0.52, wspace=0.36, top=0.90, bottom=0.10, left=0.10)
 
     methods = ['naive', 'dro']
-    mlabel  = {'naive': 'Naive-FAIR', 'dro': 'DRO-FAIR'}
+    mlabel  = {'naive': 'Naive-Fair', 'dro': 'DRO-Fair'}
+
+    x = np.array(ALPHAS)
 
     for col, ds in enumerate(DATASETS):
         for row, method in enumerate(methods):
             ax = axes[row, col]
             cl_m, cl_se, cr_m, cr_se = [], [], [], []
+
             for alpha in ALPHAS:
-                cv  = get_vals(results, ds, alpha, method, 'dp_violation', 'clean')
-                kv  = get_vals(results, ds, alpha, method, 'dp_violation', 'corrupted')
-                cm, cse = mean_se(cv)
-                km, kse = mean_se(kv)
-                cl_m.append(cm); cl_se.append(cse)
-                cr_m.append(km); cr_se.append(kse)
+                cv = _get(results, ds, alpha, method, 'dp_violation', 'clean')
+                kv = _get(results, ds, alpha, method, 'dp_violation', 'corrupted')
+                cm, cs = _ms(cv); km, ks = _ms(kv)
+                cl_m.append(cm); cl_se.append(cs)
+                cr_m.append(km); cr_se.append(ks)
 
-            x    = np.array(ALPHAS)
-            cl_m = np.array(cl_m, float);  cl_se = np.array(cl_se, float)
-            cr_m = np.array(cr_m, float);  cr_se = np.array(cr_se, float)
+            cl_m = np.array(cl_m); cl_se = np.array(cl_se)
+            cr_m = np.array(cr_m); cr_se = np.array(cr_se)
 
-            ax.plot(x, cl_m, 'o-', color=CLEAN_COLOR, lw=2, ms=5,
-                    label='Clean test')
-            ax.fill_between(x, cl_m - cl_se, cl_m + cl_se,
-                            color=CLEAN_COLOR, alpha=0.12)
-            ax.plot(x, cr_m, 's--', color=CORRUPT_COLOR, lw=2, ms=5,
-                    label='Corrupted test')
-            ax.fill_between(x, cr_m - cr_se, cr_m + cr_se,
-                            color=CORRUPT_COLOR, alpha=0.12)
+            ax.errorbar(x, cl_m, yerr=cl_se, fmt='o-', color=C_CLEAN,
+                        ms=3, lw=1.0, capsize=1.5, capthick=0.7, label='Clean')
+            ax.errorbar(x, cr_m, yerr=cr_se, fmt='s--', color=C_CORR,
+                        ms=3, lw=1.0, capsize=1.5, capthick=0.7, label='Corrupted')
 
-            ax.set_xlabel('Corruption level α', fontsize=9)
-            ax.set_ylabel('DP Violation', fontsize=9)
             ax.set_xticks(ALPHAS)
-            ax.set_title(f'{DS_LABELS[ds]} — {mlabel[method]}',
-                         fontsize=10, fontweight='bold')
-            if row == 0 and col == 0:
-                ax.legend(fontsize=9)
+            ax.set_xlabel(r'$\alpha$')
+            if col == 0:
+                ax.set_ylabel(r'$\Delta_{\mathrm{DP}}$')
 
-    fig.savefig(f'{OUT}/fig3_robustness_clean_vs_corrupted.png')
-    fig.savefig(f'{OUT}/fig3_robustness_clean_vs_corrupted.pdf')
-    plt.close()
-    print('  ✓ fig3_robustness_clean_vs_corrupted')
+            if row == 0:
+                ax.set_title(DS_LABEL[ds], fontsize=9)
+            if col == 0:
+                ax.annotate(mlabel[method], xy=(-0.52, 0.5),
+                            xycoords='axes fraction', fontsize=8,
+                            ha='center', va='center', rotation=90)
+
+            if row == 0 and col == 2:
+                ax.legend(fontsize=6, loc='best')
+
+    _save(fig, 'fig3_robustness_clean_vs_corrupted')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 4 — Significance Matrix
+# Figure 4 — Significance matrix
 # ─────────────────────────────────────────────────────────────────────────────
-def fig4_significance_matrix(results):
-    fig, axes = plt.subplots(1, 2, figsize=(13, 3.8), constrained_layout=True)
-    fig.suptitle(
-        'Statistical Significance: Wilcoxon Signed-Rank (one-sided, n=10 seeds, clean test)',
-        fontsize=11, fontweight='bold')
+def fig4(results):
+    fig, axes = plt.subplots(1, 2, figsize=(FULL_W * 0.78, 2.2))
+    fig.subplots_adjust(wspace=0.30, top=0.85, bottom=0.18)
 
-    TEAL  = np.array([0.000, 0.620, 0.451, 0.85])  # DRO wins
-    RED   = np.array([0.835, 0.369, 0.000, 0.85])  # Naive wins
-    GREY  = np.array([0.90,  0.90,  0.90,  0.65])  # tie
+    c_win  = np.array([0.165, 0.431, 0.247, 0.80])  # DRO wins — muted green
+    c_lose = np.array([0.784, 0.263, 0.196, 0.80])   # Naive wins — muted red
+    c_tie  = np.array([0.88,  0.88,  0.88,  0.55])   # tie — light grey
 
-    for ax_idx, metric in enumerate(['dp_violation', 'if_violation']):
-        ax = axes[ax_idx]
-        p_grid   = np.ones((3, 5))
-        win_grid = np.zeros((3, 5))
+    for ai, met in enumerate(['dp_violation', 'if_violation']):
+        ax = axes[ai]
+        pgrid = np.ones((3, 5))
+        wgrid = np.zeros((3, 5))
 
         for i, ds in enumerate(DATASETS):
             for j, alpha in enumerate(ALPHAS):
-                nv = get_vals(results, ds, alpha, 'naive', metric)
-                dv = get_vals(results, ds, alpha, 'dro',   metric)
-                p  = wilcoxon_p(nv, dv)
-                p_grid[i, j] = p
+                nv = _get(results, ds, alpha, 'naive', met)
+                dv = _get(results, ds, alpha, 'dro', met)
+                p  = _wilcox(nv, dv)
+                pgrid[i, j] = p
                 nm, dm = (np.mean(nv) if nv else np.nan), (np.mean(dv) if dv else np.nan)
-                if p < 0.05 and dm < nm:
-                    win_grid[i, j] =  1
-                elif p < 0.05 and dm > nm:
-                    win_grid[i, j] = -1
+                if   p < 0.05 and dm < nm: wgrid[i, j] =  1
+                elif p < 0.05 and dm > nm: wgrid[i, j] = -1
 
         cmat = np.zeros((3, 5, 4))
         for i in range(3):
             for j in range(5):
-                cmat[i, j] = TEAL if win_grid[i, j] == 1 else (
-                              RED  if win_grid[i, j] == -1 else GREY)
+                cmat[i, j] = (c_win if wgrid[i, j] == 1
+                              else c_lose if wgrid[i, j] == -1
+                              else c_tie)
 
         ax.imshow(cmat, aspect='auto', interpolation='nearest')
         ax.grid(False)
         ax.set_xticks(range(5))
-        ax.set_xticklabels([f'α={a}' for a in ALPHAS], fontsize=10)
+        ax.set_xticklabels([fr'$\alpha\!=\!{a}$' for a in ALPHAS])
         ax.set_yticks(range(3))
-        ax.set_yticklabels([DS_LABELS[d] for d in DATASETS],
-                           fontsize=10, fontweight='bold')
-        ax.set_title(
-            'DP Violation' if metric == 'dp_violation' else 'IF Violation',
-            fontsize=11, fontweight='bold')
+        ax.set_yticklabels([DS_LABEL[d] for d in DATASETS])
+        ax.tick_params(length=0)
+
+        title = (r'$\Delta_{\mathrm{DP}}$' if met == 'dp_violation'
+                 else r'$\mathcal{L}_{\mathrm{IF}}$')
+        ax.set_title(title, fontsize=9)
 
         for i in range(3):
             for j in range(5):
-                p   = p_grid[i, j]
-                w   = win_grid[i, j]
-                st  = ('***' if p < 0.001 else ('**' if p < 0.01 else
-                       ('*'  if p < 0.05  else 'ns')))
-                lbl = ('DRO ↓' if w == 1 else ('Naive ↓' if w == -1 else 'tie'))
-                tc  = 'white' if w != 0 else '#444444'
-                ax.text(j, i, f'p={p:.3f}\n{st}  {lbl}',
-                        ha='center', va='center', fontsize=8,
-                        color=tc, fontweight='bold')
+                p = pgrid[i, j]
+                w = wgrid[i, j]
+                st = ('***' if p < 0.001 else '**' if p < 0.01
+                      else '*' if p < 0.05 else 'n.s.')
+                winner = ('DRO' if w == 1 else 'Naive' if w == -1 else '')
+                tc = 'white' if w != 0 else '#555'
+                line1 = f'$p$={p:.3f}'
+                line2 = f'{st}  {winner}' if winner else st
+                ax.text(j, i, f'{line1}\n{line2}',
+                        ha='center', va='center', fontsize=5.5, color=tc)
 
         ax.set_frame_on(False)
-        teal_p = mpatches.Patch(color=TEAL, label='DRO significantly better')
-        red_p  = mpatches.Patch(color=RED,  label='Naive significantly better')
-        grey_p = mpatches.Patch(color=GREY, label='No significant difference')
-        ax.legend(handles=[teal_p, red_p, grey_p],
-                  loc='upper center', bbox_to_anchor=(0.5, -0.14),
-                  ncol=3, fontsize=8, framealpha=0.9)
 
-    fig.savefig(f'{OUT}/fig4_significance_matrix.png')
-    fig.savefig(f'{OUT}/fig4_significance_matrix.pdf')
-    plt.close()
-    print('  ✓ fig4_significance_matrix')
+    # Shared legend below
+    from matplotlib.patches import Patch
+    handles = [Patch(facecolor=c_win,  label='DRO sig. better'),
+               Patch(facecolor=c_lose, label='Naive sig. better'),
+               Patch(facecolor=c_tie,  label='Not significant')]
+    fig.legend(handles=handles, loc='lower center', ncol=3, fontsize=6.5,
+               frameon=False, bbox_to_anchor=(0.5, -0.01))
+
+    _save(fig, 'fig4_significance_matrix')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 5 — Accuracy–Fairness Tradeoff
+# Figure 5 — Accuracy vs DP tradeoff (Pareto-style scatter)
 # ─────────────────────────────────────────────────────────────────────────────
-def fig5_accuracy_fairness_tradeoff(results):
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4.8))
-    fig.subplots_adjust(top=0.86, bottom=0.14, wspace=0.30, right=0.88)
-    fig.suptitle(
-        'Accuracy–Fairness Tradeoff  (mean over 10 seeds, clean test)',
-        fontsize=12, fontweight='bold')
+def fig5(results):
+    fig, axes = plt.subplots(1, 3, figsize=(FULL_W, 2.4))
+    fig.subplots_adjust(wspace=0.34, top=0.85, bottom=0.18, right=0.86)
 
-    markers = {0.0: 'o', 0.1: 's', 0.2: '^', 0.3: 'D', 0.4: 'X'}
-    sizes   = {0.0: 65,  0.1: 75,  0.2: 85,  0.3: 95,  0.4: 105}
-    # Per-panel label offsets to avoid collision (dx, dy in points)
-    offsets = {
-        'adult':  {0.0:(6,4), 0.1:(6,-10), 0.2:(6,4), 0.3:(-30,-12), 0.4:(6,4)},
-        'credit': {0.0:(6,4), 0.1:(6,-10), 0.2:(6,4), 0.3:(6,4), 0.4:(-30,-12)},
-        'lsac':   {0.0:(6,4), 0.1:(6,-10), 0.2:(6,4), 0.3:(6,4), 0.4:(-30,-12)},
-    }
+    markers = {0.0: 'o', 0.1: 's', 0.2: '^', 0.3: 'D', 0.4: 'v'}
 
     for col, ds in enumerate(DATASETS):
         ax = axes[col]
         for alpha in ALPHAS:
-            nv_acc = get_vals(results, ds, alpha, 'naive', 'accuracy')
-            nv_dp  = get_vals(results, ds, alpha, 'naive', 'dp_violation')
-            dv_acc = get_vals(results, ds, alpha, 'dro',   'accuracy')
-            dv_dp  = get_vals(results, ds, alpha, 'dro',   'dp_violation')
-            if not nv_acc:
-                continue
-            na, nd = np.mean(nv_acc), np.mean(nv_dp)
-            da, dd = np.mean(dv_acc), np.mean(dv_dp)
+            na = np.mean(_get(results, ds, alpha, 'naive', 'accuracy'))
+            nd = np.mean(_get(results, ds, alpha, 'naive', 'dp_violation'))
+            da = np.mean(_get(results, ds, alpha, 'dro',   'accuracy'))
+            dd = np.mean(_get(results, ds, alpha, 'dro',   'dp_violation'))
 
-            ax.scatter(na, nd, color=NAIVE_COLOR, s=sizes[alpha],
-                       marker=markers[alpha], zorder=4, edgecolors='white', lw=0.8)
-            ax.scatter(da, dd, color=DRO_COLOR, s=sizes[alpha],
-                       marker=markers[alpha], zorder=4, edgecolors='white', lw=0.8)
-            dx, dy = offsets[ds].get(alpha, (6, 4))
-            ax.annotate(f'α={alpha}', (da, dd),
-                        textcoords='offset points', xytext=(dx, dy),
-                        fontsize=7, color=DRO_COLOR,
-                        arrowprops=dict(arrowstyle='-', color=DRO_COLOR,
-                                        lw=0.4, shrinkA=0, shrinkB=3)
-                        if abs(dx) > 10 or abs(dy) > 10 else None)
+            ax.scatter(na, nd, color=C_NAIVE, s=28, marker=markers[alpha],
+                       zorder=3, edgecolors='white', linewidths=0.4)
+            ax.scatter(da, dd, color=C_DRO,   s=28, marker=markers[alpha],
+                       zorder=3, edgecolors='white', linewidths=0.4)
 
-        ax.set_xlabel('Accuracy ↑', fontsize=10)
-        ax.set_ylabel('DP Violation ↓', fontsize=10)
-        ax.set_title(DS_LABELS[ds], fontsize=11, fontweight='bold')
+            # Label only DRO points — alternate offset to avoid cluster
+            dy_off = 3 if (alpha * 10) % 2 == 0 else -8
+            ax.annotate(fr'${alpha}$', (da, dd), fontsize=5, color='#555',
+                        textcoords='offset points', xytext=(5, dy_off))
 
-    # Shared legend to the right of figure
-    naive_p = mpatches.Patch(color=NAIVE_COLOR, label='Naive-FAIR')
-    dro_p   = mpatches.Patch(color=DRO_COLOR,   label='DRO-FAIR')
-    alpha_lines = [plt.Line2D([0],[0], marker=markers[a], color='gray',
-                              linestyle='None', ms=6, label=f'α={a}')
-                   for a in ALPHAS]
-    fig.legend(handles=[naive_p, dro_p] + alpha_lines,
-               loc='center right', fontsize=8, framealpha=0.9,
-               bbox_to_anchor=(0.99, 0.5))
+        ax.set_xlabel('Accuracy')
+        if col == 0:
+            ax.set_ylabel(r'$\Delta_{\mathrm{DP}}$')
+        ax.set_title(DS_LABEL[ds], fontsize=9)
 
-    fig.savefig(f'{OUT}/fig5_accuracy_fairness_tradeoff.png')
-    fig.savefig(f'{OUT}/fig5_accuracy_fairness_tradeoff.pdf')
-    plt.close()
-    print('  ✓ fig5_accuracy_fairness_tradeoff')
+    # Compact legend in margin
+    from matplotlib.lines import Line2D
+    handles = [
+        Line2D([0], [0], marker='o', color='w', markerfacecolor=C_NAIVE,
+               ms=5, label='Naive-Fair'),
+        Line2D([0], [0], marker='o', color='w', markerfacecolor=C_DRO,
+               ms=5, label='DRO-Fair'),
+    ]
+    fig.legend(handles=handles, loc='center right', fontsize=6.5,
+               frameon=True, bbox_to_anchor=(0.99, 0.55))
+
+    _save(fig, 'fig5_accuracy_fairness_tradeoff')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 6 — Seed Stability Boxplots
+# Figure 6 — Per-seed stability (boxplots)
 # ─────────────────────────────────────────────────────────────────────────────
-def fig6_seed_stability(results):
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.5), constrained_layout=True)
-    fig.suptitle(
-        'Per-Seed DRO-FAIR Accuracy (10 seeds) — Stability Analysis',
-        fontsize=12, fontweight='bold')
-
-    bp_props = dict(
-        medianprops  = dict(color='white', lw=2.5),
-        whiskerprops = dict(color=DRO_COLOR, lw=1.5),
-        capprops     = dict(color=DRO_COLOR, lw=1.5),
-        flierprops   = dict(marker='o', markerfacecolor=NAIVE_COLOR,
-                            markeredgecolor='white', markersize=5),
-        boxprops     = dict(linewidth=1.2),
-    )
+def fig6(results):
+    fig, axes = plt.subplots(1, 3, figsize=(FULL_W, 2.4))
+    fig.subplots_adjust(wspace=0.30, top=0.85, bottom=0.18)
 
     for col, ds in enumerate(DATASETS):
         ax = axes[col]
-        data, xlabels = [], []
+        data, labels = [], []
         for alpha in [0.1, 0.2, 0.3, 0.4]:
-            dv = get_vals(results, ds, alpha, 'dro', 'accuracy')
+            dv = _get(results, ds, alpha, 'dro', 'accuracy')
             if dv:
                 data.append(dv)
-                xlabels.append(f'α={alpha}')
+                labels.append(fr'${alpha}$')
 
         if not data:
             ax.set_visible(False)
             continue
 
-        bp = ax.boxplot(data, labels=xlabels, patch_artist=True, **bp_props)
+        bp = ax.boxplot(
+            data, labels=labels, patch_artist=True, widths=0.45,
+            medianprops=dict(color='white', lw=1.5),
+            whiskerprops=dict(color=C_DRO, lw=0.8),
+            capprops=dict(color=C_DRO, lw=0.8),
+            flierprops=dict(marker='.', markerfacecolor=C_NAIVE,
+                            markeredgecolor='none', ms=3),
+            boxprops=dict(linewidth=0.8),
+        )
         for patch in bp['boxes']:
-            patch.set_facecolor(DRO_COLOR)
-            patch.set_alpha(0.72)
+            patch.set_facecolor(C_DRO)
+            patch.set_alpha(0.55)
 
-        ax.axhline(0.75, color='#C0392B', lw=1.2, ls='--', alpha=0.7,
-                   label='0.75 threshold')
-        ax.set_ylabel('DRO-FAIR Accuracy', fontsize=10)
-        ax.set_xlabel('Corruption Level', fontsize=10)
-        ax.set_title(DS_LABELS[ds], fontsize=11, fontweight='bold')
-        ax.set_ylim(0.05, 1.02)
-        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.2f}'))
+        # Auto-scale y-axis with some padding
+        all_vals = [v for d in data for v in d]
+        ylo = max(0, min(all_vals) - 0.08)
+        yhi = min(1.02, max(all_vals) + 0.04)
+        ax.set_ylim(ylo, yhi)
+        if ylo < 0.75 < yhi:
+            ax.axhline(0.75, color='#999', lw=0.7, ls=':', zorder=1)
+        ax.set_xlabel(r'$\alpha$')
         if col == 0:
-            ax.legend(fontsize=8, loc='lower left')
+            ax.set_ylabel('Accuracy')
+        ax.set_title(DS_LABEL[ds], fontsize=9)
 
-    fig.savefig(f'{OUT}/fig6_seed_stability.png')
-    fig.savefig(f'{OUT}/fig6_seed_stability.pdf')
-    plt.close()
-    print('  ✓ fig6_seed_stability')
+    _save(fig, 'fig6_seed_stability')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 7 — Summary Win-Rate Bar Chart
+# Figure 7 — Win-rate summary (stacked bar)
 # ─────────────────────────────────────────────────────────────────────────────
-def fig7_summary(results):
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), constrained_layout=True)
-    fig.suptitle(
-        'DRO-FAIR vs Naive-FAIR — Win Summary at α ∈ {0.1, 0.2, 0.3} (3 cells each)',
-        fontsize=12, fontweight='bold')
+def fig7(results):
+    fig, axes = plt.subplots(1, 2, figsize=(COL_W * 1.6, 2.3))
+    fig.subplots_adjust(wspace=0.35, top=0.82, bottom=0.20)
 
-    for ax_idx, metric in enumerate(['dp_violation', 'if_violation']):
-        ax = axes[ax_idx]
+    for ai, met in enumerate(['dp_violation', 'if_violation']):
+        ax = axes[ai]
         wins, losses, ties = {}, {}, {}
         for ds in DATASETS:
-            lbl = DS_LABELS[ds]
+            lbl = DS_LABEL[ds]
             wins[lbl] = losses[lbl] = ties[lbl] = 0
             for alpha in [0.1, 0.2, 0.3]:
-                nv = get_vals(results, ds, alpha, 'naive', metric)
-                dv = get_vals(results, ds, alpha, 'dro',   metric)
-                p  = wilcoxon_p(nv, dv)
+                nv = _get(results, ds, alpha, 'naive', met)
+                dv = _get(results, ds, alpha, 'dro',   met)
+                p  = _wilcox(nv, dv)
                 nm, dm = np.mean(nv), np.mean(dv)
-                if p < 0.05 and dm < nm:
-                    wins[lbl]   += 1
-                elif p < 0.05 and dm > nm:
-                    losses[lbl] += 1
-                else:
-                    ties[lbl]   += 1
+                if   p < 0.05 and dm < nm: wins[lbl]   += 1
+                elif p < 0.05 and dm > nm: losses[lbl] += 1
+                else:                      ties[lbl]   += 1
 
-        lbls  = list(wins.keys())
-        w_v   = [wins[l]   for l in lbls]
-        t_v   = [ties[l]   for l in lbls]
-        l_v   = [losses[l] for l in lbls]
-        x     = np.arange(len(lbls))
-        w_arr = 0.52
+        lbls = list(wins.keys())
+        w = [wins[l] for l in lbls]
+        t = [ties[l] for l in lbls]
+        lo = [losses[l] for l in lbls]
+        x = np.arange(len(lbls))
+        bw = 0.48
 
-        ax.bar(x, w_v, w_arr, color=DRO_COLOR,   alpha=0.85, label='DRO sig. better')
-        ax.bar(x, t_v, w_arr, bottom=w_v,         color='#ADB5BD', alpha=0.8,  label='No sig. diff.')
-        ax.bar(x, l_v, w_arr, bottom=[w+t for w,t in zip(w_v, t_v)],
-               color=NAIVE_COLOR, alpha=0.85, label='Naive sig. better')
+        ax.bar(x, w, bw, color=C_DRO,   alpha=0.75, label='DRO wins')
+        ax.bar(x, t, bw, bottom=w, color='#ccc', alpha=0.7, label='No sig. diff.')
+        ax.bar(x, lo, bw, bottom=[a+b for a, b in zip(w, t)],
+               color=C_NAIVE, alpha=0.75, label='Naive wins')
+
+        # Annotate DRO wins count
+        for i, wi in enumerate(w):
+            if wi > 0:
+                ax.text(i, wi - 0.15, str(wi), ha='center', va='top',
+                        fontsize=7, color='white', fontweight='bold')
 
         ax.set_xticks(x)
-        ax.set_xticklabels(lbls, fontsize=11, fontweight='bold')
-        ax.set_ylabel('# comparisons (of 3)', fontsize=10)
+        ax.set_xticklabels(lbls)
+        ax.set_ylabel('Comparisons')
         ax.set_yticks([0, 1, 2, 3])
-        ax.set_ylim(0, 3.7)
-        ax.set_title(
-            'DP Violation' if metric == 'dp_violation' else 'IF Violation',
-            fontsize=11, fontweight='bold')
+        ax.set_ylim(0, 3.5)
+        title = (r'$\Delta_{\mathrm{DP}}$' if met == 'dp_violation'
+                 else r'$\mathcal{L}_{\mathrm{IF}}$')
+        ax.set_title(title, fontsize=9)
 
-        for i, (w, l) in enumerate(zip(w_v, l_v)):
-            ax.text(i, w + 0.07, f'{w}/3', ha='center', va='bottom',
-                    fontsize=11, color=DRO_COLOR, fontweight='bold')
+    # Shared legend below
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=3,
+               fontsize=6.5, frameon=False, bbox_to_anchor=(0.5, -0.02))
 
-        if ax_idx == 0:
-            ax.legend(fontsize=8, loc='upper center', ncol=3,
-                      bbox_to_anchor=(1.1, -0.15), framealpha=0.9)
-
-    fig.subplots_adjust(bottom=0.22)
-    fig.savefig(f'{OUT}/fig7_summary_win_rates.png')
-    fig.savefig(f'{OUT}/fig7_summary_win_rates.pdf')
-    plt.close()
-    print('  ✓ fig7_summary_win_rates')
+    _save(fig, 'fig7_summary_win_rates')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
     os.makedirs(OUT, exist_ok=True)
     results = load_results()
-    print(f'Loaded {len(results)} results. Generating 7 publication-quality figures...\n')
+    print(f'Generating figures from {len(results)} experiment results...\n')
 
-    fig1_main_results(results)
-    fig2_dp_reduction_heatmap(results)
-    fig3_robustness(results)
-    fig4_significance_matrix(results)
-    fig5_accuracy_fairness_tradeoff(results)
-    fig6_seed_stability(results)
-    fig7_summary(results)
+    fig1(results)
+    fig2(results)
+    fig3(results)
+    fig4(results)
+    fig5(results)
+    fig6(results)
+    fig7(results)
 
-    print(f'\n✅  All 7 figures saved to {OUT}/ at 300 DPI (PNG + PDF).')
+    print(f'\nAll figures saved to {OUT}/ (PDF + PNG, 300 DPI)')
 
 
 if __name__ == '__main__':
