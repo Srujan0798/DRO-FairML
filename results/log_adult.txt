@@ -1,0 +1,148 @@
+Completed: 2/50, Remaining: 48
+
+[3/50] adult α=0.0 seed=2
+  Done in 1148s | Naive DP=0.1764 DRO DP=0.1608 DRO Acc=0.8244 WIN
+
+[4/50] adult α=0.0 seed=3
+  Done in 1119s | Naive DP=0.1711 DRO DP=0.1590 DRO Acc=0.8167 WIN
+
+[5/50] adult α=0.0 seed=4
+  Done in 1064s | Naive DP=0.1768 DRO DP=0.1673 DRO Acc=0.8241 WIN
+
+[6/50] adult α=0.0 seed=5
+  Done in 1109s | Naive DP=0.1896 DRO DP=0.1752 DRO Acc=0.8228 WIN
+
+[7/50] adult α=0.0 seed=6
+  Done in 1107s | Naive DP=0.1748 DRO DP=0.1909 DRO Acc=0.8182 LOSS
+
+[8/50] adult α=0.0 seed=7
+  Done in 1151s | Naive DP=0.1760 DRO DP=0.1708 DRO Acc=0.8217 WIN
+
+[9/50] adult α=0.0 seed=8
+  Done in 1145s | Naive DP=0.1774 DRO DP=0.1670 DRO Acc=0.8297 WIN
+
+[10/50] adult α=0.0 seed=9
+  Done in 780s | Naive DP=0.1635 DRO DP=0.1707 DRO Acc=0.8228 LOSS
+
+[11/50] adult α=0.1 seed=0
+  Done in 408s | Naive DP=0.1439 DRO DP=0.1398 DRO Acc=0.8283 WIN
+
+[12/50] adult α=0.1 seed=1
+  Done in 394s | Naive DP=0.1921 DRO DP=0.1952 DRO Acc=0.8280 LOSS
+
+[13/50] adult α=0.1 seed=2
+  Done in 405s | Naive DP=0.1597 DRO DP=0.1599 DRO Acc=0.8308 LOSS
+
+[14/50] adult α=0.1 seed=3
+  Done in 523s | Naive DP=0.1504 DRO DP=0.1729 DRO Acc=0.8161 LOSS
+
+[15/50] adult α=0.1 seed=4
+  Done in 355s | Naive DP=0.1534 DRO DP=0.2020 DRO Acc=0.8279 LOSS
+
+[16/50] adult α=0.1 seed=5
+  Done in 406s | Naive DP=0.1704 DRO DP=0.2004 DRO Acc=0.8229 LOSS
+
+[17/50] adult α=0.1 seed=6
+  Done in 447s | Naive DP=0.1568 DRO DP=0.1933 DRO Acc=0.8212 LOSS
+
+[18/50] adult α=0.1 seed=7
+  Done in 420s | Naive DP=0.1456 DRO DP=0.1999 DRO Acc=0.8285 LOSS
+
+[19/50] adult α=0.1 seed=8
+  Done in 473s | Naive DP=0.1666 DRO DP=0.1433 DRO Acc=0.8329 WIN
+
+[20/50] adult α=0.1 seed=9
+  Done in 351s | Naive DP=0.1503 DRO DP=0.1522 DRO Acc=0.8255 LOSS
+
+[21/50] adult α=0.2 seed=0
+  Done in 308s | Naive DP=0.1243 DRO DP=0.3009 DRO Acc=0.8093 LOSS
+
+[22/50] adult α=0.2 seed=1
+  Done in 377s | Naive DP=0.1567 DRO DP=0.2197 DRO Acc=0.8166 LOSS
+
+[23/50] adult α=0.2 seed=2
+  Done in 307s | Naive DP=0.1427 DRO DP=0.1490 DRO Acc=0.8322 LOSS
+
+[24/50] adult α=0.2 seed=3
+  Done in 450s | Naive DP=0.1258 DRO DP=0.0008 DRO Acc=0.7522 WIN
+
+[25/50] adult α=0.2 seed=4
+  Done in 242s | Naive DP=0.1230 DRO DP=0.2744 DRO Acc=0.8096 LOSS
+
+[26/50] adult α=0.2 seed=5
+  Done in 296s | Naive DP=0.1497 DRO DP=0.2816 DRO Acc=0.8032 LOSS
+
+[27/50] adult α=0.2 seed=6
+  Done in 436s | Naive DP=0.1350 DRO DP=0.0000 DRO Acc=0.7521 WIN
+
+[28/50] adult α=0.2 seed=7
+  Done in 283s | Naive DP=0.1408 DRO DP=0.3042 DRO Acc=0.8117 LOSS
+
+[29/50] adult α=0.2 seed=8
+  Done in 496s | Naive DP=0.1148 DRO DP=0.0000 DRO Acc=0.7521 WIN
+
+[30/50] adult α=0.2 seed=9
+  Done in 284s | Naive DP=0.1431 DRO DP=0.1381 DRO Acc=0.8259 WIN
+
+[31/50] adult α=0.3 seed=0
+  Done in 222s | Naive DP=0.0056 DRO DP=0.0928 DRO Acc=0.8228 LOSS
+
+[32/50] adult α=0.3 seed=1
+  Done in 128s | Naive DP=0.0069 DRO DP=0.0083 DRO Acc=0.2552 LOSS
+
+[33/50] adult α=0.3 seed=2
+  Done in 178s | Naive DP=0.0260 DRO DP=0.1031 DRO Acc=0.8196 LOSS
+
+[34/50] adult α=0.3 seed=3
+  Done in 83s | Naive DP=0.0062 DRO DP=0.0003 DRO Acc=0.7521 WIN
+
+[35/50] adult α=0.3 seed=4
+  Done in 153s | Naive DP=0.0225 DRO DP=0.0186 DRO Acc=0.4023 WIN
+
+[36/50] adult α=0.3 seed=5
+  Done in 138s | Naive DP=0.0062 DRO DP=0.0034 DRO Acc=0.2509 WIN
+
+[37/50] adult α=0.3 seed=6
+  Done in 113s | Naive DP=0.0039 DRO DP=0.0562 DRO Acc=0.3308 LOSS
+
+[38/50] adult α=0.3 seed=7
+  Done in 171s | Naive DP=0.0294 DRO DP=0.0002 DRO Acc=0.2480 WIN
+
+[39/50] adult α=0.3 seed=8
+  Done in 145s | Naive DP=0.0036 DRO DP=0.0024 DRO Acc=0.2506 WIN
+
+[40/50] adult α=0.3 seed=9
+  Done in 279s | Naive DP=0.0172 DRO DP=0.1054 DRO Acc=0.8172 LOSS
+
+[41/50] adult α=0.4 seed=0
+  Done in 640s | Naive DP=0.0606 DRO DP=0.0408 DRO Acc=0.6217 WIN
+
+[42/50] adult α=0.4 seed=1
+  Done in 675s | Naive DP=0.0613 DRO DP=0.0341 DRO Acc=0.6638 WIN
+
+[43/50] adult α=0.4 seed=2
+  Done in 653s | Naive DP=0.0510 DRO DP=0.0322 DRO Acc=0.6472 WIN
+
+[44/50] adult α=0.4 seed=3
+  Done in 611s | Naive DP=0.0481 DRO DP=0.0270 DRO Acc=0.6427 WIN
+
+[45/50] adult α=0.4 seed=4
+  Done in 677s | Naive DP=0.0530 DRO DP=0.0297 DRO Acc=0.6427 WIN
+
+[46/50] adult α=0.4 seed=5
+  Done in 650s | Naive DP=0.0527 DRO DP=0.0290 DRO Acc=0.6530 WIN
+
+[47/50] adult α=0.4 seed=6
+  Done in 540s | Naive DP=0.0556 DRO DP=0.0371 DRO Acc=0.6250 WIN
+
+[48/50] adult α=0.4 seed=7
+  Done in 558s | Naive DP=0.0508 DRO DP=0.0361 DRO Acc=0.6300 WIN
+
+[49/50] adult α=0.4 seed=8
+  Done in 621s | Naive DP=0.0566 DRO DP=0.0366 DRO Acc=0.6507 WIN
+
+[50/50] adult α=0.4 seed=9
+  Done in 1150s | Naive DP=0.0567 DRO DP=0.0399 DRO Acc=0.6164 WIN
+
+Merging all results...
+Total: 150 experiments saved to results/all_results.json

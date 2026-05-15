@@ -1,0 +1,32 @@
+{
+  "dataset": "lsac",
+  "alpha": 0.2,
+  "seed": 9,
+  "naive": {
+    "time": 4.22081995010376,
+    "clean": {
+      "accuracy": 0.905589729874298,
+      "dp_violation": 0.023396670818328857,
+      "if_violation": 0.0019256485691361326
+    },
+    "corrupted": {
+      "accuracy": 0.9010430596416154,
+      "dp_violation": 0.018784165382385254,
+      "if_violation": 0.0025140411874832844
+    }
+  },
+  "dro": {
+    "time": 77.70733618736267,
+    "clean": {
+      "accuracy": 0.9018454132120888,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "corrupted": {
+      "accuracy": 0.9018454132120888,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    }
+  },
+  "total_time": 83.94072079658508
+}

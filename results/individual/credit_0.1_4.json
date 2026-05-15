@@ -1,0 +1,32 @@
+{
+  "dataset": "credit",
+  "alpha": 0.1,
+  "seed": 4,
+  "naive": {
+    "time": 6.0982890129089355,
+    "clean": {
+      "accuracy": 0.8108333333333333,
+      "dp_violation": 0.016465477645397186,
+      "if_violation": 0.0009333333333333333
+    },
+    "corrupted": {
+      "accuracy": 0.8083333333333333,
+      "dp_violation": 0.01215372234582901,
+      "if_violation": 0.0008
+    }
+  },
+  "dro": {
+    "time": 207.76832509040833,
+    "clean": {
+      "accuracy": 0.8048333333333333,
+      "dp_violation": 0.01600445806980133,
+      "if_violation": 0.0016333333333333334
+    },
+    "corrupted": {
+      "accuracy": 0.8023333333333333,
+      "dp_violation": 0.014929916709661484,
+      "if_violation": 0.002
+    }
+  },
+  "total_time": 219.01549911499023
+}

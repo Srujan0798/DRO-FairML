@@ -40,12 +40,17 @@ data/raw/
 *.xlsx
 *.data
 
-# Results
-results/
-figures/
-*.pkl
+# Model checkpoints (large binary files)
 *.pth
 *.pt
+
+# Keep results/ and figures/ tracked — they ARE the deliverables
+# results/
+# figures/
+
+# Pickle checkpoint (large, regenerable)
+results/checkpoint.pkl
+results/all_results.pkl
 
 # Logs
 *.log

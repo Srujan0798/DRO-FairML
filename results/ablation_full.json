@@ -1,0 +1,374 @@
+[
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8464344941956883,
+      "dp_violation": 0.1782168596982956,
+      "if_violation": 0.02666666666666667
+    },
+    "naive": {
+      "accuracy": 0.8344941956882256,
+      "dp_violation": 0.13672268390655518,
+      "if_violation": 0.029850746268656716
+    },
+    "dro_joint": {
+      "accuracy": 0.7525704809286898,
+      "dp_violation": 0.0022902011405676603,
+      "if_violation": 0.0015478164731896075
+    },
+    "dro_dp_only": {
+      "accuracy": 0.8298507462686567,
+      "dp_violation": 0.1497393697500229,
+      "if_violation": 0.02093974571586512
+    },
+    "dro_if_only": {
+      "accuracy": 0.82808181315644,
+      "dp_violation": 0.13555745780467987,
+      "if_violation": 0.03188501934770591
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8301824212271973,
+      "dp_violation": 0.17451980710029602,
+      "if_violation": 0.03865118850193477
+    },
+    "naive": {
+      "accuracy": 0.829297954671089,
+      "dp_violation": 0.16471850872039795,
+      "if_violation": 0.027639579878385848
+    },
+    "dro_joint": {
+      "accuracy": 0.8259812050856827,
+      "dp_violation": 0.16349685192108154,
+      "if_violation": 0.019192924267551134
+    },
+    "dro_dp_only": {
+      "accuracy": 0.8248756218905473,
+      "dp_violation": 0.12081458419561386,
+      "if_violation": 0.020541735765616364
+    },
+    "dro_if_only": {
+      "accuracy": 0.8266445550027639,
+      "dp_violation": 0.17253516614437103,
+      "if_violation": 0.028988391376451077
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 2,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8390270867882809,
+      "dp_violation": 0.1750973016023636,
+      "if_violation": 0.04398009950248756
+    },
+    "naive": {
+      "accuracy": 0.822996130458817,
+      "dp_violation": 0.14472097158432007,
+      "if_violation": 0.0310889994472084
+    },
+    "dro_joint": {
+      "accuracy": 0.8141514648977336,
+      "dp_violation": 0.12379784137010574,
+      "if_violation": 0.01925925925925926
+    },
+    "dro_dp_only": {
+      "accuracy": 0.8278606965174129,
+      "dp_violation": 0.16487988829612732,
+      "if_violation": 0.02341625207296849
+    },
+    "dro_if_only": {
+      "accuracy": 0.8291873963515755,
+      "dp_violation": 0.17159704864025116,
+      "if_violation": 0.034074074074074076
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 0,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8328358208955224,
+      "dp_violation": 0.2262183576822281,
+      "if_violation": 0.03772249861802101
+    },
+    "naive": {
+      "accuracy": 0.7742399115533444,
+      "dp_violation": 0.008277833461761475,
+      "if_violation": 0.03904919845218353
+    },
+    "dro_joint": {
+      "accuracy": 0.24908789386401325,
+      "dp_violation": 0.001910567283630371,
+      "if_violation": 0.0005085682697622996
+    },
+    "dro_dp_only": {
+      "accuracy": 0.8236594803758983,
+      "dp_violation": 0.11376577615737915,
+      "if_violation": 0.022509673852957435
+    },
+    "dro_if_only": {
+      "accuracy": 0.7725815367606412,
+      "dp_violation": 0.0039525628089904785,
+      "if_violation": 0.04338308457711443
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8377003869541183,
+      "dp_violation": 0.1875144988298416,
+      "if_violation": 0.03683803206191266
+    },
+    "naive": {
+      "accuracy": 0.7723604201216141,
+      "dp_violation": 0.016609400510787964,
+      "if_violation": 0.038872305140961856
+    },
+    "dro_joint": {
+      "accuracy": 0.2478717523493643,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_dp_only": {
+      "accuracy": 0.2478717523493643,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_if_only": {
+      "accuracy": 0.7784411276948591,
+      "dp_violation": 0.016632646322250366,
+      "if_violation": 0.044267551133222775
+    }
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 2,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.844555002763958,
+      "dp_violation": 0.18033459782600403,
+      "if_violation": 0.034096185737976785
+    },
+    "naive": {
+      "accuracy": 0.7868435599778884,
+      "dp_violation": 0.03913623094558716,
+      "if_violation": 0.03568822553897181
+    },
+    "dro_joint": {
+      "accuracy": 0.8080707573244886,
+      "dp_violation": 0.0604022815823555,
+      "if_violation": 0.015986733001658374
+    },
+    "dro_dp_only": {
+      "accuracy": 0.4542841348811498,
+      "dp_violation": 0.2048734724521637,
+      "if_violation": 0.04625760088446656
+    },
+    "dro_if_only": {
+      "accuracy": 0.7817578772802654,
+      "dp_violation": 0.0347115695476532,
+      "if_violation": 0.04371475953565506
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 0,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.807,
+      "dp_violation": 0.023526176810264587,
+      "if_violation": 0.009566666666666666
+    },
+    "naive": {
+      "accuracy": 0.8155,
+      "dp_violation": 0.022236600518226624,
+      "if_violation": 0.0037
+    },
+    "dro_joint": {
+      "accuracy": 0.7793333333333333,
+      "dp_violation": 0.0006703598191961646,
+      "if_violation": 0.00013333333333333334
+    },
+    "dro_dp_only": {
+      "accuracy": 0.7788333333333334,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_if_only": {
+      "accuracy": 0.8156666666666667,
+      "dp_violation": 0.024029292166233063,
+      "if_violation": 0.004233333333333334
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 1,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8031666666666667,
+      "dp_violation": 0.02823123335838318,
+      "if_violation": 0.013966666666666667
+    },
+    "naive": {
+      "accuracy": 0.8128333333333333,
+      "dp_violation": 0.03387318551540375,
+      "if_violation": 0.0024666666666666665
+    },
+    "dro_joint": {
+      "accuracy": 0.7791666666666667,
+      "dp_violation": 0.0001396416628267616,
+      "if_violation": 0.0
+    },
+    "dro_dp_only": {
+      "accuracy": 0.7788333333333334,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_if_only": {
+      "accuracy": 0.813,
+      "dp_violation": 0.03468844294548035,
+      "if_violation": 0.0024666666666666665
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 2,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8038333333333333,
+      "dp_violation": 0.040760338306427,
+      "if_violation": 0.006966666666666667
+    },
+    "naive": {
+      "accuracy": 0.811,
+      "dp_violation": 0.0408652201294899,
+      "if_violation": 0.0035666666666666668
+    },
+    "dro_joint": {
+      "accuracy": 0.7788333333333334,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_dp_only": {
+      "accuracy": 0.7788333333333334,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_if_only": {
+      "accuracy": 0.812,
+      "dp_violation": 0.034896813333034515,
+      "if_violation": 0.0029333333333333334
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 0,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.8033333333333333,
+      "dp_violation": 0.012161843478679657,
+      "if_violation": 0.011733333333333333
+    },
+    "naive": {
+      "accuracy": 0.7925,
+      "dp_violation": 0.029346555471420288,
+      "if_violation": 0.015766666666666665
+    },
+    "dro_joint": {
+      "accuracy": 0.779,
+      "dp_violation": 0.00028058362659066916,
+      "if_violation": 0.0
+    },
+    "dro_dp_only": {
+      "accuracy": 0.779,
+      "dp_violation": 0.0004105090338271111,
+      "if_violation": 0.00013333333333333334
+    },
+    "dro_if_only": {
+      "accuracy": 0.7906666666666666,
+      "dp_violation": 0.02332437038421631,
+      "if_violation": 0.0167
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 1,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.7966666666666666,
+      "dp_violation": 0.03802525997161865,
+      "if_violation": 0.0099
+    },
+    "naive": {
+      "accuracy": 0.7958333333333333,
+      "dp_violation": 0.05299367010593414,
+      "if_violation": 0.014266666666666667
+    },
+    "dro_joint": {
+      "accuracy": 0.7788333333333334,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_dp_only": {
+      "accuracy": 0.7788333333333334,
+      "dp_violation": 0.0,
+      "if_violation": 0.0
+    },
+    "dro_if_only": {
+      "accuracy": 0.7995,
+      "dp_violation": 0.04866825044155121,
+      "if_violation": 0.010233333333333334
+    }
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 2,
+    "adversarial": true,
+    "standard_ml": {
+      "accuracy": 0.7831666666666667,
+      "dp_violation": 0.036510273814201355,
+      "if_violation": 0.018566666666666665
+    },
+    "naive": {
+      "accuracy": 0.7935,
+      "dp_violation": 0.057254135608673096,
+      "if_violation": 0.0111
+    },
+    "dro_joint": {
+      "accuracy": 0.7743333333333333,
+      "dp_violation": 0.002592692617326975,
+      "if_violation": 0.0002666666666666667
+    },
+    "dro_dp_only": {
+      "accuracy": 0.8006666666666666,
+      "dp_violation": 0.04035830497741699,
+      "if_violation": 0.0025666666666666667
+    },
+    "dro_if_only": {
+      "accuracy": 0.799,
+      "dp_violation": 0.049519047141075134,
+      "if_violation": 0.009833333333333333
+    }
+  }
+]

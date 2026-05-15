@@ -1,0 +1,32 @@
+{
+  "dataset": "adult",
+  "alpha": 0.2,
+  "seed": 4,
+  "naive": {
+    "time": 21.50795292854309,
+    "clean": {
+      "accuracy": 0.8181315644002212,
+      "dp_violation": 0.12296980619430542,
+      "if_violation": 0.030381426202321725
+    },
+    "corrupted": {
+      "accuracy": 0.8055279159756772,
+      "dp_violation": 0.0776473879814148,
+      "if_violation": 0.03283582089552239
+    }
+  },
+  "dro": {
+    "time": 212.60170602798462,
+    "clean": {
+      "accuracy": 0.8096185737976783,
+      "dp_violation": 0.2743573784828186,
+      "if_violation": 0.03586511885019348
+    },
+    "corrupted": {
+      "accuracy": 0.7899391929242675,
+      "dp_violation": 0.17264020442962646,
+      "if_violation": 0.04435599778883361
+    }
+  },
+  "total_time": 241.8258171081543
+}

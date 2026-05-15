@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Figure generation for DRO-FairML — ICML submission style.
-Matches the typographic conventions of top ML venues:
-  Computer Modern math, minimal chrome, proper error bars, restrained palette.
+Figure generation for DRO-FairML.
+Large, readable figures with proper math fonts.
 """
 
 import os, sys, json
@@ -18,52 +17,46 @@ warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-# ── ICML-style rcParams ─────────────────────────────────────────────────────
+# ── Style ────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family':        'serif',
     'font.serif':         ['CMU Serif', 'Computer Modern Roman', 'Latin Modern Roman',
                            'DejaVu Serif', 'Times New Roman'],
-    'mathtext.fontset':   'cm',          # Computer Modern math
-    'font.size':          8,
-    'axes.titlesize':     9,
-    'axes.labelsize':     8,
-    'axes.titleweight':   'normal',
+    'mathtext.fontset':   'cm',
+    'font.size':          11,
+    'axes.titlesize':     13,
+    'axes.labelsize':     11,
+    'axes.titleweight':   'bold',
     'axes.spines.top':    False,
     'axes.spines.right':  False,
-    'axes.linewidth':     0.6,
-    'axes.labelpad':      3,
+    'axes.linewidth':     0.8,
+    'axes.labelpad':      4,
     'grid.alpha':         0.3,
     'grid.linewidth':     0.4,
     'grid.linestyle':     '--',
     'legend.frameon':     True,
-    'legend.framealpha':  0.85,
-    'legend.fontsize':    7,
+    'legend.framealpha':  0.9,
+    'legend.fontsize':    10,
     'legend.edgecolor':   '0.8',
-    'legend.handlelength': 1.5,
-    'legend.handletextpad': 0.4,
     'figure.dpi':         150,
     'savefig.dpi':        300,
     'savefig.bbox':       'tight',
-    'savefig.pad_inches': 0.05,
-    'xtick.direction':    'in',
-    'ytick.direction':    'in',
-    'xtick.major.size':   3,
-    'ytick.major.size':   3,
-    'xtick.minor.size':   1.5,
-    'ytick.minor.size':   1.5,
-    'xtick.major.pad':    2,
-    'ytick.major.pad':    2,
-    'xtick.labelsize':    7,
-    'ytick.labelsize':    7,
-    'lines.linewidth':    1.2,
-    'lines.markersize':   4,
-    'errorbar.capsize':   2,
+    'savefig.pad_inches': 0.12,
+    'xtick.direction':    'out',
+    'ytick.direction':    'out',
+    'xtick.major.size':   4,
+    'ytick.major.size':   4,
+    'xtick.labelsize':    10,
+    'ytick.labelsize':    10,
+    'lines.linewidth':    1.8,
+    'lines.markersize':   6,
+    'errorbar.capsize':   3,
 })
 
-# Two-color palette (muted, print-safe, accessible)
-C_NAIVE = '#c45232'   # muted red-brown
-C_DRO   = '#2a6e3f'   # muted forest green
-C_CLEAN = '#2b5c8a'   # steel blue
+# Professional but readable colors
+C_NAIVE = '#c44e2b'   # warm red
+C_DRO   = '#1a7a3a'   # rich green
+C_CLEAN = '#2b6d99'   # steel blue
 C_CORR  = '#d4880f'   # dark gold
 
 ALPHAS   = [0.0, 0.1, 0.2, 0.3, 0.4]
@@ -71,12 +64,8 @@ DATASETS = ['adult', 'credit', 'lsac']
 DS_LABEL = {'adult': 'Adult', 'credit': 'Credit', 'lsac': 'LSAC'}
 OUT      = 'figures'
 
-# ICML text width: 6.75 in (full), 3.25 in (single column)
-FULL_W   = 6.75
-COL_W    = 3.25
 
-
-# ── Data helpers ─────────────────────────────────────────────────────────────
+# ── Helpers ──────────────────────────────────────────────────────────────────
 def load_results():
     with open('results/all_results.json') as f:
         return json.load(f)
@@ -104,8 +93,7 @@ def _wilcox(a, b):
         return 1.0
 
 
-def _sig_marker(p, dro_m, naive_m):
-    """Return significance marker only when DRO is better (lower)."""
+def _sig(p, dro_m, naive_m):
     if dro_m >= naive_m:
         return ''
     if p < 0.001: return '***'
@@ -127,14 +115,13 @@ def _save(fig, name):
 # ─────────────────────────────────────────────────────────────────────────────
 def fig1(results):
     metrics = ['accuracy', 'dp_violation', 'if_violation']
-    ylabels = {
-        'accuracy':     'Accuracy',
-        'dp_violation': r'$\Delta_{\mathrm{DP}}$',
-        'if_violation': r'$\mathcal{L}_{\mathrm{IF}}$',
-    }
+    col_titles = ['Accuracy', r'DP Violation ($\Delta_{\mathrm{DP}}$)',
+                  r'IF Violation ($\mathcal{L}_{\mathrm{IF}}$)']
 
-    fig, axes = plt.subplots(3, 3, figsize=(FULL_W, 5.8))
-    fig.subplots_adjust(hspace=0.48, wspace=0.40, top=0.93, bottom=0.07, left=0.10)
+    fig, axes = plt.subplots(3, 3, figsize=(16, 13))
+    fig.subplots_adjust(hspace=0.35, wspace=0.30, top=0.94, bottom=0.05, left=0.08, right=0.97)
+    fig.suptitle('DRO-FAIR vs Naive-FAIR on Clean Test Set  (mean $\\pm$ 1 SE, $n{=}10$ seeds)',
+                 fontsize=15, fontweight='bold', y=0.98)
 
     x = np.array(ALPHAS)
 
@@ -146,54 +133,43 @@ def fig1(results):
             for alpha in ALPHAS:
                 nv = _get(results, ds, alpha, 'naive', met)
                 dv = _get(results, ds, alpha, 'dro',   met)
-                n_m, n_s = _ms(nv)
-                d_m, d_s = _ms(dv)
+                n_m, n_s = _ms(nv); d_m, d_s = _ms(dv)
                 nm.append(n_m); nse.append(n_s)
                 dm.append(d_m); dse.append(d_s)
 
-            nm  = np.array(nm);  nse = np.array(nse)
-            dm  = np.array(dm);  dse = np.array(dse)
+            nm = np.array(nm);  nse = np.array(nse)
+            dm = np.array(dm);  dse = np.array(dse)
 
-            # Error bars with caps (not shaded bands)
             ax.errorbar(x, nm, yerr=nse, fmt='o-', color=C_NAIVE,
-                        ms=3.5, lw=1.1, capsize=2, capthick=0.8,
-                        label='Naive-Fair', zorder=3)
+                        ms=5, lw=1.8, capsize=3, capthick=1.0,
+                        label='Naive-FAIR', zorder=3)
             ax.errorbar(x, dm, yerr=dse, fmt='s-', color=C_DRO,
-                        ms=3.5, lw=1.1, capsize=2, capthick=0.8,
-                        label='DRO-Fair', zorder=3)
+                        ms=5, lw=1.8, capsize=3, capthick=1.0,
+                        label='DRO-FAIR', zorder=3)
 
             # Significance markers
             for i, alpha in enumerate(ALPHAS):
                 nv = _get(results, ds, alpha, 'naive', met)
                 dv = _get(results, ds, alpha, 'dro',   met)
                 p = _wilcox(nv, dv)
-                s = _sig_marker(p, dm[i], nm[i])
+                s = _sig(p, dm[i], nm[i])
                 if s:
                     ymax = max(nm[i] + nse[i], dm[i] + dse[i])
                     span = ax.get_ylim()[1] - ax.get_ylim()[0]
                     if span == 0: span = 1
-                    ax.text(alpha, ymax + 0.02 * span, s,
-                            ha='center', va='bottom', fontsize=6,
-                            color=C_DRO)
+                    ax.text(alpha, ymax + 0.03 * span, s,
+                            ha='center', va='bottom', fontsize=9,
+                            color=C_DRO, fontweight='bold')
 
             ax.set_xticks(ALPHAS)
-            ax.set_xlabel(r'$\alpha$')
-            ax.set_ylabel(ylabels[met])
+            ax.set_xlabel(r'Corruption level $\alpha$', fontsize=10)
             ax.set_xlim(-0.03, 0.43)
 
-            # Row labels on far left edge (no overlap with ylabel)
-            if col == 0:
-                ax.annotate(DS_LABEL[ds], xy=(-0.50, 0.5),
-                            xycoords='axes fraction', fontsize=9,
-                            fontweight='bold', ha='center', va='center',
-                            rotation=90)
-
-            # Column headers on top row
-            if row == 0:
-                ax.set_title(ylabels[met], fontsize=9)
+            # Title = "Dataset — Metric" for every cell
+            ax.set_title(f'{DS_LABEL[ds]} — {col_titles[col]}', fontsize=11, fontweight='bold')
 
             if row == 0 and col == 2:
-                ax.legend(loc='best', fontsize=6.5)
+                ax.legend(loc='upper left', fontsize=9)
 
     _save(fig, 'fig1_main_results')
 
@@ -211,29 +187,33 @@ def fig2(results):
             nv = _get(results, ds, alpha, 'naive', 'dp_violation')
             dv = _get(results, ds, alpha, 'dro',   'dp_violation')
             if not nv: continue
-            nm, dm = np.mean(nv), np.mean(dv)
-            r = (nm - dm) / max(nm, 1e-9) * 100
+            nm_, dm_ = np.mean(nv), np.mean(dv)
+            r = (nm_ - dm_) / max(nm_, 1e-9) * 100
             raw[i, j]  = r
             clip[i, j] = np.clip(r, -100, 100)
             pmat[i, j] = _wilcox(nv, dv)
 
-    fig, ax = plt.subplots(figsize=(FULL_W * 0.65, 2.0))
+    fig, ax = plt.subplots(figsize=(12, 4.5))
 
-    # Diverging: brown-white-green (not traffic-light red/green)
     cmap = LinearSegmentedColormap.from_list(
-        'bwg', ['#a8432e', '#f7f7f7', '#2a6e3f'], N=256)
+        'bwg', ['#a8432e', '#f7f7f7', '#1a7a3a'], N=256)
     im = ax.imshow(clip, cmap=cmap, vmin=-100, vmax=100, aspect='auto')
 
-    cbar = plt.colorbar(im, ax=ax, pad=0.03, fraction=0.04, shrink=0.9)
-    cbar.set_label(r'$\Delta_{\mathrm{DP}}$ reduction (%)', fontsize=7)
-    cbar.ax.tick_params(labelsize=6)
+    cbar = plt.colorbar(im, ax=ax, pad=0.02, fraction=0.03, shrink=0.85)
+    cbar.set_label(r'$\Delta_{\mathrm{DP}}$ reduction (%)', fontsize=11)
+    cbar.ax.tick_params(labelsize=10)
 
     ax.set_xticks(range(5))
-    ax.set_xticklabels([fr'$\alpha={a}$' for a in ALPHAS])
+    ax.set_xticklabels([fr'$\alpha={a}$' for a in ALPHAS], fontsize=12)
     ax.set_yticks(range(3))
-    ax.set_yticklabels([DS_LABEL[d] for d in DATASETS])
+    ax.set_yticklabels([DS_LABEL[d] for d in DATASETS], fontsize=13, fontweight='bold')
     ax.tick_params(length=0)
     ax.grid(False)
+
+    ax.set_title('DRO-FAIR DP Reduction over Naive-FAIR\n'
+                 '(color capped $\\pm$100%; exact value shown  |  '
+                 '$*\\,p{<}0.05$  $**\\,p{<}0.01$  $***\\,p{<}0.001$)',
+                 fontsize=12, fontweight='bold', pad=12)
 
     for i in range(3):
         for j in range(5):
@@ -242,9 +222,9 @@ def fig2(results):
             p  = pmat[i, j]
             st = ('***' if p < 0.001 else '**' if p < 0.01 else '*' if p < 0.05 else '')
             tc = 'white' if abs(clip[i, j]) > 55 else 'black'
-            txt = f'{v:+.0f}%' if abs(v) <= 999 else f'{v:+.0f}'
+            txt = f'{v:+.0f}%'
             ax.text(j, i, f'{txt}\n{st}', ha='center', va='center',
-                    fontsize=6.5, color=tc)
+                    fontsize=12, color=tc, fontweight='bold')
 
     ax.set_frame_on(False)
     _save(fig, 'fig2_dp_reduction_heatmap')
@@ -254,12 +234,13 @@ def fig2(results):
 # Figure 3 — Clean vs corrupted test robustness
 # ─────────────────────────────────────────────────────────────────────────────
 def fig3(results):
-    fig, axes = plt.subplots(2, 3, figsize=(FULL_W, 3.6))
-    fig.subplots_adjust(hspace=0.52, wspace=0.36, top=0.90, bottom=0.10, left=0.10)
+    fig, axes = plt.subplots(2, 3, figsize=(16, 8))
+    fig.subplots_adjust(hspace=0.40, wspace=0.28, top=0.92, bottom=0.08, left=0.06, right=0.97)
+    fig.suptitle('Robustness: DP Violation on Clean vs Adversarially Corrupted Test Set',
+                 fontsize=14, fontweight='bold')
 
     methods = ['naive', 'dro']
-    mlabel  = {'naive': 'Naive-Fair', 'dro': 'DRO-Fair'}
-
+    mlabel  = {'naive': 'Naive-FAIR', 'dro': 'DRO-FAIR'}
     x = np.array(ALPHAS)
 
     for col, ds in enumerate(DATASETS):
@@ -278,24 +259,18 @@ def fig3(results):
             cr_m = np.array(cr_m); cr_se = np.array(cr_se)
 
             ax.errorbar(x, cl_m, yerr=cl_se, fmt='o-', color=C_CLEAN,
-                        ms=3, lw=1.0, capsize=1.5, capthick=0.7, label='Clean')
+                        ms=5, lw=1.8, capsize=3, capthick=1.0, label='Clean test')
             ax.errorbar(x, cr_m, yerr=cr_se, fmt='s--', color=C_CORR,
-                        ms=3, lw=1.0, capsize=1.5, capthick=0.7, label='Corrupted')
+                        ms=5, lw=1.8, capsize=3, capthick=1.0, label='Corrupted test')
 
             ax.set_xticks(ALPHAS)
-            ax.set_xlabel(r'$\alpha$')
-            if col == 0:
-                ax.set_ylabel(r'$\Delta_{\mathrm{DP}}$')
-
-            if row == 0:
-                ax.set_title(DS_LABEL[ds], fontsize=9)
-            if col == 0:
-                ax.annotate(mlabel[method], xy=(-0.52, 0.5),
-                            xycoords='axes fraction', fontsize=8,
-                            ha='center', va='center', rotation=90)
+            ax.set_xlabel(r'Corruption level $\alpha$', fontsize=10)
+            ax.set_ylabel(r'$\Delta_{\mathrm{DP}}$', fontsize=11)
+            ax.set_title(f'{DS_LABEL[ds]} — {mlabel[method]}',
+                         fontsize=11, fontweight='bold')
 
             if row == 0 and col == 2:
-                ax.legend(fontsize=6, loc='best')
+                ax.legend(fontsize=9, loc='best')
 
     _save(fig, 'fig3_robustness_clean_vs_corrupted')
 
@@ -304,12 +279,14 @@ def fig3(results):
 # Figure 4 — Significance matrix
 # ─────────────────────────────────────────────────────────────────────────────
 def fig4(results):
-    fig, axes = plt.subplots(1, 2, figsize=(FULL_W * 0.78, 2.2))
-    fig.subplots_adjust(wspace=0.30, top=0.85, bottom=0.18)
+    fig, axes = plt.subplots(1, 2, figsize=(15, 4.5))
+    fig.subplots_adjust(wspace=0.25, top=0.82, bottom=0.18, left=0.06, right=0.97)
+    fig.suptitle('Statistical Significance: Wilcoxon Signed-Rank (one-sided, $n{=}10$ seeds, clean test)',
+                 fontsize=13, fontweight='bold')
 
-    c_win  = np.array([0.165, 0.431, 0.247, 0.80])  # DRO wins — muted green
-    c_lose = np.array([0.784, 0.263, 0.196, 0.80])   # Naive wins — muted red
-    c_tie  = np.array([0.88,  0.88,  0.88,  0.55])   # tie — light grey
+    c_win  = np.array([0.10, 0.48, 0.23, 0.80])   # green
+    c_lose = np.array([0.77, 0.31, 0.17, 0.80])    # red
+    c_tie  = np.array([0.90, 0.90, 0.90, 0.55])    # grey
 
     for ai, met in enumerate(['dp_violation', 'if_violation']):
         ax = axes[ai]
@@ -322,9 +299,9 @@ def fig4(results):
                 dv = _get(results, ds, alpha, 'dro', met)
                 p  = _wilcox(nv, dv)
                 pgrid[i, j] = p
-                nm, dm = (np.mean(nv) if nv else np.nan), (np.mean(dv) if dv else np.nan)
-                if   p < 0.05 and dm < nm: wgrid[i, j] =  1
-                elif p < 0.05 and dm > nm: wgrid[i, j] = -1
+                nm_, dm_ = (np.mean(nv) if nv else np.nan), (np.mean(dv) if dv else np.nan)
+                if   p < 0.05 and dm_ < nm_: wgrid[i, j] =  1
+                elif p < 0.05 and dm_ > nm_: wgrid[i, j] = -1
 
         cmat = np.zeros((3, 5, 4))
         for i in range(3):
@@ -336,14 +313,14 @@ def fig4(results):
         ax.imshow(cmat, aspect='auto', interpolation='nearest')
         ax.grid(False)
         ax.set_xticks(range(5))
-        ax.set_xticklabels([fr'$\alpha\!=\!{a}$' for a in ALPHAS])
+        ax.set_xticklabels([fr'$\alpha={a}$' for a in ALPHAS], fontsize=11)
         ax.set_yticks(range(3))
-        ax.set_yticklabels([DS_LABEL[d] for d in DATASETS])
+        ax.set_yticklabels([DS_LABEL[d] for d in DATASETS], fontsize=12, fontweight='bold')
         ax.tick_params(length=0)
 
-        title = (r'$\Delta_{\mathrm{DP}}$' if met == 'dp_violation'
-                 else r'$\mathcal{L}_{\mathrm{IF}}$')
-        ax.set_title(title, fontsize=9)
+        title = (r'DP Violation ($\Delta_{\mathrm{DP}}$)' if met == 'dp_violation'
+                 else r'IF Violation ($\mathcal{L}_{\mathrm{IF}}$)')
+        ax.set_title(title, fontsize=12, fontweight='bold')
 
         for i in range(3):
             for j in range(5):
@@ -352,33 +329,36 @@ def fig4(results):
                 st = ('***' if p < 0.001 else '**' if p < 0.01
                       else '*' if p < 0.05 else 'n.s.')
                 winner = ('DRO' if w == 1 else 'Naive' if w == -1 else '')
-                tc = 'white' if w != 0 else '#555'
+                tc = 'white' if w != 0 else '#444'
                 line1 = f'$p$={p:.3f}'
                 line2 = f'{st}  {winner}' if winner else st
                 ax.text(j, i, f'{line1}\n{line2}',
-                        ha='center', va='center', fontsize=5.5, color=tc)
+                        ha='center', va='center', fontsize=9, color=tc,
+                        fontweight='bold')
 
         ax.set_frame_on(False)
 
-    # Shared legend below
     from matplotlib.patches import Patch
     handles = [Patch(facecolor=c_win,  label='DRO sig. better'),
                Patch(facecolor=c_lose, label='Naive sig. better'),
                Patch(facecolor=c_tie,  label='Not significant')]
-    fig.legend(handles=handles, loc='lower center', ncol=3, fontsize=6.5,
-               frameon=False, bbox_to_anchor=(0.5, -0.01))
+    fig.legend(handles=handles, loc='lower center', ncol=3, fontsize=10,
+               frameon=False, bbox_to_anchor=(0.5, 0.0))
 
     _save(fig, 'fig4_significance_matrix')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 5 — Accuracy vs DP tradeoff (Pareto-style scatter)
+# Figure 5 — Accuracy vs DP tradeoff
 # ─────────────────────────────────────────────────────────────────────────────
 def fig5(results):
-    fig, axes = plt.subplots(1, 3, figsize=(FULL_W, 2.4))
-    fig.subplots_adjust(wspace=0.34, top=0.85, bottom=0.18, right=0.86)
+    fig, axes = plt.subplots(1, 3, figsize=(16, 5))
+    fig.subplots_adjust(wspace=0.28, top=0.88, bottom=0.12, left=0.05, right=0.88)
+    fig.suptitle('Accuracy vs Fairness Tradeoff  (mean over 10 seeds, clean test)',
+                 fontsize=14, fontweight='bold')
 
     markers = {0.0: 'o', 0.1: 's', 0.2: '^', 0.3: 'D', 0.4: 'v'}
+    sizes   = {0.0: 70,  0.1: 80,  0.2: 90,  0.3: 100, 0.4: 110}
 
     for col, ds in enumerate(DATASETS):
         ax = axes[col]
@@ -388,31 +368,33 @@ def fig5(results):
             da = np.mean(_get(results, ds, alpha, 'dro',   'accuracy'))
             dd = np.mean(_get(results, ds, alpha, 'dro',   'dp_violation'))
 
-            ax.scatter(na, nd, color=C_NAIVE, s=28, marker=markers[alpha],
-                       zorder=3, edgecolors='white', linewidths=0.4)
-            ax.scatter(da, dd, color=C_DRO,   s=28, marker=markers[alpha],
-                       zorder=3, edgecolors='white', linewidths=0.4)
+            ax.scatter(na, nd, color=C_NAIVE, s=sizes[alpha], marker=markers[alpha],
+                       zorder=3, edgecolors='white', linewidths=0.6)
+            ax.scatter(da, dd, color=C_DRO,   s=sizes[alpha], marker=markers[alpha],
+                       zorder=3, edgecolors='white', linewidths=0.6)
 
-            # Label only DRO points — alternate offset to avoid cluster
-            dy_off = 3 if (alpha * 10) % 2 == 0 else -8
-            ax.annotate(fr'${alpha}$', (da, dd), fontsize=5, color='#555',
-                        textcoords='offset points', xytext=(5, dy_off))
+            # Label DRO points with offset to avoid overlap
+            dy = 5 if alpha in [0.0, 0.2, 0.4] else -12
+            ax.annotate(fr'$\alpha$={alpha}', (da, dd), fontsize=8, color='#444',
+                        textcoords='offset points', xytext=(6, dy))
 
-        ax.set_xlabel('Accuracy')
-        if col == 0:
-            ax.set_ylabel(r'$\Delta_{\mathrm{DP}}$')
-        ax.set_title(DS_LABEL[ds], fontsize=9)
+        ax.set_xlabel('Accuracy', fontsize=11)
+        ax.set_ylabel(r'$\Delta_{\mathrm{DP}}$', fontsize=11)
+        ax.set_title(DS_LABEL[ds], fontsize=13, fontweight='bold')
 
-    # Compact legend in margin
+    # Legend in right margin
     from matplotlib.lines import Line2D
     handles = [
         Line2D([0], [0], marker='o', color='w', markerfacecolor=C_NAIVE,
-               ms=5, label='Naive-Fair'),
+               ms=8, label='Naive-FAIR'),
         Line2D([0], [0], marker='o', color='w', markerfacecolor=C_DRO,
-               ms=5, label='DRO-Fair'),
+               ms=8, label='DRO-FAIR'),
     ]
-    fig.legend(handles=handles, loc='center right', fontsize=6.5,
-               frameon=True, bbox_to_anchor=(0.99, 0.55))
+    for a in ALPHAS:
+        handles.append(Line2D([0], [0], marker=markers[a], color='w',
+                              markerfacecolor='gray', ms=7, label=fr'$\alpha$={a}'))
+    fig.legend(handles=handles, loc='center right', fontsize=9,
+               frameon=True, bbox_to_anchor=(0.99, 0.5))
 
     _save(fig, 'fig5_accuracy_fairness_tradeoff')
 
@@ -421,8 +403,10 @@ def fig5(results):
 # Figure 6 — Per-seed stability (boxplots)
 # ─────────────────────────────────────────────────────────────────────────────
 def fig6(results):
-    fig, axes = plt.subplots(1, 3, figsize=(FULL_W, 2.4))
-    fig.subplots_adjust(wspace=0.30, top=0.85, bottom=0.18)
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    fig.subplots_adjust(wspace=0.25, top=0.88, bottom=0.12)
+    fig.suptitle('Per-Seed DRO-FAIR Accuracy ($n{=}10$ seeds)',
+                 fontsize=14, fontweight='bold')
 
     for col, ds in enumerate(DATASETS):
         ax = axes[col]
@@ -431,46 +415,51 @@ def fig6(results):
             dv = _get(results, ds, alpha, 'dro', 'accuracy')
             if dv:
                 data.append(dv)
-                labels.append(fr'${alpha}$')
+                labels.append(fr'$\alpha$={alpha}')
 
         if not data:
             ax.set_visible(False)
             continue
 
         bp = ax.boxplot(
-            data, labels=labels, patch_artist=True, widths=0.45,
-            medianprops=dict(color='white', lw=1.5),
-            whiskerprops=dict(color=C_DRO, lw=0.8),
-            capprops=dict(color=C_DRO, lw=0.8),
-            flierprops=dict(marker='.', markerfacecolor=C_NAIVE,
-                            markeredgecolor='none', ms=3),
-            boxprops=dict(linewidth=0.8),
+            data, labels=labels, patch_artist=True, widths=0.5,
+            medianprops=dict(color='white', lw=2),
+            whiskerprops=dict(color=C_DRO, lw=1.2),
+            capprops=dict(color=C_DRO, lw=1.2),
+            flierprops=dict(marker='o', markerfacecolor=C_NAIVE,
+                            markeredgecolor='white', ms=5),
+            boxprops=dict(linewidth=1.0),
         )
         for patch in bp['boxes']:
             patch.set_facecolor(C_DRO)
-            patch.set_alpha(0.55)
+            patch.set_alpha(0.6)
 
-        # Auto-scale y-axis with some padding
+        # Auto-scale y with padding
         all_vals = [v for d in data for v in d]
         ylo = max(0, min(all_vals) - 0.08)
         yhi = min(1.02, max(all_vals) + 0.04)
         ax.set_ylim(ylo, yhi)
         if ylo < 0.75 < yhi:
-            ax.axhline(0.75, color='#999', lw=0.7, ls=':', zorder=1)
-        ax.set_xlabel(r'$\alpha$')
-        if col == 0:
-            ax.set_ylabel('Accuracy')
-        ax.set_title(DS_LABEL[ds], fontsize=9)
+            ax.axhline(0.75, color='#999', lw=0.8, ls=':', zorder=1,
+                       label='0.75 threshold')
+            if col == 0:
+                ax.legend(fontsize=8, loc='lower left')
+
+        ax.set_xlabel('Corruption Level', fontsize=11)
+        ax.set_ylabel('DRO-FAIR Accuracy', fontsize=11)
+        ax.set_title(DS_LABEL[ds], fontsize=13, fontweight='bold')
 
     _save(fig, 'fig6_seed_stability')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 7 — Win-rate summary (stacked bar)
+# Figure 7 — Win-rate summary
 # ─────────────────────────────────────────────────────────────────────────────
 def fig7(results):
-    fig, axes = plt.subplots(1, 2, figsize=(COL_W * 1.6, 2.3))
-    fig.subplots_adjust(wspace=0.35, top=0.82, bottom=0.20)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    fig.subplots_adjust(wspace=0.30, top=0.85, bottom=0.18, left=0.08, right=0.95)
+    fig.suptitle(r'DRO-FAIR vs Naive-FAIR — Win Summary at $\alpha \in \{0.1, 0.2, 0.3\}$',
+                 fontsize=14, fontweight='bold')
 
     for ai, met in enumerate(['dp_violation', 'if_violation']):
         ax = axes[ai]
@@ -482,42 +471,42 @@ def fig7(results):
                 nv = _get(results, ds, alpha, 'naive', met)
                 dv = _get(results, ds, alpha, 'dro',   met)
                 p  = _wilcox(nv, dv)
-                nm, dm = np.mean(nv), np.mean(dv)
-                if   p < 0.05 and dm < nm: wins[lbl]   += 1
-                elif p < 0.05 and dm > nm: losses[lbl] += 1
-                else:                      ties[lbl]   += 1
+                nm_, dm_ = np.mean(nv), np.mean(dv)
+                if   p < 0.05 and dm_ < nm_: wins[lbl]   += 1
+                elif p < 0.05 and dm_ > nm_: losses[lbl] += 1
+                else:                        ties[lbl]   += 1
 
         lbls = list(wins.keys())
         w = [wins[l] for l in lbls]
         t = [ties[l] for l in lbls]
         lo = [losses[l] for l in lbls]
         x = np.arange(len(lbls))
-        bw = 0.48
+        bw = 0.52
 
-        ax.bar(x, w, bw, color=C_DRO,   alpha=0.75, label='DRO wins')
-        ax.bar(x, t, bw, bottom=w, color='#ccc', alpha=0.7, label='No sig. diff.')
+        ax.bar(x, w, bw, color=C_DRO,   alpha=0.80, label='DRO sig. better')
+        ax.bar(x, t, bw, bottom=w, color='#ccc', alpha=0.75, label='No sig. diff.')
         ax.bar(x, lo, bw, bottom=[a+b for a, b in zip(w, t)],
-               color=C_NAIVE, alpha=0.75, label='Naive wins')
+               color=C_NAIVE, alpha=0.80, label='Naive sig. better')
 
-        # Annotate DRO wins count
         for i, wi in enumerate(w):
             if wi > 0:
-                ax.text(i, wi - 0.15, str(wi), ha='center', va='top',
-                        fontsize=7, color='white', fontweight='bold')
+                ax.text(i, wi / 2, f'{wi}/3', ha='center', va='center',
+                        fontsize=12, color='white', fontweight='bold')
 
         ax.set_xticks(x)
-        ax.set_xticklabels(lbls)
-        ax.set_ylabel('Comparisons')
+        ax.set_xticklabels(lbls, fontsize=12, fontweight='bold')
+        ax.set_ylabel('# Comparisons (of 3)', fontsize=11)
         ax.set_yticks([0, 1, 2, 3])
-        ax.set_ylim(0, 3.5)
-        title = (r'$\Delta_{\mathrm{DP}}$' if met == 'dp_violation'
-                 else r'$\mathcal{L}_{\mathrm{IF}}$')
-        ax.set_title(title, fontsize=9)
+        ax.set_ylim(0, 3.6)
+
+        title = (r'DP Violation ($\Delta_{\mathrm{DP}}$)' if met == 'dp_violation'
+                 else r'IF Violation ($\mathcal{L}_{\mathrm{IF}}$)')
+        ax.set_title(title, fontsize=12, fontweight='bold')
 
     # Shared legend below
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower center', ncol=3,
-               fontsize=6.5, frameon=False, bbox_to_anchor=(0.5, -0.02))
+               fontsize=10, frameon=True, bbox_to_anchor=(0.5, 0.01))
 
     _save(fig, 'fig7_summary_win_rates')
 
