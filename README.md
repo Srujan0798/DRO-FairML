@@ -287,6 +287,10 @@ All **32 unit tests** pass, covering:
 - Fairness book: [fairmlbook.org](https://fairmlbook.org)
 - LSAC dataset: [Law School Dataset](https://github.com/damtharvey/law-school-dataset)
 
+## Acknowledgments
+
+This implementation is built on the theoretical framework from the ICML submission *"Robust Individual and Group Fair Classification"* (Anonymous, 2026). We thank the original authors for the rigorous treatment of corruption-calibrated TV uncertainty sets and Algorithm 1. We extend the paper's random-corruption setting with adversarial attacks following the guidance from [Jonathan Hui's adversarial attacks survey](https://jonathan-hui.medium.com/adversarial-attacks-b58318bb497b), and benchmark on the LSAC dataset compiled by [damtharvey](https://github.com/damtharvey/law-school-dataset). The tilted empirical risk formulation builds on Li et al. (ICLR 2021).
+
 ## License
 
-MIT License
+MIT License — see [LICENSE](LICENSE)
