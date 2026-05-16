@@ -443,7 +443,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
     \textcolor{dro}{Green} $=$ DRO significantly better;
     \textcolor{naive}{red} $=$ Naive significantly better;
     grey $=$ not significant.
-    DRO wins 6/9 DP cells, 7/9 IF cells at $\alpha\in\{0.1,0.2,0.3\}$.}
+    DRO wins 6/9 DP cells, 5/9 IF cells at $\alpha\in\{0.1,0.2,0.3\}$.}
   \label{fig:sigmatrix}
 \end{figure}
 
@@ -465,7 +465,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
   \centering
   \includegraphics[width=\textwidth]{../figures/fig7_summary_win_rates.pdf}
   \caption{\textbf{Win-Rate Summary.}
-    DRO significantly better in 6/9 DP comparisons and 7/9 IF comparisons
+    DRO significantly better in 6/9 DP comparisons and 5/9 IF comparisons
     at $\alpha\in\{0.1,0.2,0.3\}$, Wilcoxon $p<0.05$.}
   \label{fig:winrates}
 \end{figure}
@@ -479,7 +479,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
   feedback loop breaks.
 \item \textbf{Adult $\alpha=0.1$--$0.3$:} DRO loses --- adversarial feedback loop
   (Section~\ref{sec:discussion}).
-\item \textbf{Summary:} DRO-FAIR wins DP in 6/9 cells, IF in 7/9 cells
+\item \textbf{Summary:} DRO-FAIR wins DP in 6/9 cells, IF in 5/9 cells
   ($\alpha\in\{0.1,0.2,0.3\}$).
 \end{itemize}
 
@@ -677,7 +677,7 @@ all theoretical formulas numerically.  Our adversarial corruption extension
 flips --- provides a 2--5$\times$ harder evaluation than the paper's random
 noise at the same $\alpha$.
 
-Across 150 experiments, DRO-FAIR reduces DP in 6/9 cells and IF in 7/9 cells
+Across 150 experiments, DRO-FAIR reduces DP in 6/9 cells and IF in 5/9 cells
 at $\alpha\in\{0.1,0.2,0.3\}$, with all Credit and LSAC wins statistically
 significant ($p{<}0.001$, Wilcoxon).  On LSAC at $\alpha=0.3$: DP $-99.6\%$,
 IF $-100\%$, accuracy drop $<0.2\%$.  On Credit at $\alpha=0.3$: DP $-91.8\%$,
