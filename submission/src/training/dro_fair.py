@@ -28,7 +28,8 @@ class DroFairTrainer:
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lr_p=5e-3, lambda_max=1.5, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
-                 use_dp=True, use_if=True, tau_warmup_epochs=15):
+                 use_dp=True, use_if=True, tau_warmup_epochs=15,
+                 lambda_warmstart=0.0):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -46,6 +47,7 @@ class DroFairTrainer:
         self.use_dp = use_dp
         self.use_if = use_if
         self.tau_warmup_epochs = tau_warmup_epochs
+        self.lambda_warmstart = lambda_warmstart
         self.rho_dp = None
         self.rho_if = None
         self.n_samples = None
@@ -176,8 +178,8 @@ class DroFairTrainer:
 
         opt_theta = torch.optim.AdamW(self.model.parameters(), lr=self.lr_theta, weight_decay=self.weight_decay)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(opt_theta, step_size=30, gamma=0.5)
-        lambda_dp = torch.tensor(0.0, device=self.device)
-        lambda_if = torch.tensor(0.0, device=self.device)
+        lambda_dp = torch.tensor(self.lambda_warmstart, device=self.device)
+        lambda_if = torch.tensor(self.lambda_warmstart, device=self.device)
         self._lambda_lr = self.lr_lambda
 
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)

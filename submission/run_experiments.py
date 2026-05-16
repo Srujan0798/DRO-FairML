@@ -36,6 +36,21 @@ def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
 
 
+def get_lambda_max(dataset, alpha):
+    """Dataset-adaptive lambda_max cap.
+
+    Adult has baseline DP ~0.17 (8x higher than Credit/LSAC's ~0.02).
+    With lambda_max=1.5, the DP penalty (lambda*DP) can reach 0.255 on Adult,
+    dominating the BCE loss and forcing model collapse via runaway dual ascent.
+
+    Cap lambda_max proportional to baseline DP to prevent the feedback loop on
+    high-baseline-DP datasets while preserving full strength on Credit/LSAC.
+    """
+    if dataset == 'adult' and alpha >= 0.2:
+        return 0.5
+    return 1.5
+
+
 def corrupt_test_data_adversarial(X_test, y_test, a_test, alpha, seed, model, device):
     """Apply adversarial corruption to test data for test-time evaluation."""
     corruptor = AdversarialCorruptor(
@@ -136,11 +151,13 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
 
     model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     # Train from random initialization (no warm-start) as per paper
+    lambda_max = get_lambda_max(dataset_name, alpha)
     trainer_dro = DroFairTrainer(
         model_dro, alpha=alpha, device=device,
-        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=1.5,
+        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=lambda_max,
         tau=tau_train, beta=5.0, k=5, gamma=0.0,
-        K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15
+        K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15,
+        lambda_warmstart=0.01
     )
 
     if verbose:
