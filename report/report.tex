@@ -17,7 +17,6 @@
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{float}
 \usepackage{natbib}
 \usepackage{enumitem}
 \usepackage{microtype}
@@ -426,7 +425,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig2_dp_reduction_heatmap.pdf}
   \caption{\textbf{DP Reduction Heatmap.}
@@ -437,7 +436,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
   \label{fig:heatmap}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig4_significance_matrix.pdf}
   \caption{\textbf{Statistical Significance Matrix.}
@@ -452,7 +451,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
 \section{Reduction Summary}
 % ─────────────────────────────────────────────────────────────────────────────
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig5_accuracy_fairness_tradeoff.pdf}
   \caption{\textbf{Accuracy--Fairness Tradeoff.}
@@ -462,7 +461,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
   \label{fig:tradeoff}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig7_summary_win_rates.pdf}
   \caption{\textbf{Win-Rate Summary.}
@@ -514,7 +513,7 @@ Naive-FAIR at $\alpha=0.3$ shows a misleadingly low DP because coordinated
 label flips reduce the majority-class positive rate --- a measurement artefact,
 not genuine fairness improvement.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig6_seed_stability.pdf}
   \caption{\textbf{Seed Stability.}
@@ -534,7 +533,7 @@ $\alpha$, while Naive-FAIR shows larger degradation under test-time attack.
 On Adult, both methods degrade substantially at high $\alpha$ due to the
 feedback loop discussed above.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig3_robustness_clean_vs_corrupted.pdf}
   \caption{\textbf{Clean vs.\ Corrupted Test.}
@@ -613,7 +612,21 @@ Algorithm~1 step order & $\theta\to\lambda\to\tilde{p}$ &
 \section{Runtime Analysis}
 % ─────────────────────────────────────────────────────────────────────────────
 
-\input{../results/runtime_table.tex}
+\begin{table}[H]
+\centering\small
+\caption{Runtime comparison (seconds per experiment, CPU).}
+\label{tab:runtime}
+\rowcolors{2}{gray!8}{white}
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{hdrblue!90}
+\color{white}\textbf{Method} & \color{white}\textbf{Time (s)} & \color{white}\textbf{Overhead} \\
+\midrule
+Naive-FAIR & $6.0 \pm 7.5$ & $1.0\times$ \\
+DRO-FAIR   & $324.9 \pm 203.5$ & $54.2\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 DRO-FAIR is $\approx37.5\times$ slower than Naive-FAIR on CPU due to $K=10$
 inner PGD steps $+$ Dykstra projection per epoch.  The paper's
@@ -624,7 +637,24 @@ the dominant overhead.
 \section{Ablation Study}
 % ─────────────────────────────────────────────────────────────────────────────
 
-\input{../results/ablation_table.tex}
+\begin{table}[H]
+\centering\small
+\caption{Ablation study on Adult (adversarial corruption, 3 seeds).}
+\label{tab:ablation}
+\rowcolors{2}{gray!8}{white}
+\begin{tabular}{L{4cm}cccccc}
+\toprule
+\rowcolor{hdrblue!90}
+\color{white}\textbf{Variant} & \color{white}\(\alpha{=}0.2\) Acc & \color{white}DP & \color{white}IF & \color{white}\(\alpha{=}0.3\) Acc & \color{white}DP & \color{white}IF \\
+\midrule
+Standard ML       & 0.822 & 0.1034 & 0.0233 & 0.816 & 0.1135 & 0.0248 \\
+Naive-FAIR        & 0.821 & 0.0905 & 0.0164 & 0.786 & 0.0339 & 0.0258 \\
+DRO Joint (DP+IF) & 0.788 & 0.0484 & 0.0067 & 0.606 & 0.0109 & 0.0028 \\
+DRO DP-only       & 0.803 & 0.0726 & 0.0108 & 0.647 & 0.0599 & 0.0119 \\
+DRO IF-only       & 0.821 & 0.0956 & 0.0174 & 0.787 & 0.0295 & 0.0280 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{itemize}
 \item \textbf{Standard ML:} highest accuracy ($\approx83\%$) but worst DP
