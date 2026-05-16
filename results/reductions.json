@@ -4,70 +4,70 @@
     "alpha": 0.0,
     "eval": "clean",
     "dp_reduction": 2.3708474190218043,
-    "if_reduction": -3.619536332814076
+    "if_reduction": -3.581570028396068
   },
   {
     "dataset": "adult",
     "alpha": 0.0,
     "eval": "corrupted",
     "dp_reduction": 2.3708474190218043,
-    "if_reduction": -3.619536332814076
+    "if_reduction": -3.581570028396068
   },
   {
     "dataset": "adult",
     "alpha": 0.1,
     "eval": "clean",
-    "dp_reduction": -10.673201205659492,
-    "if_reduction": -1.2306886619533897
+    "dp_reduction": -10.674338547920597,
+    "if_reduction": -1.177702172206252
   },
   {
     "dataset": "adult",
     "alpha": 0.1,
     "eval": "corrupted",
-    "dp_reduction": -11.049613379379297,
-    "if_reduction": -0.36550922080081083
+    "dp_reduction": -11.051447401568536,
+    "if_reduction": -0.34883720930232054
   },
   {
     "dataset": "adult",
     "alpha": 0.2,
     "eval": "clean",
-    "dp_reduction": -23.06571242811502,
-    "if_reduction": 26.686580212734967
+    "dp_reduction": -23.083954674136724,
+    "if_reduction": 26.649172680224503
   },
   {
     "dataset": "adult",
     "alpha": 0.2,
     "eval": "corrupted",
-    "dp_reduction": -19.672804557393032,
-    "if_reduction": 26.90636609785279
+    "dp_reduction": -19.69654972777974,
+    "if_reduction": 26.689402551471513
   },
   {
     "dataset": "adult",
     "alpha": 0.3,
     "eval": "clean",
-    "dp_reduction": -207.00366724473417,
-    "if_reduction": 59.50618819578332
+    "dp_reduction": -206.45299625652157,
+    "if_reduction": 59.4683764940239
   },
   {
     "dataset": "adult",
     "alpha": 0.3,
     "eval": "corrupted",
-    "dp_reduction": 14.883722260118937,
-    "if_reduction": 64.33891136447224
+    "dp_reduction": 13.596285860421647,
+    "if_reduction": 64.228729536546
   },
   {
     "dataset": "adult",
     "alpha": 0.4,
     "eval": "clean",
     "dp_reduction": 37.309139689909685,
-    "if_reduction": 23.448275862068986
+    "if_reduction": 25.00000000000001
   },
   {
     "dataset": "adult",
     "alpha": 0.4,
     "eval": "corrupted",
     "dp_reduction": 33.08113749021654,
-    "if_reduction": 8.695652173913052
+    "if_reduction": 19.23076923076923
   },
   {
     "dataset": "credit",
