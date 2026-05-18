@@ -17,8 +17,11 @@ All notable fixes and improvements to the DRO-FAIR project.
 
 ### Added
 - `CHANGELOG.md` — This file.
+- `docs/PROJECT_REFERENCE.md` — Project facts, file structure, hyperparameters, conventions.
 - `docs/KEY_FORMULAS.md` — Math reference and core formulas.
 - `docs/IMPLEMENTATION_NOTES.md` — Design decisions, derivations, and code map.
+- `docs/REVIEW_CHECKLIST.md` — Self-review checklist with grading rubric.
+- `docs/VERIFICATION_PROTOCOL.md` — Step-by-step reproducibility verification.
 - `docs/FAQ.md` — Frequently asked questions about the implementation.
 - `submission/MANIFEST.md` — Submission package inventory.
 - `tests/conftest.py` — Pytest configuration to prevent plugin hangs.

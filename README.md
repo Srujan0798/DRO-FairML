@@ -294,10 +294,13 @@ This implementation is built on the theoretical framework from the ICML submissi
 ## Project Resources
 
 - [CHANGELOG.md](CHANGELOG.md) — Version history
-- [PRE_SUBMISSION_CHECKLIST.md](PRE_SUBMISSION_CHECKLIST.md) — Verification checklist
-- [docs/FAQ.md](docs/FAQ.md) — Frequently asked questions
+- [PRE_SUBMISSION_CHECKLIST.md](PRE_SUBMISSION_CHECKLIST.md) — Quick submission checklist
+- [docs/PROJECT_REFERENCE.md](docs/PROJECT_REFERENCE.md) — Project facts, file structure, conventions
 - [docs/KEY_FORMULAS.md](docs/KEY_FORMULAS.md) — Math reference and core formulas
 - [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) — Design decisions and derivations
+- [docs/REVIEW_CHECKLIST.md](docs/REVIEW_CHECKLIST.md) — Self-review checklist for submission readiness
+- [docs/VERIFICATION_PROTOCOL.md](docs/VERIFICATION_PROTOCOL.md) — Step-by-step reproducibility verification
+- [docs/FAQ.md](docs/FAQ.md) — Frequently asked questions
 
 ## License
 
