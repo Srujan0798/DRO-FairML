@@ -293,11 +293,11 @@ This implementation is built on the theoretical framework from the ICML submissi
 
 ## Project Resources
 
-- [CHANGELOG.md](CHANGELOG.md) — All fixes and version history
-- [AGENTS.md](AGENTS.md) — Guide for AI agents working on this codebase
-- [PRE_SUBMISSION_CHECKLIST.md](PRE_SUBMISSION_CHECKLIST.md) — Verification checklist before submission
+- [CHANGELOG.md](CHANGELOG.md) — Version history
+- [PRE_SUBMISSION_CHECKLIST.md](PRE_SUBMISSION_CHECKLIST.md) — Verification checklist
 - [docs/FAQ.md](docs/FAQ.md) — Frequently asked questions
-- [docs/DEFENSE_GUIDE.md](docs/DEFENSE_GUIDE.md) — Oral defense preparation
+- [docs/KEY_FORMULAS.md](docs/KEY_FORMULAS.md) — Math reference and core formulas
+- [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) — Design decisions and derivations
 
 ## License
 

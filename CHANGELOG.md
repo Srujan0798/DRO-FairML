@@ -16,9 +16,10 @@ All notable fixes and improvements to the DRO-FAIR project.
 - **Makefile broken targets:** `monitor` and `review` referenced non-existent scripts. Updated with working alternatives.
 
 ### Added
-- `AGENTS.md` — Comprehensive guide for future AI agents working on this project.
 - `CHANGELOG.md` — This file.
-- `docs/DEFENSE_GUIDE.md` — Oral defense preparation guide.
+- `docs/KEY_FORMULAS.md` — Math reference and core formulas.
+- `docs/IMPLEMENTATION_NOTES.md` — Design decisions, derivations, and code map.
+- `docs/FAQ.md` — Frequently asked questions about the implementation.
 - `submission/MANIFEST.md` — Submission package inventory.
 - `tests/conftest.py` — Pytest configuration to prevent plugin hangs.
 - `.github/workflows/verification.yml` — CI verification step.
