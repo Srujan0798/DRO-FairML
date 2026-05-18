@@ -201,7 +201,7 @@ Experiments at α ∈ {0.0, 0.1, 0.2, 0.3, 0.4} with 10 random seeds per setting
 
 - Naive-FAIR: ~10–50s per experiment (60 epochs, full-batch CPU)
 - DRO-FAIR: ~400–1350s per experiment (60 epochs + K=10 inner steps)
-- Overhead: **~37.5× on CPU** (paper reports ~12× on GPU — difference expected due to full-batch CPU computation + k-NN graph construction without GPU acceleration)
+- Overhead: **~54× on CPU** (paper reports ~12× on GPU — difference expected due to full-batch CPU computation + k-NN graph construction without GPU acceleration)
 
 ## Verified Results (150 experiments, 10 seeds each)
 
@@ -248,7 +248,7 @@ python main.py --run-experiments --n-seeds 10
 python main.py --generate-results
 ```
 
-Expected runtime: ~25–35 hours on CPU for 150 experiments (37.5× overhead vs Naive-FAIR).
+Expected runtime: ~25–35 hours on CPU for 150 experiments (54× overhead vs Naive-FAIR).
 
 ## Theoretical Guarantees
 
