@@ -560,7 +560,7 @@ DP is already large.
   Multi-group fairness requires per-group radii and multi-way DP.
 \item \textbf{Full-batch training.}
   Required for correct importance reweighting; limits scalability.
-\item \textbf{CPU overhead $\approx 54\times$} vs Naive-FAIR
+\item \textbf{CPU overhead $\approx 37.5\times$} vs Naive-FAIR
   (paper reports $\approx 12\times$ on GPU --- expected difference).
 \item \textbf{$\tau=1$ at $\alpha=0.4$.}
   Soft threshold makes IF metric uninformative; direct comparison to
@@ -622,13 +622,13 @@ Algorithm~1 step order & $\theta\to\lambda\to\tilde{p}$ &
 \rowcolor{hdrblue!90}
 \color{white}\textbf{Method} & \color{white}\textbf{Time (s)} & \color{white}\textbf{Overhead} \\
 \midrule
-Naive-FAIR & $6.0 \pm 7.5$ & $1.0\times$ \\
-DRO-FAIR   & $324.9 \pm 203.5$ & $54.2\times$ \\
+Naive-FAIR & $10.6 \pm 9.1$ & $1.0\times$ \\
+DRO-FAIR   & $397.6 \pm 258.5$ & $37.5\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-DRO-FAIR is $\approx54\times$ slower than Naive-FAIR on CPU due to $K=10$
+DRO-FAIR is $\approx37.5\times$ slower than Naive-FAIR on CPU due to $K=10$
 inner PGD steps $+$ Dykstra projection per epoch.  The paper's
 $\approx12\times$ is GPU-based; full-batch CPU $k$-NN graph construction is
 the dominant overhead.
