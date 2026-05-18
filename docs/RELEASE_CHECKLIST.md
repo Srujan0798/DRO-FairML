@@ -1,6 +1,6 @@
-# Pre-Submission Checklist
+# Release Checklist
 
-Run this checklist before every submission.
+Quick checklist to run before tagging a new release. Verifies data integrity, report consistency, and packaging completeness.
 
 ## Data Integrity
 - [ ] `results/all_results.json` has exactly 150 experiments
@@ -36,7 +36,7 @@ Run this checklist before every submission.
 - [ ] `submission/src/` matches root `src/`
 - [ ] `submission/run_experiments.py` present
 - [ ] `submission/default.yaml` present
-- [ ] 3 prompt documents present in `submission/`
+- [ ] Mirror copies of `PROJECT_REFERENCE.md`, `REVIEW_CHECKLIST.md`, `VERIFICATION_PROTOCOL.md` present in `submission/`
 
 ## Validation
 ```bash
