@@ -20,7 +20,9 @@ Creates:
 
 Then runs:
     - Theory verification
-    - Professor review simulator
+    - Random vs adversarial comparison
+    - LaTeX extras (runtime, ablation tables)
+    - Results validation
 """
 
 import os

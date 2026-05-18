@@ -45,9 +45,9 @@
 ### Documentation
 | File | Description |
 |------|-------------|
-| `ORC_PROMPT.md` | Omnipotent Review Catalyst prompt |
-| `VERIFICATION_PROMPT.md` | Full verification protocol |
-| `PROFESSOR_REVIEW_PROMPT.md` | Professor review rubric |
+| `PROJECT_REFERENCE.md` | Project facts, file structure, hyperparameters |
+| `VERIFICATION_PROTOCOL.md` | Step-by-step reproducibility verification |
+| `REVIEW_CHECKLIST.md` | Self-review checklist with grading rubric |
 
 ---
 

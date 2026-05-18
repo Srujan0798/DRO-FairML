@@ -111,7 +111,7 @@ For submission acceptance, all of the following must exist and be valid:
 
 ---
 
-## 6. Defense Readiness
+## 6. Author Understanding
 
 The following six questions should be answerable in conversation, without referencing the code or report.
 
@@ -187,7 +187,7 @@ Any parameter without a clear source in either the paper or a documented stabili
 | Algorithm correctness | 20% | All invariants in §1 and §2 hold |
 | Results validity | 25% | All checks in §4 pass, statistical significance verified |
 | Novelty / contribution | 15% | One-paragraph contribution distinct from re-running the paper |
-| Defense readiness | 15% | 6/6 in §6 |
+| Author understanding | 15% | 6/6 in §6 |
 | Deliverables | 15% | All boxes in §5 checked |
 | Repository cleanliness | 10% | All conditions in §8 satisfied |
 
@@ -203,7 +203,7 @@ When using this checklist for a structured review, produce a short report contai
 2. **Per-category scores** with one-line notes.
 3. **Critical failures** that must be addressed (with file:line references).
 4. **Minor issues** that should be addressed.
-5. **Defense questions** asked and answered, with verdict per question.
+5. **Understanding-check questions** asked and answered, with verdict per question.
 6. **Files flagged for deletion** (if any).
 7. **Missing deliverables** (if any).
 8. **Recommended priority order** for fixes.

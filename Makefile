@@ -10,7 +10,7 @@ help:
 	@echo "  experiments   - Run full experiment suite (150 exps)"
 	@echo "  results       - Generate tables and plots from existing results"
 	@echo "  deliverables  - Generate ALL deliverables (tables + plots + ablations + theory)"
-	@echo "  review        - Run professor review simulator (self-grade)"
+	@echo "  review        - Open self-review checklist (docs/REVIEW_CHECKLIST.md)"
 	@echo "  full          - Run experiments then generate results"
 	@echo "  clean         - Remove Python cache files"
 
@@ -39,7 +39,9 @@ deliverables:
 	python3 experiments/generate_all_deliverables.py
 
 review:
-	@echo "Run manual review using docs/ORC_PROMPT.md and docs/PROFESSOR_REVIEW_PROMPT.md"
+	@echo "Self-review: docs/REVIEW_CHECKLIST.md"
+	@echo "Verification: docs/VERIFICATION_PROTOCOL.md"
+	@echo "Release check: docs/RELEASE_CHECKLIST.md"
 
 full:
 	python3 main.py --full-pipeline
