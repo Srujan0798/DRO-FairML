@@ -1,0 +1,11 @@
+# Treat JSON results as binary to avoid diff noise
+results/*.json binary
+results/*.pkl binary
+results/individual/*.json binary
+
+# Treat PDFs as binary
+*.pdf binary
+*.png binary
+
+# Treat CSV as text
+table1.csv text

@@ -291,6 +291,14 @@ All **32 unit tests** pass, covering:
 
 This implementation is built on the theoretical framework from the ICML submission *"Robust Individual and Group Fair Classification"* (Anonymous, 2026). We thank the original authors for the rigorous treatment of corruption-calibrated TV uncertainty sets and Algorithm 1. We extend the paper's random-corruption setting with adversarial attacks following the guidance from [Jonathan Hui's adversarial attacks survey](https://jonathan-hui.medium.com/adversarial-attacks-b58318bb497b), and benchmark on the LSAC dataset compiled by [damtharvey](https://github.com/damtharvey/law-school-dataset). The tilted empirical risk formulation builds on Li et al. (ICLR 2021).
 
+## Project Resources
+
+- [CHANGELOG.md](CHANGELOG.md) — All fixes and version history
+- [AGENTS.md](AGENTS.md) — Guide for AI agents working on this codebase
+- [PRE_SUBMISSION_CHECKLIST.md](PRE_SUBMISSION_CHECKLIST.md) — Verification checklist before submission
+- [docs/FAQ.md](docs/FAQ.md) — Frequently asked questions
+- [docs/DEFENSE_GUIDE.md](docs/DEFENSE_GUIDE.md) — Oral defense preparation
+
 ## License
 
 MIT License — see [LICENSE](LICENSE)

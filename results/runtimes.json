@@ -1,8 +1,10 @@
 {
-  "naive_mean": 2.698323799434461,
-  "naive_std": 1.1919001779953853,
-  "dro_mean": 178.5674037807866,
-  "dro_std": 122.77013085600696,
-  "overhead": 66.17715924909099,
-  "n_experiments": 95
+  "naive_mean": 10.606926362515768,
+  "naive_std": 9.136247634887695,
+  "dro_mean": 397.5569051114722,
+  "dro_std": 258.5384826660156,
+  "overhead": 37.48140335083008,
+  "n_experiments": 150,
+  "source": "all_results.json (authoritative)",
+  "note": "Regenerated from full 150-experiment dataset"
 }

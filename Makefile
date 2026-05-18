@@ -21,7 +21,13 @@ test:
 	python3 -m pytest tests/ -v
 
 monitor:
-	python3 experiments/monitor_progress.py
+	@echo "Monitor script removed. Use: python3 -c \"import json; d=json.load(open('results/all_results.json')); print(len(d), '/150 experiments')\""
+
+validate:
+	python3 experiments/validate_results.py
+
+theory:
+	python3 experiments/verify_theory.py
 
 experiments:
 	python3 experiments/run_experiments.py --n_seeds 10
@@ -33,7 +39,7 @@ deliverables:
 	python3 experiments/generate_all_deliverables.py
 
 review:
-	python3 experiments/professor_review_simulator.py
+	@echo "Run manual review using docs/ORC_PROMPT.md and docs/PROFESSOR_REVIEW_PROMPT.md"
 
 full:
 	python3 main.py --full-pipeline
