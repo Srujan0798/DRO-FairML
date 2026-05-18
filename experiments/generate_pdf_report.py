@@ -439,7 +439,7 @@ for item in [
     "<b>Credit α=0.2:</b> DP −50%, both metrics win",
     "<b>Adult α=0.4:</b> DRO wins (DP −37%) — at extreme corruption the feedback loop breaks",
     "<b>Adult α=0.1–0.3:</b> DRO loses — adversarial feedback loop (see §7)",
-    "<b>Summary:</b> DRO-FAIR wins DP in 6/9 cells, IF in 7/9 cells (α=0.1–0.3)",
+    "<b>Summary:</b> DRO-FAIR wins DP in 6/9 cells, IF in 5/9 cells (α=0.1–0.3)",
 ]:
     story.append(Paragraph(f"• {item}", BULLET))
 story.append(Spacer(1, 0.3*cm))
@@ -712,7 +712,7 @@ story.append(Paragraph(
 story.append(Spacer(1, 0.15*cm))
 story.append(Paragraph(
     "Across 150 experiments (3 datasets × 5 α × 10 seeds), DRO-FAIR reduces DP in 6/9 cells "
-    "and IF in 7/9 cells at α=0.1–0.3, with all Credit and LSAC wins statistically significant "
+    "and IF in 5/9 cells at α=0.1–0.3, with all Credit and LSAC wins statistically significant "
     "(p&lt;0.001, Wilcoxon). On LSAC at α=0.3: DP −99.6%, IF −100%, accuracy drop &lt;0.2%. "
     "On Credit at α=0.3: DP −91.8%, accuracy drop 1.9%.", BODY))
 story.append(Spacer(1, 0.15*cm))
