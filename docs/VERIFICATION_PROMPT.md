@@ -518,10 +518,10 @@ Mark PASS or FAIL for each:
 □ src/training/dro_fair.py: bias-corrected radii formula
 □ src/utils/projections.py: Dykstra with 500-iteration tail loop
 □ src/corruption/adversarial.py: AdversarialCorruptor attacks X, Y, A
-□ configs/default.yaml: lambda_max=2.0 (not 10.0)
+□ configs/default.yaml: lambda_max=1.5 (stability fix; was 2.0 in paper)
 □ 150 experiments run to completion
 □ 0 NaN or Inf values in any result
-□ table1.csv has 15 rows with correct data
+□ table1.csv has 60 rows with correct data
 □ DRO wins ≥6/9 comparisons at α=0.1, 0.2, 0.3
 □ All 32 tests pass
 □ Final report generated
