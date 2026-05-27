@@ -148,11 +148,66 @@ def load_lsac(data_dir='data/raw'):
     return X, y, a, 'LSAC'
 
 
+def load_utkface(data_dir='/data/srujan.sai/UTKFace', feature_cache=None):
+    """Load and preprocess UTKFace dataset.
+
+    Uses ResNet18 pretrained features (512-dim) extracted from face images.
+    If feature_cache is provided, loads pre-extracted features.
+    Otherwise returns placeholders for later feature extraction.
+
+    UTKFace file format: {age}_{gender}_{race}_{date}.jpg.chip.jpg
+        age: 0-116
+        gender: 0=Female, 1=Male
+        race: 0=White, 1=Black, 2=Asian, 3=Indian, 4=Others
+
+    Returns:
+        X: ResNet18 features (200K, 512)
+        y: gender labels (binary: 1=Male)
+        a: race labels (5-class: 0-4) — could also use gender as protected
+    """
+    import os
+    import glob
+
+    if feature_cache is not None and os.path.exists(feature_cache):
+        data = np.load(feature_cache)
+        return data['X'], data['gender'], data['race'], 'UTKFace'
+
+    image_dir = os.path.join(data_dir, '*.jpg.chip.jpg')
+    image_files = glob.glob(image_dir)
+
+    if len(image_files) == 0:
+        raise RuntimeError(f"No UTKFace images found in {data_dir}")
+
+    print(f"Found {len(image_files)} UTKFace images — run feature extraction first")
+    print(f"Expected format: {{age}}_{{gender}}_{{race}}_{{date}}.jpg.chip.jpg")
+    print(f"Feature cache not found at {feature_cache}")
+    print(f"Will return placeholder data — extract features using extract_utkface_features.py")
+
+    X = np.zeros((len(image_files), 512), dtype=np.float32)
+    y = np.zeros(len(image_files), dtype=np.float32)
+    a = np.zeros(len(image_files), dtype=np.int64)
+
+    for i, fpath in enumerate(image_files[:100]):
+        fname = os.path.basename(fpath)
+        parts = fname.split('_')
+        if len(parts) >= 3:
+            try:
+                age = int(parts[0])
+                gender = int(parts[1])
+                race = int(parts[2])
+                y[i] = gender
+                a[i] = race
+            except:
+                pass
+
+    return X, y, a, 'UTKFace'
+
+
 def get_dataset(name, data_dir='data/raw', test_size=0.2, val_size=0.15, random_state=42):
     """
     Load dataset and split into train/val/test.
     CRITICAL FIX: StandardScaler is fit ONLY on training data to prevent leakage.
-    
+
     Returns: X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dataset_name
     """
     name = name.lower()
@@ -162,6 +217,8 @@ def get_dataset(name, data_dir='data/raw', test_size=0.2, val_size=0.15, random_
         X, y, a, dname = load_credit(data_dir)
     elif name == 'lsac':
         X, y, a, dname = load_lsac(data_dir)
+    elif name == 'utkface':
+        X, y, a, dname = load_utkface(data_dir)
     else:
         raise ValueError(f"Unknown dataset: {name}")
 

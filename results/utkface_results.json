@@ -1,0 +1,32 @@
+[
+  {
+    "dataset": "utkface",
+    "alpha": 0.2,
+    "seed": 0,
+    "naive": {
+      "clean": {
+        "accuracy": 0.51,
+        "dp_violation": 0.0770619809627533,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.51,
+        "dp_violation": 0.014153897762298584,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.52,
+        "dp_violation": 0.052694618701934814,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.52,
+        "dp_violation": 0.0826500654220581,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 26.898749113082886
+  }
+]
