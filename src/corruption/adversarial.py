@@ -408,31 +408,40 @@ class FairnessTargetedPGD:
             y_attacked: corrupted labels
             corrupt_mask: boolean mask of flipped samples
         """
+        y_orig = y.copy()
         y_adv = y.copy()
         n = len(y)
         n_corrupt = int(self.alpha * n)
 
         for step in range(self.pgd_steps):
             grad = self.compute_fairness_gradient(y_adv, a, X)
-
-            # Select targets
             target_idx = self._select_targets(grad, n_corrupt, a)
-
-            # Apply flips
             y_adv[target_idx] = 1 - y_adv[target_idx]
 
-        # Final selection for return mask
-        grad_final = self.compute_fairness_gradient(y_adv, a)
-        target_idx = self._select_targets(grad_final, n_corrupt, a)
+        # After all steps, find labels that actually changed
+        changed = y_adv != y_orig
+        changed_idx = np.where(changed)[0]
+
+        # Enforce exact alpha budget: if too many changed, keep top by gradient
+        if len(changed_idx) > n_corrupt:
+            grad_final = self.compute_fairness_gradient(y_adv, a, X)
+            changed_grad = grad_final[changed_idx]
+            keep_idx = changed_idx[np.argsort(-changed_grad)[:n_corrupt]]
+            y_adv = y_orig.copy()
+            y_adv[keep_idx] = 1 - y_adv[keep_idx]
+            changed_idx = keep_idx
 
         corrupt_mask = np.zeros(n, dtype=bool)
-        corrupt_mask[target_idx] = True
+        corrupt_mask[changed_idx] = True
 
         return y_adv, corrupt_mask
 
     def corrupt(self, X, y, a, model=None, device='cpu'):
         """
         Apply fairness-targeted adversarial corruption.
+
+        Total corruption budget is exactly alpha*n samples.
+        All three attacks (label, feature, attribute) target the SAME indices.
 
         Args:
             X: features (numpy array, already standardized)
@@ -447,48 +456,24 @@ class FairnessTargetedPGD:
         n = len(y)
         n_corrupt = int(self.alpha * n)
 
-        # Select corruption targets
-        if self.coordinated:
-            group_counts = np.bincount(a.astype(int))
-            minority_group = int(np.argmin(group_counts))
-            minority_indices = np.where(a == minority_group)[0]
-            majority_indices = np.where(a != minority_group)[0]
-
-            n_minority = min(int(0.7 * n_corrupt), len(minority_indices))
-            n_majority = n_corrupt - n_minority
-
-            corrupt_idx = []
-            if n_minority > 0:
-                corrupt_idx.extend(self.rng.choice(minority_indices, n_minority, replace=False))
-            if n_majority > 0 and len(majority_indices) > 0:
-                corrupt_idx.extend(self.rng.choice(majority_indices, n_majority, replace=False))
-            corrupt_idx = np.array(corrupt_idx, dtype=np.int64)
-        else:
-            if n_corrupt > 0:
-                corrupt_idx = self.rng.choice(n, n_corrupt, replace=False).astype(np.int64)
-            else:
-                corrupt_idx = np.array([], dtype=np.int64)
-
-        corrupt_mask = np.zeros(n, dtype=bool)
-        if len(corrupt_idx) > 0:
-            corrupt_mask[corrupt_idx] = True
-
         X_c = X.copy()
         y_c = y.copy()
         a_c = a.copy()
 
-        # 1. Feature perturbation (same as AdversarialCorruptor)
-        if model is not None:
-            X_c = self._attack_features_pgd(X_c, y_c, corrupt_idx, model, device)
-        else:
-            X_c = self._attack_features_fgsm(X_c, y_c, corrupt_idx)
+        # 1. Fairness-targeted label attack FIRST to select worst samples
+        y_c, corrupt_mask = self._attack_labels_fairness(y_c, a_c, X_c)
+        corrupt_idx = np.where(corrupt_mask)[0]
 
-        # 2. Fairness-targeted label attack (NEW — gradient-based)
-        y_c, label_mask = self._attack_labels_fairness(y_c, a_c, X_c)
-        corrupt_mask = corrupt_mask | label_mask
+        # 2. Feature perturbation on SAME indices
+        if len(corrupt_idx) > 0:
+            if model is not None:
+                X_c = self._attack_features_pgd(X_c, y_c, corrupt_idx, model, device)
+            else:
+                X_c = self._attack_features_fgsm(X_c, y_c, corrupt_idx)
 
-        # 3. Attribute flips
-        a_c = self._attack_attributes(a_c, corrupt_idx)
+        # 3. Attribute flips on SAME indices
+        if len(corrupt_idx) > 0:
+            a_c = self._attack_attributes(a_c, corrupt_idx)
 
         return X_c, y_c, a_c, corrupt_mask
 
