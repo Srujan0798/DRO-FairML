@@ -1,50 +1,64 @@
 #!/bin/bash
-# Setup script for DRO-FAIR on FLAIR2 server
-# Run this ONCE after logging in
+# Setup script for UTKFace experiments on GPU server
+# Run this after getting GPU server access
 
-echo "=== DRO-FAIR Setup ==="
-echo ""
+set -e
 
-# Install Python packages (try multiple methods)
-echo "[1/5] Installing packages..."
+echo "=== UTKFace GPU Server Setup ==="
 
-if python3 -c "import numpy" 2>/dev/null; then
-    echo "numpy already installed"
-else
-    echo "Installing numpy torch sklearn..."
-    pip install numpy torch scikit-learn pandas --quiet 2>&1 || \
-    pip install --trusted-host pypi.org numpy torch scikit-learn pandas -i http://pypi.org/simple/ 2>&1 || \
-    echo "WARNING: Could not install packages. Check pip manually."
-fi
+# Config
+SERVER_USER="srujan.sai"
+SERVER_HOST="flair2.iitgn.ac.in"  # Update with actual hostname when confirmed
+REMOTE_DATA_DIR="/data/${SERVER_USER}/UTKFace"
+REMOTE_CACHE="/data/${SERVER_USER}/utkface_features.npz"
+PROJECT_DIR="/home/${SERVER_USER}/DRO-FairML"
 
-# Check GPU
-echo ""
-echo "[2/5] GPU Status:"
-nvidia-smi 2>&1 | head -15 || echo "nvidia-smi not found"
+echo "Server: ${SERVER_USER}@${SERVER_HOST}"
+echo "Data dir: ${REMOTE_DATA_DIR}"
 
-# Check torch
-echo ""
-echo "[3/5] PyTorch + CUDA:"
-python3 -c "import torch; print('CUDA:', torch.cuda.is_available()); print('Devices:', torch.cuda.device_count() if torch.cuda.is_available() else 0)" 2>&1
+# 1. Create directories
+echo "[1/5] Creating remote directories..."
+ssh ${SERVER_USER}@${SERVER_HOST} "mkdir -p ${REMOTE_DATA_DIR} ${PROJECT_DIR}"
 
-# Create data directory
-echo ""
-echo "[4/5] Setting up directories..."
-mkdir -p /data/srujan.sai/DRO-FairML/data/raw
-mkdir -p /data/srujan.sai/UTKFace
-ls -la /data/srujan.sai/DRO-FairML/
+# 2. Copy project code
+echo "[2/5] Copying project code..."
+rsync -avz --exclude='venv' --exclude='data/raw' --exclude='figures' --exclude='results' \
+    /Users/srujansai/Desktop/DRO-FairML/ \
+    ${SERVER_USER}@${SERVER_HOST}:${PROJECT_DIR}/
 
-# Copy local data if exists
-if [ -d "$(dirname "$0")/../data/raw" ]; then
-    echo ""
-    echo "[5/5] Copying local data files..."
-    cp -n $(dirname "$0")/../data/raw/*.data /data/srujan.sai/DRO-FairML/data/raw/ 2>/dev/null || true
-    cp -n $(dirname "$0")/../data/raw/*.xls /data/srujan.sai/DRO-FairML/data/raw/ 2>/dev/null || true
-    cp -n $(dirname "$0")/../data/raw/*.csv /data/srujan.sai/DRO-FairML/data/raw/ 2>/dev/null || true
-fi
+# 3. Download UTKFace (if not present)
+echo "[3/5] Checking UTKFace data..."
+ssh ${SERVER_USER}@${SERVER_HOST} << EOF
+    if [ ! -f "${REMOTE_DATA_DIR}/1.jpg.chip.jpg" ]; then
+        echo "UTKFace not found. Downloading..."
+        # Option 1: wget from mirror
+        cd /tmp
+        wget -q https://github.com/moo-simple-unet/releases/download/v1.0/UTKFace.tar.gz -O UTKFace.tar.gz 2>/dev/null || echo "wget failed, use manual upload"
+        # Option 2: kaggle (requires API key)
+        # kaggle datasets download -d jangedoo/utkface-new
+        echo "If auto-download failed, manually upload UTKFace images to ${REMOTE_DATA_DIR}"
+    else
+        echo "UTKFace already present"
+    fi
+EOF
 
-echo ""
-echo "=== Setup Complete ==="
-echo "Run experiments with:"
-echo "  cd /data/srujan.sai/DRO-FairML"
-echo "  PYTHONPATH=/data/srujan.sai/DRO-FairML python3 scripts/test_fairness_pgd.py"
+# 4. Extract features
+echo "[4/5] Extracting ResNet18 features..."
+ssh ${SERVER_USER}@${SERVER_HOST} << EOF
+    cd ${PROJECT_DIR}
+    python3 scripts/extract_utkface_features.py \
+        --data-dir ${REMOTE_DATA_DIR} \
+        --output ${REMOTE_CACHE} \
+        --batch-size 128
+EOF
+
+# 5. Run smoke test
+echo "[5/5] Running UTKFace smoke test..."
+ssh ${SERVER_USER}@${SERVER_HOST} << EOF
+    cd ${PROJECT_DIR}
+    python3 experiments/run_utkface.py --smoke
+EOF
+
+echo "=== Setup complete ==="
+echo "Next: run full experiments with:"
+echo "  ssh ${SERVER_USER}@${SERVER_HOST} 'cd ${PROJECT_DIR} && python3 experiments/run_utkface.py --alphas 0.0 0.1 0.2 0.3 --n_seeds 5'"

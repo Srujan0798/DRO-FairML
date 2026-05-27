@@ -187,7 +187,8 @@ def load_utkface(data_dir='/data/srujan.sai/UTKFace', feature_cache=None):
     y = np.zeros(len(image_files), dtype=np.float32)
     a = np.zeros(len(image_files), dtype=np.int64)
 
-    for i, fpath in enumerate(image_files[:100]):
+    valid_count = 0
+    for i, fpath in enumerate(image_files):
         fname = os.path.basename(fpath)
         parts = fname.split('_')
         if len(parts) >= 3:
@@ -197,9 +198,11 @@ def load_utkface(data_dir='/data/srujan.sai/UTKFace', feature_cache=None):
                 race = int(parts[2])
                 y[i] = gender
                 a[i] = race
+                valid_count += 1
             except:
                 pass
 
+    print(f"Parsed {valid_count}/{len(image_files)} valid filenames")
     return X, y, a, 'UTKFace'
 
 
