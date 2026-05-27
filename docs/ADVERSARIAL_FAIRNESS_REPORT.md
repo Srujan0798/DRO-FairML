@@ -72,28 +72,42 @@ UTKFace images (200K) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 
 ## 4. Preliminary Results
 
-### 4.1 Smoke Test (Adult, α=0.2, 1 seed, epochs=10)
+### 4.1 Fast-Mode Results (Adult, 55 experiments, epochs=30, K_inner=5)
 
-| Attack | Method | Accuracy | DP Violation | IF Violation | Time |
-|--------|--------|----------|--------------|--------------|------|
-| DP | Naive | 0.808 | 0.1822 | 0.0165 | 170s |
-| DP | DRO | 0.804 | 0.1964 | 0.0206 | 167s |
-| IF | Naive | 0.782 | 0.0424 | 0.0041 | 178s |
-| IF | DRO | 0.791 | 0.0638 | 0.0072 | 1128s |
-| Combined | Naive | 0.782 | 0.0679 | 0.0028 | 20s |
-| Combined | DRO | 0.793 | 0.1015 | 0.0050 | 27s |
+| Attack | Alpha | Method | N | Accuracy | DP Violation | IF Violation |
+|--------|-------|--------|---|----------|--------------|--------------|
+| DP | 0.1 | Naive | 5 | 0.8157 | 0.2056 | 0.04188 |
+| DP | 0.1 | DRO | 5 | 0.8129 | 0.2297 | 0.04647 |
+| DP | 0.2 | Naive | 4 | 0.7867 | 0.1725 | 0.04881 |
+| DP | 0.2 | DRO | 4 | 0.7903 | 0.1996 | 0.04352 |
+| IF | 0.1 | Naive | 5 | 0.8138 | 0.1516 | 0.03126 |
+| IF | 0.1 | DRO | 5 | 0.8154 | 0.1686 | 0.03415 |
+| IF | 0.2 | Naive | 4 | 0.8015 | 0.1102 | 0.02373 |
+| IF | 0.2 | DRO | 4 | 0.8056 | 0.1102 | 0.02038 |
+| Combined | 0.1 | Naive | 5 | 0.8073 | 0.1269 | 0.02249 |
+| Combined | 0.1 | DRO | 5 | 0.8121 | 0.1543 | 0.02624 |
+| Combined | 0.2 | Naive | 4 | 0.8034 | 0.1893 | 0.03467 |
+| Combined | 0.2 | DRO | 3 | 0.7775 | 0.0385 | 0.00170 |
 
-**Notes:**
-- Smoke test uses reduced epochs (10 vs 60) — models not fully converged
-- Adult at α=0.2 is known to trigger feedback loops (documented in submitted paper)
-- Full experiments with 60 epochs, 5 seeds, 3 datasets running now
+**Key Finding:** Under DP-only and IF-only attacks, DRO-FAIR shows **HIGHER** DP violation than Naive-FAIR. This is the opposite of random-noise results.
+
+**Wilcoxon tests (Naive DP > DRO DP, one-sided):**
+- DP attack α=0.1: Naive=0.2056, DRO=0.2297, reduction=**−11.7%**, p=0.969
+- DP attack α=0.2: Naive=0.1725, DRO=0.1996, reduction=**−15.7%**, p=0.875
+- IF attack α=0.1: Naive=0.1516, DRO=0.1686, reduction=**−11.2%**, p=0.969
+- Combined α=0.2: Naive=0.1631, DRO=0.0385, reduction=**+76.4%**, p=0.250 (n=3)
+
+**Interpretation:**
+1. DP-targeted and IF-targeted attacks are strong enough to break DRO's advantage
+2. Combined attack is weaker on individual metrics (attacker splits budget between two objectives)
+3. At Combined α=0.2, DRO shows large improvement — needs more seeds to confirm
 
 ### 4.2 Full Experiment Status
 
-- **Launched:** May 27, 16:30
-- **Target:** 264 experiments (3 datasets × 3 alphas × 5 seeds × 3 attacks × 2 methods − 6 smoke)
-- **Progress:** 1/264 complete (Adult α=0.1 seed=0 dp/naive)
-- **ETA:** ~4–5 hours
+- **Launched:** May 27, 17:31 (fast mode: epochs=30, K_inner=5)
+- **Target:** 270 experiments (3 datasets × 3 alphas × 5 seeds × 3 attacks × 2 methods)
+- **Progress:** 55/270 complete (all Adult so far)
+- **ETA:** ~3–4 hours (screen session `fpgd`)
 - **Output:** `results/fairness_pgd_results.json`
 
 ---
