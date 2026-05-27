@@ -33,7 +33,7 @@ def get_lambda_max(dataset, alpha):
     return 1.5
 
 
-def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10):
+def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=5):
     """Run single (dataset, alpha, seed, attack, method) experiment."""
     import random
     random.seed(seed)
@@ -53,7 +53,7 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
     attack_obj = FairnessTargetedPGD(
         alpha=alpha,
         target_metric=attack,
-        pgd_steps=5,
+        pgd_steps=pgd_steps,
         coordinated=True,
         random_state=seed
     )
@@ -126,13 +126,15 @@ def main():
         args.n_seeds = 1
         smoke_epochs = 10
         smoke_k_inner = 3
+        smoke_pgd_steps = 2
         print("SMOKE TEST MODE: 1 dataset, 1 alpha, 1 seed")
         print("Attacks: dp, if, combined | Methods: naive, dro")
         print("Expected: 6 rows\n")
-        print("NOTE: smoke test uses epochs=10, K_inner=3 (not 60/10) for speed")
+        print("NOTE: smoke uses epochs=10, K_inner=3, pgd_steps=2 for speed")
     else:
         smoke_epochs = 60
         smoke_k_inner = 10
+        smoke_pgd_steps = 5
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Device: {device}")
@@ -158,7 +160,7 @@ def main():
                             t0 = time.time()
                             result = run_single_experiment(
                                 dataset, alpha, seed, attack, method, device=device, verbose=False,
-                                epochs=smoke_epochs, k_inner=smoke_k_inner
+                                epochs=smoke_epochs, k_inner=smoke_k_inner, pgd_steps=smoke_pgd_steps
                             )
                             elapsed = time.time() - t0
                             all_results.append(result)
