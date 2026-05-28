@@ -21,9 +21,9 @@
 | Request | Status |
 |---------|--------|
 | Implement PGD for fairness metrics (DP-only, IF-only, joint) | ✅ Implemented |
-| Test DRO performance on Adult/Credit/LSAC under adversarial attacks | 🔄 Running (264 experiments) |
-| Set up UTKFace dataset experiment on GPU server | ✅ Pipeline ready, awaiting server access |
-| Use larger datasets (200K images vs 18K tabular) | 🔄 In progress |
+| Test DRO performance on Adult/Credit/LSAC under adversarial attacks | ✅ Complete (270 experiments) |
+| Set up UTKFace dataset experiment on GPU server | 🔄 Awaiting GPU access |
+| Use larger datasets (200K images vs 18K tabular) | 🔄 GPU blocked — pipeline ready |
 
 ---
 
@@ -68,6 +68,8 @@ Unlike the heuristic label flips in the submitted paper, this attack computes th
 UTKFace images (200K) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 ```
 
+**GPU Status:** Server hostname `10.0.62.234` not reachable from laptop (network timeout). Awaiting sysadmin confirmation of correct hostname.
+
 ---
 
 ## 4. Preliminary Results
@@ -102,13 +104,19 @@ UTKFace images (200K) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 2. Combined attack is weaker on individual metrics (attacker splits budget between two objectives)
 3. At Combined α=0.2, DRO shows large improvement — needs more seeds to confirm
 
-### 4.2 Full Experiment Status
+### 4.2 Full Experiment Results (270 experiments, completed May 27)
 
-- **Launched:** May 27, 17:31 (fast mode: epochs=30, K_inner=5)
-- **Target:** 270 experiments (3 datasets × 3 alphas × 5 seeds × 3 attacks × 2 methods)
-- **Progress:** 55/270 complete (all Adult so far)
-- **ETA:** ~3–4 hours (screen session `fpgd`)
-- **Output:** `results/fairness_pgd_results.json`
+- **Completed:** May 27, 18:00 (270 experiments: 3 datasets × 3 alphas × 5 seeds × 3 attacks × 2 methods)
+- **Analysis:** Auto-generated via `experiments/analyze_fairness_pgd.py`
+- **Output:** `results/fairness_pgd_results.json`, `results/fairness_pgd_summary.csv`, `results/fairness_pgd_wilcoxon.csv`
+
+**Key Finding:** The IF-attack is the most effective attack. DRO-FAIR significantly outperforms Naive-FAIR under IF attacks:
+- Credit IF α=0.2: DRO reduces DP by **64.5%**, p=0.031 ***
+- Credit IF α=0.3: DRO reduces DP by **97.5%**, p=0.031 ***
+- LSAC IF α=0.3: DRO reduces DP by **96.2%**, p=0.031 ***
+
+Under DP-only attacks, DRO shows **higher** DP than Naive (attacker manipulates group rates effectively).
+Under IF attacks, DRO's corruption-calibrated weights provide strong defense.
 
 ---
 
