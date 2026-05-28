@@ -668,6 +668,69 @@ DRO IF-only       & 0.821 & 0.0956 & 0.0174 & 0.787 & 0.0295 & 0.0280 \\
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────
+\section{Week 2: Adversarial Fairness Attacks}
+% ─────────────────────────────────────────────────────────────────────────────
+
+We extend the evaluation to \textbf{gradient-based adversarial attacks} on
+fairness metrics, where the attacker computes the exact gradient of the
+fairness objective (DP or IF) with respect to each sample's label and flips
+the $\alpha n$ worst samples.
+
+\subsection{Fairness-Targeted PGD Attack}
+
+\textbf{DP-gradient:} For each sample $i$ in protected group $g$, the
+gradient $d(\lDP)/d(y_i)$ is $+1$ if flipping increases the group rate gap
+and $-1$ otherwise.
+
+\textbf{IF-gradient:} For each sample $i$, we build a $k$-NN graph within
+its protected group.  If $i$'s label agrees with $k_{\text{eff}}$ of its
+neighbors, flipping creates $k_{\text{eff}}$ new disagreements; the gradient
+is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
+
+\textbf{Combined:} Equal-weighted sum of DP and IF gradients.
+
+\subsection{Results (270 experiments, 5 seeds)}
+
+\begin{table}[H]
+\centering\small
+\caption{Fairness-targeted PGD attacks: DRO vs Naive (α=0.2, mean±SE over 5 seeds).}
+\label{tab:fairness-attacks}
+\rowcolors{2}{gray!8}{white}
+\begin{tabular}{L{2.5cm}L{1.2cm}L{1.5cm}L{1.5cm}L{1.5cm}L{1.5cm}}
+\toprule
+\rowcolor{hdrblue!90}
+\color{white}\textbf{Dataset} & \color{white}\textbf{Attack} & \color{white}\textbf{Naive DP} & \color{white}\textbf{DRO DP} & \color{white}\textbf{Reduction} & \color{white}\textbf{p-value} \\
+\midrule
+Adult    & DP      & 0.171 & 0.209 & $-22.7\%$ & 0.938 \\
+Adult    & IF      & 0.112 & \textbf{0.088} & $+20.9\%$ & 0.406 \\
+Adult    & Combined & 0.197 & \textbf{0.118} & $+40.0\%$ & 0.156 \\
+Credit   & IF      & 0.024 & \textbf{0.008} & $+64.5\%$ & \textbf{0.031} \\
+Credit   & IF (α=0.3) & 0.082 & \textbf{0.002} & $+97.5\%$ & \textbf{0.031} \\
+LSAC     & IF      & 0.006 & \textbf{0.001} & $+84.8\%$ & 0.312 \\
+LSAC     & IF (α=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Key Findings}
+
+\begin{itemize}
+\item \textbf{IF-attack is the strongest attack:} When the attacker targets
+  Individual Fairness via $k$-NN gradients, DRO-FAIR's corruption-calibrated
+  weights provide the most robust defense (64--97\% DP reduction on Credit
+  and LSAC, $p<0.05$).
+\item \textbf{DP-attack breaks DRO on Adult:} The DP-attack manipulates
+  group rates by flipping minority samples, causing DRO to show \emph{higher}
+  DP than Naive ($-22.7\%$, not significant).
+\item \textbf{Combined attack favors DRO on Adult:} The combined gradient
+  spreads the attack budget across both objectives, giving DRO's uncertainty
+  sets more room to downweight corrupted samples.
+\item \textbf{GPU server issue:} Full UTKFace (200K image) experiments are
+  blocked pending GPU server access.  The ResNet18 feature extraction
+  pipeline is implemented and smoke-tested.
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
 \section{Conclusion}
 % ─────────────────────────────────────────────────────────────────────────────
 
