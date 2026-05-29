@@ -90,17 +90,24 @@
 
 ## CLOSING (30 seconds)
 
-> "Madam, to summarize: Task 1 complete — DRO defends well against IF attacks on tabular data. Task 2 complete — UTKFace shows a surprising result where DRO hurts under corruption on image features. Both tasks are done. We are ready for the next phase: larger datasets and deeper analysis. No submission code was modified."
+> "Madam, to summarize: Task 1 complete — DRO defends well against IF attacks on tabular data. Task 2 complete — UTKFace shows a surprising result where DRO hurts under corruption on image features. Both tasks are done. We are also running 5 seeds on UTKFace right now on the GPU server for stronger statistical power. We are ready for the next phase: larger datasets and deeper analysis. No submission code was modified."
 
 ---
 
+## PRIMARY VISUAL (Show This First!)
+
+**`figures/final_meeting_figure.png`** — One page showing BOTH tasks + key insight
+- Top-left: Task 1 significant results (tabular)
+- Top-right: Task 2 UTKFace results (images)  
+- Bottom: Key finding text box
+
 ## FILES TO HAVE OPEN
 
-1. **Terminal:** `results/utkface_results.json` (9 experiments, real data)
-2. **Image viewer:** `figures/fig_utkface_dp_comparison.png`
-3. **Image viewer:** `figures/fig8_fairness_pgd_comparison.png`
-4. **Text editor:** `src/corruption/adversarial.py` (FairnessTargetedPGD class)
-5. **Browser (if needed):** GitHub repo at commit `977422d`
+1. **Image viewer:** `figures/final_meeting_figure.png` (PRIMARY — show first!)
+2. **Image viewer:** `figures/summary_dashboard_may29.png` (backup visual)
+3. **Terminal:** `results/utkface_results.json` (9 experiments done, 15 running on server)
+4. **Text editor:** `src/corruption/adversarial.py` (FairnessTargetedPGD class, if asked)
+5. **Browser:** GitHub repo at commit `2a91f7c`
 
 ---
 
