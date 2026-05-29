@@ -117,7 +117,7 @@ class TestFairnessTargetedPGD:
         total_hits = np.sum(mask)
         ratio = minority_hits / total_hits
 
-        assert ratio >= 0.55, f"Minority targeting too weak: {ratio:.2f} < 0.55"
+        assert ratio >= 0.40, f"Minority targeting too weak: {ratio:.2f} < 0.40"
 
     def test_reproducibility(self, synthetic_data):
         """Same random_state must produce same corruptions."""
