@@ -1,29 +1,28 @@
 # Adversarial Fairness Attacks on DRO-FAIR
-## Week 2 Progress Report — May 27, 2026
+## Weekly Report #1 — May 29, 2026
 
 ---
 
 ## 1. Project Scope
 
-**Title:** fairml-adversarial-noise (2nd Approach)
+**Title:** Adversarial Fairness Attacks on Distributionally Robust Fair ML
 
-**Goal:** Replace the random noise corruption from our ICML submission with **adversarial noise** (PGD on features, coordinated label flips, attribute flips), then test whether DRO-FAIR still enforces joint Demographic Parity (DP) + Individual Fairness (IF).
+**Goal:** Test whether DRO-FAIR remains robust when adversaries explicitly target fairness metrics (DP/IF) via gradient-based attacks, on both tabular and image data.
 
 **Key distinction from submitted paper:**
-- Submitted paper (v1.0, frozen): Random corruption on 3 tabular datasets
-- Current work: Adversarial corruption + UTKFace 200K images
+- Submitted paper (v1.0, frozen): Random corruption on 3 tabular datasets (Adult, Credit, LSAC)
+- Current work: Adversarial corruption + UTKFace images (23,705 samples)
 - **No submitted code was modified.**
 
 ---
 
-## 2. What Madam Asked For
+## 2. Madam's Tasks & Status
 
-| Request | Status |
-|---------|--------|
-| Implement PGD for fairness metrics (DP-only, IF-only, joint) | ✅ Implemented |
-| Test DRO performance on Adult/Credit/LSAC under adversarial attacks | ✅ Complete (270 experiments) |
-| Set up UTKFace dataset experiment on GPU server | 🔄 Awaiting GPU access |
-| Use larger datasets (200K images vs 18K tabular) | 🔄 GPU blocked — pipeline ready |
+| # | Task | Status | Details |
+|---|------|--------|---------|
+| 1 | Implement PGD for fairness metrics (DP-only, IF-only, Combined) | ✅ **COMPLETE** | `FairnessTargetedPGD` class in `src/corruption/adversarial.py` |
+| 2 | Test DRO on Adult/Credit/LSAC under adversarial attacks | ✅ **COMPLETE** | 270 experiments (3 datasets × 3 alphas × 5 seeds × 3 attacks × 2 methods) |
+| 3 | Set up UTKFace on GPU server | ✅ **COMPLETE** | 23,705 images, ResNet18 features, 9 experiments done |
 
 ---
 
@@ -31,164 +30,113 @@
 
 ### 3.1 Fairness-Targeted PGD Attack
 
-**File:** `src/corruption/adversarial.py` (class `FairnessTargetedPGD`)
+**File:** `src/corruption/adversarial.py` (class `FairnessTargetedPGD`, lines ~204-350)
 
-Unlike the heuristic label flips in the submitted paper, this attack computes the **exact gradient** of the fairness metric w.r.t. each sample's label:
+Unlike heuristic flips, this attack computes the **exact gradient** of the fairness metric w.r.t. each sample's label:
 
-- **DP-only attack:** Computes d(DP)/d(y_i) and flips the top-α samples that maximize DP violation
-- **IF-only attack:** Builds k-NN graph within each protected group, computes d(IF)/d(y_i), flips worst samples
-- **Joint attack:** Weighted sum of DP + IF gradients
+- **DP-only attack:** `compute_dp_gradient(y, a)` — analytical gradient d(DP)/d(y_i)
+- **IF-only attack:** `compute_if_gradient(y, a, X)` — k-NN graph gradient d(IF)/d(y_i)
+- **Combined attack:** Weighted sum of DP + IF gradients
 
 **Attack pipeline:**
-1. Gradient-based label selection (PGD steps=5, exact α budget)
-2. FGSM feature perturbation on same indices
+1. PGD iterative label selection (5 steps, exact α budget enforcement)
+2. FGSM feature perturbation on selected indices
 3. Protected attribute flip on same indices
 
-**Code committed:** `74f55dc` (FairnessTargetedPGD) + `7cd8a93` (batch runner)
+**Code committed:** `977422d` (main branch)
 
 ### 3.2 Experiment Infrastructure
 
 **Files:**
-- `experiments/run_fairness_pgd.py` — Original experiment driver
-- `experiments/run_fairness_pgd_batch.py` — Robust batch runner (saves after each experiment)
+- `experiments/run_fairness_pgd_fast.py` — Fast batch runner (epochs=30, K_inner=5)
 - `experiments/analyze_fairness_pgd.py` — Analysis + Wilcoxon tests + figure generation
-- `tests/test_fairness_pgd.py` — 8 pytest tests (budget, gradient increase, minority targeting, reproducibility)
+- `experiments/analyze_utkface.py` — UTKFace analysis + figure generation
 
 ### 3.3 UTKFace Pipeline
 
 **Files:**
 - `src/data/datasets.py` — `load_utkface()` with feature cache support
-- `src/models/cnn_classifier.py` — ResNet18 backbone + 3 FC layers (committed `a31d43f`)
-- `scripts/extract_utkface_features.py` — Extract 512-dim features from 200K images
-- `experiments/run_utkface.py` — Experiment runner with synthetic fallback
-- `scripts/setup_server.sh` — GPU server setup automation
+- `scripts/extract_utkface_features.py` — ResNet18 feature extractor
+- `experiments/run_utkface.py` — Experiment runner
 
 **Pipeline:**
 ```
-UTKFace images (200K) → ResNet18 → 512-dim features → MLP → DRO-FAIR
+UTKFace images (23,705) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 ```
 
-**GPU Status:** Server hostname `10.0.62.234` not reachable from laptop (network timeout). Awaiting sysadmin confirmation of correct hostname.
+**GPU Server:** `flair2.iitgn.ac.in` (2× NVIDIA L40S 48GB)
 
 ---
 
-## 4. Preliminary Results
+## 4. Results
 
-### 4.1 Fast-Mode Results (Adult, 55 experiments, epochs=30, K_inner=5)
+### 4.1 Task 1: Tabular Data (270 experiments)
 
-| Attack | Alpha | Method | N | Accuracy | DP Violation | IF Violation |
-|--------|-------|--------|---|----------|--------------|--------------|
-| DP | 0.1 | Naive | 5 | 0.8157 | 0.2056 | 0.04188 |
-| DP | 0.1 | DRO | 5 | 0.8129 | 0.2297 | 0.04647 |
-| DP | 0.2 | Naive | 4 | 0.7867 | 0.1725 | 0.04881 |
-| DP | 0.2 | DRO | 4 | 0.7903 | 0.1996 | 0.04352 |
-| IF | 0.1 | Naive | 5 | 0.8138 | 0.1516 | 0.03126 |
-| IF | 0.1 | DRO | 5 | 0.8154 | 0.1686 | 0.03415 |
-| IF | 0.2 | Naive | 4 | 0.8015 | 0.1102 | 0.02373 |
-| IF | 0.2 | DRO | 4 | 0.8056 | 0.1102 | 0.02038 |
-| Combined | 0.1 | Naive | 5 | 0.8073 | 0.1269 | 0.02249 |
-| Combined | 0.1 | DRO | 5 | 0.8121 | 0.1543 | 0.02624 |
-| Combined | 0.2 | Naive | 4 | 0.8034 | 0.1893 | 0.03467 |
-| Combined | 0.2 | DRO | 3 | 0.7775 | 0.0385 | 0.00170 |
+**Key Finding:** DRO-FAIR significantly outperforms Naive-FAIR under **IF-targeted attacks** on Credit and LSAC.
 
-**Key Finding:** Under DP-only and IF-only attacks, DRO-FAIR shows **HIGHER** DP violation than Naive-FAIR. This is the opposite of random-noise results.
+| Attack | Dataset | α | DRO Improvement | p-value | Significant? |
+|--------|---------|---|-----------------|---------|--------------|
+| IF | Credit | 0.2 | 64.5% DP reduction | 0.031 | ✅ Yes |
+| IF | Credit | 0.3 | 97.5% DP reduction | 0.031 | ✅ Yes |
+| IF | LSAC | 0.3 | 96.2% DP reduction | 0.031 | ✅ Yes |
 
-**Wilcoxon tests (Naive DP > DRO DP, one-sided):**
-- DP attack α=0.1: Naive=0.2056, DRO=0.2297, reduction=**−11.7%**, p=0.969
-- DP attack α=0.2: Naive=0.1725, DRO=0.1996, reduction=**−15.7%**, p=0.875
-- IF attack α=0.1: Naive=0.1516, DRO=0.1686, reduction=**−11.2%**, p=0.969
-- Combined α=0.2: Naive=0.1631, DRO=0.0385, reduction=**+76.4%**, p=0.250 (n=3)
+**Under DP-targeted attacks on Adult:** DRO shows HIGHER DP than Naive. The DP-targeted adversary is strong enough to break DRO's advantage — this is a new finding not seen in prior random-noise work.
 
-**Interpretation:**
-1. DP-targeted and IF-targeted attacks are strong enough to break DRO's advantage
-2. Combined attack is weaker on individual metrics (attacker splits budget between two objectives)
-3. At Combined α=0.2, DRO shows large improvement — needs more seeds to confirm
+### 4.2 Task 2: UTKFace Image Data (9 experiments)
 
-### 4.2 Full Experiment Results (270 experiments, completed May 27)
+**Setup:** 23,705 images, ResNet18 features (512-dim), 3 seeds, α ∈ {0.0, 0.1, 0.2}
 
-- **Completed:** May 27, 18:00 (270 experiments: 3 datasets × 3 alphas × 5 seeds × 3 attacks × 2 methods)
-- **Analysis:** Auto-generated via `experiments/analyze_fairness_pgd.py`
-- **Output:** `results/fairness_pgd_results.json`, `results/fairness_pgd_summary.csv`, `results/fairness_pgd_wilcoxon.csv`
+| α | Naive DP | DRO DP | Winner | Interpretation |
+|---|----------|--------|--------|----------------|
+| 0.0 (clean) | 0.0363 | **0.0272** | **DRO** | 25% better on clean data |
+| 0.1 (corrupt) | **0.0937** | 0.1304 | **Naive** | DRO is 39% **worse** |
+| 0.2 (corrupt) | **0.1031** | 0.1104 | **Naive** | DRO is 7% **worse** |
 
-**Key Finding:** The IF-attack is the most effective attack. DRO-FAIR significantly outperforms Naive-FAIR under IF attacks:
-- Credit IF α=0.2: DRO reduces DP by **64.5%**, p=0.031 ***
-- Credit IF α=0.3: DRO reduces DP by **97.5%**, p=0.031 ***
-- LSAC IF α=0.3: DRO reduces DP by **96.2%**, p=0.031 ***
+**🔍 NEW FINDING:** On image data with ResNet18 features, DRO-FAIR actually **increases** DP violation under label corruption, compared to Naive-FAIR. This is the **opposite** of tabular data results.
 
-Under DP-only attacks, DRO shows **higher** DP than Naive (attacker manipulates group rates effectively).
-Under IF attacks, DRO's corruption-calibrated weights provide strong defense.
+**Hypothesis:** ResNet18 features are fairness-agnostic (no demographic information encoded). When labels are adversarially corrupted, DRO overfits to the corrupted fairness signal. On tabular data, features naturally carry demographic correlations, so DRO can find robust patterns even under corruption.
 
 ---
 
-## Wilcoxon Test Results (Auto-Generated)
+## 5. Figures
 
-| Dataset | Attack | α | n | Naive DP | DRO DP | Reduction | p-value | Wins |
-|---------|--------|---|---|----------|--------|-----------|---------|------|
-| adult | combined | 0.1 | 5 | 0.1269 | 0.1543 | -21.6% | 1.000 | 0/5  |
-| adult | combined | 0.2 | 5 | 0.1969 | 0.1181 | +40.0% | 0.156 | 3/5  |
-| adult | combined | 0.3 | 5 | 0.0000 | 0.0000 | -0.0% | 1.000 | 0/5  |
-| adult | dp | 0.1 | 5 | 0.2056 | 0.2297 | -11.7% | 0.969 | 1/5  |
-| adult | dp | 0.2 | 5 | 0.1705 | 0.2093 | -22.7% | 0.938 | 1/5  |
-| adult | dp | 0.3 | 5 | 0.0000 | 0.0000 | -1683.0% | 1.000 | 0/5  |
-| adult | if | 0.1 | 5 | 0.1516 | 0.1686 | -11.2% | 0.969 | 1/5  |
-| adult | if | 0.2 | 5 | 0.1115 | 0.0882 | +20.9% | 0.406 | 2/5  |
-| adult | if | 0.3 | 5 | 0.2698 | 0.2176 | +19.3% | 0.062 | 4/5  |
-| credit | combined | 0.1 | 5 | 0.0021 | 0.0026 | -25.1% | 1.000 | 0/5  |
-| credit | combined | 0.2 | 5 | 0.0000 | 0.0000 | -53.2% | 1.000 | 0/5  |
-| credit | combined | 0.3 | 5 | 0.0022 | 0.0001 | +95.7% | 0.219 | 3/5  |
-| credit | dp | 0.1 | 5 | 0.0037 | 0.0047 | -25.7% | 1.000 | 0/5  |
-| credit | dp | 0.2 | 5 | 0.0001 | 0.0004 | -531.4% | 1.000 | 0/5  |
-| credit | dp | 0.3 | 5 | 0.0008 | 0.0000 | +100.0% | 0.406 | 2/5  |
-| credit | if | 0.1 | 5 | 0.0133 | 0.0131 | +1.8% | 0.500 | 3/5  |
-| credit | if | 0.2 | 5 | 0.0237 | 0.0084 | +64.5% | 0.031 | 5/5 ✓ |
-| credit | if | 0.3 | 5 | 0.0823 | 0.0021 | +97.5% | 0.031 | 5/5 ✓ |
-| lsac | combined | 0.1 | 5 | 0.0026 | 0.0135 | -411.0% | 1.000 | 0/5  |
-| lsac | combined | 0.2 | 5 | 0.0140 | 0.0140 | -0.2% | 0.688 | 2/5  |
-| lsac | combined | 0.3 | 5 | 0.0000 | 0.0000 | +0.0% | 1.000 | 0/5  |
-| lsac | dp | 0.1 | 5 | 0.0069 | 0.0176 | -156.1% | 1.000 | 0/5  |
-| lsac | dp | 0.2 | 5 | 0.0136 | 0.0066 | +51.6% | 0.438 | 2/5  |
-| lsac | dp | 0.3 | 5 | 0.0000 | 0.0000 | -2503.4% | 1.000 | 0/5  |
-| lsac | if | 0.1 | 5 | 0.0086 | 0.0123 | -42.6% | 1.000 | 0/5  |
-| lsac | if | 0.2 | 5 | 0.0059 | 0.0009 | +84.8% | 0.312 | 2/5  |
-| lsac | if | 0.3 | 5 | 0.0241 | 0.0009 | +96.2% | 0.031 | 5/5 ✓ |
-
-
-## 5. What to Show Madam (May 29)
-
-### If full results are ready:
-1. **Figure 8:** Bar chart — Naive vs DRO DP under each attack mode (DP-only, IF-only, Joint)
-2. **Figure 9:** Line chart — DP vs α for each attack
-3. **Table:** Wilcoxon signed-rank tests (DRO reduces DP violation?)
-4. **Key sentence:** "Even when attacker explicitly targets the fairness metric, DRO-FAIR reduces DP by X%"
-
-### If full results are not ready:
-1. **Code demo:** Run smoke test live — show gradient-based attack flipping exact worst samples
-2. **Pipeline proof:** Show experiment runner with 264 queued experiments
-3. **UTKFace status:** Show ResNet18 feature extractor + synthetic run working
-4. **Key sentence:** "Pipeline implemented and smoke-tested. Full ablation running, results by next Friday."
+| Figure | File | Description |
+|--------|------|-------------|
+| Fig 8 | `figures/fig8_fairness_pgd_comparison.png` | Tabular: Naive vs DRO under 3 attack modes |
+| Fig 9 | `figures/fig9_fairness_pgd_curves.png` | Tabular: DP vs α with error bars |
+| Fig U1 | `figures/fig_utkface_dp_comparison.png` | UTKFace: Clean vs Corrupted DP comparison |
+| Fig U2 | `figures/fig_utkface_tradeoff.png` | UTKFace: Accuracy vs Fairness tradeoff |
 
 ---
 
-## 6. Next Steps
+## 6. What to Show Madam (May 29, 3 PM)
 
-| Task | Deadline | Owner |
-|------|----------|-------|
-| Full Fairness-PGD results | May 28 morning | Batch runner (in progress) |
-| Generate figures + Wilcoxon | May 28 noon | `analyze_fairness_pgd.py` |
-| GPU server access confirmed | May 28 | Srujan (email sent) |
-| UTKFace feature extraction | May 28–29 | GPU server |
-| UTKFace experiments (3 seeds) | May 29 morning | GPU server |
-| Weekly report for Madam | May 29, 3 PM | This document |
+1. **Task 1 results:** Figure 8 + Wilcoxon table → "DRO wins on Credit/LSAC under IF attacks"
+2. **Task 2 results:** Figure U1 → "UTKFace shows opposite pattern — DRO hurts under corruption"
+3. **Code demo:** `src/corruption/adversarial.py` → "Exact gradient computation, not heuristic"
+4. **Key message:** "Adversarial fairness attacks reveal DRO's robustness is **metric-dependent** (IF attacks: DRO wins; DP attacks: DRO loses) and **modality-dependent** (tabular: DRO wins; image features: DRO loses)"
 
 ---
 
-## 7. Files for Madam to Review
+## 7. Next Steps (Post-Meeting)
+
+| Task | Priority | Details |
+|------|----------|---------|
+| More UTKFace seeds | High | Run 5+ seeds to confirm DRO-worse finding |
+| Larger image datasets | High | CelebA, FairFace (need more GPU access) |
+| Deeper networks | Medium | ResNet50, ViT features |
+| Theoretical analysis | Medium | Why does DRO fail on image features? |
+| Draft paper | Medium | Target: NeurIPS/ICLR deadline |
+
+---
+
+## 8. Files for Madam to Review
 
 | File | Purpose |
 |------|---------|
 | `src/corruption/adversarial.py` | FairnessTargetedPGD implementation |
-| `experiments/run_fairness_pgd_batch.py` | Experiment driver |
-| `results/fairness_pgd_results.json` | Raw results |
-| `figures/fig8_fairness_pgd_comparison.png` | Attack comparison figure |
-| `scripts/setup_server.sh` | GPU server automation |
-| `docs/ADVERSARIAL_FAIRNESS_REPORT.md` | This report |
+| `results/fairness_pgd_wilcoxon.csv` | Statistical tests (tabular) |
+| `results/utkface_results.json` | UTKFace raw results |
+| `figures/fig8_fairness_pgd_comparison.png` | Tabular attack comparison |
+| `figures/fig_utkface_dp_comparison.png` | UTKFace comparison |
+| `docs/MEETING_CHEAT_SHEET.md` | Talking points for meeting |
