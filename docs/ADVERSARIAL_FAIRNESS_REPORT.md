@@ -72,15 +72,18 @@ UTKFace images (23,705) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 
 ### 4.1 Task 1: Tabular Data (270 experiments)
 
-**Key Finding:** DRO-FAIR significantly outperforms Naive-FAIR under **IF-targeted attacks** on Credit and LSAC.
+**Key Finding:** DRO-FAIR significantly outperforms Naive-FAIR under **IF-targeted attacks** on Credit and LSAC **at high corruption levels (α=0.3)**.
 
-| Attack | Dataset | α | DRO Improvement | p-value | Significant? |
+| Attack | Dataset | α | DRO DP Reduction | p-value | Significant? |
 |--------|---------|---|-----------------|---------|--------------|
 | IF | Credit | 0.2 | 64.5% DP reduction | 0.031 | ✅ Yes |
 | IF | Credit | 0.3 | 97.5% DP reduction | 0.031 | ✅ Yes |
+| IF | LSAC | 0.2 | 84.8% DP reduction | 0.312 | ❌ ns |
 | IF | LSAC | 0.3 | 96.2% DP reduction | 0.031 | ✅ Yes |
 
-**Under DP-targeted attacks on Adult:** DRO shows HIGHER DP than Naive. The DP-targeted adversary is strong enough to break DRO's advantage — this is a new finding not seen in prior random-noise work.
+**At lower corruption levels (α=0.1):** DRO does not significantly outperform Naive — the attack is too weak to differentiate.
+
+**Under DP-targeted attacks on Adult:** DRO shows HIGHER DP than Naive. The DP-targeted adversary is strong enough to break DRO's advantage — this is consistent with Week 1's feedback loop finding.
 
 ### 4.2 Task 2: UTKFace Image Data (9 experiments)
 
