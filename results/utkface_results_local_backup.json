@@ -27,7 +27,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 217.98397278785706
+    "total_time": 217.92717742919922
   },
   {
     "dataset": "utkface",
@@ -57,7 +57,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 214.9578766822815
+    "total_time": 215.05045127868652
   },
   {
     "dataset": "utkface",
@@ -87,67 +87,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 213.9490704536438
-  },
-  {
-    "dataset": "utkface",
-    "alpha": 0.0,
-    "seed": 3,
-    "naive": {
-      "clean": {
-        "accuracy": 0.8622653448639528,
-        "dp_violation": 0.01631149649620056,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8622653448639528,
-        "dp_violation": 0.01631149649620056,
-        "if_violation": 0.0
-      }
-    },
-    "dro": {
-      "clean": {
-        "accuracy": 0.8652183083737608,
-        "dp_violation": 0.015407800674438477,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8652183083737608,
-        "dp_violation": 0.015407800674438477,
-        "if_violation": 0.0
-      }
-    },
-    "total_time": 212.3743281364441
-  },
-  {
-    "dataset": "utkface",
-    "alpha": 0.0,
-    "seed": 4,
-    "naive": {
-      "clean": {
-        "accuracy": 0.8711242353933769,
-        "dp_violation": 0.02139100432395935,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8711242353933769,
-        "dp_violation": 0.02139100432395935,
-        "if_violation": 0.0
-      }
-    },
-    "dro": {
-      "clean": {
-        "accuracy": 0.8700696055684455,
-        "dp_violation": 0.015170305967330933,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8700696055684455,
-        "dp_violation": 0.015170305967330933,
-        "if_violation": 0.0
-      }
-    },
-    "total_time": 213.6791651248932
+    "total_time": 212.8224196434021
   },
   {
     "dataset": "utkface",
@@ -177,7 +117,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 51.81915640830994
+    "total_time": 51.85634708404541
   },
   {
     "dataset": "utkface",
@@ -207,7 +147,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 22.653918027877808
+    "total_time": 25.26031994819641
   },
   {
     "dataset": "utkface",
@@ -237,67 +177,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 48.5111665725708
-  },
-  {
-    "dataset": "utkface",
-    "alpha": 0.1,
-    "seed": 3,
-    "naive": {
-      "clean": {
-        "accuracy": 0.860999789074035,
-        "dp_violation": 0.02782347798347473,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8612107150390214,
-        "dp_violation": 0.0480981171131134,
-        "if_violation": 0.0
-      }
-    },
-    "dro": {
-      "clean": {
-        "accuracy": 0.8645855304788019,
-        "dp_violation": 0.004664748907089233,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8645855304788019,
-        "dp_violation": 0.06653746962547302,
-        "if_violation": 0.0
-      }
-    },
-    "total_time": 23.08161211013794
-  },
-  {
-    "dataset": "utkface",
-    "alpha": 0.1,
-    "seed": 4,
-    "naive": {
-      "clean": {
-        "accuracy": 0.8647964564437882,
-        "dp_violation": 0.0012890100479125977,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8647964564437882,
-        "dp_violation": 0.24899543821811676,
-        "if_violation": 0.0
-      }
-    },
-    "dro": {
-      "clean": {
-        "accuracy": 0.8628981227589116,
-        "dp_violation": 0.007631838321685791,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8628981227589116,
-        "dp_violation": 0.2469213306903839,
-        "if_violation": 0.0
-      }
-    },
-    "total_time": 22.910381078720093
+    "total_time": 49.898966789245605
   },
   {
     "dataset": "utkface",
@@ -327,7 +207,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 63.03906464576721
+    "total_time": 64.54422235488892
   },
   {
     "dataset": "utkface",
@@ -357,7 +237,7 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 39.27149415016174
+    "total_time": 41.69053244590759
   },
   {
     "dataset": "utkface",
@@ -387,66 +267,6 @@
         "if_violation": 0.0
       }
     },
-    "total_time": 60.273550033569336
-  },
-  {
-    "dataset": "utkface",
-    "alpha": 0.2,
-    "seed": 3,
-    "naive": {
-      "clean": {
-        "accuracy": 0.8569921957392955,
-        "dp_violation": 0.02863389253616333,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8569921957392955,
-        "dp_violation": 0.03288465738296509,
-        "if_violation": 0.0
-      }
-    },
-    "dro": {
-      "clean": {
-        "accuracy": 0.852984602404556,
-        "dp_violation": 0.0068295300006866455,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.852984602404556,
-        "dp_violation": 0.05647289752960205,
-        "if_violation": 0.0
-      }
-    },
-    "total_time": 29.939943552017212
-  },
-  {
-    "dataset": "utkface",
-    "alpha": 0.2,
-    "seed": 4,
-    "naive": {
-      "clean": {
-        "accuracy": 0.8569921957392955,
-        "dp_violation": 0.0009036362171173096,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8569921957392955,
-        "dp_violation": 0.05558404326438904,
-        "if_violation": 0.0
-      }
-    },
-    "dro": {
-      "clean": {
-        "accuracy": 0.851508120649652,
-        "dp_violation": 0.006908327341079712,
-        "if_violation": 0.0
-      },
-      "corrupted": {
-        "accuracy": 0.8512971946846657,
-        "dp_violation": 0.07123786211013794,
-        "if_violation": 0.0
-      }
-    },
-    "total_time": 42.03994083404541
+    "total_time": 61.52200245857239
   }
 ]
