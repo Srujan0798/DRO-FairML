@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
-"""Generate fig8_attack_defense_matrix — 3x3 heatmap of DRO vs Naive across attacks and datasets."""
-import csv
+"""
+Generate Figure 8: Attack-Defense Matrix heatmap from fairness_pgd_wilcoxon.csv.
+
+Each cell corresponds to (attack type × dataset).
+- Color: best significant positive DP reduction %, or average if none.
+- Text: best significant result with α and p-value, or average + "n.s."
+"""
+import os
+import pandas as pd
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+from matplotlib.colors import LinearSegmentedColormap
 
-# ── Style ───────────────────────────────────────────────────────────────────
+# ── Style ────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family':        'serif',
     'font.serif':         ['CMU Serif', 'Computer Modern Roman', 'Latin Modern Roman',
@@ -19,113 +26,119 @@ plt.rcParams.update({
     'axes.titleweight':   'bold',
     'axes.spines.top':    False,
     'axes.spines.right':  False,
-    'axes.spines.left':   False,
-    'axes.spines.bottom': False,
     'axes.linewidth':     0.8,
     'axes.labelpad':      4,
+    'grid.alpha':         0.3,
+    'grid.linewidth':     0.4,
+    'grid.linestyle':     '--',
+    'legend.frameon':     True,
+    'legend.framealpha':  0.9,
+    'legend.fontsize':    10,
+    'legend.edgecolor':   '0.8',
+    'savefig.dpi':        300,
+    'figure.dpi':         150,
 })
 
-# ── Load data ───────────────────────────────────────────────────────────────
-results = {}
-with open('results/fairness_pgd_wilcoxon.csv', newline='') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        dataset = row['dataset']
-        attack = row['attack']
-        alpha = float(row['alpha'])
-        reduction = float(row['dp_reduction_pct'])
-        pvalue = float(row['dp_pvalue'])
-        key = (dataset, attack)
-        if key not in results:
-            results[key] = []
-        results[key].append((alpha, reduction, pvalue))
+CSV_PATH = 'results/fairness_pgd_wilcoxon.csv'
+OUT_DIR = 'figures'
+OUT_NAME = 'fig8_attack_defense_matrix'
 
-# ── Aggregate: for each cell, show the best significant result if any ───────
-datasets = ['adult', 'credit', 'lsac']
-attacks = ['dp', 'if', 'combined']
+DATASETS = ['adult', 'credit', 'lsac']
+DS_LABELS = {'adult': 'Adult', 'credit': 'Credit', 'lsac': 'LSAC'}
+ATTACKS = ['dp', 'if', 'combined']
+ATTACK_LABELS = {'dp': 'DP', 'if': 'IF', 'combined': 'Combined'}
 
-cell_value = np.zeros((3, 3))      # reduction %
-cell_pval = np.ones((3, 3))        # best p-value
-cell_text = [["" for _ in range(3)] for _ in range(3)]
-cell_alpha = [["" for _ in range(3)] for _ in range(3)]
+SIG_THRESHOLD = 0.05
+CLIP_MIN = -100
+CLIP_MAX = 100
 
-for i, attack in enumerate(attacks):
-    for j, dataset in enumerate(datasets):
-        key = (dataset, attack)
-        if key in results:
-            entries = results[key]
-            # Find best significant result
-            sig = [(a, r, p) for a, r, p in entries if p < 0.05 and r > 0]
-            if sig:
-                best = max(sig, key=lambda x: x[1])
-                cell_value[i, j] = best[1]
-                cell_pval[i, j] = best[2]
-                cell_text[i][j] = f"+{best[1]:.1f}%\np={best[2]:.3f}"
-                cell_alpha[i][j] = f"α={best[0]:.1f}"
+
+def main():
+    df = pd.read_csv(CSV_PATH)
+
+    n_rows = len(ATTACKS)
+    n_cols = len(DATASETS)
+    color_mat = np.zeros((n_rows, n_cols))
+    text_mat = [["" for _ in range(n_cols)] for _ in range(n_rows)]
+
+    for i, attack in enumerate(ATTACKS):
+        for j, dataset in enumerate(DATASETS):
+            sub = df[(df['attack'] == attack) & (df['dataset'] == dataset)]
+            if sub.empty:
+                color_mat[i, j] = 0.0
+                text_mat[i][j] = "N/A"
+                continue
+
+            # Best significant positive result
+            sig = sub[sub['dp_pvalue'] < SIG_THRESHOLD]
+            if not sig.empty:
+                best_idx = sig['dp_reduction_pct'].idxmax()
+                best = sig.loc[best_idx]
+                val = float(best['dp_reduction_pct'])
+                alpha = float(best['alpha'])
+                p = float(best['dp_pvalue'])
+                text = f"{val:+.1f}%\nα={alpha:.1f}, p={p:.3f}"
+                color_val = val
             else:
-                # Show average or most representative
-                avg_r = np.mean([r for _, r, _ in entries])
-                cell_value[i, j] = avg_r
-                cell_pval[i, j] = min(p for _, _, p in entries)
-                if avg_r > 0:
-                    cell_text[i][j] = f"+{avg_r:.1f}%\nn.s."
-                else:
-                    cell_text[i][j] = f"{avg_r:.1f}%\nn.s."
+                avg = float(sub['dp_reduction_pct'].mean())
+                text = f"{avg:+.1f}%\nn.s."
+                color_val = avg
 
-# ── Plot ────────────────────────────────────────────────────────────────────
-fig, ax = plt.subplots(figsize=(10, 8))
+            color_mat[i, j] = color_val
+            text_mat[i][j] = text
 
-# Custom diverging colormap: red (negative) -> white (0) -> green (positive)
-vmax = max(abs(cell_value.min()), abs(cell_value.max()))
-if vmax == 0:
-    vmax = 1
+    # ── Plot ─────────────────────────────────────────────────────────────────
+    fig, ax = plt.subplots(figsize=(10, 8))
 
-for i in range(3):
-    for j in range(3):
-        val = cell_value[i, j]
-        # Color: negative = red, positive = green, intensity by magnitude
-        if val >= 0:
-            intensity = min(val / 100, 1.0)
-            color = (1 - intensity * 0.7, 1 - intensity * 0.2, 1 - intensity * 0.7)
-        else:
-            intensity = min(abs(val) / 50, 1.0)
-            color = (1, 1 - intensity * 0.7, 1 - intensity * 0.7)
+    cmap = LinearSegmentedColormap.from_list(
+        'rdwhgn', ['#e74c3c', '#ffffff', '#2ecc71'], N=256)
 
-        rect = Rectangle((j - 0.5, i - 0.5), 1, 1, facecolor=color, edgecolor='black', linewidth=1.5)
-        ax.add_patch(rect)
+    im = ax.imshow(color_mat, cmap=cmap, vmin=CLIP_MIN, vmax=CLIP_MAX, aspect='auto')
 
-        text = cell_text[i][j]
-        fontsize = 14 if '\np=' in text else 13
-        weight = 'bold' if 'p=' in text else 'normal'
-        color_text = '#1a472a' if val > 0 else '#8b0000'
-        ax.text(j, i, text, ha='center', va='center', fontsize=fontsize,
-                fontweight=weight, color=color_text)
+    # Colorbar
+    cbar = plt.colorbar(im, ax=ax, pad=0.02, fraction=0.046, shrink=0.8)
+    cbar.set_label('DP Reduction %', fontsize=11)
+    cbar.ax.tick_params(labelsize=10)
 
-# Labels
-ax.set_xticks(range(3))
-ax.set_yticks(range(3))
-ax.set_xticklabels([d.upper() for d in datasets], fontsize=13, fontweight='bold')
-ax.set_yticklabels([a.upper() for a in attacks], fontsize=13, fontweight='bold')
-ax.set_xlabel('Dataset', fontsize=13, fontweight='bold', labelpad=10)
-ax.set_ylabel('Attack Mode', fontsize=13, fontweight='bold', labelpad=10)
-ax.set_title('DRO vs Naive: DP Reduction % under Adversarial Attacks\n' +
-             '(Green = DRO better, Red = DRO worse)',
-             fontsize=14, fontweight='bold', pad=15)
+    # Ticks & labels
+    ax.set_xticks(np.arange(n_cols))
+    ax.set_yticks(np.arange(n_rows))
+    ax.set_xticklabels([DS_LABELS[d] for d in DATASETS], fontsize=12, fontweight='bold')
+    ax.set_yticklabels([ATTACK_LABELS[a] for a in ATTACKS], fontsize=12, fontweight='bold')
+    ax.tick_params(length=0)
 
-# Colorbar legend
-from matplotlib.patches import Patch
-legend_elements = [
-    Patch(facecolor=(0.85, 0.95, 0.85), edgecolor='black', label='DRO wins (significant)'),
-    Patch(facecolor=(0.95, 0.85, 0.85), edgecolor='black', label='DRO loses / not sig.'),
-]
-ax.legend(handles=legend_elements, loc='upper right', fontsize=10,
-          frameon=True, framealpha=0.9, edgecolor='0.8')
+    ax.set_xlabel('Dataset', fontsize=11)
+    ax.set_ylabel('Attack Type', fontsize=11)
+    ax.set_title('DRO vs Naive: DP Reduction % under Adversarial Attacks',
+                 fontsize=13, fontweight='bold', pad=12)
 
-ax.set_xlim(-0.5, 2.5)
-ax.set_ylim(-0.5, 2.5)
-ax.invert_yaxis()
+    # Annotations
+    for i in range(n_rows):
+        for j in range(n_cols):
+            val = color_mat[i, j]
+            txt = text_mat[i][j]
+            clipped = np.clip(val, CLIP_MIN, CLIP_MAX)
+            tc = 'white' if abs(clipped) > 55 else 'black'
+            ax.text(j, i, txt, ha='center', va='center',
+                    fontsize=11, color=tc, fontweight='bold')
 
-plt.tight_layout()
-plt.savefig('figures/fig8_attack_defense_matrix.png', dpi=300, bbox_inches='tight', facecolor='white')
-plt.savefig('figures/fig8_attack_defense_matrix.pdf', bbox_inches='tight', facecolor='white')
-print('Saved: figures/fig8_attack_defense_matrix.png & .pdf')
+    ax.set_frame_on(False)
+    fig.tight_layout()
+
+    os.makedirs(OUT_DIR, exist_ok=True)
+    pdf_path = os.path.join(OUT_DIR, f'{OUT_NAME}.pdf')
+    png_path = os.path.join(OUT_DIR, f'{OUT_NAME}.png')
+    fig.savefig(pdf_path)
+    fig.savefig(png_path, dpi=300)
+    plt.close(fig)
+
+    # Verify
+    for p in (pdf_path, png_path):
+        size = os.path.getsize(p)
+        print(f"Saved {p} ({size:,} bytes)")
+        if size < 10 * 1024:
+            raise RuntimeError(f"{p} is too small ({size} bytes)")
+
+
+if __name__ == '__main__':
+    main()
