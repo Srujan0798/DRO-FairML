@@ -1,5 +1,5 @@
 # Adversarial Fairness Attacks on DRO-FAIR
-## Weekly Report #1 — May 29, 2026
+## Weekly Report — Updated June 2, 2026
 
 ---
 
@@ -112,7 +112,7 @@ UTKFace images (23,705) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 
 ---
 
-## 6. What to Show Madam (May 29, 3 PM)
+## 6. What to Show Madam (June 2, 3 PM)
 
 1. **Task 1 results:** Figure 8 + Wilcoxon table → "DRO wins on Credit/LSAC under IF attacks"
 2. **Task 2 results:** Figure U1 → "UTKFace shows opposite pattern — DRO hurts under corruption"
@@ -127,6 +127,7 @@ UTKFace images (23,705) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 |------|----------|---------|
 | More UTKFace seeds | High | Run 5+ seeds to confirm DRO-worse finding |
 | Larger image datasets | High | CelebA, FairFace (need more GPU access) |
+| FairnessTargetedPGD on UTKFace | High | Run DP/IF attacks on UTKFace images |
 | Deeper networks | Medium | ResNet50, ViT features |
 | Theoretical analysis | Medium | Why does DRO fail on image features? |
 | Draft paper | Medium | Target: NeurIPS/ICLR deadline |
