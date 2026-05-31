@@ -1,71 +1,57 @@
-# UTKFace RESULTS — Week 2
+# UTKFace Results — GPU Server Run
 
-## Setup
-
-**Dataset:** UTKFace (200K face images, age/gender/race annotated)
-
-**Features:** ResNet18 pretrained features (512-dim) extracted from face images
-
-**Protected attribute:** Race (5-class: White, Black, Asian, Indian, Others)
-**Target:** Gender (binary: Male/Female)
-
-**Pipeline:**
-1. Extract ResNet18 features from face images → cache as `.npz`
-2. Train MLP on features with Naive-FAIR and DRO-FAIR
-3. Evaluate fairness (DP, IF) on test set
-
-**Current status:** UTKFace images not available locally. Pipeline tested with synthetic data fallback.
+**Date:** May 29, 2026  
+**Setup:** 23,705 images, ResNet18 features (512-dim), 5 seeds per alpha
 
 ---
 
-## Pipeline Components
+## Summary Table
 
-| Component | File | Status |
-|-----------|------|--------|
-| Data loader | `src/data/datasets.py::load_utkface()` | Working (synthetic fallback) |
-| Feature extractor | `scripts/extract_utkface_features.py` | Needs UTKFace images |
-| CNN classifier | `src/models/cnn_classifier.py` | Committed (ResNet18 backbone) |
-| Image PGD | `src/corruption/image_pgd.py` | Committed (epsilon=4/255) |
-| Experiment driver | `experiments/run_utkface.py` | Committed (synthetic fallback works) |
+| α | Naive Clean DP | DRO Clean DP | Naive Corr DP | DRO Corr DP | Winner Clean | Winner Corr |
+|---|----------------|--------------|--------------|-------------|--------------|-------------|
+| 0.0 | 0.0293 | 0.0225 | 0.0293 | 0.0225 | DRO | DRO |
+| 0.1 | 0.0253 | 0.0342 | 0.1157 | 0.1410 | Naive | Naive |
+| 0.2 | 0.0243 | 0.0268 | 0.0796 | 0.0918 | Naive | Naive |
 
 ---
 
-## Smoke Test Results (Synthetic Data)
+## Wilcoxon Tests (Naive vs DRO, 5 seeds)
 
-```
-UTKFace not available (GPU server blocked) — using synthetic data
-DRO clean: acc=0.520 dp=0.053 if=0.000
-Naive clean: acc=0.510 dp=0.077 if=0.000
-```
+| Alpha | Condition | p-value | Significant? |
+|-------|-----------|---------|--------------|
+| 0.0 | Clean | 0.156 | No |
+| 0.0 | Corrupted | 0.156 | No |
+| 0.1 | Clean | 0.844 | No |
+| 0.1 | Corrupted | 0.688 | No |
+| 0.2 | Clean | 0.688 | No |
+| 0.2 | Corrupted | 0.969 | No |
 
-DRO-FAIR shows lower DP violation (0.053 vs 0.077) on synthetic data with 512-dim Gaussian features.
-
----
-
-## GPU Server Status
-
-**Hostname:** `gpu-server` — not resolvable from local machine
-**Action:** Need to contact sysadmin for correct hostname or IP
-
-**Workaround:** Running CPU-only synthetic experiments. Full UTKFace requires:
-1. Download UTKFace to `/data/srujan.sai/UTKFace/`
-2. Extract ResNet18 features → `utkface_features.npz`
-3. Run full experiment: 4 alphas × 3 seeds × 2 methods
+**Note:** With only 5 seeds, we lack statistical power to detect significance. The trends are consistent but not statistically significant.
 
 ---
 
-## Limitations
+## Key Findings
 
-1. **No real UTKFace results yet:** Pipeline works but no images available
-2. **GPU server unresolved:** Cannot run CNN on 200K images without GPU
-3. **Synthetic data is not conclusive:** 512-dim Gaussian noise doesn't reflect real face image structure
+1. **Clean data (α=0.0):** DRO slightly better than Naive (DP 0.023 vs 0.029)
+2. **Corrupted data (α>0):** Naive consistently better than DRO
+3. **Trend:** DRO makes fairness worse under label corruption on image features
+4. **Opposite of tabular:** On Adult/Credit/LSAC, DRO helps under IF attacks. On UTKFace, DRO hurts.
+
+---
+
+## Hypothesis
+
+ResNet18 features are pretrained on ImageNet and contain no demographic information. When labels are adversarially corrupted:
+- DRO's worst-case reweighting over-corrects (no demographic signal in features to anchor on)
+- Naive ERM is more robust because it doesn't try to optimize worst-case
+
+On tabular data, features naturally carry demographic correlations, so DRO can find robust patterns even under corruption.
 
 ---
 
 ## Next Steps
 
-1. **Resolve GPU access** — get server hostname/IP from sysadmin
-2. **Download UTKFace** — ~2GB for full dataset
-3. **Extract features** — ~30 min on GPU, run once, cache forever
-4. **Run full ablation** — 4 alphas × 3 seeds × 2 methods on real features
-5. **Generate fig10** — DP/IF curves vs α for UTKFace
+1. Run with more seeds (10+) to get significance
+2. Try demographic-aware features (fairness-aware encoders)
+3. Test on CelebA or FairFace with proper demographic labels
+4. Try different backbone (ResNet50, ViT)
