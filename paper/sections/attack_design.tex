@@ -1,0 +1,18 @@
+\subsection{Threat Model}
+The attacker modifies fraction $\alpha$ of training labels, features, and protected attributes, with white-box access to the fairness metric.
+
+\subsection{DP-only Attack}
+The gradient of the DP gap with respect to each label is:
+\begin{equation}
+\frac{\partial (\text{DP}_{\text{gap}})}{\partial y_i} = \text{sign}(\bar{y}_0 - \bar{y}_1) \times \left(\frac{\mathbf{1}\{a_i=0\}}{n_0} - \frac{\mathbf{1}\{a_i=1\}}{n_1}\right)
+\end{equation}
+where $\bar{y}_g$ is the mean label for group $g$. We flip the top-$\alpha n$ samples with the largest positive gradient.
+
+\subsection{IF-only Attack}
+Using a $k$-NN graph within each protected group:
+\begin{equation}
+\frac{\partial (\text{IF})}{\partial y_i} = \frac{\text{agree}_i - \text{disagree}_i}{k_{\text{eff}}}
+\end{equation}
+
+\subsection{PGD Optimization}
+We run 5 iterative steps: (1) compute gradient, (2) select top-$\alpha$ targets, (3) flip labels, (4) repeat. After all steps, we enforce the exact $\alpha$ budget by keeping only the top-$\alpha$ flips ranked by final gradient magnitude.

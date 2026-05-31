@@ -1,0 +1,35 @@
+\subsection{Tabular Data}
+\begin{table}[h]
+\centering
+\begin{tabular}{llcc}
+\toprule
+Dataset & Attack & $\alpha$ & DRO Reduction \\
+\midrule
+Credit & IF & 0.2 & \textbf{64.5\%} ($p$=0.031) \\
+Credit & IF & 0.3 & \textbf{97.5\%} ($p$=0.031) \\
+LSAC & IF & 0.3 & \textbf{96.2\%} ($p$=0.031) \\
+\bottomrule
+\end{tabular}
+\caption{DRO improvement under IF-targeted attacks (significant results).}
+\label{tab:tabular}
+\end{table}
+
+Under IF attacks, DRO significantly reduces DP violation by 64--97\% on Credit and LSAC ($p < 0.05$). Under DP attacks, DRO loses---the adversary directly optimizes the same metric DRO protects, creating a stronger feedback loop.
+
+\subsection{Image Data (UTKFace)}
+\begin{table}[h]
+\centering
+\begin{tabular}{cccc}
+\toprule
+$\alpha$ & Naive DP & DRO DP & Winner \\
+\midrule
+0.0 (clean) & 0.029 $\pm$ 0.012 & 0.023 $\pm$ 0.006 & DRO \\
+0.1 (corrupt) & 0.116 $\pm$ 0.092 & 0.141 $\pm$ 0.067 & Naive \\
+0.2 (corrupt) & 0.080 $\pm$ 0.034 & 0.092 $\pm$ 0.033 & Naive \\
+\bottomrule
+\end{tabular}
+\caption{UTKFace results ($n$=5 seeds). DRO inverts under corruption.}
+\label{tab:utkface}
+\end{table}
+
+On clean data, DRO improves fairness by 23\%. Under corruption, DRO produces 15--22\% \textit{higher} DP violation than Naive---opposite to tabular results.

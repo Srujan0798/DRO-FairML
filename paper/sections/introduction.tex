@@ -1,0 +1,7 @@
+Algorithmic fairness has become critical as machine learning systems deploy in high-stakes domains. A common approach enforces fairness constraints during training, such as Demographic Parity (DP)---equal positive prediction rates across protected groups---and Individual Fairness (IF)---similar individuals receiving similar predictions \citep{hardt2016equality,dwork2012fairness}.
+
+Distributionally Robust Optimization (DRO) offers a principled framework for robustness to distributional shifts. DRO-FAIR formulates fairness as a constraint within DRO, learning parameters that satisfy fairness under the worst-case distribution within an uncertainty set \citep{hashimoto2018fairness}.
+
+\textbf{The Gap.} Existing evaluations use \textit{random label noise}---uniformly flipping labels. This does not reflect adversarial scenarios where an attacker with knowledge of the fairness metric strategically corrupts the most impactful samples \citep{solans2021poisoning}. To our knowledge, no prior work computes the \textbf{exact gradient} of fairness metrics with respect to individual labels.
+
+\textbf{Our Contributions.} (1) \textit{FairnessTargetedPGD}: gradient-based attacks computing $\partial(\text{fairness})/\partial y_i$. (2) Comprehensive evaluation: 270 tabular + 15 image experiments. (3) Key finding: DRO robustness is \textbf{metric-dependent} (wins under IF, loses under DP) and \textbf{modality-dependent} (wins on tabular, inverts on images).

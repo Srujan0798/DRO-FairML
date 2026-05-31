@@ -1,0 +1,16 @@
+\subsection{The Feature-Demography Correlation Hypothesis}
+Our central hypothesis is that \textbf{DRO-FAIR requires features to naturally encode demographic information} to be effective under corruption.
+
+\textbf{Tabular data:} Features like income and credit score naturally correlate with protected attributes. Even with corrupted labels, DRO identifies robust patterns.
+
+\textbf{Image features (ResNet18):} Trained on ImageNet, ResNet18 extracts visual features that are \textit{demographic-agnostic}. Under label corruption, DRO has no robust signal---its worst-case reweighting amplifies the spurious fairness signal from corrupted labels.
+
+\subsection{Mechanism}
+\begin{enumerate}
+\item Corrupted labels introduce a spurious fairness constraint
+\item DRO's Lagrange multiplier $\lambda$ increases to enforce it
+\item Without feature-demography correlation, $\lambda$ over-corrects
+\item Result: DRO achieves worse fairness than naive training
+\end{enumerate}
+
+This reveals a fundamental requirement for DRO: feature-demography correlation. Without it, worst-case reweighting amplifies noise.

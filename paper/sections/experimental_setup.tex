@@ -1,0 +1,19 @@
+\subsection{Datasets}
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrll}
+\toprule
+Dataset & Samples & Features & Protected & Task \\
+\midrule
+Adult & 48,842 & 14 & Sex & Income $>$50K \\
+Credit & 30,000 & 23 & Sex & Default \\
+LSAC & 26,184 & 11 & Race & Bar passage \\
+UTKFace & 23,705 & 512 (ResNet18) & Race & Gender \\
+\bottomrule
+\end{tabular}
+\caption{Datasets used in evaluation.}
+\label{tab:datasets}
+\end{table}
+
+\subsection{Methods and Metrics}
+We compare Naive-FAIR (fixed Lagrange multiplier) vs. DRO-FAIR (adaptive worst-case reweighting). Attacks: DP-only, IF-only, Combined, with $\alpha \in \{0.1, 0.2, 0.3\}$ (tabular) and $\alpha \in \{0.0, 0.1, 0.2\}$ (UTKFace). We use 5 random seeds per configuration. Statistical significance is assessed via Wilcoxon signed-rank test.
