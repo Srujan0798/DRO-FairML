@@ -85,15 +85,15 @@ UTKFace images (23,705) → ResNet18 → 512-dim features → MLP → DRO-FAIR
 
 **Under DP-targeted attacks on Adult:** DRO shows HIGHER DP than Naive. The DP-targeted adversary is strong enough to break DRO's advantage — this is consistent with Week 1's feedback loop finding.
 
-### 4.2 Task 2: UTKFace Image Data (9 experiments)
+### 4.2 Task 2: UTKFace Image Data (15 experiments)
 
-**Setup:** 23,705 images, ResNet18 features (512-dim), 3 seeds, α ∈ {0.0, 0.1, 0.2}
+**Setup:** 23,705 images, ResNet18 features (512-dim), 5 seeds, α ∈ {0.0, 0.1, 0.2}
 
-| α | Naive DP | DRO DP | Winner | Interpretation |
-|---|----------|--------|--------|----------------|
-| 0.0 (clean) | 0.0363 | **0.0272** | **DRO** | 25% better on clean data |
-| 0.1 (corrupt) | **0.0937** | 0.1304 | **Naive** | DRO is 39% **worse** |
-| 0.2 (corrupt) | **0.1031** | 0.1104 | **Naive** | DRO is 7% **worse** |
+| α | Naive Clean DP | DRO Clean DP | Naive Corr DP | DRO Corr DP | Winner |
+|---|----------------|--------------|--------------|-------------|--------|
+| 0.0 | 0.029 | **0.023** | 0.029 | **0.023** | **DRO** |
+| 0.1 | 0.025 | 0.034 | **0.116** | 0.141 | **Naive** |
+| 0.2 | 0.024 | 0.027 | **0.080** | 0.092 | **Naive** |
 
 **🔍 NEW FINDING:** On image data with ResNet18 features, DRO-FAIR actually **increases** DP violation under label corruption, compared to Naive-FAIR. This is the **opposite** of tabular data results.
 
