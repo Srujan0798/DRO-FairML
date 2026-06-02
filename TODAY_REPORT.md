@@ -63,6 +63,33 @@ feedback loop documented in v1.0).
 - `figures/fig8_attack_defense_matrix.pdf` — 3×3 attack-vs-dataset heatmap
 - `figures/fig9_fairness_pgd_curves.pdf` — DP curves vs α per attack
 
+#### On the α=0.1 "no significant difference"
+
+A natural follow-up question: *if DRO doesn't win at α=0.1, is the attack
+affecting the radius? Or is the attack just too weak?*
+
+**The TV radii depend only on α (the corruption budget), not on attack design.**
+ρ_DP,j = α/((1−α)π_j + α) and ρ_IF = 2α − α² are functions of α only.
+Attack design (gradient direction, PGD steps, ε) controls how damaging each
+corrupted sample is, but the radius — and thus DRO's defensive envelope — is
+fixed by α.
+
+At α=0.1, both Naive and DRO perform similarly because the 10% corruption
+budget is too small for Naive to actually fail. DRO is calibrated for the
+worst-case-within-α=0.1, but if realized corruption is not worst-case, DRO
+slightly **over-prepares** — the classical "robustness tax" of distributionally
+robust optimization. Example, Credit under IF attack:
+
+| α | Naive DP | DRO DP | DP change | Note |
+|---|---|---|---|---|
+| 0.1 | 0.0133 | 0.0131 | +1.8% | tie (n.s.) — robustness tax visible |
+| 0.2 | 0.0237 | 0.0084 | **+64.5%** | DRO wins (p=0.031) |
+| 0.3 | 0.0823 | 0.0021 | **+97.5%** | DRO dominates (p=0.031) |
+
+This is the **textbook DRO pattern**: little advantage at low corruption (cost
+of being prepared for a threat that didn't materialise), large advantage at
+high corruption (protection actually pays off).
+
 ---
 
 ### Task 2 — UTKFace experiment on GPU server
