@@ -214,21 +214,25 @@ class FairnessTargetedPGD:
     Reference: Solans et al. "Poisoning Attacks on Algorithmic Fairness" (2021)
     """
 
-    def __init__(self, alpha=0.2, target_metric='dp', pgd_steps=5,
+    def __init__(self, alpha=0.2, target_metric='dp', pgd_steps=20,
+                 epsilon=0.3, pgd_step_size=0.02,
                  coordinated=True, random_state=None):
         """
         Args:
             alpha: fraction of samples to corrupt
             target_metric: 'dp' (Demographic Parity) or 'if' (Individual Fairness)
                           or 'combined' (weighted sum)
-            pgd_steps: number of PGD iterations (since flipping changes group rates,
-                      we need multiple steps to converge to optimal attack)
+            pgd_steps: number of PGD iterations for feature attack
+            epsilon: max perturbation magnitude for feature attack (as multiple of std)
+            pgd_step_size: step size for PGD feature attack
             coordinated: if True, target minority group more aggressively
             random_state: random seed for reproducibility
         """
         self.alpha = alpha
         self.target_metric = target_metric
         self.pgd_steps = pgd_steps
+        self.epsilon = epsilon
+        self.pgd_step_size = pgd_step_size
         self.coordinated = coordinated
         self.rng = np.random.RandomState(random_state)
 
@@ -506,16 +510,30 @@ class FairnessTargetedPGD:
 
         # 2. Feature perturbation on SAME indices
         if len(corrupt_idx) > 0:
-            if model is not None:
-                X_c = self._attack_features_pgd(X_c, y_c, corrupt_idx, model, device)
-            else:
-                X_c = self._attack_features_fgsm(X_c, y_c, corrupt_idx)
+            if model is None:
+                # Train surrogate model for gradient-based PGD when no model provided
+                model = self._train_surrogate(X, y, device=device)
+            X_c = self._attack_features_pgd(X_c, y_c, corrupt_idx, model, device)
 
         # 3. Attribute flips on SAME indices
         if len(corrupt_idx) > 0:
             a_c = self._attack_attributes(a_c, corrupt_idx)
 
         return X_c, y_c, a_c, corrupt_mask
+
+    def _train_surrogate(self, X, y, device='cpu'):
+        """Train a quick LogisticRegression surrogate for gradient-based PGD."""
+        from sklearn.linear_model import LogisticRegression
+        lr = LogisticRegression(max_iter=500, solver='lbfgs')
+        lr.fit(X, y)
+        W = torch.tensor(lr.coef_, dtype=torch.float32, device=device)
+        b = torch.tensor(lr.intercept_, dtype=torch.float32, device=device)
+
+        class LRSurrogate(nn.Module):
+            def __init__(s): super().__init__(); s.W = W; s.b = b
+            def forward(s, x): return (x @ s.W.T + s.b).squeeze(-1)
+
+        return LRSurrogate().to(device)
 
     def _attack_features_fgsm(self, X, y, corrupt_idx):
         """FGSM-style feature perturbation (no model needed)."""
@@ -531,7 +549,7 @@ class FairnessTargetedPGD:
             direction = 2 * target_label - 1
             noise = self.rng.randn(X.shape[1])
             noise = noise / (np.linalg.norm(noise) + 1e-8)
-            perturbation = 0.1 * direction * col_stds.squeeze() * noise
+            perturbation = self.epsilon * direction * col_stds.squeeze() * noise
             X_adv[idx] = X[idx] + perturbation
 
         return X_adv
@@ -545,16 +563,15 @@ class FairnessTargetedPGD:
         model.eval()
         X_batch = torch.tensor(X[corrupt_idx], dtype=torch.float32, device=device, requires_grad=True)
         y_batch = torch.tensor(y[corrupt_idx], dtype=torch.float32, device=device)
+        X_orig = torch.tensor(X[corrupt_idx], dtype=torch.float32, device=device)
 
-        for step in range(5):
+        for step in range(self.pgd_steps):
             logits = model(X_batch)
             loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, y_batch)
             grad = torch.autograd.grad(loss, X_batch)[0]
-            X_batch = X_batch + 0.02 * torch.sign(grad)
-            delta = torch.clamp(X_batch - torch.tensor(X[corrupt_idx], dtype=torch.float32, device=device),
-                              -0.1, 0.1)
-            X_batch = torch.tensor(X[corrupt_idx], dtype=torch.float32, device=device) + delta
-            X_batch = X_batch.detach().requires_grad_(True)
+            X_batch = X_batch + self.pgd_step_size * torch.sign(grad)
+            delta = torch.clamp(X_batch - X_orig, -self.epsilon, self.epsilon)
+            X_batch = (X_orig + delta).detach().requires_grad_(True)
 
         X_adv[corrupt_idx] = X_batch.detach().cpu().numpy()
         return X_adv
