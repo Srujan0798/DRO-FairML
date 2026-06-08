@@ -218,5 +218,93 @@
     "dp_clean": 0.14900660514831543,
     "if_clean": 0.03302125443517006,
     "total_time": 23.879937887191772
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "dp",
+    "method": "dro",
+    "acc_clean": 0.7638474295190714,
+    "dp_clean": 0.01586051844060421,
+    "if_clean": 0.0009425339637658661,
+    "total_time": 451.84359192848206
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "if",
+    "method": "dro",
+    "acc_clean": 0.824212271973466,
+    "dp_clean": 0.2201317846775055,
+    "if_clean": 0.039763436538275194,
+    "total_time": 298.31291604042053
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "combined",
+    "method": "naive",
+    "acc_clean": 0.7551133222775014,
+    "dp_clean": 0.0036773476749658585,
+    "if_clean": 5.3927717512561803e-05,
+    "total_time": 40.90707802772522
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "combined",
+    "method": "dro",
+    "acc_clean": 0.7521282476506357,
+    "dp_clean": 7.062555429371287e-09,
+    "if_clean": 0.0,
+    "total_time": 484.92759799957275
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.7732448866777225,
+    "dp_clean": 0.026113467290997505,
+    "if_clean": 0.0015271665787179223,
+    "total_time": 44.47799897193909
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "dp",
+    "method": "dro",
+    "acc_clean": 0.7534549474847982,
+    "dp_clean": 0.001994494581595063,
+    "if_clean": 4.0495257855020354e-05,
+    "total_time": 633.7492961883545
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "if",
+    "method": "naive",
+    "acc_clean": 0.8172470978441128,
+    "dp_clean": 0.14358210563659668,
+    "if_clean": 0.03995927559747576,
+    "total_time": 49.7389440536499
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "if",
+    "method": "dro",
+    "acc_clean": 0.8194582642343836,
+    "dp_clean": 0.1953706592321396,
+    "if_clean": 0.03627753406150201,
+    "total_time": 378.44188594818115
   }
 ]
