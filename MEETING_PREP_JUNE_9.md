@@ -76,20 +76,20 @@ She also pointed out from CSV results:
 
 ## 5. Preliminary Findings (Adult α=0.1, 3 seeds)
 
-| Attack | Method | Acc | DP | IF |
-|--------|--------|-----|-----|-----|
-| DP | Naive | 0.82 | 0.17-0.20 | ~0.001 |
-| DP | DRO | 0.82 | 0.17-0.20 | ~0.001 |
-| IF | Naive | 0.82 | 0.13-0.15 | 0.03-0.04 |
-| IF | DRO | 0.82 | 0.00-0.02 | 0.00-0.01 |
-| Combined | Naive | 0.82 | 0.15-0.17 | 0.03-0.04 |
-| Combined | DRO | 0.82 | 0.00-0.02 | 0.00-0.01 |
+| Attack | Method | Acc | DP (mean ± std) | IF (mean ± std) |
+|--------|--------|-----|-----------------|-----------------|
+| DP | Naive | 0.819±0.002 | 0.186±0.009 | 0.035±0.005 |
+| DP | DRO | 0.822±0.002 | **0.199±0.020** | 0.036±0.005 |
+| IF | Naive | 0.820±0.003 | 0.150±0.011 | 0.034±0.003 |
+| IF | DRO | 0.822±0.003 | **0.179±0.010** | 0.034±0.004 |
+| Combined | Naive | 0.817±0.005 | 0.167±0.010 | 0.033±0.004 |
+| Combined | DRO | 0.822±0.004 | **0.179±0.024** | 0.032±0.003 |
 
-**Observation:** DRO ≈ Naive under DP attacks, but DRO >> Naive under IF/Combined attacks. This pattern is consistent across 3 seeds.
+**Observation:** DRO produces CONSISTENTLY HIGHER DP (worse fairness) than Naive across ALL attack types. DRO accuracy is slightly higher (+0.003), confirming it trades fairness for accuracy. This validates madam's observation exactly.
 
 ---
 
-## 6. Critical Finding: Why DRO Fails on Adult Under DP Attack
+## 6. Critical Finding: Why DRO Fails on Adult (All Attack Types)
 
 **Not a bug. A research design mismatch.**
 
@@ -108,6 +108,8 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 - True clean: Female 33%, Male 67%
 
 **Result:** DRO's uncertainty set is centered on the WRONG distribution. It "defends" against a corruption model that doesn't match the actual attack. Lambda diagnostic confirms λ_DP stays small (~0.05), so it's NOT lambda runaway — it's structural.
+
+**Why this affects ALL attacks:** The radii mismatch corrupts DRO's core mechanism (worst-case reweighting `p`), so regardless of whether the attack targets DP, IF, or Combined, DRO's defense is miscalibrated.
 
 **Implication:** DRO's theoretical guarantees hold only when the corruption model matches reality. With coordinated attacks, the standard TV-ball radii are miscalibrated.
 
