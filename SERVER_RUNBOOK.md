@@ -13,17 +13,16 @@ ssh flair2.iitgn.ac.in
 cd /data/srujan.sai/DRO-FairML
 git pull
 
-# Option A: Sequential (safest, ~5-6 hours total)
-bash experiments/run_all_server_experiments.sh
+# ONE COMMAND runs everything (tabular re-run + all UTKFace + figures)
+bash experiments/run_everything.sh
 
-# Option B: Parallel (fast items concurrent, ~3-4 hours total)
-bash experiments/run_all_server_parallel.sh
-
-# After completion, generate report + figures
-venv/bin/python3 experiments/aggregate_all_results.py
-venv/bin/python3 experiments/generate_all_figures.py
-venv/bin/python3 experiments/check_server_progress.py
+# Or with tmux (recommended — survives disconnect)
+tmux new-session -d -s dro_full 'bash experiments/run_everything.sh'
+tmux attach -t dro_full
+# Detach: Ctrl+B then D
 ```
+
+**Expected total time:** ~6-8 hours (tabular ~2-3h CPU, UTKFace ~3-4h GPU)
 
 ---
 
