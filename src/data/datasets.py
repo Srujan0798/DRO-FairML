@@ -148,7 +148,7 @@ def load_lsac(data_dir='data/raw'):
     return X, y, a, 'LSAC'
 
 
-def load_utkface(data_dir='/data/srujan.sai/UTKFace', feature_cache=None):
+def load_utkface(data_dir='data/raw/utkface', feature_cache=None):
     """Load and preprocess UTKFace dataset.
 
     Uses ResNet18 pretrained features (512-dim) extracted from face images.
