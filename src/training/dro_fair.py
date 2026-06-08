@@ -184,7 +184,8 @@ class DroFairTrainer:
 
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)
 
-        history = {'train_loss': [], 'val_acc': [], 'val_dp': [], 'val_if': []}
+        history = {'train_loss': [], 'val_acc': [], 'val_dp': [], 'val_if': [],
+                   'lambda_dp': [], 'lambda_if': [], 'g_dp': [], 'g_if': []}
 
         for epoch in range(self.epochs):
             self.model.train()
@@ -248,6 +249,10 @@ class DroFairTrainer:
                             p_if = self._project_if_weights(p_if, self.p_if_center, self.rho_if)
 
             history['train_loss'].append(total_loss.item())
+            history['lambda_dp'].append(float(lambda_dp.item()) if self.use_dp else 0.0)
+            history['lambda_if'].append(float(lambda_if.item()) if self.use_if else 0.0)
+            history['g_dp'].append(float(g_dp.item()) if self.use_dp else 0.0)
+            history['g_if'].append(float(g_if.item()) if self.use_if else 0.0)
 
             # Validation
             if X_val is not None and (epoch + 1) % 5 == 0:
@@ -265,6 +270,7 @@ class DroFairTrainer:
                           f"val_if={metrics['if_violation']:.4f}, "
                           f"lambda_dp={lambda_dp.item():.2f}, lambda_if={lambda_if.item():.2f}")
 
+        self.history = history
         return history
 
     def predict(self, X):

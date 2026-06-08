@@ -18,7 +18,7 @@ import torch
 from src.data.datasets import get_dataset
 from src.models.classifier import MLPClassifier
 from src.models.cnn_classifier import CNNClassifier
-from src.corruption.adversarial import AdversarialCorruptor
+from src.corruption.adversarial import AdversarialCorruptor, FairnessTargetedPGD
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.evaluation.metrics import compute_metrics_torch
@@ -37,8 +37,18 @@ def _make_synthetic_utkface(n=1000, dim=512, seed=42):
     return X, y, a
 
 
-def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbose=False):
-    """Run single UTKFace experiment."""
+def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbose=False,
+                                  lambda_max=1.5, attack='adversarial',
+                                  save_lambda_history=False):
+    """Run single UTKFace experiment.
+
+    attack: 'adversarial' (original AdversarialCorruptor), or 'dp' | 'if' | 'combined'
+            for FairnessTargetedPGD modes.
+    lambda_max: cap on dual variables — used to test H3 (inner-max overshoot on
+                continuous embeddings). Default 1.5; try 0.5 to test.
+    save_lambda_history: persist per-epoch λ_DP/λ_IF/g_DP/g_IF in the result
+                         dict for the trajectory diagnostic.
+    """
     import random
     random.seed(seed)
     np.random.seed(seed)
@@ -66,15 +76,23 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
     tau = get_temperature(alpha)
     input_dim = X_train.shape[1]
 
-    corruptor = AdversarialCorruptor(
-        alpha=alpha, epsilon=0.1,
-        feature_attack=True, label_flip=True, attr_flip=True,
-        coordinated=True, random_state=seed
-    )
+    if attack == 'adversarial':
+        corruptor = AdversarialCorruptor(
+            alpha=alpha, epsilon=0.1,
+            feature_attack=True, label_flip=True, attr_flip=True,
+            coordinated=True, random_state=seed
+        )
+    elif attack in ('dp', 'if', 'combined'):
+        corruptor = FairnessTargetedPGD(
+            alpha=alpha, target_metric=attack, pgd_steps=5,
+            coordinated=True, random_state=seed
+        )
+    else:
+        raise ValueError(f"unknown attack: {attack!r}")
+
     X_train_c, y_train_c, a_train_c, _ = corruptor.corrupt(
         X_train, y_train, a_train, model=None, device=device
     )
-
     X_test_c, y_test_c, a_test_c, _ = corruptor.corrupt(
         X_test, y_test, a_test, model=None, device=device
     )
@@ -83,6 +101,8 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
         'dataset': dataset_name,
         'alpha': alpha,
         'seed': seed,
+        'attack': attack,
+        'lambda_max': lambda_max,
         'naive': {},
         'dro': {}
     }
@@ -109,13 +129,20 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
     model_dro = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
     trainer_dro = DroFairTrainer(
         model_dro, alpha=alpha, device=device,
-        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=1.5,
+        lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=lambda_max,
         tau=tau, beta=5.0, k=5, gamma=0.0,
         K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15,
         lambda_warmstart=0.01
     )
-    trainer_dro.fit(X_train_c, y_train_c, a_train_c,
-                    X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
+    dro_history = trainer_dro.fit(X_train_c, y_train_c, a_train_c,
+                                  X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
+    if save_lambda_history:
+        results['dro']['lambda_history'] = {
+            'lambda_dp': dro_history.get('lambda_dp', []),
+            'lambda_if': dro_history.get('lambda_if', []),
+            'g_dp': dro_history.get('g_dp', []),
+            'g_if': dro_history.get('g_if', []),
+        }
 
     results['dro']['clean'] = compute_metrics_torch(
         trainer_dro.model, X_test, y_test, a_test,
@@ -144,6 +171,16 @@ def main():
     parser.add_argument('--alphas', type=float, nargs='+', default=[0.0, 0.1, 0.2, 0.3])
     parser.add_argument('--n_seeds', type=int, default=5)
     parser.add_argument('--smoke', action='store_true', help='Run single seed only (smoke test)')
+    parser.add_argument('--attack', choices=['adversarial', 'dp', 'if', 'combined'],
+                        default='adversarial',
+                        help="Corruption type: 'adversarial' (default, multi-modal) or "
+                             "FairnessTargetedPGD modes 'dp'|'if'|'combined'")
+    parser.add_argument('--lambda_max', type=float, default=1.5,
+                        help='Cap on DRO dual variables (H3 test: try 0.5)')
+    parser.add_argument('--save_lambda_history', action='store_true',
+                        help='Persist per-epoch λ_DP/λ_IF trajectories for diagnostic')
+    parser.add_argument('--output', type=str, default=None,
+                        help='Override output JSON path')
     args = parser.parse_args()
 
     if args.smoke:
@@ -152,10 +189,15 @@ def main():
         print("SMOKE TEST MODE: 1 seed, alpha=0.2")
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f"Using device: {device}")
+    print(f"Using device: {device} | attack={args.attack} | lambda_max={args.lambda_max}")
 
     os.makedirs('results', exist_ok=True)
-    results_path = 'results/utkface_results.json'
+    if args.output:
+        results_path = args.output
+    else:
+        tag = f"_{args.attack}" if args.attack != 'adversarial' else ''
+        tag += f"_lmax{args.lambda_max}" if args.lambda_max != 1.5 else ''
+        results_path = f'results/utkface_results{tag}.json'
 
     all_results = []
     for dataset in args.datasets:
@@ -164,7 +206,11 @@ def main():
                 print(f"\n[{dataset}] alpha={alpha} seed={seed}")
                 try:
                     t0 = time.time()
-                    result = run_single_utkface_experiment(dataset, alpha, seed, device=device, verbose=False)
+                    result = run_single_utkface_experiment(
+                        dataset, alpha, seed, device=device, verbose=False,
+                        lambda_max=args.lambda_max, attack=args.attack,
+                        save_lambda_history=args.save_lambda_history,
+                    )
                     elapsed = time.time() - t0
                     all_results.append(result)
                     print(f"  Done in {elapsed:.0f}s | "
