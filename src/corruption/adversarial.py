@@ -163,23 +163,20 @@ class AdversarialCorruptor:
         return X_adv
     
     def _attack_labels(self, y, a, corrupt_idx):
-        """Adversarial label flips: flip labels to maximize DP violation."""
+        """Adversarial label flips: greedily flip labels to maximize DP violation."""
         y_adv = y.copy()
         
-        # Compute current group-conditional positive rates
-        mask0 = (a == 0)
-        mask1 = (a == 1)
-        
-        group0_pos = np.mean(y[mask0]) if np.any(mask0) else 0.5
-        group1_pos = np.mean(y[mask1]) if np.any(mask1) else 0.5
-        
         for idx in corrupt_idx:
+            # Recompute rates after each flip (old code computed once, causing stale heuristic)
+            mask0 = (a == 0)
+            mask1 = (a == 1)
+            group0_pos = np.mean(y_adv[mask0]) if np.any(mask0) else 0.5
+            group1_pos = np.mean(y_adv[mask1]) if np.any(mask1) else 0.5
+            
             group = int(a[idx])
-            current_label = int(y[idx])
+            current_label = int(y_adv[idx])
             
             # Flip to increase group rate disparity
-            # If group0 has lower rate, flip group0 negatives to positives
-            # and group1 positives to negatives
             if group == 0 and group0_pos <= group1_pos and current_label == 0:
                 y_adv[idx] = 1
             elif group == 0 and group0_pos > group1_pos and current_label == 1:
@@ -189,8 +186,8 @@ class AdversarialCorruptor:
             elif group == 1 and group1_pos > group0_pos and current_label == 1:
                 y_adv[idx] = 0
             else:
-                # Default: random flip
-                y_adv[idx] = 1 - current_label
+                # No beneficial flip: keep original
+                pass
         
         return y_adv
     
@@ -358,7 +355,14 @@ class FairnessTargetedPGD:
         elif self.target_metric == 'if':
             return self.compute_if_gradient(y, a, X=X)
         elif self.target_metric == 'combined':
-            return 0.5 * self.compute_dp_gradient(y, a) + 0.5 * self.compute_if_gradient(y, a, X=X)
+            dp_grad = self.compute_dp_gradient(y, a)
+            if_grad = self.compute_if_gradient(y, a, X=X)
+            # Normalize to comparable scales before mixing (DP grad is ~1/count_g,
+            # IF grad is in [-1,1]; without normalization IF dominates completely)
+            finite_dp = dp_grad[np.isfinite(dp_grad)]
+            dp_max = np.max(np.abs(finite_dp)) + 1e-12 if len(finite_dp) > 0 else 1.0
+            if_max = np.max(np.abs(if_grad)) + 1e-12
+            return 0.5 * (dp_grad / dp_max) + 0.5 * (if_grad / if_max)
         else:
             raise ValueError(f"Unknown metric: {self.target_metric}")
 
