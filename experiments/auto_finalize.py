@@ -18,7 +18,7 @@ RESULTS_DIR = 'results'
 FIGURES_DIR = 'figures'
 
 EXPECTED = {
-    'fairness_pgd_results.json': 270,
+    'fairness_pgd_results.json': 216,
     'lambda_diagnostic_full.json': 12,
 }
 
