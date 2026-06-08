@@ -45,6 +45,9 @@
 9. **Tabular runner: no resume support** → Skips already-completed experiments
 10. **Analyze script: missing `makedirs`** → Added to `plot_alpha_curves`
 11. **Generate figures: KeyError risk** → Added `.get()` guard
+12. **Data splits: label-only stratification** → Joint label+group stratification
+13. **UTKFace: `a=race` (5-class) breaks binary trainer** → Override to `a=gender`
+14. **IF attack: recomputed k-NN 3000× per run** → Precompute once, reuse (CRITICAL speedup)
 
 ## 📊 Preliminary Result (Fixed Attack)
 
