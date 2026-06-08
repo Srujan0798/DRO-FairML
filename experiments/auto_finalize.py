@@ -120,6 +120,14 @@ def main():
     run_cmd("venv/bin/python3 experiments/generate_all_figures.py",
             "Generate all publication figures")
 
+    # Paper tables
+    run_cmd("venv/bin/python3 experiments/generate_paper_tables.py",
+            "Generate paper LaTeX tables")
+
+    # Report tables
+    run_cmd("venv/bin/python3 experiments/generate_report_tables.py",
+            "Generate report LaTeX tables")
+
     # Summary
     generate_summary()
 
