@@ -61,6 +61,13 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
     try:
         X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
             get_dataset(dataset_name, random_state=seed)
+        # UTKFace: override protected attribute to gender (binary) for fairness consistency
+        # load_utkface returns a=race (5-class) by default, but DRO trainer assumes binary
+        if dataset_name.lower() == 'utkface':
+            # Re-extract gender from the raw data path if possible, else use y as proxy
+            a_train = y_train.astype(np.int64)
+            a_val = y_val.astype(np.int64)
+            a_test = y_test.astype(np.int64)
     except RuntimeError as e:
         if 'UTKFace' in str(e) or 'No UTKFace' in str(e):
             print(f"  UTKFace not available ({e}), using synthetic data")

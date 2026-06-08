@@ -225,15 +225,37 @@ def get_dataset(name, data_dir='data/raw', test_size=0.2, val_size=0.15, random_
     else:
         raise ValueError(f"Unknown dataset: {name}")
 
+    # Joint stratification by label and protected attribute when possible
+    try:
+        n_groups = int(a.max() + 1)
+        joint_strat = y * n_groups + a
+        # Check if all combinations have at least 2 samples
+        if np.min(np.bincount(joint_strat.astype(int))) >= 2:
+            strat = joint_strat
+        else:
+            strat = y
+    except Exception:
+        strat = y
+
     # First split: train+val / test
     X_trainval, X_test, y_trainval, y_test, a_trainval, a_test = train_test_split(
-        X, y, a, test_size=test_size, random_state=random_state, stratify=y
+        X, y, a, test_size=test_size, random_state=random_state, stratify=strat
     )
 
     # Second split: train / val
+    try:
+        n_groups = int(a_trainval.max() + 1)
+        joint_strat_val = y_trainval * n_groups + a_trainval
+        if np.min(np.bincount(joint_strat_val.astype(int))) >= 2:
+            strat_val = joint_strat_val
+        else:
+            strat_val = y_trainval
+    except Exception:
+        strat_val = y_trainval
+
     X_train, X_val, y_train, y_val, a_train, a_val = train_test_split(
         X_trainval, y_trainval, a_trainval, test_size=val_size / (1 - test_size),
-        random_state=random_state, stratify=y_trainval
+        random_state=random_state, stratify=strat_val
     )
 
     # CRITICAL FIX: Fit scaler ONLY on training data, transform val/test
