@@ -132,11 +132,12 @@ def load_lsac(data_dir='data/raw'):
     # Target: pass_bar (1=passed, 0=failed)
     y = df['pass_bar'].values.astype(np.float32)
 
-    # Protected attribute: male (1=male, 0=female)
-    a = df['male'].values.astype(np.int64)
+    # Protected attribute: race (racetxt: 0=minority, 1=majority)
+    # NOTE: Was 'male' in earlier code; fixed to match paper (Race)
+    a = df['racetxt'].values.astype(np.int64)
 
     # Drop target and protected
-    df = df.drop(columns=['pass_bar', 'male'])
+    df = df.drop(columns=['pass_bar', 'racetxt'])
 
     # Encode remaining categoricals if any
     for col in df.columns:

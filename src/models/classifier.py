@@ -24,12 +24,16 @@ class MLPClassifier(nn.Module):
     
     def predict_proba(self, x, temperature=1.0):
         """Return soft predictions using sigmoid with temperature."""
-        logits = self.forward(x)
-        return torch.sigmoid(logits * temperature)
-    
+        self.eval()
+        with torch.no_grad():
+            logits = self.forward(x)
+            return torch.sigmoid(logits * temperature)
+
     def predict(self, x):
         """Return hard binary predictions (threshold at 0.5)."""
-        if not isinstance(x, torch.Tensor):
-            x = torch.tensor(x, dtype=torch.float32)
-        probs = torch.sigmoid(self.forward(x))
-        return (probs >= 0.5).cpu().numpy()
+        self.eval()
+        with torch.no_grad():
+            if not isinstance(x, torch.Tensor):
+                x = torch.tensor(x, dtype=torch.float32)
+            probs = torch.sigmoid(self.forward(x))
+            return (probs >= 0.5).cpu().numpy()

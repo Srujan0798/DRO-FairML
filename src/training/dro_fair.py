@@ -254,12 +254,12 @@ class DroFairTrainer:
             history['g_dp'].append(float(g_dp.item()) if self.use_dp else 0.0)
             history['g_if'].append(float(g_if.item()) if self.use_if else 0.0)
 
-            # Validation
+            # Validation (use same temperature as training for consistent signals)
             if X_val is not None and (epoch + 1) % 5 == 0:
                 from src.evaluation.metrics import compute_metrics_torch
                 metrics = compute_metrics_torch(
                     self.model, X_val, y_val, a_val,
-                    device=self.device, temperature=self.tau, k=self.k, gamma=self.gamma
+                    device=self.device, temperature=current_tau, k=self.k, gamma=self.gamma
                 )
                 history["val_acc"].append(float(metrics["accuracy"]))
                 history["val_dp"].append(float(metrics["dp_violation"]))
