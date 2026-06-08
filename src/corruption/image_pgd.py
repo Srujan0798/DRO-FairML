@@ -64,7 +64,7 @@ class ImagePGD:
 
             with torch.no_grad():
                 X_adv = X_adv + self.step_size * torch.sign(X_adv.grad)
-                X_adv = torch.maximum(torch.minimum(X_adv, torch.tensor(X_max)), torch.tensor(X_min))
+                X_adv = torch.maximum(torch.minimum(X_adv, X_max), X_min)
                 X_adv = torch.clamp(X_adv, 0, 1)
 
         return X_adv
