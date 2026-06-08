@@ -258,7 +258,7 @@ def plot_master_comparison(all_data, out_stem):
         means = []
         for a in alphas:
             subset = [r for r in ds_runs if r['alpha'] == a]
-            vals = [r['dp_clean'] for r in subset]
+            vals = [r.get('dp_clean', np.nan) for r in subset]
             means.append(np.mean(vals) if vals else np.nan)
         if means:
             ax.plot(alphas, means, marker='o', label=f'{ds.capitalize()} (tabular)',

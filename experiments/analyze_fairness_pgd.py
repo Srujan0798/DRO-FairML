@@ -165,6 +165,7 @@ def plot_alpha_curves(summary_df, outpath='figures/fig9_fairness_pgd_curves.pdf'
             ax.set_ylim(bottom=0)
 
     plt.tight_layout()
+    os.makedirs('figures', exist_ok=True)
     plt.savefig(outpath, dpi=300, bbox_inches='tight')
     plt.savefig(outpath.replace('.pdf', '.png'), dpi=300, bbox_inches='tight')
     print(f"Saved figure to {outpath}")
