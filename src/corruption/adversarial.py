@@ -336,22 +336,19 @@ class FairnessTargetedPGD:
         if precomputed_neighbors is None:
             precomputed_neighbors = self._precompute_if_neighbors(X, a, k)
 
-        # Use precomputed k-NN within each protected group
+        # Use precomputed k-NN within each protected group (vectorized)
         for g, info in precomputed_neighbors.items():
             idx_g = info['idx_g']
             neighbor_idx = info['neighbor_idx']
             k_eff = info['k_eff']
             y_g = y[idx_g]
 
-            for local_i, global_i in enumerate(idx_g):
-                neighbors = neighbor_idx[local_i]  # local indices within group g
-                neighbor_labels = y_g[neighbors]
-                # Count how many neighbors AGREE with y_i
-                agree = np.sum(neighbor_labels == y_g[local_i])
-                disagree = k_eff - agree
-                # Flipping creates `agree` new disagreements and fixes `disagree` ones
-                # Net change in IF violation = agree - disagree
-                grad[global_i] = (agree - disagree) / k_eff
+            # Vectorized: y_g[neighbor_idx] has shape (n_g, k_eff)
+            # Compare each sample's label to its neighbors' labels
+            neighbor_labels = y_g[neighbor_idx]  # shape: (n_g, k_eff)
+            agree = np.sum(neighbor_labels == y_g[:, None], axis=1)  # shape: (n_g,)
+            disagree = k_eff - agree
+            grad[idx_g] = (agree - disagree) / k_eff
 
         return grad
 
