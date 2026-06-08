@@ -54,7 +54,9 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         alpha=alpha,
         target_metric=attack,
         pgd_steps=pgd_steps,
-        coordinated=True,
+        epsilon=0.3,
+        pgd_step_size=0.02,
+        coordinated=False,
         random_state=seed
     )
 
