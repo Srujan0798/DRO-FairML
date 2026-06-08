@@ -5,7 +5,7 @@ Trains Naive-FAIR and DRO-FAIR on clean data, applies attacks, retrains, evaluat
 
 Usage:
     python3 experiments/run_fairness_pgd.py --smoke
-    python3 experiments/run_fairness_pgd.py --datasets adult --alphas 0.1 0.2 0.3
+    python3 experiments/run_fairness_pgd.py --datasets adult --alphas 0.1 0.2 0.3 0.4
 """
 import os
 import sys
@@ -115,8 +115,8 @@ def main():
     parser.add_argument('--datasets', nargs='+', default=['adult', 'credit', 'lsac'])
     parser.add_argument('--attacks', nargs='+', default=['dp', 'if', 'combined'])
     parser.add_argument('--methods', nargs='+', default=['naive', 'dro'])
-    parser.add_argument('--alphas', type=float, nargs='+', default=[0.1, 0.2, 0.3])
-    parser.add_argument('--n_seeds', type=int, default=10)
+    parser.add_argument('--alphas', type=float, nargs='+', default=[0.1, 0.2, 0.3, 0.4])
+    parser.add_argument('--n_seeds', type=int, default=3)
     parser.add_argument('--smoke', action='store_true', help='1 seed, 1 dataset, 1 alpha')
     args = parser.parse_args()
 
