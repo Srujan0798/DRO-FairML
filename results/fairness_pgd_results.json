@@ -306,5 +306,38 @@
     "dp_clean": 0.1953706592321396,
     "if_clean": 0.03627753406150201,
     "total_time": 378.44188594818115
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "combined",
+    "method": "naive",
+    "acc_clean": 0.7521282476506357,
+    "dp_clean": 4.317931012742804e-10,
+    "if_clean": 1.6790770055389815e-33,
+    "total_time": 46.877617835998535
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "combined",
+    "method": "dro",
+    "acc_clean": 0.7521282476506357,
+    "dp_clean": 2.326693504528521e-09,
+    "if_clean": 2.3222727694032124e-30,
+    "total_time": 340.97539615631104
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 2,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.7712548369264787,
+    "dp_clean": 0.024260200560092926,
+    "if_clean": 0.0025603631979735125,
+    "total_time": 28.05102515220642
   }
 ]
