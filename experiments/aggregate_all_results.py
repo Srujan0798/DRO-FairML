@@ -41,15 +41,22 @@ def summarize_runs(runs, name):
     if not runs:
         return f"**{name}**: no data\n"
 
-    # Handle both old format (nested clean/corrupted) and new format (flat)
+    # Handle three formats:
+    # 1) old: nested clean/corrupted under naive/dro
+    # 2) new flat: naive/dro dict with dp_violation, accuracy
+    # 3) fairness_pgd flat: method='naive'|'dro', dp_clean, acc_clean
     def extract_dp_acc(entry, method):
+        if entry.get('method') == method:
+            # fairness_pgd flat format
+            return entry.get('dp_clean', np.nan), entry.get('acc_clean', np.nan)
         m = entry.get(method, {})
-        if 'clean' in m and 'corrupted' in m:
-            # old format: evaluate on corrupted test
+        if isinstance(m, dict) and 'clean' in m and 'corrupted' in m:
+            # old format
             return m['corrupted']['dp_violation'], m['corrupted']['accuracy']
-        else:
-            # new format: flat
+        elif isinstance(m, dict):
+            # new flat format
             return m.get('dp_violation', np.nan), m.get('accuracy', np.nan)
+        return np.nan, np.nan
 
     naive_dp = []
     naive_acc = []
@@ -58,10 +65,10 @@ def summarize_runs(runs, name):
     for r in runs:
         ndp, nacc = extract_dp_acc(r, 'naive')
         ddp, dacc = extract_dp_acc(r, 'dro')
-        naive_dp.append(ndp)
-        naive_acc.append(nacc)
-        dro_dp.append(ddp)
-        dro_acc.append(dacc)
+        if not np.isnan(ndp): naive_dp.append(ndp)
+        if not np.isnan(nacc): naive_acc.append(nacc)
+        if not np.isnan(ddp): dro_dp.append(ddp)
+        if not np.isnan(dacc): dro_acc.append(dacc)
 
     lines = [f"### {name} ({len(runs)} runs)"]
     lines.append(f"| Method | DP violation | Accuracy |")
@@ -70,8 +77,8 @@ def summarize_runs(runs, name):
     lines.append(f"| DRO    | {np.mean(dro_dp):.4f} +/- {np.std(dro_dp):.4f} | {np.mean(dro_acc):.3f} +/- {np.std(dro_acc):.3f} |")
 
     # Delta
-    dp_delta = np.mean(dro_dp) - np.mean(naive_dp)
-    acc_delta = np.mean(dro_acc) - np.mean(naive_acc)
+    dp_delta = np.mean(dro_dp) - np.mean(naive_dp) if dro_dp and naive_dp else np.nan
+    acc_delta = np.mean(dro_acc) - np.mean(naive_acc) if dro_acc and naive_acc else np.nan
     lines.append(f"| Delta  | {dp_delta:+.4f} | {acc_delta:+.3f} |")
     lines.append("")
     return "\n".join(lines)
@@ -90,11 +97,14 @@ def summarize_by_alpha(runs, name):
         return f"**{name}**: no data\n"
 
     def extract_dp_acc(entry, method):
+        if entry.get('method') == method:
+            return entry.get('dp_clean', np.nan), entry.get('acc_clean', np.nan)
         m = entry.get(method, {})
-        if 'clean' in m and 'corrupted' in m:
+        if isinstance(m, dict) and 'clean' in m and 'corrupted' in m:
             return m['corrupted']['dp_violation'], m['corrupted']['accuracy']
-        else:
+        elif isinstance(m, dict):
             return m.get('dp_violation', np.nan), m.get('accuracy', np.nan)
+        return np.nan, np.nan
 
     lines = [f"### {name} by alpha"]
     lines.append(f"| alpha | n | Naive DP | DRO DP | Delta DP | Naive Acc | DRO Acc |")
@@ -110,11 +120,11 @@ def summarize_by_alpha(runs, name):
         for r in group:
             ndp, nacc = extract_dp_acc(r, 'naive')
             ddp, dacc = extract_dp_acc(r, 'dro')
-            naive_dp.append(ndp)
-            naive_acc.append(nacc)
-            dro_dp.append(ddp)
-            dro_acc.append(dacc)
-        dp_delta = np.mean(dro_dp) - np.mean(naive_dp)
+            if not np.isnan(ndp): naive_dp.append(ndp)
+            if not np.isnan(nacc): naive_acc.append(nacc)
+            if not np.isnan(ddp): dro_dp.append(ddp)
+            if not np.isnan(dacc): dro_acc.append(dacc)
+        dp_delta = np.mean(dro_dp) - np.mean(naive_dp) if dro_dp and naive_dp else np.nan
         lines.append(f"| {alpha} | {len(group)} | "
                      f"{np.mean(naive_dp):.4f} | {np.mean(dro_dp):.4f} | {dp_delta:+.4f} | "
                      f"{np.mean(naive_acc):.3f} | {np.mean(dro_acc):.3f} |")
