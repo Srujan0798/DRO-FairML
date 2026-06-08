@@ -1,0 +1,13 @@
+[
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 0,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.8213377556661139,
+    "dp_clean": 0.18905985355377197,
+    "if_clean": 0.032319899709128054,
+    "total_time": 36.35914182662964
+  }
+]

@@ -154,8 +154,15 @@ def main():
         with open(results_path, 'w') as f:
             json.dump(all_results, f, indent=2)
 
+    # Build set of already-completed keys for resume support
+    completed_keys = {
+        (r.get('dataset'), r.get('alpha'), r.get('seed'), r.get('attack'), r.get('method'))
+        for r in all_results
+    }
+
     total = len(args.datasets) * len(args.alphas) * args.n_seeds * len(args.attacks) * len(args.methods)
     count = 0
+    skipped = 0
 
     for dataset in args.datasets:
         for alpha in args.alphas:
@@ -163,6 +170,12 @@ def main():
                 for attack in args.attacks:
                     for method in args.methods:
                         count += 1
+                        key = (dataset, alpha, seed, attack, method)
+                        if key in completed_keys:
+                            skipped += 1
+                            print(f"[{count}/{total}] SKIP (already done): {dataset} α={alpha} seed={seed} attack={attack} method={method}")
+                            continue
+
                         label = f"[{count}/{total}] {dataset} α={alpha} seed={seed} attack={attack} method={method}"
                         print(label)
 
@@ -174,6 +187,7 @@ def main():
                             )
                             elapsed = time.time() - t0
                             all_results.append(result)
+                            completed_keys.add(key)
                             save_incremental()
 
                             print(f"  → acc={result['acc_clean']:.3f} dp={result['dp_clean']:.4f} "
@@ -184,7 +198,8 @@ def main():
                             import traceback
                             traceback.print_exc()
 
-    print(f"\nSaved {len(all_results)} results to {results_path}")
+    print(f"\nSkipped {skipped} already-completed experiments")
+    print(f"Saved {len(all_results)} results to {results_path}")
 
     if args.smoke and len(all_results) > 0:
         print("\nSMOKE TEST JSON:")
