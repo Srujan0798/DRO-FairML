@@ -142,7 +142,17 @@ def main():
     os.makedirs('results', exist_ok=True)
     results_path = 'results/fairness_pgd_results.json'
 
-    all_results = []
+    # Load any existing results to support resuming
+    if os.path.exists(results_path):
+        with open(results_path) as f:
+            all_results = json.load(f)
+        print(f"Loaded {len(all_results)} existing results from {results_path}")
+    else:
+        all_results = []
+
+    def save_incremental():
+        with open(results_path, 'w') as f:
+            json.dump(all_results, f, indent=2)
 
     total = len(args.datasets) * len(args.alphas) * args.n_seeds * len(args.attacks) * len(args.methods)
     count = 0
@@ -164,6 +174,7 @@ def main():
                             )
                             elapsed = time.time() - t0
                             all_results.append(result)
+                            save_incremental()
 
                             print(f"  → acc={result['acc_clean']:.3f} dp={result['dp_clean']:.4f} "
                                   f"if={result['if_clean']:.4f} ({elapsed:.0f}s)")
@@ -172,9 +183,6 @@ def main():
                             print(f"  → FAILED: {e}")
                             import traceback
                             traceback.print_exc()
-
-    with open(results_path, 'w') as f:
-        json.dump(all_results, f, indent=2)
 
     print(f"\nSaved {len(all_results)} results to {results_path}")
 
