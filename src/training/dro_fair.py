@@ -248,7 +248,7 @@ class DroFairTrainer:
                             p_if = p_if_grad + self.lr_p * p_if_grad.grad
                             p_if = self._project_if_weights(p_if, self.p_if_center, self.rho_if)
 
-            history['train_loss'].append(total_loss.item())
+            history['train_loss'].append(float(total_loss.item()))
             history['lambda_dp'].append(float(lambda_dp.item()) if self.use_dp else 0.0)
             history['lambda_if'].append(float(lambda_if.item()) if self.use_if else 0.0)
             history['g_dp'].append(float(g_dp.item()) if self.use_dp else 0.0)
@@ -261,9 +261,9 @@ class DroFairTrainer:
                     self.model, X_val, y_val, a_val,
                     device=self.device, temperature=self.tau, k=self.k, gamma=self.gamma
                 )
-                history['val_acc'].append(metrics['accuracy'])
-                history['val_dp'].append(metrics['dp_violation'])
-                history['val_if'].append(metrics['if_violation'])
+                history["val_acc"].append(float(metrics["accuracy"]))
+                history["val_dp"].append(float(metrics["dp_violation"]))
+                history["val_if"].append(float(metrics["if_violation"]))
                 if verbose:
                     print(f"Epoch {epoch+1}/{self.epochs}: loss={total_loss.item():.4f}, "
                           f"val_acc={metrics['accuracy']:.4f}, val_dp={metrics['dp_violation']:.4f}, "
