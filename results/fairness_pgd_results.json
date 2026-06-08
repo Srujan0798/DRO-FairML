@@ -5,10 +5,10 @@
     "seed": 0,
     "attack": "dp",
     "method": "naive",
-    "acc_clean": 0.8213377556661139,
-    "dp_clean": 0.18905985355377197,
-    "if_clean": 0.032319899709128054,
-    "total_time": 36.35914182662964
+    "acc_clean": 0.8247650635710337,
+    "dp_clean": 0.2159784883260727,
+    "if_clean": 0.03850558639452187,
+    "total_time": 28.07512068748474
   },
   {
     "dataset": "adult",
@@ -16,10 +16,10 @@
     "seed": 0,
     "attack": "dp",
     "method": "dro",
-    "acc_clean": 0.8239911553344389,
-    "dp_clean": 0.21899443864822388,
-    "if_clean": 0.03964978087788741,
-    "total_time": 815.496838092804
+    "acc_clean": 0.8200110558319513,
+    "dp_clean": 0.28535524010658264,
+    "if_clean": 0.05443521917478812,
+    "total_time": 275.352166891098
   },
   {
     "dataset": "adult",
@@ -27,10 +27,10 @@
     "seed": 0,
     "attack": "if",
     "method": "naive",
-    "acc_clean": 0.8216694306246545,
-    "dp_clean": 0.14267189800739288,
-    "if_clean": 0.03359364746578684,
-    "total_time": 35.81293082237244
+    "acc_clean": 0.8200110558319513,
+    "dp_clean": 0.1333000808954239,
+    "if_clean": 0.02836710349272239,
+    "total_time": 42.28842377662659
   },
   {
     "dataset": "adult",
@@ -38,306 +38,9 @@
     "seed": 0,
     "attack": "if",
     "method": "dro",
-    "acc_clean": 0.8250967385295743,
-    "dp_clean": 0.18614304065704346,
-    "if_clean": 0.03194955129122606,
-    "total_time": 558.1308090686798
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 0,
-    "attack": "combined",
-    "method": "naive",
-    "acc_clean": 0.8246545052515202,
-    "dp_clean": 0.16948819160461426,
-    "if_clean": 0.032272340664137505,
-    "total_time": 22.56719207763672
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 0,
-    "attack": "combined",
-    "method": "dro",
-    "acc_clean": 0.8267551133222775,
-    "dp_clean": 0.2026108056306839,
-    "if_clean": 0.03308584026125678,
-    "total_time": 529.8877077102661
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 1,
-    "attack": "dp",
-    "method": "naive",
-    "acc_clean": 0.8212271973466003,
-    "dp_clean": 0.19532296061515808,
-    "if_clean": 0.04072517366748739,
-    "total_time": 20.95192813873291
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 1,
-    "attack": "dp",
-    "method": "dro",
-    "acc_clean": 0.8221116639027087,
-    "dp_clean": 0.19840380549430847,
-    "if_clean": 0.03829707337448374,
-    "total_time": 368.9537947177887
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 1,
-    "attack": "if",
-    "method": "naive",
-    "acc_clean": 0.8197899391929243,
-    "dp_clean": 0.16307595372200012,
-    "if_clean": 0.03736010852596639,
-    "total_time": 22.030455112457275
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 1,
-    "attack": "if",
-    "method": "dro",
-    "acc_clean": 0.8202321724709785,
-    "dp_clean": 0.1847190409898758,
-    "if_clean": 0.03793494207991767,
-    "total_time": 394.98146200180054
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 1,
-    "attack": "combined",
-    "method": "naive",
-    "acc_clean": 0.820342730790492,
-    "dp_clean": 0.17573386430740356,
-    "if_clean": 0.03708771187543806,
-    "total_time": 22.629385948181152
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 1,
-    "attack": "combined",
-    "method": "dro",
-    "acc_clean": 0.8208955223880597,
-    "dp_clean": 0.17584820091724396,
-    "if_clean": 0.03506950007563899,
-    "total_time": 309.6111640930176
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 2,
-    "attack": "dp",
-    "method": "naive",
-    "acc_clean": 0.8164731896075179,
-    "dp_clean": 0.17389646172523499,
-    "if_clean": 0.03208018111277094,
-    "total_time": 24.302416801452637
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 2,
-    "attack": "dp",
-    "method": "dro",
-    "acc_clean": 0.8199004975124378,
-    "dp_clean": 0.18107116222381592,
-    "if_clean": 0.030761462705253696,
-    "total_time": 397.59085726737976
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 2,
-    "attack": "if",
-    "method": "naive",
-    "acc_clean": 0.816694306246545,
-    "dp_clean": 0.143976628780365,
-    "if_clean": 0.031753738082570857,
-    "total_time": 19.048752784729004
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 2,
-    "attack": "if",
-    "method": "dro",
-    "acc_clean": 0.8210060807075732,
-    "dp_clean": 0.16775844991207123,
-    "if_clean": 0.030887432178613828,
-    "total_time": 424.5475251674652
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 2,
-    "attack": "combined",
-    "method": "naive",
-    "acc_clean": 0.8161415146489773,
-    "dp_clean": 0.15653829276561737,
-    "if_clean": 0.02865072021074084,
-    "total_time": 23.45035696029663
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.1,
-    "seed": 2,
-    "attack": "combined",
-    "method": "dro",
-    "acc_clean": 0.8187949143173023,
-    "dp_clean": 0.15816740691661835,
-    "if_clean": 0.028507103277643962,
-    "total_time": 418.6884341239929
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 0,
-    "attack": "dp",
-    "method": "naive",
-    "acc_clean": 0.7829740187949144,
-    "dp_clean": 0.03896147385239601,
-    "if_clean": 0.0024883107753490836,
-    "total_time": 17.273191928863525
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 0,
-    "attack": "if",
-    "method": "naive",
-    "acc_clean": 0.8211166390270868,
-    "dp_clean": 0.14900660514831543,
-    "if_clean": 0.03302125443517006,
-    "total_time": 23.879937887191772
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 0,
-    "attack": "dp",
-    "method": "dro",
-    "acc_clean": 0.7638474295190714,
-    "dp_clean": 0.01586051844060421,
-    "if_clean": 0.0009425339637658661,
-    "total_time": 451.84359192848206
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 0,
-    "attack": "if",
-    "method": "dro",
-    "acc_clean": 0.824212271973466,
-    "dp_clean": 0.2201317846775055,
-    "if_clean": 0.039763436538275194,
-    "total_time": 298.31291604042053
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 0,
-    "attack": "combined",
-    "method": "naive",
-    "acc_clean": 0.7551133222775014,
-    "dp_clean": 0.0036773476749658585,
-    "if_clean": 5.3927717512561803e-05,
-    "total_time": 40.90707802772522
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 0,
-    "attack": "combined",
-    "method": "dro",
-    "acc_clean": 0.7521282476506357,
-    "dp_clean": 7.062555429371287e-09,
-    "if_clean": 0.0,
-    "total_time": 484.92759799957275
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 1,
-    "attack": "dp",
-    "method": "naive",
-    "acc_clean": 0.7732448866777225,
-    "dp_clean": 0.026113467290997505,
-    "if_clean": 0.0015271665787179223,
-    "total_time": 44.47799897193909
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 1,
-    "attack": "dp",
-    "method": "dro",
-    "acc_clean": 0.7534549474847982,
-    "dp_clean": 0.001994494581595063,
-    "if_clean": 4.0495257855020354e-05,
-    "total_time": 633.7492961883545
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 1,
-    "attack": "if",
-    "method": "naive",
-    "acc_clean": 0.8172470978441128,
-    "dp_clean": 0.14358210563659668,
-    "if_clean": 0.03995927559747576,
-    "total_time": 49.7389440536499
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 1,
-    "attack": "if",
-    "method": "dro",
-    "acc_clean": 0.8194582642343836,
-    "dp_clean": 0.1953706592321396,
-    "if_clean": 0.03627753406150201,
-    "total_time": 378.44188594818115
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 1,
-    "attack": "combined",
-    "method": "naive",
-    "acc_clean": 0.7521282476506357,
-    "dp_clean": 4.317931012742804e-10,
-    "if_clean": 1.6790770055389815e-33,
-    "total_time": 46.877617835998535
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 1,
-    "attack": "combined",
-    "method": "dro",
-    "acc_clean": 0.7521282476506357,
-    "dp_clean": 2.326693504528521e-09,
-    "if_clean": 2.3222727694032124e-30,
-    "total_time": 340.97539615631104
-  },
-  {
-    "dataset": "adult",
-    "alpha": 0.2,
-    "seed": 2,
-    "attack": "dp",
-    "method": "naive",
-    "acc_clean": 0.7712548369264787,
-    "dp_clean": 0.024260200560092926,
-    "if_clean": 0.0025603631979735125,
-    "total_time": 28.05102515220642
+    "acc_clean": 0.8232172470978442,
+    "dp_clean": 0.17109626531600952,
+    "if_clean": 0.027872331259153723,
+    "total_time": 276.1409709453583
   }
 ]
