@@ -284,7 +284,24 @@ class FairnessTargetedPGD:
 
         return grad
 
-    def compute_if_gradient(self, y, a, X=None, k=5):
+    def _precompute_if_neighbors(self, X, a, k=5):
+        """Precompute k-NN neighbor indices for IF gradient (computed once, reused)."""
+        from sklearn.neighbors import NearestNeighbors
+        neighbors = {}
+        for g in [0, 1]:
+            mask_g = (a == g)
+            if mask_g.sum() <= k:
+                continue
+            idx_g = np.where(mask_g)[0]
+            X_g = X[idx_g]
+            k_eff = min(k, len(idx_g) - 1)
+            nbrs = NearestNeighbors(n_neighbors=k_eff + 1).fit(X_g)
+            _, neighbor_idx = nbrs.kneighbors(X_g)
+            neighbor_idx = neighbor_idx[:, 1:]  # drop self
+            neighbors[g] = {'idx_g': idx_g, 'neighbor_idx': neighbor_idx, 'k_eff': k_eff}
+        return neighbors
+
+    def compute_if_gradient(self, y, a, X=None, k=5, precomputed_neighbors=None):
         """
         Compute gradient of Individual Fairness w.r.t. each sample's label.
 
@@ -305,31 +322,26 @@ class FairnessTargetedPGD:
             a: protected attribute (n,) — k-NN is computed WITHIN same group
             X: features (n, d) — required for proper k-NN gradient
             k: number of neighbors
+            precomputed_neighbors: dict from _precompute_if_neighbors() for speed
 
         Returns:
             grad: array where grad[i] > 0 means flipping y[i] INCREASES IF violation
         """
-        from sklearn.neighbors import NearestNeighbors
-
         n = len(y)
         grad = np.zeros(n)
 
         if X is None:
             return grad
 
-        # Compute k-NN within each protected group (IF measures within-group consistency)
-        for g in [0, 1]:
-            mask_g = (a == g)
-            if mask_g.sum() <= k:
-                continue
-            idx_g = np.where(mask_g)[0]
-            X_g = X[idx_g]
-            y_g = y[idx_g]
+        if precomputed_neighbors is None:
+            precomputed_neighbors = self._precompute_if_neighbors(X, a, k)
 
-            k_eff = min(k, len(idx_g) - 1)
-            nbrs = NearestNeighbors(n_neighbors=k_eff + 1).fit(X_g)
-            _, neighbor_idx = nbrs.kneighbors(X_g)
-            neighbor_idx = neighbor_idx[:, 1:]  # drop self
+        # Use precomputed k-NN within each protected group
+        for g, info in precomputed_neighbors.items():
+            idx_g = info['idx_g']
+            neighbor_idx = info['neighbor_idx']
+            k_eff = info['k_eff']
+            y_g = y[idx_g]
 
             for local_i, global_i in enumerate(idx_g):
                 neighbors = neighbor_idx[local_i]  # local indices within group g
@@ -343,7 +355,7 @@ class FairnessTargetedPGD:
 
         return grad
 
-    def compute_fairness_gradient(self, y, a, X=None):
+    def compute_fairness_gradient(self, y, a, X=None, precomputed_neighbors=None):
         """
         Compute gradient for the target fairness metric.
 
@@ -353,10 +365,10 @@ class FairnessTargetedPGD:
         if self.target_metric == 'dp':
             return self.compute_dp_gradient(y, a)
         elif self.target_metric == 'if':
-            return self.compute_if_gradient(y, a, X=X)
+            return self.compute_if_gradient(y, a, X=X, precomputed_neighbors=precomputed_neighbors)
         elif self.target_metric == 'combined':
             dp_grad = self.compute_dp_gradient(y, a)
-            if_grad = self.compute_if_gradient(y, a, X=X)
+            if_grad = self.compute_if_gradient(y, a, X=X, precomputed_neighbors=precomputed_neighbors)
             # Normalize to comparable scales before mixing (DP grad is ~1/count_g,
             # IF grad is in [-1,1]; without normalization IF dominates completely)
             finite_dp = dp_grad[np.isfinite(dp_grad)]
@@ -425,13 +437,18 @@ class FairnessTargetedPGD:
         n_corrupt = int(self.alpha * n)
         flipped = np.zeros(n, dtype=bool)
 
+        # Precompute k-NN once for IF attacks (major speedup — was recomputing 3000×)
+        precomputed_neighbors = None
+        if self.target_metric in ('if', 'combined') and X is not None:
+            precomputed_neighbors = self._precompute_if_neighbors(X, a)
+
         # Coordinated targeting: track minority group budget
         group_counts = np.bincount(a.astype(int))
         minority_group = int(np.argmin(group_counts))
         n_minority_target = int(0.7 * n_corrupt) if self.coordinated else 0
 
         for _ in range(n_corrupt):
-            grad = self.compute_fairness_gradient(y_adv, a, X)
+            grad = self.compute_fairness_gradient(y_adv, a, X, precomputed_neighbors=precomputed_neighbors)
             grad[flipped] = -np.inf  # do not re-flip
 
             if not np.any(grad > 0):
