@@ -427,5 +427,137 @@
     "dp_clean": 0.017927706241607666,
     "if_clean": 0.002782649406175134,
     "total_time": 33.61827301979065
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 0,
+    "attack": "if",
+    "method": "dro",
+    "acc_clean": 0.7521282476506357,
+    "dp_clean": 0.00013689949992112815,
+    "if_clean": 2.228815110708826e-15,
+    "total_time": 188.52553701400757
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 0,
+    "attack": "combined",
+    "method": "naive",
+    "acc_clean": 0.6590381426202322,
+    "dp_clean": 0.5803627371788025,
+    "if_clean": 0.019772855239585278,
+    "total_time": 34.2071590423584
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 0,
+    "attack": "combined",
+    "method": "dro",
+    "acc_clean": 0.6981757877280266,
+    "dp_clean": 0.6110591888427734,
+    "if_clean": 0.005506274270419901,
+    "total_time": 102.60159993171692
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.6593698175787728,
+    "dp_clean": 0.5593209862709045,
+    "if_clean": 0.019228929793639736,
+    "total_time": 17.327306985855103
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "attack": "dp",
+    "method": "dro",
+    "acc_clean": 0.7009397457158651,
+    "dp_clean": 0.5849977731704712,
+    "if_clean": 0.011871650640483386,
+    "total_time": 86.31942200660706
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "attack": "if",
+    "method": "naive",
+    "acc_clean": 0.748922056384743,
+    "dp_clean": 0.002397065982222557,
+    "if_clean": 0.0014358266763347652,
+    "total_time": 19.809722185134888
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "attack": "if",
+    "method": "dro",
+    "acc_clean": 0.7521282476506357,
+    "dp_clean": 9.519657396594994e-06,
+    "if_clean": 5.742295449360378e-16,
+    "total_time": 306.76549315452576
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "attack": "combined",
+    "method": "naive",
+    "acc_clean": 0.6385848535102266,
+    "dp_clean": 0.5498111248016357,
+    "if_clean": 0.022477614926521335,
+    "total_time": 136.20252895355225
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "attack": "combined",
+    "method": "dro",
+    "acc_clean": 0.6983969043670536,
+    "dp_clean": 0.5952283143997192,
+    "if_clean": 0.008831716204877443,
+    "total_time": 453.29541301727295
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 2,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.6440022111663902,
+    "dp_clean": 0.5789597034454346,
+    "if_clean": 0.023171985033005865,
+    "total_time": 53.163182973861694
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 2,
+    "attack": "dp",
+    "method": "dro",
+    "acc_clean": 0.6927584300718629,
+    "dp_clean": 0.6013551950454712,
+    "if_clean": 0.011504650572289854,
+    "total_time": 228.83499765396118
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 2,
+    "attack": "if",
+    "method": "naive",
+    "acc_clean": 0.7556661138750691,
+    "dp_clean": 0.01328786090016365,
+    "if_clean": 0.007917199642426789,
+    "total_time": 103.1771879196167
   }
 ]
