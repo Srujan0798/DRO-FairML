@@ -237,26 +237,30 @@ class FairnessTargetedPGD:
 
     def compute_dp_gradient(self, y, a):
         """
-        Compute gradient of Demographic Parity w.r.t. each sample's label.
+        Compute the EXACT marginal gain in DP violation from flipping each sample.
 
-        For group g ∈ {0, 1}, the group rate is:
-            P(Y=1|A=g) = mean(y[g])
+        For group g, flipping a sample changes the group rate by ±1/count_g.
+        The marginal gain depends on:
+          1. Which group has the higher rate
+          2. The current label (flipping 0→1 or 1→0)
+          3. The group size (larger impact in smaller groups)
 
         DP = |P(Y=1|A=0) - P(Y=1|A=1)| = |p0 - p1|
 
-        Derivative d(DP)/d(y_i):
-            If p0 > p1: want to INCREASE p0 or DECREASE p1 → gap widens
-            If p1 > p0: want to INCREASE p1 or DECREASE p0 → gap widens
-
-        Gradient sign:
-            +1: flipping increases unfairness (target for attack)
-            -1: flipping decreases unfairness (avoid)
+        Marginal gain for flipping sample i in group g:
+          If p0 > p1:
+            g=0, y_i=0→1:  gain = +1/n0  (increases p0, widens gap)
+            g=0, y_i=1→0:  gain = -1/n0  (decreases p0, shrinks gap)
+            g=1, y_i=1→0:  gain = +1/n1  (decreases p1, widens gap)
+            g=1, y_i=0→1:  gain = -1/n1  (increases p1, shrinks gap)
+          If p1 > p0: symmetric
 
         Returns:
-            grad: array where grad[i] > 0 means flipping y[i] INCREASES DP violation
+            grad: array where grad[i] is the exact DP increase from flipping y[i]
+                  (positive = flip increases unfairness, negative = flip decreases it)
         """
         n = len(y)
-        grad = np.zeros(n)
+        grad = np.full(n, -np.inf)
 
         mask0 = (a == 0)
         mask1 = (a == 1)
@@ -269,18 +273,17 @@ class FairnessTargetedPGD:
         p0 = np.mean(y[mask0])
         p1 = np.mean(y[mask1])
 
+        inv_n0 = 1.0 / count0
+        inv_n1 = 1.0 / count1
+
         if p0 >= p1:
-            # Group 0 is higher, want to WIDEN gap
-            # Group 0: 0→1 increases p0 (+1), 1→0 decreases p0 (-1)
-            grad[mask0] = np.where(y[mask0] == 0, +1.0, -1.0)
-            # Group 1: 1→0 decreases p1 (+1), 0→1 increases p1 (-1)
-            grad[mask1] = np.where(y[mask1] == 1, +1.0, -1.0)
+            # Group 0 higher: widen by increasing p0 or decreasing p1
+            grad[mask0] = np.where(y[mask0] == 0, +inv_n0, -inv_n0)
+            grad[mask1] = np.where(y[mask1] == 1, +inv_n1, -inv_n1)
         else:
-            # Group 1 is higher, want to WIDEN gap
-            # Group 0: 1→0 decreases p0 (+1), 0→1 increases p0 (-1)
-            grad[mask0] = np.where(y[mask0] == 1, +1.0, -1.0)
-            # Group 1: 0→1 increases p1 (+1), 1→0 decreases p1 (-1)
-            grad[mask1] = np.where(y[mask1] == 0, +1.0, -1.0)
+            # Group 1 higher: widen by increasing p1 or decreasing p0
+            grad[mask1] = np.where(y[mask1] == 0, +inv_n1, -inv_n1)
+            grad[mask0] = np.where(y[mask0] == 1, +inv_n0, -inv_n0)
 
         return grad
 
@@ -399,41 +402,60 @@ class FairnessTargetedPGD:
 
     def _attack_labels_fairness(self, y, a, X=None):
         """
-        Core gradient-based label attack.
+        Greedy fairness-targeted label attack.
 
-        Iteratively computes fairness gradient and flips the samples
-        that would cause the most unfairness increase.
+        At each step, computes the EXACT marginal gain in the fairness
+        metric from flipping each unflipped sample. Flips the sample
+        with the highest positive gain, then recomputes all gains.
+
+        This is correct for discrete label flips; the old batched-PGD
+        approach was wrong because it flipped the same samples multiple
+        times and used uniform (not group-size-weighted) gradients.
 
         Returns:
             y_attacked: corrupted labels
             corrupt_mask: boolean mask of flipped samples
         """
-        y_orig = y.copy()
         y_adv = y.copy()
         n = len(y)
         n_corrupt = int(self.alpha * n)
+        flipped = np.zeros(n, dtype=bool)
 
-        for step in range(self.pgd_steps):
+        # Coordinated targeting: track minority group budget
+        group_counts = np.bincount(a.astype(int))
+        minority_group = int(np.argmin(group_counts))
+        n_minority_target = int(0.7 * n_corrupt) if self.coordinated else 0
+
+        for _ in range(n_corrupt):
             grad = self.compute_fairness_gradient(y_adv, a, X)
-            target_idx = self._select_targets(grad, n_corrupt, a)
-            y_adv[target_idx] = 1 - y_adv[target_idx]
+            grad[flipped] = -np.inf  # do not re-flip
 
-        # After all steps, find labels that actually changed
-        changed = y_adv != y_orig
-        changed_idx = np.where(changed)[0]
+            if not np.any(grad > 0):
+                break  # no beneficial flip left
 
-        # Enforce exact alpha budget: if too many changed, keep top by gradient
-        if len(changed_idx) > n_corrupt:
-            grad_final = self.compute_fairness_gradient(y_adv, a, X)
-            changed_grad = grad_final[changed_idx]
-            keep_idx = changed_idx[np.argsort(-changed_grad)[:n_corrupt]]
-            y_adv = y_orig.copy()
-            y_adv[keep_idx] = 1 - y_adv[keep_idx]
-            changed_idx = keep_idx
+            if self.coordinated:
+                n_minority_done = np.sum(flipped & (a == minority_group))
+                minority_mask = (a == minority_group) & ~flipped
+                majority_mask = (a != minority_group) & ~flipped
 
-        corrupt_mask = np.zeros(n, dtype=bool)
-        corrupt_mask[changed_idx] = True
+                # Try to allocate 70% to minority group
+                if n_minority_done < n_minority_target and np.any(minority_mask):
+                    masked_grad = np.full(n, -np.inf)
+                    masked_grad[minority_mask] = grad[minority_mask]
+                    best = np.argmax(masked_grad)
+                elif np.any(majority_mask):
+                    masked_grad = np.full(n, -np.inf)
+                    masked_grad[majority_mask] = grad[majority_mask]
+                    best = np.argmax(masked_grad)
+                else:
+                    best = np.argmax(grad)
+            else:
+                best = np.argmax(grad)
 
+            y_adv[best] = 1 - y_adv[best]
+            flipped[best] = True
+
+        corrupt_mask = flipped
         return y_adv, corrupt_mask
 
     def corrupt(self, X, y, a, model=None, device='cpu'):
