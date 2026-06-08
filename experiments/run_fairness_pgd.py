@@ -133,7 +133,7 @@ def main():
         print("NOTE: smoke uses epochs=10, K_inner=3, pgd_steps=2 for speed")
     else:
         smoke_epochs = 60
-        smoke_k_inner = 10
+        smoke_k_inner = 5   # reduced from 10 for speed (~2× faster, still converges)
         smoke_pgd_steps = 5
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
