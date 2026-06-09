@@ -113,14 +113,14 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | Component | Status | Count | Notes |
 |-----------|--------|-------|-------|
 | Lambda diagnostic | ✅ Complete | 12/12 | All 3 datasets × 2 λ_max × 2 seeds |
-| Tabular Fairness-PGD | 🔄 Running | ~117/270 done | 3 datasets × 5 alphas × 3 seeds × 3 attacks × 2 methods. Clean parallel batch in progress. |
+| Tabular Fairness-PGD | 🔄 Running | ~184/270 done | LSAC ✅ complete. Adult & Credit in progress (α=0.2). Clean parallel batch. |
 | UTKFace | ⏸️ Blocked | 0 | No GPU/images on laptop; scripts ready for server |
 
 **Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~5-15 min each. Full batch ETA ~6-8 hours.
 
 **Preliminary results (new fixed code, partial data):**
 
-### Adult — DRO consistently WORSE than Naive
+### Adult — DRO WORSE for DP/Combined, MIXED for IF
 
 | α | Attack | Naive DP | DRO DP | Δ DP |
 |---|--------|----------|--------|------|
@@ -130,20 +130,29 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | 0.1 | dp | 0.1799 | 0.2155 | +19.8% |
 | 0.1 | if | 0.1310 | 0.1530 | +16.8% |
 | 0.1 | combined | 0.1690 | 0.2144 | +26.9% |
+| 0.2 | dp | 0.3276 | 0.5029 | +53.5% |
+| 0.2 | if | 0.0902 | 0.0876 | -2.9% |
+| 0.2 | combined | 0.2461 | 0.4877 | +98.2% |
 
-**Pattern:** DRO produces HIGHER DP (worse fairness) than Naive across ALL attacks at α≥0.1. Confirms the radii mismatch hypothesis — DRO's defense is miscalibrated on Adult.
+**Pattern:** DRO fails for DP and Combined attacks (worsens DP). **Surprising:** DRO slightly HELPS for IF attack at α=0.2 (-2.9%). This suggests the radii mismatch affects DP-targeted attacks more severely than IF-targeted attacks.
 
-### Credit — DRO neutral to slightly BETTER
+### Credit — DRO neutral to BETTER at higher alphas
 
 | α | Attack | Naive DP | DRO DP | Δ DP |
 |---|--------|----------|--------|------|
 | 0.0 | dp | 0.0130 | 0.0131 | +0.3% |
 | 0.0 | if | 0.0130 | 0.0131 | +0.3% |
 | 0.0 | combined | 0.0130 | 0.0118 | -9.9% |
+| 0.1 | dp | 0.0198 | 0.0192 | -3.2% |
+| 0.1 | if | 0.0131 | 0.0136 | +3.5% |
+| 0.1 | combined | 0.0141 | 0.0150 | +6.3% |
+| 0.2 | dp | 0.0319 | 0.0307 | -4.0% |
+| 0.2 | if | 0.0039 | 0.0019 | -51.0% |
+| 0.2 | combined | 0.0144 | 0.0142 | -1.0% |
 
-**Pattern:** DRO similar or slightly better. Credit's more balanced group structure may make the radii mismatch less severe.
+**Pattern:** Credit shows DRO generally helps or is neutral. At α=0.2, DRO dramatically reduces DP for IF attack (-51.0%). Credit's more balanced group structure may make the radii mismatch less severe than Adult. *Note: α=0.2 data is partial (n=2-3).*
 
-### LSAC — DRO WINS at higher alphas (IF/Combined)
+### LSAC — COMPLETE (90/90). Alpha-dependent, attack-dependent pattern
 
 | α | Attack | Naive DP | DRO DP | Δ DP |
 |---|--------|----------|--------|------|
@@ -153,16 +162,19 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | 0.2 | dp | 0.0004 | 0.0200 | — |
 | 0.2 | if | 0.0541 | 0.0714 | +31.9% |
 | 0.2 | combined | 0.2080 | 0.1383 | -33.5% |
-| 0.3 | dp | 0.0000 | 0.0000 | — |
-| 0.3 | if | 0.0565 | 0.1747 | +209.4% |
-| 0.3 | combined | 0.3433 | 0.3763 | +9.6% |
+| 0.3 | dp | 0.0004 | 0.0182 | — |
+| 0.3 | if | 0.1006 | 0.1879 | +86.9% |
+| 0.3 | combined | 0.3600 | 0.3793 | +5.4% |
+| 0.4 | dp | 0.1085 | 0.1584 | +45.9% |
+| 0.4 | if | 0.0612 | 0.0674 | +10.3% |
+| 0.4 | combined | 0.1702 | 0.1607 | -5.6% |
 
-**Pattern:** DRO effectiveness on LSAC is **alpha-dependent and attack-dependent**:
+**Pattern:** DRO effectiveness on LSAC is **highly nuanced**:
 - α=0.1: DRO wins big for IF/Combined
-- α=0.2: DRO mixed (worse for dp, slightly better for combined)
-- α=0.3: DRO worse for IF/Combined, both near-zero for dp (model collapse)
+- α=0.2-0.3: Mixed (near-zero for dp, worse for if, mixed for combined)
+- α=0.4: DRO slightly worse for dp/if, slightly better for combined
 
-**Note:** LSAC shows extreme variance across seeds with `racetxt` as protected attribute. Preliminary patterns shift as more seeds complete. n=3 is insufficient for robust claims.
+**Note:** LSAC shows extreme variance across seeds with `racetxt` as protected attribute. Complete 90-run dataset reveals the pattern is more complex than initial n=3 suggested.
 
 ---
 
@@ -171,7 +183,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 1. **K_inner=5 locally** — Paper spec is K_inner=10. Using 5 for CPU feasibility. Plan to re-run with K_inner=10 on server for final numbers.
 2. **3 seeds only** — Wilcoxon p<0.05 requires n≥6. Need 5+ seeds for statistical significance claims.
 3. **UTKFace blocked** — No GPU access today. Image experiments queued for server.
-4. **Partial results at meeting time** — Full tabular batch (~270 runs) will not complete before 3pm. Currently ~117/270 done (43%).
+4. **Partial results at meeting time** — Full tabular batch (~270 runs) will not complete before 3pm. Currently ~184/270 done (68%). LSAC complete (90/90). Adult & Credit in progress.
 5. **LSAC high variance** — With `racetxt` as protected attribute, baseline DP varies dramatically across seeds (0.000 to 0.112). Small sample (n=3) produces unstable estimates.
 
 ---
@@ -199,5 +211,5 @@ experiments/auto_finalize.py      # expected count 270→270
 
 ---
 
-*Prepared: June 9, ~12:00 PM IST*
-*Status: Code fixed, experiments running (~117/270 done), lambda diagnostic complete*
+*Prepared: June 9, ~12:20 PM IST*
+*Status: Code fixed, experiments running (~184/270 done, LSAC complete), lambda diagnostic complete*
