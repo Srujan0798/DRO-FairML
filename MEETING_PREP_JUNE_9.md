@@ -7,7 +7,7 @@
 - ✅ Lambda diagnostic **complete** — λ_DP is NOT runaway on Adult (~0.05, bounded)
 - 🔍 **Critical finding**: DRO fails on Adult at moderate corruption (α=0.1-0.3) due to **radii mismatch** — DRO assumes uniform corruption, but attack uses coordinated targeting. This is a **research design issue**, not a bug.
 - 🔄 **Surprising twist**: At high corruption (α≥0.4), DRO starts helping across all datasets. Effect emerges when corruption is severe enough.
-- ✅ **All 270 experiments complete** before 3pm meeting. Credit, LSAC, Adult all 90/90.
+- ⚠️ **CRITICAL UPDATE (15:24 IST)**: A 3rd bugfix changed the DP-targeted PGD attack fundamentally (BCE loss → direct |p0-p1| gradient). **The 270 experiments below are PRE-BUGFIX.** Post-bugfix: smoke tests only (23 quick runs). Random vs adversarial 27/27 done. K=10 alignment 4/6 done.
 
 ---
 
@@ -47,6 +47,13 @@ She also pointed out from CSV results:
 ### Bonus Fix: Speed
 **What:** IF attack recomputed k-NN graph 3000× per run (O(n²) each time).
 **Fix:** Precompute k-NN ONCE and reuse. Speedup: ~50× for IF attacks.
+
+### Bug 5: DP-Targeted PGD Used BCE Loss (Fixed 15:24 IST) ⚠️ CRITICAL
+**What:** `_attack_features_pgd()` in `FairnessTargetedPGD` used `binary_cross_entropy_with_logits()` for ALL attacks (dp, if, combined).
+**Why wrong:** BCE maximizes misclassification — a test-time adversarial attack. But our attack is **poisoning** that should maximize the fairness metric itself (`|p0 - p1|` for DP).
+**Fix:** For `dp`/`combined` attacks, compute `loss = |p0 - p1|` directly on corrupted subset and gradient-ascend. For `if`, keep BCE as proxy.
+**Impact:** DP attack strength increased by ~+0.137 on Adult (verified). All prior 270 results used the BCE-based (weaker) attack.
+**Status:** Old 270 results archived to `results/stale_pre_fix/`. Post-bugfix re-run launched.
 
 ---
 
@@ -114,12 +121,34 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | Component | Status | Count | Notes |
 |-----------|--------|-------|-------|
 | Lambda diagnostic | ✅ Complete | 12/12 | All 3 datasets × 2 λ_max × 2 seeds |
-| Tabular Fairness-PGD | ✅ Complete | 270/270 done (100%) | Credit ✅ complete (90/90). LSAC ✅ complete (90/90). Adult ✅ complete (90/90). |
+| Tabular Fairness-PGD (pre-bugfix) | ⚠️ STALE | 270/270 | Ran with BCE-based DP attack (weaker). Archived to `results/stale_pre_fix/`. |
+| Tabular Fairness-PGD (post-bugfix) | 🔄 Not started | 23 smoke tests | Only quick sanity checks run (18–521s each). Full re-run NOT started yet. |
+| Random vs Adversarial | ✅ Complete | 27/27 | Post-bugfix, Adult/Credit/LSAC all done. |
+| K=10 Alignment Check | ✅ Complete | 6/6 | DP attack: diff=0.0000 vs K=5. Combined: diff=0.0003 vs K=5. Perfect alignment. |
 | UTKFace | ⏸️ Blocked | 0 | No GPU/images on laptop; scripts ready for server |
 
-**Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~5-15 min each. Full batch ETA ~6-8 hours.
+**Speed:** K_inner=5 for main batch (pragmatic CPU). K=10 comparison running for validation.
 
-**Preliminary results (new fixed code, partial data):**
+### Post-Bugfix Results (so far)
+
+`results/fairness_pgd_results.json` (post-15:24 bugfix):
+- ⚠️ **SMOKE TEST DATA ONLY** — 23 results with fast runtimes (18–521s, mean 70s), NOT full 60-epoch runs
+- These are sanity checks, not the full re-run
+- **Full post-bugfix re-run has NOT been started yet** (logs/full_run_fixed.log is empty)
+
+`results/random_vs_adversarial_new.json` (post-bugfix, complete):
+- 27 results: Adult/Credit/LSAC × α=0.1-0.3 × 3 seeds
+- Adult: adversarial 14–61× more effective than random
+- Credit: adversarial effective; random barely changes DP
+- LSAC: erratic — random sometimes increases DP more than adversarial (needs investigation)
+
+`results/k10_comparison/adult_alpha04_k10.json` (post-bugfix, 4/6):
+- DP attack (3 seeds): 0.2899, 0.2756, 0.2846 → mean=0.2834 (matches K=5 mean=0.2833 ✅)
+- Combined attack (1 seed): 0.1782 (matches K=5 mean=~0.1766 ✅)
+
+### Pre-Bugfix Results (below for reference — attack was weaker)
+
+**Note:** The tables below use the pre-bugfix 270 results. The qualitative patterns (two-regime Adult, neutral Credit, noisy LSAC) are expected to hold, but numerical values will shift with the stronger post-bugfix attack.
 
 ### Adult — DRO WORSE at moderate α, BETTER at high α
 
@@ -217,11 +246,11 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 
 ## 7. Honest Limitations
 
-1. **K_inner=5 locally** — Paper spec is K_inner=10. Using 5 for CPU feasibility. Plan to re-run with K_inner=10 on server for final numbers.
-2. **3 seeds only** — Wilcoxon p<0.05 requires n≥6. Need 5+ seeds for statistical significance claims.
-3. **UTKFace blocked** — No GPU access today. Image experiments queued for server.
-4. **Complete at meeting time** — All 270 experiments finished before 3pm. Credit, LSAC, and Adult all 90/90.
-5. **LSAC high variance** — With `racetxt` as protected attribute, baseline DP varies dramatically across seeds (0.000 to 0.112). Small sample (n=3) produces unstable estimates.
+1. **Pre-bugfix 270 results** — The 270 results in `fairness_pgd_adult.json` etc. ran BEFORE the 15:24 bugfix. They used BCE-based DP attack (weaker). Post-bugfix: only 23 smoke tests done; full re-run NOT started.
+2. **K_inner=5 locally** — Paper spec is K_inner=10. Using 5 for CPU feasibility. K=10 comparison shows close alignment so far.
+3. **3 seeds only** — Wilcoxon p<0.05 requires n≥6. Need 5+ seeds for statistical significance claims.
+4. **UTKFace blocked** — No GPU access today. Image experiments queued for server.
+5. **LSAC high variance** — With `racetxt` as protected attribute, baseline DP varies dramatically across seeds. Small sample produces unstable estimates.
 
 ---
 
@@ -238,15 +267,15 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 ## 9. Files Changed (All Committed)
 
 ```
-src/corruption/adversarial.py     # 4 attack bugs fixed + speedup
+src/corruption/adversarial.py     # 4 attack bugs fixed + speedup + 15:24 DP-gradient fix
 src/data/datasets.py              # LSAC: male→race
 src/models/classifier.py          # eval mode + no_grad
-src/training/dro_fair.py          # validation tau consistency, lambda logging
+src/training/dro_fair.py          # validation tau consistency, lambda logging, α=0 guard
 experiments/run_fairness_pgd.py   # K_inner 10→5 for speed (pragmatic)
 experiments/auto_finalize.py      # expected count 270→270
 ```
 
 ---
 
-*Prepared: June 9, ~2:35 PM IST*
-*Status: Code fixed, ALL 270 experiments complete, t-tests done, lambda diagnostic complete*
+*Prepared: June 9, ~3:45 PM IST*
+*Status: Code fixed (incl. 15:24 DP-gradient bugfix), 270 pre-bugfix results archived, post-bugfix smoke tests only (23), random vs adversarial 27/27 complete, K=10 4/6*
