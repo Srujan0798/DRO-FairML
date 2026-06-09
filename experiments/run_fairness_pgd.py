@@ -27,13 +27,7 @@ def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
 
 
-def get_lambda_max(dataset, alpha):
-    if dataset == 'adult' and alpha >= 0.2:
-        return 0.5
-    return 1.5
-
-
-def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=5):
+def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=20):
     """Run single (dataset, alpha, seed, attack, method) experiment."""
     import random
     random.seed(seed)
@@ -88,13 +82,11 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         )
     else:
         model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
-        lambda_max = get_lambda_max(dataset_name, alpha)
         trainer = DroFairTrainer(
             model, alpha=alpha, device=device,
-            lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=lambda_max,
+            lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=1.5,
             tau=tau, beta=5.0, k=5, gamma=0.0,
-            K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15,
-            lambda_warmstart=0.01
+            K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15
         )
         trainer.fit(X_train_att, y_train_att, a_train_att,
                      X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
@@ -135,8 +127,8 @@ def main():
         print("NOTE: smoke uses epochs=10, K_inner=3, pgd_steps=2 for speed")
     else:
         smoke_epochs = 60
-        smoke_k_inner = 5   # reduced from 10 for speed (~2× faster, still converges)
-        smoke_pgd_steps = 5
+        smoke_k_inner = 10  # paper spec
+        smoke_pgd_steps = 20  # full attack strength
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Device: {device}")

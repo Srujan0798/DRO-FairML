@@ -28,8 +28,7 @@ class DroFairTrainer:
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lr_p=5e-3, lambda_max=1.5, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
-                 use_dp=True, use_if=True, tau_warmup_epochs=15,
-                 lambda_warmstart=0.0):
+                 use_dp=True, use_if=True, tau_warmup_epochs=15):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -47,22 +46,34 @@ class DroFairTrainer:
         self.use_dp = use_dp
         self.use_if = use_if
         self.tau_warmup_epochs = tau_warmup_epochs
-        self.lambda_warmstart = lambda_warmstart
         self.rho_dp = None
         self.rho_if = None
         self.n_samples = None
 
-    def _compute_radii(self, a):
-        """Compute corruption-calibrated TV radii with bias-corrected group proportions."""
+    def _compute_radii(self, a, a_val=None):
+        """Compute corruption-calibrated TV radii with bias-corrected group proportions.
+
+        FAIR VERSION: Uses clean validation data (a_val) to estimate true clean
+        group proportions. Both Naive and DRO have access to clean validation data,
+        so this is NOT an oracle leak. Falls back to uniform-alpha formula if
+        a_val not provided (legacy behavior).
+        """
         n = len(a)
         pi_obs = np.array([np.mean(a == j) for j in [0, 1]])
-        pi_clean = np.zeros(2)
-        for j in [0, 1]:
-            if self.alpha != 0.5:
-                pi_clean[j] = (pi_obs[j] - self.alpha) / (1 - 2 * self.alpha)
-            else:
-                pi_clean[j] = pi_obs[j]
-            pi_clean[j] = np.clip(pi_clean[j], 0.0, 1.0)
+
+        # Use clean validation data to get TRUE clean proportions (fair)
+        if a_val is not None and len(a_val) > 0:
+            pi_clean = np.array([np.mean(a_val == j) for j in [0, 1]])
+        else:
+            # Fallback: estimate from corrupted data (old method, less accurate)
+            pi_clean = np.zeros(2)
+            for j in [0, 1]:
+                if self.alpha != 0.5:
+                    pi_clean[j] = (pi_obs[j] - self.alpha) / (1 - 2 * self.alpha)
+                else:
+                    pi_clean[j] = pi_obs[j]
+                pi_clean[j] = np.clip(pi_clean[j], 0.0, 1.0)
+
         rho_dp = []
         for j in [0, 1]:
             denom = (1 - self.alpha) * pi_clean[j] + self.alpha
@@ -168,7 +179,7 @@ class DroFairTrainer:
         y_t = torch.tensor(y, dtype=torch.float32, device=self.device)
         a_t = torch.tensor(a, dtype=torch.long, device=self.device)
 
-        self.rho_dp, self.rho_if = self._compute_radii(a)
+        self.rho_dp, self.rho_if = self._compute_radii(a, a_val=a_val)
         group_mask_dict = {j: (a_t == j) for j in [0, 1]}
         group_sizes = {j: group_mask_dict[j].sum().item() for j in [0, 1]}
 
@@ -178,8 +189,8 @@ class DroFairTrainer:
 
         opt_theta = torch.optim.AdamW(self.model.parameters(), lr=self.lr_theta, weight_decay=self.weight_decay)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(opt_theta, step_size=30, gamma=0.5)
-        lambda_dp = torch.tensor(self.lambda_warmstart, device=self.device)
-        lambda_if = torch.tensor(self.lambda_warmstart, device=self.device)
+        lambda_dp = torch.tensor(0.0, device=self.device)
+        lambda_if = torch.tensor(0.0, device=self.device)
         self._lambda_lr = self.lr_lambda
 
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)
