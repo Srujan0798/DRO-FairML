@@ -79,9 +79,13 @@ def generate_summary():
             lam = json.load(f)
         lines.append(f"\n## Lambda Diagnostic ({len(lam)} runs)\n")
         for r in lam:
+            ldp = r.get('lambda_dp_final')
+            lif = r.get('lambda_if_final')
+            ldp_str = f"{ldp:.4f}" if ldp is not None else "N/A"
+            lif_str = f"{lif:.4f}" if lif is not None else "N/A"
             lines.append(f"- {r.get('dataset')} λ_max={r.get('lambda_max')} seed={r.get('seed')}: "
-                        f"final λ_DP={r.get('lambda_dp_final', 'N/A'):.4f}, "
-                        f"final λ_IF={r.get('lambda_if_final', 'N/A'):.4f}")
+                        f"final λ_DP={ldp_str}, "
+                        f"final λ_IF={lif_str}")
 
     summary_path = 'RESULTS_SUMMARY.md'
     with open(summary_path, 'w') as f:
