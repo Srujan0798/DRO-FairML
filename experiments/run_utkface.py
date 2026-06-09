@@ -91,7 +91,7 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
         )
     elif attack in ('dp', 'if', 'combined'):
         corruptor = FairnessTargetedPGD(
-            alpha=alpha, target_metric=attack, pgd_steps=5,
+            alpha=alpha, target_metric=attack, pgd_steps=20,
             coordinated=True, random_state=seed
         )
     else:
@@ -138,8 +138,7 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
         model_dro, alpha=alpha, device=device,
         lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=lambda_max,
         tau=tau, beta=5.0, k=5, gamma=0.0,
-        K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15,
-        lambda_warmstart=0.01
+        K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15
     )
     dro_history = trainer_dro.fit(X_train_c, y_train_c, a_train_c,
                                   X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
@@ -175,7 +174,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--datasets', nargs='+', default=['utkface'])
-    parser.add_argument('--alphas', type=float, nargs='+', default=[0.0, 0.1, 0.2, 0.3])
+    parser.add_argument('--alphas', type=float, nargs='+', default=[0.0, 0.1, 0.2, 0.3, 0.4])
     parser.add_argument('--n_seeds', type=int, default=5)
     parser.add_argument('--smoke', action='store_true', help='Run single seed only (smoke test)')
     parser.add_argument('--attack', choices=['adversarial', 'dp', 'if', 'combined'],
