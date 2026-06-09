@@ -113,23 +113,50 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | Component | Status | Count | Notes |
 |-----------|--------|-------|-------|
 | Lambda diagnostic | ✅ Complete | 12/12 | All 3 datasets × 2 λ_max × 2 seeds |
-| Tabular Fairness-PGD | 🔄 Running | ~20/270 done | 3 datasets × 5 alphas × 3 seeds × 3 attacks × 2 methods. Clean parallel batch started. |
+| Tabular Fairness-PGD | 🔄 Running | ~99/270 done | 3 datasets × 5 alphas × 3 seeds × 3 attacks × 2 methods. Clean parallel batch in progress. |
 | UTKFace | ⏸️ Blocked | 0 | No GPU/images on laptop; scripts ready for server |
 
-**Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~6-8 min each. Full batch ETA ~4-6 hours.
+**Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~5-15 min each. Full batch ETA ~6-8 hours.
 
-**Preliminary results (Adult α=0.0, 3 seeds, new fixed code):**
+**Preliminary results (new fixed code, partial data):**
 
-| Attack | Method | Acc | DP (mean) | IF (mean) |
-|--------|--------|-----|-----------|-----------|
-| DP | Naive | 0.814 | 0.146 | 0.033 |
-| DP | DRO | 0.815 | 0.160 | 0.039 |
-| IF | Naive | 0.812 | 0.146 | 0.033 |
-| IF | DRO | 0.815 | 0.160 | 0.039 |
-| Combined | Naive | 0.815 | 0.168 | 0.039 |
-| Combined | DRO | 0.818 | 0.164 | 0.042 |
+### Adult — DRO consistently WORSE than Naive
 
-At α=0.0 (no corruption), DRO and Naive are similar, as expected. Full α>0 results arriving throughout the day.
+| α | Attack | Naive DP | DRO DP | Δ DP |
+|---|--------|----------|--------|------|
+| 0.0 | dp | 0.1569 | 0.1686 | +7.4% |
+| 0.0 | if | 0.1569 | 0.1686 | +7.4% |
+| 0.0 | combined | 0.1569 | 0.1686 | +7.4% |
+| 0.1 | dp | 0.1799 | 0.2155 | +19.8% |
+| 0.1 | if | 0.1310 | 0.1530 | +16.8% |
+| 0.1 | combined | 0.1690 | 0.2144 | +26.9% |
+
+**Pattern:** DRO produces HIGHER DP (worse fairness) than Naive across ALL attacks at α≥0.1. Confirms the radii mismatch hypothesis — DRO's defense is miscalibrated on Adult.
+
+### Credit — DRO neutral to slightly BETTER
+
+| α | Attack | Naive DP | DRO DP | Δ DP |
+|---|--------|----------|--------|------|
+| 0.0 | dp | 0.0130 | 0.0131 | +0.3% |
+| 0.0 | if | 0.0130 | 0.0131 | +0.3% |
+| 0.0 | combined | 0.0130 | 0.0118 | -9.9% |
+
+**Pattern:** DRO similar or slightly better. Credit's more balanced group structure may make the radii mismatch less severe.
+
+### LSAC — DRO WINS at higher alphas (IF/Combined)
+
+| α | Attack | Naive DP | DRO DP | Δ DP |
+|---|--------|----------|--------|------|
+| 0.1 | dp | 0.0190 | 0.0522 | +175.0% |
+| 0.1 | if | 0.0120 | 0.0000 | -100.0% |
+| 0.1 | combined | 0.0560 | 0.0008 | -98.6% |
+| 0.2 | dp | 0.0004 | 0.0200 | — |
+| 0.2 | if | 0.0541 | 0.0014 | -97.4% |
+| 0.2 | combined | 0.1709 | 0.0663 | -61.2% |
+
+**Pattern:** At α≥0.1, DRO dramatically REDUCES DP for IF and Combined attacks. DP attack results are noisy (small n=3, high variance across seeds with race attribute).
+
+**Note:** LSAC shows high variance across seeds with `racetxt` as protected attribute. Need 5+ seeds for robust claims.
 
 ---
 
@@ -138,7 +165,8 @@ At α=0.0 (no corruption), DRO and Naive are similar, as expected. Full α>0 res
 1. **K_inner=5 locally** — Paper spec is K_inner=10. Using 5 for CPU feasibility. Plan to re-run with K_inner=10 on server for final numbers.
 2. **3 seeds only** — Wilcoxon p<0.05 requires n≥6. Need 5+ seeds for statistical significance claims.
 3. **UTKFace blocked** — No GPU access today. Image experiments queued for server.
-4. **Partial results at meeting time** — Full tabular batch (~270 runs) will not complete before 3pm.
+4. **Partial results at meeting time** — Full tabular batch (~270 runs) will not complete before 3pm. Currently ~100/270 done.
+5. **LSAC high variance** — With `racetxt` as protected attribute, baseline DP varies dramatically across seeds (0.000 to 0.112). Small sample (n=3) produces unstable estimates.
 
 ---
 
@@ -165,5 +193,5 @@ experiments/auto_finalize.py      # expected count 270→270
 
 ---
 
-*Prepared: June 9, ~10:00 AM IST*
-*Status: Code fixed, experiments running, lambda diagnostic complete*
+*Prepared: June 9, ~11:45 AM IST*
+*Status: Code fixed, experiments running (~100/270 done), lambda diagnostic complete*
