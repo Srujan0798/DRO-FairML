@@ -513,7 +513,7 @@ class FairnessTargetedPGD:
             if model is None:
                 # Train surrogate model for gradient-based PGD when no model provided
                 model = self._train_surrogate(X, y, device=device)
-            X_c = self._attack_features_pgd(X_c, y_c, corrupt_idx, model, device)
+            X_c = self._attack_features_pgd(X_c, y_c, a_c, corrupt_idx, model, device)
 
         # 3. Attribute flips on SAME indices
         if len(corrupt_idx) > 0:
@@ -554,8 +554,12 @@ class FairnessTargetedPGD:
 
         return X_adv
 
-    def _attack_features_pgd(self, X, y, corrupt_idx, model, device):
-        """PGD-style feature perturbation (model required)."""
+    def _attack_features_pgd(self, X, y, a, corrupt_idx, model, device):
+        """PGD-style feature perturbation targeting the chosen fairness metric.
+
+        For 'dp'/'combined': maximizes |p0 - p1| directly (DP-targeted gradient).
+        For 'if': maximizes BCE loss on corrupted labels (proxy for prediction spread).
+        """
         X_adv = X.copy()
         if len(corrupt_idx) == 0:
             return X_adv
@@ -565,9 +569,28 @@ class FairnessTargetedPGD:
         y_batch = torch.tensor(y[corrupt_idx], dtype=torch.float32, device=device)
         X_orig = torch.tensor(X[corrupt_idx], dtype=torch.float32, device=device)
 
-        for step in range(self.pgd_steps):
-            logits = model(X_batch)
-            loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, y_batch)
+        use_dp_loss = self.target_metric in ('dp', 'combined')
+        if use_dp_loss:
+            a_batch = torch.tensor(a[corrupt_idx], dtype=torch.float32, device=device)
+
+        for _ in range(self.pgd_steps):
+            logits = model(X_batch).squeeze()
+
+            if use_dp_loss:
+                # Maximize DP = |p0 - p1| directly on the corrupted subset
+                h = torch.sigmoid(logits)
+                mask0 = (a_batch == 0)
+                mask1 = (a_batch == 1)
+                if mask0.sum() > 0 and mask1.sum() > 0:
+                    p0 = h[mask0].mean()
+                    p1 = h[mask1].mean()
+                    loss = torch.abs(p0 - p1)  # gradient ascent → maximizes DP
+                else:
+                    # Only one group in corrupt_idx; fallback to BCE on flipped labels
+                    loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, y_batch)
+            else:
+                loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, y_batch)
+
             grad = torch.autograd.grad(loss, X_batch)[0]
             X_batch = X_batch + self.pgd_step_size * torch.sign(grad)
             delta = torch.clamp(X_batch - X_orig, -self.epsilon, self.epsilon)

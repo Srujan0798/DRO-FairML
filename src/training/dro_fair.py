@@ -234,10 +234,12 @@ class DroFairTrainer:
 
             # === STEP 4: INNER MAXIMIZATION (update p AFTER θ and λ) ===
             # Per paper Algorithm 1: p update happens AFTER θ and λ updates
+            # Skip entirely when alpha=0: radii=0 so p never moves, but the loop
+            # still advances torch RNG — causing DRO to diverge from Naive at α=0.
             with torch.no_grad():
                 h_tilde_detach = h_tilde.detach()
 
-            for _ in range(self.K_inner):
+            for _ in range(self.K_inner if self.alpha > 0 else 0):
                 if self.use_dp:
                     for j in [0, 1]:
                         p_j = p_dp_dict[j].clone().detach().requires_grad_(True)
