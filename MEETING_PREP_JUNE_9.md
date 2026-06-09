@@ -169,12 +169,26 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | 0.4 | if | 0.0612 | 0.0674 | +10.3% |
 | 0.4 | combined | 0.1702 | 0.1607 | -5.6% |
 
-**Pattern:** DRO effectiveness on LSAC is **highly nuanced**:
-- α=0.1: DRO wins big for IF/Combined
-- α=0.2-0.3: Mixed (near-zero for dp, worse for if, mixed for combined)
-- α=0.4: DRO slightly worse for dp/if, slightly better for combined
+**Complete 90-run paired t-test results:**
 
-**Note:** LSAC shows extreme variance across seeds with `racetxt` as protected attribute. Complete 90-run dataset reveals the pattern is more complex than initial n=3 suggested.
+| α | Attack | Δ DP | p-value | Significant? |
+|---|--------|------|---------|--------------|
+| 0.1 | dp | +0.033 | 0.34 | No |
+| 0.1 | if | -0.012 | 0.42 | No |
+| 0.1 | combined | -0.055 | 0.30 | No |
+| 0.2 | dp | +0.020 | 0.42 | No |
+| 0.2 | if | +0.017 | 0.43 | No |
+| 0.2 | combined | -0.070 | 0.20 | No |
+| 0.3 | dp | +0.018 | 0.42 | No |
+| 0.3 | if | +0.087 | 0.12 | No |
+| 0.3 | combined | +0.019 | 0.49 | No |
+| 0.4 | dp | +0.050 | **0.0019** | ✅ Yes |
+| 0.4 | if | +0.006 | **0.0088** | ✅ Yes |
+| 0.4 | combined | -0.009 | **0.0111** | ✅ Yes |
+
+**Critical finding:** With the complete 90-run dataset, **NONE of the α=0.1-0.3 differences are statistically significant** (all p > 0.05). Only at α=0.4 do we see significant effects. The initial "DRO wins" impression from n=3 was an artifact of small sample size.
+
+**Implication:** LSAC results are noisy. DRO's advantage (if any) only emerges at high corruption (α=0.4), and even then the effect sizes are small.
 
 ---
 
@@ -211,5 +225,5 @@ experiments/auto_finalize.py      # expected count 270→270
 
 ---
 
-*Prepared: June 9, ~12:40 PM IST*
-*Status: Code fixed, experiments running (~193/270 done, LSAC complete, Adult alpha=0.2 complete), lambda diagnostic complete*
+*Prepared: June 9, ~12:45 PM IST*
+*Status: Code fixed, experiments running (~194/270 done), LSAC complete (90/90, t-tests done), Adult alpha=0.2 complete, lambda diagnostic complete*
