@@ -62,3 +62,5 @@ Thumbs.db
 
 # Project specific
 paper_text.txt
+.last_checkpoint
+_archive/
