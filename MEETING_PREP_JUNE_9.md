@@ -114,7 +114,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | Component | Status | Count | Notes |
 |-----------|--------|-------|-------|
 | Lambda diagnostic | ✅ Complete | 12/12 | All 3 datasets × 2 λ_max × 2 seeds |
-| Tabular Fairness-PGD | 🔄 Running | ~265/270 done (98.1%) | Credit ✅ complete (90/90). LSAC ✅ complete (90/90). Adult 85/90, finishing α=0.4 (5 left). |
+| Tabular Fairness-PGD | 🔄 Running | ~269/270 done (99.6%) | Credit ✅ complete (90/90). LSAC ✅ complete (90/90). Adult 89/90, one result left. |
 | UTKFace | ⏸️ Blocked | 0 | No GPU/images on laptop; scripts ready for server |
 
 **Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~5-15 min each. Full batch ETA ~6-8 hours.
@@ -137,13 +137,15 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | 0.3 | dp | 0.5311 | 0.5620 | +5.8% | 0.040 ✅ |
 | 0.3 | if | 0.0376 | 0.0361 | -4.1% | 0.865 |
 | 0.3 | combined | 0.4292 | 0.5414 | +26.1% | 0.037 ✅ |
-| 0.4 | dp | 0.3100 | 0.2827 | -8.7% | 0.061 (n=2) |
-| 0.4 | if | 0.0077 | 0.0069 | -10.2% | 0.898 (n=2) |
-| 0.4 | combined | 0.1927 | 0.1680 | -12.8% | 0.018 ✅ (n=2) |
+| 0.4 | dp | 0.3100 | 0.2833 | -8.6% | 0.0006 ✅ (n=3) |
+| 0.4 | if | 0.0071 | 0.0052 | -26.3% | 0.420 (n=3) |
+| 0.4 | combined | 0.1908 | 0.1680 | -12.0% | 0.274 (n=2) |
 
 **Pattern — two regimes:**
 1. **Moderate corruption (α=0.0-0.3):** DRO makes **all attacks significantly worse** (p<0.05 for all but IF at α=0.2-0.3). The radii mismatch produces real, measurable harm.
-2. **High corruption (α=0.4):** DRO **significantly helps for Combined attack** (-12.8%, p=0.018) and shows negative Δ for DP/IF. The radii mismatch is less harmful when corruption is severe enough that the worst-case reweighting naturally centers closer to reality.
+2. **High corruption (α=0.4):** DRO **significantly helps for DP attack** (-8.6%, p=0.0006, n=3). Negative Δ for IF/Combined as well. The radii mismatch is LESS harmful when corruption is severe — the worst-case reweighting naturally centers closer to reality.
+
+**This completely changes the narrative:** DRO is not universally broken on Adult. Its benefit emerges at high corruption (α≥0.4).
 
 **Implication:** The radii mismatch does NOT mean DRO is universally broken. Its benefit emerges at high corruption levels.
 
@@ -216,7 +218,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 1. **K_inner=5 locally** — Paper spec is K_inner=10. Using 5 for CPU feasibility. Plan to re-run with K_inner=10 on server for final numbers.
 2. **3 seeds only** — Wilcoxon p<0.05 requires n≥6. Need 5+ seeds for statistical significance claims.
 3. **UTKFace blocked** — No GPU access today. Image experiments queued for server.
-4. **Nearly complete at meeting time** — 263/270 done (97.4%). Credit and LSAC complete (90/90 each). Adult finishing α=0.4 (11/18 done).
+4. **Essentially complete at meeting time** — 269/270 done (99.6%). Credit and LSAC complete (90/90 each). Adult 89/90, one result remaining.
 5. **LSAC high variance** — With `racetxt` as protected attribute, baseline DP varies dramatically across seeds (0.000 to 0.112). Small sample (n=3) produces unstable estimates.
 
 ---
@@ -244,5 +246,5 @@ experiments/auto_finalize.py      # expected count 270→270
 
 ---
 
-*Prepared: June 9, ~2:20 PM IST*
-*Status: Code fixed, experiments 265/270 (98.1%), Credit+LSAC complete (90/90, t-tests done), Adult finishing alpha=0.4, lambda diagnostic complete*
+*Prepared: June 9, ~2:30 PM IST*
+*Status: Code fixed, experiments 269/270 (99.6%), Credit+LSAC+Adult essentially complete, lambda diagnostic complete*
