@@ -113,7 +113,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | Component | Status | Count | Notes |
 |-----------|--------|-------|-------|
 | Lambda diagnostic | ✅ Complete | 12/12 | All 3 datasets × 2 λ_max × 2 seeds |
-| Tabular Fairness-PGD | 🔄 Running | ~184/270 done | LSAC ✅ complete. Adult & Credit in progress (α=0.2). Clean parallel batch. |
+| Tabular Fairness-PGD | 🔄 Running | ~193/270 done | LSAC ✅ complete. Adult α=0.2 ✅ complete, now α=0.3. Credit in progress (α=0.2). |
 | UTKFace | ⏸️ Blocked | 0 | No GPU/images on laptop; scripts ready for server |
 
 **Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~5-15 min each. Full batch ETA ~6-8 hours.
@@ -131,10 +131,10 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | 0.1 | if | 0.1310 | 0.1530 | +16.8% |
 | 0.1 | combined | 0.1690 | 0.2144 | +26.9% |
 | 0.2 | dp | 0.3276 | 0.5029 | +53.5% |
-| 0.2 | if | 0.0902 | 0.0876 | -2.9% |
-| 0.2 | combined | 0.2461 | 0.4877 | +98.2% |
+| 0.2 | if | 0.0902 | 0.0854 | -5.3% |
+| 0.2 | combined | 0.2529 | 0.4823 | +90.7% |
 
-**Pattern:** DRO fails for DP and Combined attacks (worsens DP). **Surprising:** DRO slightly HELPS for IF attack at α=0.2 (-2.9%). This suggests the radii mismatch affects DP-targeted attacks more severely than IF-targeted attacks.
+**Pattern:** DRO fails for DP and Combined attacks (worsens DP). **Surprising:** DRO slightly HELPS for IF attack at α=0.2 (-5.3%). This suggests the radii mismatch affects DP-targeted attacks more severely than IF-targeted attacks. Adult α=0.2 now COMPLETE (n=6 per attack).
 
 ### Credit — DRO neutral to BETTER at higher alphas
 
@@ -183,7 +183,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 1. **K_inner=5 locally** — Paper spec is K_inner=10. Using 5 for CPU feasibility. Plan to re-run with K_inner=10 on server for final numbers.
 2. **3 seeds only** — Wilcoxon p<0.05 requires n≥6. Need 5+ seeds for statistical significance claims.
 3. **UTKFace blocked** — No GPU access today. Image experiments queued for server.
-4. **Partial results at meeting time** — Full tabular batch (~270 runs) will not complete before 3pm. Currently ~184/270 done (68%). LSAC complete (90/90). Adult & Credit in progress.
+4. **Partial results at meeting time** — Full tabular batch (~270 runs) will not complete before 3pm. Currently ~193/270 done (71.5%). LSAC complete (90/90). Adult α=0.2 complete, now α=0.3. Credit α=0.2 in progress.
 5. **LSAC high variance** — With `racetxt` as protected attribute, baseline DP varies dramatically across seeds (0.000 to 0.112). Small sample (n=3) produces unstable estimates.
 
 ---
@@ -211,5 +211,5 @@ experiments/auto_finalize.py      # expected count 270→270
 
 ---
 
-*Prepared: June 9, ~12:20 PM IST*
-*Status: Code fixed, experiments running (~184/270 done, LSAC complete), lambda diagnostic complete*
+*Prepared: June 9, ~12:40 PM IST*
+*Status: Code fixed, experiments running (~193/270 done, LSAC complete, Adult alpha=0.2 complete), lambda diagnostic complete*
