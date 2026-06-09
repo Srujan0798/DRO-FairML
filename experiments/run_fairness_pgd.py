@@ -127,7 +127,7 @@ def main():
         print("NOTE: smoke uses epochs=10, K_inner=3, pgd_steps=2 for speed")
     else:
         smoke_epochs = 60
-        smoke_k_inner = 10  # paper spec
+        smoke_k_inner = 5   # practical speed on CPU
         smoke_pgd_steps = 20  # full attack strength
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
