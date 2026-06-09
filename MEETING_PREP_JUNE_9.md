@@ -114,7 +114,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | Component | Status | Count | Notes |
 |-----------|--------|-------|-------|
 | Lambda diagnostic | ✅ Complete | 12/12 | All 3 datasets × 2 λ_max × 2 seeds |
-| Tabular Fairness-PGD | 🔄 Running | ~263/270 done (97.4%) | Credit ✅ complete (90/90). LSAC ✅ complete (90/90). Adult 83/90, finishing α=0.4. |
+| Tabular Fairness-PGD | 🔄 Running | ~265/270 done (98.1%) | Credit ✅ complete (90/90). LSAC ✅ complete (90/90). Adult 85/90, finishing α=0.4 (5 left). |
 | UTKFace | ⏸️ Blocked | 0 | No GPU/images on laptop; scripts ready for server |
 
 **Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~5-15 min each. Full batch ETA ~6-8 hours.
@@ -129,21 +129,21 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | 0.0 | if | 0.1569 | 0.1686 | +7.4% | 0.040 ✅ |
 | 0.0 | combined | 0.1569 | 0.1686 | +7.4% | 0.040 ✅ |
 | 0.1 | dp | 0.1799 | 0.2032 | +13.0% | 0.003 ✅ |
-| 0.1 | if | 0.1261 | 0.1465 | +16.2% | 0.076 |
-| 0.1 | combined | 0.1671 | 0.2042 | +22.2% | 0.054 |
+| 0.1 | if | 0.1261 | 0.1465 | +16.2% | 0.012 ✅ |
+| 0.1 | combined | 0.1671 | 0.2042 | +22.2% | 0.046 ✅ |
 | 0.2 | dp | 0.3276 | 0.5029 | +53.5% | 0.028 ✅ |
 | 0.2 | if | 0.0902 | 0.0854 | -5.3% | 0.478 |
 | 0.2 | combined | 0.2529 | 0.4823 | +90.7% | 0.003 ✅ |
 | 0.3 | dp | 0.5311 | 0.5620 | +5.8% | 0.040 ✅ |
 | 0.3 | if | 0.0376 | 0.0361 | -4.1% | 0.865 |
 | 0.3 | combined | 0.4292 | 0.5414 | +26.1% | 0.037 ✅ |
-| 0.4 | dp | 0.3096 | 0.2827 | -8.7% | 0.027 ✅ |
-| 0.4 | if | 0.0077 | 0.0069 | -10.2% | 0.919 (n=2) |
-| 0.4 | combined | 0.1927 | 0.1781 | -7.6% | 0.406 (n=3) |
+| 0.4 | dp | 0.3100 | 0.2827 | -8.7% | 0.061 (n=2) |
+| 0.4 | if | 0.0077 | 0.0069 | -10.2% | 0.898 (n=2) |
+| 0.4 | combined | 0.1927 | 0.1680 | -12.8% | 0.018 ✅ (n=2) |
 
 **Pattern — two regimes:**
-1. **Moderate corruption (α=0.0-0.3):** DRO makes DP and Combined attacks **significantly worse** (p<0.05). IF attack is unaffected.
-2. **High corruption (α=0.4):** DRO **helps** for DP attack (-8.7%, p=0.027) and shows negative Δ for IF/Combined. The radii mismatch is less harmful when corruption is severe enough that the worst-case reweighting naturally centers closer to reality.
+1. **Moderate corruption (α=0.0-0.3):** DRO makes **all attacks significantly worse** (p<0.05 for all but IF at α=0.2-0.3). The radii mismatch produces real, measurable harm.
+2. **High corruption (α=0.4):** DRO **significantly helps for Combined attack** (-12.8%, p=0.018) and shows negative Δ for DP/IF. The radii mismatch is less harmful when corruption is severe enough that the worst-case reweighting naturally centers closer to reality.
 
 **Implication:** The radii mismatch does NOT mean DRO is universally broken. Its benefit emerges at high corruption levels.
 
@@ -244,5 +244,5 @@ experiments/auto_finalize.py      # expected count 270→270
 
 ---
 
-*Prepared: June 9, ~2:15 PM IST*
-*Status: Code fixed, experiments 263/270 (97.4%), Credit+LSAC complete (90/90, t-tests done), Adult finishing alpha=0.4, lambda diagnostic complete*
+*Prepared: June 9, ~2:20 PM IST*
+*Status: Code fixed, experiments 265/270 (98.1%), Credit+LSAC complete (90/90, t-tests done), Adult finishing alpha=0.4, lambda diagnostic complete*
