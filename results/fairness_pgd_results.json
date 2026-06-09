@@ -9,5 +9,27 @@
     "dp_clean": 0.15684887766838074,
     "if_clean": 0.03845184409218509,
     "total_time": 14.518751859664917
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 0,
+    "attack": "dp",
+    "method": "dro",
+    "acc_clean": 0.8183526810392482,
+    "dp_clean": 0.16377247869968414,
+    "if_clean": 0.0417881699001587,
+    "total_time": 1306.6269698143005
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 1,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.8145936981757878,
+    "dp_clean": 0.16843253374099731,
+    "if_clean": 0.03908059470685112,
+    "total_time": 14.545001983642578
   }
 ]
