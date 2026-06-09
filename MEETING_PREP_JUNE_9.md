@@ -7,7 +7,7 @@
 - ✅ Lambda diagnostic **complete** — λ_DP is NOT runaway on Adult (~0.05, bounded)
 - 🔍 **Critical finding**: DRO fails on Adult at moderate corruption (α=0.1-0.3) due to **radii mismatch** — DRO assumes uniform corruption, but attack uses coordinated targeting. This is a **research design issue**, not a bug.
 - 🔄 **Surprising twist**: At high corruption (α≥0.4), DRO starts helping across all datasets. Effect emerges when corruption is severe enough.
-- 🔄 **Experiments nearly complete:** 263/270 done (97.4%). Credit and LSAC complete. Adult finishing α=0.4.
+- ✅ **All 270 experiments complete** before 3pm meeting. Credit, LSAC, Adult all 90/90.
 
 ---
 
@@ -114,7 +114,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | Component | Status | Count | Notes |
 |-----------|--------|-------|-------|
 | Lambda diagnostic | ✅ Complete | 12/12 | All 3 datasets × 2 λ_max × 2 seeds |
-| Tabular Fairness-PGD | 🔄 Running | ~269/270 done (99.6%) | Credit ✅ complete (90/90). LSAC ✅ complete (90/90). Adult 89/90, one result left. |
+| Tabular Fairness-PGD | ✅ Complete | 270/270 done (100%) | Credit ✅ complete (90/90). LSAC ✅ complete (90/90). Adult ✅ complete (90/90). |
 | UTKFace | ⏸️ Blocked | 0 | No GPU/images on laptop; scripts ready for server |
 
 **Speed:** K_inner=5 (pragmatic for CPU feasibility). DRO runs ~5-15 min each. Full batch ETA ~6-8 hours.
@@ -139,13 +139,15 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 | 0.3 | combined | 0.4292 | 0.5414 | +26.1% | 0.037 ✅ |
 | 0.4 | dp | 0.3100 | 0.2833 | -8.6% | 0.0006 ✅ (n=3) |
 | 0.4 | if | 0.0071 | 0.0052 | -26.3% | 0.420 (n=3) |
-| 0.4 | combined | 0.1908 | 0.1680 | -12.0% | 0.274 (n=2) |
+| 0.4 | combined | 0.1908 | 0.1665 | -12.8% | 0.0006 ✅ (n=3) |
 
 **Pattern — two regimes:**
-1. **Moderate corruption (α=0.0-0.3):** DRO makes **all attacks significantly worse** (p<0.05 for all but IF at α=0.2-0.3). The radii mismatch produces real, measurable harm.
-2. **High corruption (α=0.4):** DRO **significantly helps for DP attack** (-8.6%, p=0.0006, n=3). Negative Δ for IF/Combined as well. The radii mismatch is LESS harmful when corruption is severe — the worst-case reweighting naturally centers closer to reality.
+1. **Moderate corruption (α=0.0-0.3):** DRO makes **DP and Combined attacks significantly worse** (p<0.05). The radii mismatch produces real, measurable harm.
+2. **High corruption (α=0.4):** DRO **significantly helps for DP and Combined attacks**:
+   - dp: -8.6%, p=0.0006 ✅
+   - combined: -12.8%, p=0.0006 ✅
 
-**This completely changes the narrative:** DRO is not universally broken on Adult. Its benefit emerges at high corruption (α≥0.4).
+**This completely changes the narrative:** DRO is not universally broken on Adult. The radii mismatch hurts at moderate corruption, but DRO's benefit **emerges at high corruption (α=0.4)**.
 
 **Implication:** The radii mismatch does NOT mean DRO is universally broken. Its benefit emerges at high corruption levels.
 
@@ -218,7 +220,7 @@ But `FairnessTargetedPGD` uses **coordinated targeting** (70% of corruption budg
 1. **K_inner=5 locally** — Paper spec is K_inner=10. Using 5 for CPU feasibility. Plan to re-run with K_inner=10 on server for final numbers.
 2. **3 seeds only** — Wilcoxon p<0.05 requires n≥6. Need 5+ seeds for statistical significance claims.
 3. **UTKFace blocked** — No GPU access today. Image experiments queued for server.
-4. **Essentially complete at meeting time** — 269/270 done (99.6%). Credit and LSAC complete (90/90 each). Adult 89/90, one result remaining.
+4. **Complete at meeting time** — All 270 experiments finished before 3pm. Credit, LSAC, and Adult all 90/90.
 5. **LSAC high variance** — With `racetxt` as protected attribute, baseline DP varies dramatically across seeds (0.000 to 0.112). Small sample (n=3) produces unstable estimates.
 
 ---
@@ -246,5 +248,5 @@ experiments/auto_finalize.py      # expected count 270→270
 
 ---
 
-*Prepared: June 9, ~2:30 PM IST*
-*Status: Code fixed, experiments 269/270 (99.6%), Credit+LSAC+Adult essentially complete, lambda diagnostic complete*
+*Prepared: June 9, ~2:35 PM IST*
+*Status: Code fixed, ALL 270 experiments complete, t-tests done, lambda diagnostic complete*
