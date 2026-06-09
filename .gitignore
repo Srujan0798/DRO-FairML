@@ -64,3 +64,11 @@ Thumbs.db
 paper_text.txt
 .last_checkpoint
 _archive/
+
+# Temporary per-dataset result files (merged into fairness_pgd_results.json)
+results/fairness_pgd_adult.json
+results/fairness_pgd_credit.json
+results/fairness_pgd_lsac.json
+
+# Session zip files
+session_*.zip
