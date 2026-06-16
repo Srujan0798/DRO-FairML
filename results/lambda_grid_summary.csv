@@ -1,0 +1,2 @@
+alpha,lambda_init,lr_lambda,dp_mean,dp_se,acc_mean,acc_se,n_seeds
+0.200000,0.000000,0.001000,0.246624,0,0.753787,0,1
