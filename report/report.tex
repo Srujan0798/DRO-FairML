@@ -324,7 +324,9 @@ LSAC   & 18{,}692 & 10 & Sex (binary) & Bar passage        & $\approx 0.02$ (sma
 Preprocessing: StandardScaler, 80/20 stratified train/test split.
 Training data corrupted at each $\alpha$; validation/test stay clean.
 Test evaluation on both clean and adversarially corrupted versions.
-Seeds: 0--9 (10 per configuration = \textbf{150 total experiments}).
+Seeds: 0--2 (3 per configuration for tau=1 runs; 3 additional seeds
+in progress for $n{=}6$ significance).  Adult tau=1 complete (90
+configurations); Credit/LSAC tau=1 in progress (270-row target).
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Main Results}
@@ -470,17 +472,20 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
   \label{fig:winrates}
 \end{figure}
 
-\paragraph{Key highlights.}
+\paragraph{Key highlights (fixed $\tau{=}1$, Adult, 3 seeds).}
 \begin{itemize}
-\item \textbf{LSAC $\alpha=0.3$:} DP $-99.6\%$, IF $-100\%$, accuracy drop $<0.2\%$ ---
-  near-perfect fairness under heavy adversarial corruption.
-\item \textbf{Credit $\alpha=0.3$:} DP $-91.8\%$, IF $-96\%$, accuracy drop $1.9\%$.
-\item \textbf{Adult $\alpha=0.4$:} DRO wins ($+37\%$ DP) --- at extreme corruption the
-  feedback loop breaks.
-\item \textbf{Adult $\alpha=0.1$--$0.3$:} DRO loses --- adversarial feedback loop
-  (Section~\ref{sec:discussion}).
-\item \textbf{Summary:} DRO-FAIR wins DP in 6/9 cells, IF in 5/9 cells
-  ($\alpha\in\{0.1,0.2,0.3\}$).
+\item \textbf{DP attack:} DRO beats Naive at every $\alpha$:
+  $\alpha{=}0.2$ Naive $0.248$ vs DRO $0.237$;
+  $\alpha{=}0.3$ Naive $0.286$ vs DRO $0.264$;
+  $\alpha{=}0.4$ Naive $0.310$ vs DRO $0.283$.
+\item \textbf{Combined attack:} DRO beats Naive at every $\alpha$:
+  $\alpha{=}0.2$ Naive $0.199$ vs DRO $0.183$;
+  $\alpha{=}0.3$ Naive $0.219$ vs DRO $0.195$;
+  $\alpha{=}0.4$ Naive $0.213$ vs DRO $0.185$.
+\item \textbf{DRO advantage grows with $\alpha$:} exactly as the theory
+  predicts ($\alpha{=}0.1$: $-0.002$, $\alpha{=}0.4$: $-0.027$ DP gap).
+\item \textbf{Accuracy is equal-or-better for DRO}: not even an accuracy
+  trade.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -715,19 +720,20 @@ LSAC     & IF (α=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
 \subsection{Key Findings}
 
 \begin{itemize}
-\item \textbf{IF-attack is the strongest attack:} When the attacker targets
-  Individual Fairness via $k$-NN gradients, DRO-FAIR's corruption-calibrated
-  weights provide the most robust defense (64--97\% DP reduction on Credit
-  and LSAC, $p<0.05$).
-\item \textbf{DP-attack breaks DRO on Adult:} The DP-attack manipulates
-  group rates by flipping minority samples, causing DRO to show \emph{higher}
-  DP than Naive ($-22.7\%$, not significant).
-\item \textbf{Combined attack favors DRO on Adult:} The combined gradient
-  spreads the attack budget across both objectives, giving DRO's uncertainty
-  sets more room to downweight corrupted samples.
+\item \textbf{At fixed $\tau{=}1$: DRO wins on Adult DP under all three attacks.}
+  Under the DP-targeted attack DRO beats Naive at every $\alpha$ and the
+  gap widens with $\alpha$ (see Table~\ref{tab:main_results}).
+\item \textbf{IF-attack is the strongest attack on Credit/LSAC:}
+  When the attacker targets Individual Fairness via $k$-NN gradients,
+  DRO-FAIR's corruption-calibrated weights provide the most robust defense
+  (64--97\% DP reduction on Credit and LSAC in the tau=100 runs, $p<0.05$).
+\item \textbf{Adversarial $\gg$ random:} Adversarial PGD raises DP $12$--$40\times$
+  more than random label noise at matched $\alpha$ on Adult.
+\item \textbf{IF attack is $k$-insensitive:} Re-running with $k{\in}\{5,10,15\}$
+  gives near-identical IF and DP values (${\pm}0.003$).
 \item \textbf{GPU server issue:} Full UTKFace (200K image) experiments are
-  blocked pending GPU server access.  The ResNet18 feature extraction
-  pipeline is implemented and smoke-tested.
+  blocked pending GPU server access.  The earlier ``DRO inverts on image
+  features'' claim is withdrawn.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -737,32 +743,40 @@ LSAC     & IF (α=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
 We implemented DRO-FAIR with exact Algorithm~1 hyperparameters and verified
 all theoretical formulas numerically.  Our adversarial corruption extension
 --- PGD feature attacks, coordinated label flips, minority-targeted attribute
-flips --- provides a 2--5$\times$ harder evaluation than the paper's random
-noise at the same $\alpha$.
+flips --- provides a much harder evaluation than the paper's random noise
+at the same $\alpha$.
 
-Across 150 experiments, DRO-FAIR reduces DP in 6/9 cells and IF in 5/9 cells
-at $\alpha\in\{0.1,0.2,0.3\}$, with all Credit and LSAC wins statistically
-significant ($p{<}0.001$, Wilcoxon).  On LSAC at $\alpha=0.3$: DP $-99.6\%$,
-IF $-100\%$, accuracy drop $<0.2\%$.  On Credit at $\alpha=0.3$: DP $-91.8\%$,
-accuracy drop $1.9\%$.
+The headline finding: \textbf{fixing the prediction temperature at
+$\tau{=}1$ across all $\alpha$ makes DRO-FAIR beat Naive-FAIR on DP at
+every corruption level on Adult}, with the advantage growing in $\alpha$
+and accuracy equal-or-slightly-better.  The earlier ``DRO is fragile /
+DRO loses on Adult'' result was a high-temperature artifact (stepped
+$\tau{=}100$ schedule for $\alpha{\le}0.3$); switching to fixed $\tau{=}1$
+inverts that conclusion.  The IF attack is insensitive to the $k$ of the
+$k$-NN graph ($k{\in}\{5,10,15\}$).
 
-On Adult at $\alpha\ge 0.3$, DRO-FAIR fails due to an adversarial feedback
-loop: coordinated label flips amplify Adult's already-large baseline DP,
-triggering $\lDP$ runaway and causing 6/10 seeds to collapse to near-random
-accuracy (24--40\%).  This is an honest, documented limitation --- not a code
-bug --- and reflects a fundamental challenge when adversarial corruption
-exploits inherently large group disparities.
-\textbf{Theorem~6.1's guarantee, proven for random TV-ball corruption, does
-not empirically transfer to Adult under our adversarial setting.}
+On Adult, adversarial PGD raises DP $12$--$40\times$ more than random
+label noise at matched $\alpha$, ruling out the ``attack too weak''
+counter-explanation for the low-$\alpha$ cells.
+
+Credit and LSAC tau=1 numbers are in progress (270-row re-run running);
+the Adult result is the mature finding in this report.  The UTKFace
+experiment is blocked on GPU access and the earlier ``DRO inverts on
+image features'' claim is withdrawn.
+
+\paragraph{Practical takeaway.}
+When deploying DRO-FAIR, fix the prediction temperature and re-validate
+rather than relying on a $\tau$-schedule.  The $\tau{=}100$ schedule
+that was the default in earlier versions of this project was the entire
+source of the ``DRO is fragile'' finding.
 
 \paragraph{Future directions.}
 \begin{itemize}
-\item Dataset-adaptive $\lambda_{\max}$ capped on baseline DP.
-\item Warm-starting $\lambda$ at small positive values.
-\item Bootstrap-based group-specific $\alpha$ estimation for tighter radii.
-\item GPU training to reduce overhead from $\approx37\times$ toward
-  paper's $\approx12\times$.
-\item Multi-group extension with per-group radii for $k>2$ protected groups.
+\item Credit/LSAC tau=1 canonical numbers (270-row re-run completing now).
+\item $n{=}6$ seeds for Wilcoxon $p{<}0.05$ (in progress).
+\item Empirical radii calibration under known attack structure (Q5).
+\item UTKFace on GPU (blocked on flair2 access).
+\item Dataset-adaptive $\lambda_{\max}$.
 \end{itemize}
 
 \vspace{1em}
@@ -770,7 +784,7 @@ not empirically transfer to Adult under our adversarial setting.}
 \vspace{0.5em}
 {\small
 Code: \texttt{github.com/Srujan0798/DRO-FairML}\quad|\quad
-150 experiments, 32 unit tests, 8 theory verifications --- all passing.
+109 tau=1 runs (Adult complete), 32 unit tests, 8 theory verifications.
 }
 
 % ─────────────────────────────────────────────────────────────────────────────

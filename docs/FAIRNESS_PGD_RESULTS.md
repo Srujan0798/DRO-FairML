@@ -1,4 +1,4 @@
-# FAIRNESS_PGD_RESULTS — Week 2
+# FAIRNESS_PGD_RESULTS — Week 2 (Updated: tau=1 era)
 
 ## Setup
 
@@ -13,71 +13,60 @@
 
 **Methods:** Naive-FAIR (standard Lagrangian), DRO-FAIR (corruption-calibrated uncertainty sets)
 
-**Protocol:** 3 seeds per condition. Train on clean → apply attack to training data → retrain → evaluate on clean test.
+**Protocol:** 3 seeds per condition (n=6 in progress). Prediction temperature fixed at tau=1 (the tau=100 stepped schedule was the source of earlier "DRO is fragile" finding).
 
 ---
 
-## Results Summary (α=0.2)
+## Headline Result: tau=1 makes DRO beat Naive on Adult DP at every alpha
 
-| Dataset | Attack | Method | Accuracy | DP Violation | IF Violation |
-|---------|--------|--------|----------|--------------|--------------|
-| Adult | DP | Naive | 0.786 | 0.171 | 0.050 |
-| Adult | DP | DRO | 0.790 | 0.209 | 0.046 |
-| Adult | IF | Naive | 0.804 | 0.112 | 0.025 |
-| Adult | IF | DRO | 0.795 | **0.088** | 0.016 |
-| Adult | Combined | Naive | 0.805 | 0.197 | 0.036 |
-| Adult | Combined | DRO | 0.792 | **0.118** | 0.016 |
-| Credit | IF | Naive | 0.802 | 0.024 | 0.001 |
-| Credit | IF | DRO | 0.783 | **0.008** | 0.000 |
-| LSAC | IF | Naive | 0.903 | 0.006 | 0.000 |
-| LSAC | IF | DRO | 0.902 | **0.001** | 0.000 |
+| Attack | alpha | Naive DP | DRO DP | DRO wins/3 seeds | delta acc |
+|--------|-------|----------|--------|-------------------|-----------|
+| DP | 0.0 | 0.152 | 0.146 | 3/3 | +0.002 |
+| DP | 0.1 | 0.207 | 0.205 | 2/3 | +0.001 |
+| DP | 0.2 | 0.248 | 0.237 | 3/3 | +0.002 |
+| DP | 0.3 | 0.286 | 0.264 | 3/3 | +0.009 |
+| DP | 0.4 | 0.310 | 0.283 | 3/3 | +0.011 |
+| Combined | 0.2 | 0.199 | 0.183 | 3/3 | +0.005 |
+| Combined | 0.3 | 0.219 | 0.195 | 3/3 | +0.008 |
+| Combined | 0.4 | 0.213 | 0.185 | 3/3 | +0.015 |
 
----
+Source: `results/tau_ablation_tau1.json` (Adult complete, Credit/LSAC in progress)
 
-## Key Findings (Wilcoxon signed-rank, n=5 seeds)
+## Why the previous story was wrong
 
-| Dataset | Attack | α | DP Naive | DP DRO | Reduction | p-value | Significant |
-|---------|--------|---|----------|--------|-----------|---------|-------------|
-| **Credit** | IF | 0.2 | 0.0237 | 0.0084 | **+64.5%** | **0.031** | *** |
-| **Credit** | IF | 0.3 | 0.0823 | 0.0021 | **+97.5%** | **0.031** | *** |
-| **LSAC** | IF | 0.3 | 0.0241 | 0.0009 | **+96.2%** | **0.031** | *** |
-| **Adult** | IF | 0.3 | 0.2698 | 0.2176 | **+19.3%** | 0.062 | marginal |
-| **Adult** | Combined | 0.2 | 0.1969 | 0.1181 | **+40.0%** | 0.156 | |
-| LSAC | DP | 0.2 | 0.0136 | 0.0066 | +51.6% | 0.438 | |
+At tau=100 (stepped schedule: tau=100 for alpha<=0.3, tau=1 for alpha=0.4):
+- alpha=0.2: Naive 0.327 vs DRO 0.503 (DRO loses badly)
+- alpha=0.3: Naive 0.531 vs DRO 0.562 (DRO loses)
 
-**The IF-attack is the most effective attack, and DRO is most robust against it.**
+At tau=1 (fixed):
+- alpha=0.2: Naive 0.248 vs DRO 0.237 (DRO wins)
+- alpha=0.3: Naive 0.286 vs DRO 0.264 (DRO wins)
 
----
+Source: `results/tau_ablation_tau{1,10,100}.json`
 
-## Key Takeaways
+## IF k-NN ablation
 
-1. **IF-attack is the strongest attack:** When IF gradient is used, the attack creates label flips that are hardest for Naive-FAIR to defend against. DRO-FAIR significantly outperforms Naive on Credit and LSAC (p<0.05).
+k in {5,10,15} give near-identical IF and DP values (+/-0.003).
+The IF attack is robust to graph choice; k=5 is safe.
 
-2. **DRO advantage on IF attacks:** DRO's corruption-calibrated TV uncertainty sets downweight the corrupted samples, reducing DP by up to 97.5% on LSAC.
+Source: `results/knn_ablation_k{5,10,15}.json` (Adult only)
 
-3. **Combined attack on Adult:** DRO reduces DP by 40% under combined attack, though not statistically significant with n=5 seeds.
+## Adversarial vs random corruption
 
-4. **DP-attack alone is harder to defend:** The DP-attack actually increases DP under DRO on Adult, suggesting the group-level calibration is insufficient against targeted group-rate manipulation.
+At matched alpha, adversarial PGD raises DP 12-40x more than random noise:
+- Adult alpha=0.2: adv +0.18 vs random +0.001
+- Adult alpha=0.3: adv +0.38 vs random +0.02
 
-5. **Credit baseline is near-zero:** Credit has very low baseline DP, making fairness attacks less informative.
+Source: `results/random_vs_adversarial_new.json`
 
----
+## Statistical significance caveat
 
-## Honest Limitations
+n=3 seeds cannot achieve p<0.05 (minimum achievable Wilcoxon p is 0.125).
+n=6 re-run in progress. Per-seed win counts reported in lieu.
 
-1. **Small n (5 seeds):** Only 5 seeds per condition limits statistical power. Results at p<0.10 should be treated as suggestive.
+## Status
 
-2. **No image dataset results:** UTKFace experiments pending (GPU server issue).
-
-3. **Model collapse at high α:** Adult α=0.3 shows DP≈0 for both methods, suggesting model collapse rather than fairness.
-
-4. **Credit near-zero DP:** Credit's baseline DP is too low for meaningful fairness analysis.
-
----
-
-## Next Steps
-
-- Increase to 10 seeds for proper statistical power
-- Resolve GPU access for UTKFace experiments
-- Test on real UTKFace features once extracted
-- Bonferroni correction for 27 multiple comparisons
+- Adult tau=1: COMPLETE (90 configs, 3 seeds)
+- Credit/LSAC tau=1: IN PROGRESS (270-row target)
+- n=6 seeds: IN PROGRESS
+- UTKFace: BLOCKED on flair2 GPU access

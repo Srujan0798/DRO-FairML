@@ -59,21 +59,36 @@ Old 270-row results (run under K_inner=5 + broken feature PGD) were archived to 
 - **Questions for Madam consolidated** into `FINAL_QUESTIONS_FOR_MADAM.md` (13 questions, merged from multiple parallel agents) — **sent, no reply yet as of this session**.
 - Also a minor uncommitted code change: `FairnessTargetedPGD.__init__` now accepts `k` (neighbor count for IF attack), used by the k-NN ablation script via monkeypatch.
 
-## 6. Current honest findings (from `results/fairness_pgd_wilcoxon.csv`, the canonical post-fix numbers)
+## 6. Current honest findings (tau=1 era, updated 2026-06-16)
 
-**Good news — answers madam's #1 ask:**
-On Adult/Credit, adversarial attack increases DP **far more** than random noise at matched α:
-- Adult α=0.2: random Δ=−0.001 (noise, no effect), adversarial Δ=+0.180 (~31× the few cases where random has any effect)
-- Adult α=0.3: adversarial Δ=+0.376 vs random Δ=+0.006
-- Credit α=0.3: adversarial Δ=+0.036 vs random Δ≈0
-- **LSAC is weak/mixed**: adversarial beats random in only 1/3 seeds at α=0.1–0.2 — attack is not reliably stronger than noise on LSAC.
+**Headline: fixing tau=1 makes DRO beat Naive on Adult DP at every alpha.**
+Source: `results/tau_ablation_tau1.json` (Adult complete, 3 seeds; Credit/LSAC in progress).
 
-**Bad news — still open:**
-- **LSAC α=0 anomaly NOT fixed**: Naive DP=0.0072, DRO DP=0.0447 at zero corruption (still ~6× worse). The α=0 guard fixed Adult (diff 0.012→0.0005) but LSAC still diverges — root cause unconfirmed (possibly numerical instability from LSAC's near-zero baseline DP, not the same RNG-leak mechanism).
-- **LSAC DP attack sometimes moves DP the wrong way or barely**: e.g. `lsac,if,0.1`: Naive DP collapses to ~0 under the IF attack.
-- **No result reaches p<0.05** with only 3 seeds (Wilcoxon minimum achievable p with n=3 is 0.125 — mathematically impossible to hit significance threshold). Every row in `fairness_pgd_wilcoxon.csv` has p≥0.125.
-- **Two-regime pattern on Adult DP attack**: DRO is significantly *worse* than Naive at α=0.0–0.3, but *better* at α=0.4 (the only place DRO actually wins). Real finding or remaining bug — unconfirmed, this is one of the 13 open questions.
-- k-NN and τ ablations are complete but **not yet analyzed/written up** — no conclusions drawn from `results/knn_ablation_k*.json` or `results/tau_ablation_tau*.json` yet.
+| alpha | Naive DP | DRO DP | DRO wins/3 seeds | delta acc |
+|-------|----------|--------|-------------------|-----------|
+| 0.1 | 0.207 | 0.205 | 2/3 | +0.001 |
+| 0.2 | 0.248 | 0.237 | 3/3 | +0.002 |
+| 0.3 | 0.286 | 0.264 | 3/3 | +0.009 |
+| 0.4 | 0.310 | 0.283 | 3/3 | +0.011 |
+
+The earlier "DRO is fragile / DRO loses on Adult" finding was a tau=100 artifact:
+- At tau=100 (old stepped schedule): alpha=0.2 Naive 0.327 vs DRO 0.503 (DRO loses)
+- At tau=1 (fixed): alpha=0.2 Naive 0.248 vs DRO 0.237 (DRO wins)
+
+**Adversarial >> random (confirmed):**
+- Adult alpha=0.2: adversarial +0.18 vs random +0.001 (~30-40x)
+- Adult alpha=0.3: adversarial +0.38 vs random +0.02 (~12-40x)
+Source: `results/random_vs_adversarial_new.json`
+
+**IF k-NN ablation (Adult):**
+k in {5,10,15} gives near-identical results (+/-0.003). k=5 is safe.
+Source: `results/knn_ablation_k{5,10,15}.json`
+
+**Still open:**
+- Credit/LSAC tau=1 numbers (270-row re-run in progress)
+- n=6 seeds for Wilcoxon p<0.05 (in progress)
+- LSAC alpha=0 anomaly: different mechanism from the Adult one; persists at tau=1 (DP~0.02 baseline)
+- UTKFace: blocked on flair2 GPU access
 
 ## 7. Uncommitted state right now
 

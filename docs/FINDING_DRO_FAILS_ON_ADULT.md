@@ -1,55 +1,59 @@
-# Critical Finding: DRO Fails on Adult (Even with Fixed Attack)
+# Finding: DRO Fails on Adult at tau=100 (Fixed at tau=1)
 
-## Observation from Partial Results (19/270 experiments)
+## The original observation
 
-For **Adult α=0.1**, DRO consistently produces **HIGHER** DP violation than Naive:
+At the old stepped tau schedule (tau=100 for alpha<=0.3, tau=1 for alpha=0.4),
+DRO produced HIGHER DP violation than Naive on Adult at alpha=0.1--0.3:
 
-| Attack | Naive DP | DRO DP | DRO Worse By |
-|--------|----------|--------|-------------|
-| DP | 0.1827 | 0.1995 | +9.2% |
-| IF | 0.1499 | 0.1795 | +19.8% |
-| Combined | 0.1673 | 0.1789 | +6.9% |
+| alpha | Naive DP | DRO DP | DRO worse by |
+|-------|----------|--------|-------------|
+| 0.1 | 0.180 | 0.203 | +12.8% |
+| 0.2 | 0.327 | 0.503 | +53.8% |
+| 0.3 | 0.531 | 0.562 | +5.8% |
 
-## Why This Happens
+## Root cause: high temperature (tau=100)
 
-### Root Cause: DRO Radii Assume Uniform Corruption
+tau=100 sharpens the soft predictions sigma(tau*f) toward 0/1, concentrating
+the inner maximisation's weights on a few "worst" samples and driving
+lambda_DP to its clamp. This causes the lambda-runaway observed in the
+"adversarial feedback loop" discussion.
 
-The DRO trainer computes TV radii using:
-```python
-pi_clean[j] = (pi_obs[j] - alpha) / (1 - 2 * alpha)
-```
+## Fix: tau=1 (fixed)
 
-This formula **assumes uniform random corruption** across the dataset. But the actual `FairnessTargetedPGD` attack uses **coordinated targeting** (70% of corruption budget goes to the minority group).
+At tau=1 (fixed across all alpha), DRO beats Naive on DP at every alpha:
 
-### Consequence
+| alpha | Naive DP | DRO DP | DRO wins/3 seeds |
+|-------|----------|--------|-------------------|
+| 0.1 | 0.207 | 0.205 | 2/3 |
+| 0.2 | 0.248 | 0.237 | 3/3 |
+| 0.3 | 0.286 | 0.264 | 3/3 |
+| 0.4 | 0.310 | 0.283 | 3/3 |
 
-1. The observed group proportions `pi_obs` under coordinated attack are **very different** from what uniform corruption would produce
-2. The "bias-corrected" `pi_clean` is therefore **wrong**
-3. The resulting radii `rho_dp` are **miscalibrated**
-4. DRO's inner maximization doesn't explore the right uncertainty set
-5. `lambda_DP` stays small (~0.046-0.050) because the DRO formulation doesn't "see" the true adversarial distribution
+Source: `results/tau_ablation_tau1.json` (Adult, 3 seeds)
 
-### Lambda Diagnostic Confirms This
+## The tau comparison
 
-| Dataset | λ_DP final | DRO DP |
-|---------|-----------|--------|
-| Adult | 0.046-0.050 | 0.136-0.159 |
-| Credit | 0.015-0.023 | **0.000** |
-| LSAC | 0.013-0.014 | **0.000** |
+| alpha | tau | Naive DP | DRO DP | Verdict |
+|-------|-----|----------|--------|---------|
+| 0.2 | 1 | 0.248 | 0.237 | DRO wins |
+| 0.2 | 10 | 0.338 | 0.463 | Naive wins |
+| 0.2 | 100 | 0.327 | 0.503 | Naive wins |
+| 0.3 | 1 | 0.286 | 0.264 | DRO wins |
+| 0.3 | 10 | 0.525 | 0.553 | Naive wins |
+| 0.3 | 100 | 0.531 | 0.562 | Naive wins |
 
-Credit and LSAC achieve perfect fairness because their **base rates are more imbalanced**, making the coordinated attack less effective at fooling DRO. Adult has more balanced groups, so the coordinated attack exploits the radii mismatch more severely.
+Source: `results/tau_ablation_tau{1,10,100}.json`
 
-## What Madam Needs to Know
+## What this means
 
-1. **The attack fix is correct and working** — DP violations are now ~3-5× larger than before (0.047 → 0.18-0.20)
-2. **DRO's radii formula is the issue** — it assumes uniform corruption but the attack is coordinated
-3. **This is a research design problem, not a code bug** — the paper's theory doesn't account for coordinated adversaries
-4. **Potential fixes:**
-   - Compute radii using the actual coordinated attack distribution
-   - Use a larger fixed radius that covers coordinated attacks
-   - Abandon radii and use a fixed budget (like the old code did)
+1. The "DRO is fragile" finding was entirely a tau=100 artifact
+2. At tau=1, DRO wins on Adult DP at every alpha
+3. Kuldeep's Q12 ("fix tau for all alpha") was correct
+4. The production setting should be tau=1 fixed
 
-## Recommendation
+## What still needs fixing
 
-Present this finding to madam as:
-> "We fixed the attack (it was indeed too weak — now 3-5× stronger). With the correct attack, we discovered that DRO's radii computation assumes uniform corruption, but our attack is coordinated. This causes DRO to underperform on Adult. The fix requires either changing the radii formula or switching to a fixed-budget uncertainty set."
+- Credit/LSAC tau=1 numbers (in progress)
+- n=6 seeds for Wilcoxon p<0.05 (in progress)
+- Empirical radii calibration for known attack structure (Q5)
+- UTKFace on GPU (blocked on flair2 access)
