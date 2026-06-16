@@ -4,4 +4,15 @@ Distributionally Robust Optimization (DRO) offers a principled framework for rob
 
 \textbf{The Gap.} Existing evaluations use \textit{random label noise}---uniformly flipping labels. This does not reflect adversarial scenarios where an attacker with knowledge of the fairness metric strategically corrupts the most impactful samples \citep{solans2021poisoning}. To our knowledge, no prior work computes the \textbf{exact gradient} of fairness metrics with respect to individual labels.
 
-\textbf{Our Contributions.} (1) \textit{FairnessTargetedPGD}: gradient-based attacks computing $\partial(\text{fairness})/\partial y_i$. (2) Comprehensive evaluation: 270 tabular + 15 image experiments. (3) Key finding: DRO robustness is \textbf{metric-dependent} (wins under IF, loses under DP) and \textbf{modality-dependent} (wins on tabular, inverts on images).
+\textbf{Our Contributions.}
+(1) \textit{FairnessTargetedPGD}: gradient-based attacks computing
+$\partial(\text{fairness})/\partial y_i$ on each label.
+(2) The temperature ablation: fixing $\tau=1$ across all $\alpha$ (vs.\
+the stepped $\tau{=}100$ schedule for $\alpha\le 0.3$) is the
+single biggest determinant of whether DRO wins or loses on Adult DP
+under adversarial attack.
+(3) The IF k-NN ablation and the empirical-radii interpretation per
+Kuldeep's feedback (\S\ref{sec:results-tabular}).
+(4) The adversarial-vs-random comparison showing adversarial PGD
+raises DP by an order of magnitude more than random label noise at
+matched $\alpha$ on Adult.

@@ -5,15 +5,35 @@
 \toprule
 Dataset & Samples & Features & Protected & Task \\
 \midrule
-Adult & 48,842 & 14 & Sex & Income $>$50K \\
-Credit & 30,000 & 23 & Sex & Default \\
-LSAC & 26,184 & 11 & Race & Bar passage \\
-UTKFace & 23,705 & 512 (ResNet18) & Race & Gender \\
+Adult & 45,222 & 12 & Sex & Income $>$50K \\
+Credit & 30,000 & 22 & Sex & Default \\
+LSAC & 18,692 & 10 & Sex & Bar passage \\
+UTKFace & 23,705 & 512 (ResNet18) & Sex (binary) & Age $>$ 25 \\
 \bottomrule
 \end{tabular}
-\caption{Datasets used in evaluation.}
+\caption{Datasets used in evaluation.  UTKFace results are pending GPU
+access (\texttt{SERVER\_RUNBOOK.md}).}
 \label{tab:datasets}
 \end{table}
 
-\subsection{Methods and Metrics}
-We compare Naive-FAIR (fixed Lagrange multiplier) vs. DRO-FAIR (adaptive worst-case reweighting). Attacks: DP-only, IF-only, Combined, with $\alpha \in \{0.1, 0.2, 0.3\}$ (tabular) and $\alpha \in \{0.0, 0.1, 0.2\}$ (UTKFace). We use 5 random seeds per configuration. Statistical significance is assessed via Wilcoxon signed-rank test.
+\subsection{Methods, Attacks, Hyperparameters}
+We compare Naive-FAIR (fixed Lagrange multiplier) vs.\ DRO-FAIR
+(adaptive worst-case reweighting within a TV uncertainty set).
+Attacks: DP-only, IF-only, Combined, with $\alpha\in\{0.0, 0.1, 0.2,
+0.3, 0.4\}$ (tabular) and $\alpha\in\{0.0, 0.1, 0.2\}$ (UTKFace, when
+unblocked).  3 seeds per cell in this paper; 3 additional seeds
+($n{=}6$) are running to enable Wilcoxon $p<0.05$ (the minimum
+achievable $p$ with $n{=}3$ is $0.125$).
+
+Prediction temperature is fixed at $\tau{=}1$ across all
+$\alpha$ (per Kuldeep's Q12).  The earlier $\tau{=}100$ schedule for
+$\alpha\le 0.3$ is the artifact behind the previous ``DRO is
+fragile'' finding.  Inner-loop PGD: $K_{\mathrm{inner}}{=}10$,
+$\mathrm{pgd\_steps}{=}20$.  Dual ascent: $\eta_{\lambda}{=}5\!\times\!10^{-3}$,
+$\lambda_{\max}{=}1.5$, $\lambda$ initialised at $0.0$.
+Algorithm-1 step order is $\theta\!\to\!\lambda\!\to\!\tilde p$ and the
+inner max ascends $\nabla g$ (not $\lambda\nabla g$).
+
+Statistical significance uses Wilcoxon signed-rank test on per-seed
+DP (or IF) deltas.  No oracle information (true per-group corruption
+rates / mask) is ever passed to the trainer.

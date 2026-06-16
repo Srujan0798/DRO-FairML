@@ -15,4 +15,13 @@ Using a $k$-NN graph within each protected group:
 \end{equation}
 
 \subsection{PGD Optimization}
-We run 5 iterative steps: (1) compute gradient, (2) select top-$\alpha$ targets, (3) flip labels, (4) repeat. After all steps, we enforce the exact $\alpha$ budget by keeping only the top-$\alpha$ flips ranked by final gradient magnitude.
+We run $\mathrm{pgd\_steps}{=}20$ iterative steps: (1) compute the
+fairness-metric gradient with respect to each label and feature
+perturbation (the feature-perturbation half maximises $|p_0-p_1|$
+directly for the DP and combined attacks, and falls back to
+classification loss only for the IF attack), (2) rank samples by
+gradient magnitude, (3) flip the top-$\alpha$ labels, (4) repeat.
+After all steps we enforce the exact $\alpha$ budget by keeping
+only the top-$\alpha$ flips ranked by final gradient magnitude.
+The IF attack uses a k-NN graph ($k{=}5$ default; the ablation in
+\S\ref{sec:results-tabular} shows the attack is insensitive to $k$).

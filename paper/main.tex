@@ -8,7 +8,8 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{xcolor}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
 \usepackage{natbib}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -23,7 +24,7 @@
 \maketitle
 
 \begin{abstract}
-We introduce \textit{FairnessTargetedPGD}, a gradient-based adversarial attack that explicitly targets fairness metrics---Demographic Parity (DP) and Individual Fairness (IF)---and evaluate the robustness of DRO-FAIR under these attacks. Unlike prior work that tests only random label noise, our attacks compute the exact gradient of the fairness metric with respect to each training label and flip the optimal subset to maximize unfairness. We conduct 270 experiments on three tabular datasets (Adult, Credit, LSAC) and 15 experiments on UTKFace image data with ResNet18 features. Our key finding is that DRO-FAIR's robustness is \textbf{not universal}: it strongly defends against IF-targeted attacks on tabular data (64--97\% DP reduction, $p < 0.05$), but \textbf{inverts} on image features---producing worse fairness than naive training under corruption. This modality-dependent behavior reveals a fundamental limitation: DRO requires feature-demography correlation to be effective.
+We introduce \textit{FairnessTargetedPGD}, a gradient-based adversarial attack that explicitly targets fairness metrics---Demographic Parity (DP) and Individual Fairness (IF)---and evaluate the robustness of DRO-FAIR under these attacks. Unlike prior work that tests only random label noise, our attacks compute the exact gradient of the fairness metric with respect to each training label and flip the optimal subset to maximize unfairness. On Adult, fixing the prediction temperature at $\tau=1$ across all corruption levels $\alpha$ makes DRO-FAIR beat Naive-FAIR on DP at every $\alpha$ under the DP-targeted and combined attacks, with the advantage growing in $\alpha$ and accuracy equal-or-slightly-better. The earlier ``DRO is fragile / inverts on Adult'' finding was a high-temperature artifact (stepped $\tau{=}100$ schedule for $\alpha\le 0.3$); switching to fixed $\tau{=}1$ inverts that conclusion. Adversarial PGD raises DP by $12$--$40\times$ more than random label noise at matched $\alpha$ on Adult. The IF attack is insensitive to the $k$ of the k-NN graph ($k \in \{5,10,15\}$). The UTKFace experiment is blocked on GPU access and we therefore withdraw the earlier ``DRO inverts on image features'' claim from prior versions of this paper.
 \end{abstract}
 
 \section{Introduction}

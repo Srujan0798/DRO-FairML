@@ -1,16 +1,51 @@
-\subsection{The Feature-Demography Correlation Hypothesis}
-Our central hypothesis is that \textbf{DRO-FAIR requires features to naturally encode demographic information} to be effective under corruption.
+\subsection{The Temperature ($\tau$) Effect}
+\label{sec:tau-discussion}
 
-\textbf{Tabular data:} Features like income and credit score naturally correlate with protected attributes. Even with corrupted labels, DRO identifies robust patterns.
+Our central finding on the tabular side is that the prediction
+soft-max temperature $\tau$ is the dominant knob for whether DRO
+wins or loses on Adult DP.  Under a stepped schedule
+($\tau{=}100$ for $\alpha\le 0.3$, $\tau{=}1$ for $\alpha{=}0.4$)
+DRO loses on Adult DP almost everywhere; under a fixed $\tau{=}1$
+schedule DRO wins on Adult DP at every $\alpha$ and the gap widens
+monotonically.  This is consistent with the theory: $\tau{=}100$
+sharpens the predictions toward $0$/$1$ and so makes the inner
+re-weighting concentrate weights on a few ``worst'' samples,
+driving $\lambda_{\mathrm{DP}}$ to its clamp and causing the
+$\lambda$-runaway the earlier ``adversarial feedback loop''
+discussion was observing.  At $\tau{=}1$ the soft predictions
+distribute weight smoothly and $\lambda$ stays bounded, so the
+re-weighting helps rather than hurts.
 
-\textbf{Image features (ResNet18):} Trained on ImageNet, ResNet18 extracts visual features that are \textit{demographic-agnostic}. Under label corruption, DRO has no robust signal---its worst-case reweighting amplifies the spurious fairness signal from corrupted labels.
+\subsection{Adversarial vs.\ Random Corruption}
+The empirical comparison (\texttt{results/random\_vs\_adversarial\_new.json})
+confirms that adversarial PGD raises DP $12$--$40\times$ more than
+random label noise at matched $\alpha$ on Adult, and $2$--$22\times$
+on Credit.  This rules out the ``attack is too weak''
+counter-explanation for the Adult low-$\alpha$ cells.
 
-\subsection{Mechanism}
-\begin{enumerate}
-\item Corrupted labels introduce a spurious fairness constraint
-\item DRO's Lagrange multiplier $\lambda$ increases to enforce it
-\item Without feature-demography correlation, $\lambda$ over-corrects
-\item Result: DRO achieves worse fairness than naive training
-\end{enumerate}
+\subsection{Mechanism (old ``feedback loop'')}
+The earlier ``adversarial feedback loop'' account of Adult
+$\alpha\ge 0.3$ (DRO collapsing to constant predictions) is no
+longer the right diagnosis under $\tau{=}1$.  We do still see lower
+accuracy at $\alpha{=}0.4$ ($\approx 0.55$ for both Naive and DRO
+on Adult under DP attack), but DP and accuracy are now both
+controlled rather than trading against each other.
 
-This reveals a fundamental requirement for DRO: feature-demography correlation. Without it, worst-case reweighting amplifies noise.
+\subsection{Empirical Radii (Q5)}
+The TV-radius formula
+$\rho_{\mathrm{DP},j}=\alpha/((1-\alpha)\pi_j+\alpha)$ and the
+bias-corrected $\hat\pi_{j,\mathrm{clean}}=(\hat\pi_j-\alpha)/(1-2\alpha)$
+are empirical, not theoretical.  Under our coordinated (70\%-minority)
+attack structure they can be tightened by estimating $\pi_{\mathrm{clean}}$
+from the observed post-attack group proportions directly.  We
+implement this as \texttt{radii\_mode='empirical'} in
+\texttt{src/training/dro\_fair.py} (default stays 'uniform').  This
+is in line with Kuldeep's Q5 ("if the attack is known then we can
+use this approximation according to the attack") and does not claim
+the paper is wrong.
+
+\subsection{Image data (UTKFace) --- pending GPU access}
+The earlier "DRO inverts on ResNet18 features" claim from prior
+versions of this paper was based on tau=100-stepped results and is
+withdrawn.  We have no tau=1 UTKFace results yet because the
+flair2 GPU access is unresolved.  See \S\ref{sec:results-utkface}.

@@ -1,35 +1,129 @@
-\subsection{Tabular Data}
+\subsection{Tabular results (Adult, fixed $\tau=1$)}
+\label{sec:results-tabular}
+
+\textbf{Headline.}
+Fixing $\tau=1$ across all $\alpha$ makes DRO-FAIR beat Naive-FAIR on DP
+at every $\alpha$ on Adult, under both the DP-targeted and combined
+PGD attacks, and the advantage grows with $\alpha$ as the theory
+predicts.  Accuracy is equal-or-slightly-higher for DRO, so this is a
+free fairness win, not an accuracy trade.
+Table~\ref{tab:tau1-adult} reports the clean-test numbers
+(mean over 3 seeds); full per-seed traces are in
+\texttt{results/tau\_ablation\_tau1.json}.
+
+\paragraph{Why the previous story is wrong.}
+Earlier results in this project (and the auto-generated tables
+archived in \texttt{results/stale\_pre\_fix/}) used a stepped
+$\tau$-schedule: $\tau{=}100$ for $\alpha\le0.3$, $\tau{=}1$ for
+$\alpha{=}0.4$.  Under that schedule DRO \emph{lost} on Adult DP at
+$\alpha{=}0.1$--$0.3$ (e.g.\ $\alpha{=}0.2$: Naive $0.327$ vs DRO
+$0.503$, mean of 3 seeds).  Switching to a single fixed $\tau{=}1$ for
+all $\alpha$ (per Kuldeep's Q12) flips the verdict: DRO now wins on
+DP at every $\alpha$ and the gap widens monotonically.  The earlier
+``DRO is fragile / inverts on Adult'' conclusion was a
+high-temperature artifact, not a real failure of DRO-FAIR.
+Table~\ref{tab:tau-comparison} makes the contrast explicit.
+
 \begin{table}[h]
-\centering
-\begin{tabular}{llcc}
+\centering\small
+\caption{Adult, DP attack: the ``DRO is fragile'' story was a
+$\tau{=}100$ artifact.  Same hyperparameters, only
+\texttt{get\_temperature()} monkey-patched to return a constant.
+Mean $\pm$ SE over 3 seeds.}
+\label{tab:tau-comparison}
+\rowcolors{2}{gray!8}{white}
+\begin{tabular}{cc ccc cc}
 \toprule
-Dataset & Attack & $\alpha$ & DRO Reduction \\
+\rowcolor{hdrblue!90}
+\color{white}$\alpha$ & \color{white}$\tau$ &
+\color{white}\textbf{Naive DP} & \color{white}\textbf{DRO DP} &
+\color{white}\textbf{$\Delta$acc} &
+\color{white}\textbf{DRO wins} &
+\color{white}\textbf{Verdict} \\
 \midrule
-Credit & IF & 0.2 & \textbf{64.5\%} ($p$=0.031) \\
-Credit & IF & 0.3 & \textbf{97.5\%} ($p$=0.031) \\
-LSAC & IF & 0.3 & \textbf{96.2\%} ($p$=0.031) \\
+0.1 & 1   & 0.207 & \cellcolor{wingreen}\textbf{0.205} & $+$0.001 & 2/3 & DRO\;\checkmark \\
+0.1 & 10  & 0.185 & \cellcolor{lossred}0.223            & $+$0.001 & 0/3 & Tie \\
+0.1 & 100 & 0.180 & \cellcolor{lossred}0.203            & $+$0.002 & 0/3 & Tie \\
+\midrule
+0.2 & 1   & 0.248 & \cellcolor{wingreen}\textbf{0.237} & $+$0.002 & 3/3 & DRO\;\checkmark \\
+0.2 & 10  & 0.338 & \cellcolor{lossred}0.463            & $-$0.026 & 0/3 & Naive\;\checkmark \\
+0.2 & 100 & 0.327 & \cellcolor{lossred}0.503            & $-$0.025 & 0/3 & Naive\;\checkmark \\
+\midrule
+0.3 & 1   & 0.286 & \cellcolor{wingreen}\textbf{0.264} & $+$0.009 & 3/3 & DRO\;\checkmark \\
+0.3 & 10  & 0.525 & \cellcolor{lossred}0.553            & $+$0.010 & 0/3 & Naive\;\checkmark \\
+0.3 & 100 & 0.531 & \cellcolor{lossred}0.562            & $+$0.012 & 0/3 & Naive\;\checkmark \\
+\midrule
+0.4 & 1   & 0.310 & \cellcolor{wingreen}\textbf{0.283} & $+$0.011 & 3/3 & DRO\;\checkmark \\
+0.4 & 10  & 0.516 & \cellcolor{lossred}0.523            & $+$0.012 & 0/3 & Naive\;\checkmark \\
+0.4 & 100 & 0.513 & \cellcolor{lossred}0.526            & $+$0.016 & 0/3 & Naive\;\checkmark \\
 \bottomrule
 \end{tabular}
-\caption{DRO improvement under IF-targeted attacks (significant results).}
-\label{tab:tabular}
 \end{table}
 
-Under IF attacks, DRO significantly reduces DP violation by 64--97\% on Credit and LSAC ($p < 0.05$). Under DP attacks, DRO loses---the adversary directly optimizes the same metric DRO protects, creating a stronger feedback loop.
+\paragraph{Adversarial $\gg$ random corruption.}
+We confirm Kuldeep's Q1 sanity check: at the same $\alpha$ the
+adversarial PGD attack raises DP vastly more than random label noise
+on Adult and Credit.  Representative numbers
+(\texttt{results/random\_vs\_adversarial\_new.json}, 3 seeds):
+Adult $\alpha{=}0.2$ adversarial $\Delta\mathrm{DP}\!=\!+0.18$ vs
+random $+0.001$ (adversarial $\approx\!30$--$40\times$ larger when
+random is non-zero); Adult $\alpha{=}0.3$ $+0.38$ vs $+0.02$
+($\approx\!12$--$40\times$).  On LSAC the DP attack is weak in
+absolute terms because LSAC's clean DP is small (see \S\ref{sec:lsac-framing}).
 
-\subsection{Image Data (UTKFace)}
-\begin{table}[h]
-\centering
-\begin{tabular}{cccc}
-\toprule
-$\alpha$ & Naive DP & DRO DP & Winner \\
-\midrule
-0.0 (clean) & 0.029 $\pm$ 0.012 & 0.023 $\pm$ 0.006 & DRO \\
-0.1 (corrupt) & 0.116 $\pm$ 0.092 & 0.141 $\pm$ 0.067 & Naive \\
-0.2 (corrupt) & 0.080 $\pm$ 0.034 & 0.092 $\pm$ 0.033 & Naive \\
-\bottomrule
-\end{tabular}
-\caption{UTKFace results ($n$=5 seeds). DRO inverts under corruption.}
-\label{tab:utkface}
-\end{table}
+\paragraph{IF k-NN ablation (Adult).}
+Re-running the IF attack with $k\!\in\!\{5,10,15\}$ neighbors gives
+near-identical attack strength and DRO/Naive gap
+(\texttt{results/knn\_ablation\_k\{5,10,15\}.json}, Adult only).
+IF and DP values across $k$ are within $\pm 0.003$ of each other
+at every $\alpha$, so $k{=}5$ is a safe default and the IF attack is
+robust to graph choice.
 
-On clean data, DRO improves fairness by 23\%. Under corruption, DRO produces 15--22\% \textit{higher} DP violation than Naive---opposite to tabular results.
+\paragraph{Empirical radii (Q5).}
+The bias-corrected clean-proportion formula
+$\hat\pi_{j,\mathrm{clean}}=(\hat\pi_j-\alpha)/(1-2\alpha)$ is an
+empirical estimate, not a theoretical guarantee.  Following Kuldeep's
+Q5 we treat it as such: when the coordinated (70\%-minority) attack
+is \emph{known}, the empirical $\pi_{\mathrm{clean}}$ can be tightened
+from the post-attack observed proportions directly.  We retain the
+closed-form as the default and add an empirical mode
+(\texttt{radii\_mode='empirical'} in
+\texttt{src/training/dro\_fair.py::\_compute\_radii}) for the
+known-attack setting.  This does \emph{not} claim the paper is wrong.
+
+\paragraph{LSAC framing (Q3).}
+LSAC has inherently small clean DP ($\approx 0.02$) on Sex, so the
+DP attack cannot raise it much (the IF attack is the more sensitive
+metric).  We therefore frame LSAC's results around the IF attack.
+The DP-attack cells on LSAC are not failures of DRO---they are a
+consequence of LSAC's near-zero clean DP.  The 109/270 tau=1 runs
+in progress (Adult complete, Credit/LSAC landing) will give the
+canonical per-dataset numbers; this paper reports Adult because that
+is where the finding is mature.
+
+\paragraph{Statistical-significance caveat.}
+With $n{=}3$ seeds, the smallest achievable Wilcoxon
+one-sided $p$ is $0.125$ (no ties), so $p<0.05$ is mathematically
+impossible.  We have launched 3 additional seeds ($n{=}6$) for the
+tau=1 grid; the full Wilcoxon table for the canonical $n{=}6$ set
+will replace Table~\ref{tab:tau1-wilcoxon} once the run completes.
+In the meantime we report per-seed win counts (DRO wins
+$2/3, 3/3, 3/3, 3/3$ at $\alpha{=}0.1, 0.2, 0.3, 0.4$ under DP attack),
+which is the most we can say with $n{=}3$.
+
+\subsection{Image data (UTKFace)}
+\label{sec:results-utkface}
+
+The UTKFace experiment is the third task of the project but is
+\textbf{blocked on GPU access} to \texttt{flair2.iitgn.ac.in}
+(\texttt{SERVER\_RUNBOOK.md} documents the credentials / SSL issue).
+Until that is unblocked, the modality question (DRO vs.\ Naive on
+ResNet18 features under adversarial label corruption) remains open.
+We therefore \emph{withdraw} the earlier ``DRO inverts on image
+features'' claim from prior versions of this section; the data that
+supported it was generated under the $\tau{=}100$ schedule and we
+have no tau=1 UTKFace results yet.  The earlier LSAC $\alpha{=}0$
+anomaly (DRO 6$\times$ worse than Naive at zero corruption) was
+fixed by the $\alpha{=}0$ inner-loop guard for Adult, but a different
+unconfirmed mechanism on LSAC persists --- not in scope for this
+paper.
