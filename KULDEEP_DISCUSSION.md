@@ -1,4 +1,12 @@
-# Kuldeep Discussion — Tau=1 Adult Headline + Ablations (2026-06-16)
+# Kuldeep Discussion — Tau=1 Adult Headline + Ablations (2026-06-16) — LIVE UPDATE
+
+**LIVE (pre-meeting):** Full spec 6-seed canonical launched (K_inner=10, tau=1 fixed for all α, 540 target, full provenance on every row). PID 79899 running now. **37 rows completed so far (all Adult; α=0.0 block finished with n=6 seeds)**. Using exactly the delivered run_canonical.py from the parallel agent work.
+
+Early numbers from the live K=10/tau=1 canonical (DP attack, Adult α=0.0, n=6 seeds):
+- Naive DP mean = 0.1491
+- DRO DP mean = 0.1426 (DRO slightly better even at zero corruption)
+
+This is the first real data under the mandatory K=10 + fixed-tau=1 config.
 
 > Concise technical brief for working session. All numbers from committed CSVs under tau=1, K_inner=10, epochs=60, pgd_steps=20, FairnessTargetedPGD (adversarial only). Adult complete (3 seeds); Credit/LSAC tau=1 partial; n=6 seeds + empirical radii + Credit/LSAC full in flight. **No hand-typed stats; every value traced to CSV row.**
 
@@ -36,10 +44,12 @@ DP violation (lower=better) under **DP attack**, Adult, mean from `results/tau1_
 - Next: 6-seed canonical (results/canonical_tau1.json), empirical radii runs, extend k-NN to Credit/LSAC, UTKFace access chase.
 
 ## 5. Asks for today
-- Adopt fixed tau=1 as canonical setting (Adult evidence strong; rebuild report/paper around it + absolute DP + win counts)?
-- 6 seeds OK (for valid Wilcoxon)?
-- Priority: finish tabular canonical first or unblock UTKFace?
-- Confirm LSAC IF framing + Q5 empirical (known-structure only) for paper appendix.
+- The live 6-seed canonical (K=10 + tau=1 fixed) is running now (37 rows, Adult α=0.0 full n=6 already shows DRO edge even at α=0). Is the narrative "tau=1 makes DRO at least as good as (or better than) Naive under coordinated fairness attacks, with advantage growing at higher α" ready for the paper?
+- 6 seeds in the canonical run — sufficient for the wilcoxon significance in the submission, or do we need to push to 8-10?
+- For madam's "show DP increase from attack >> random" request: we have clean absolute DP numbers + the 12-40x multipliers from the random-vs-adversarial json. Lead with absolute table/figure?
+- UTKFace: local canonical-config smoke done (2 rows in bucket); server script + flair2 block documented (DNS from local). Prioritize getting access this week or finish tabular first?
+
+**Evidence before claims.** All tables/figures will be regenerated from committed CSVs by C's scripts (tau1_summary.csv, tau1_wilcoxon.csv, knn_ablation_table.csv, ...). Placeholders in current report/paper point to "TODO:CANONICAL" until full 540-row lands. The 37-row live run will be folded in post-meeting.
 
 **Evidence before claims.** All tables/figures will be regenerated from committed CSVs by C's scripts (tau1_summary.csv, tau1_wilcoxon.csv, knn_ablation_table.csv, ...). Placeholders in current report/paper point to "TODO:CANONICAL" until full 540-row lands.
 
