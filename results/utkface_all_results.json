@@ -2625,5 +2625,45 @@
       },
       "elapsed": 1.3838450908660889
     }
+  ],
+  "fairness_pgd": [
+    {
+      "dataset": "utkface_smoke",
+      "alpha": 0.2,
+      "seed": 0,
+      "attack": "dp",
+      "method": "naive",
+      "acc_clean": 0.4666666666666667,
+      "dp_clean": 0.003419637680053711,
+      "if_clean": 0.0,
+      "total_time": 4.891907215118408,
+      "k_inner": 2,
+      "tau": 1.0,
+      "radii_mode": "uniform",
+      "lambda_init": 0.0,
+      "coordinated": false,
+      "pgd_steps": 2,
+      "n_seeds_planned": 1,
+      "epochs": 2
+    },
+    {
+      "dataset": "utkface_smoke",
+      "alpha": 0.2,
+      "seed": 0,
+      "attack": "dp",
+      "method": "dro",
+      "acc_clean": 0.4666666666666667,
+      "dp_clean": 0.003262728452682495,
+      "if_clean": 0.0,
+      "total_time": 0.7440497875213623,
+      "k_inner": 2,
+      "tau": 1.0,
+      "radii_mode": "uniform",
+      "lambda_init": 0.0,
+      "coordinated": false,
+      "pgd_steps": 2,
+      "n_seeds_planned": 1,
+      "epochs": 2
+    }
   ]
 }

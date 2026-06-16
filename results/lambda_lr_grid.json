@@ -1,0 +1,22 @@
+[
+  {
+    "acc": 0.7522388059701492,
+    "dp": 0.016157925128936768,
+    "if": 6.590517998163493e-12,
+    "dataset": "adult",
+    "attack": "dp",
+    "tau": 1.0,
+    "alpha": 0.2,
+    "seed": 0,
+    "lambda_init": 0.0,
+    "lr_lambda": 0.001,
+    "time": 71.88540124893188,
+    "k_inner": 10,
+    "radii_mode": "uniform",
+    "coordinated": false,
+    "pgd_steps": 20,
+    "n_seeds_planned": 1,
+    "epochs": 3,
+    "use_if": false
+  }
+]
