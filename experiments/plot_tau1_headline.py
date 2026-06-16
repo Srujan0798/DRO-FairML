@@ -6,6 +6,14 @@ Side-by-side: DRO vs Naive DP violation vs α
   left: tau=1 (DRO wins on Adult at every α, per verified headline)
   right: tau=100 (DRO loses — the old "fragile" regime)
 
+Also generates meeting-format clean plots for Kuldeep (x=α, y=metric on Adult only;
+serif/CM fonts, simple errorbar lines, y starting ~0.78 for acc plots):
+- adult_accuracy_tau1_meeting.{pdf,png}
+- adult_accuracy_tau100_meeting.{pdf,png}
+- adult_if_tau1_meeting.{pdf,png}
+- adult_if_tau100_meeting.{pdf,png}
+- adult_acc_vs_alpha_different_tau.{pdf,png}  (acc comparison across τ=1,10,100 for "adjust τ for larger α")
+
 Evidence before claims: this script loads the tau ablation JSONs and
 prints exact row counts / win counts used for the figure.
 
@@ -23,8 +31,8 @@ tau=1, full provenance) lands, RE-POINT the load paths below to:
 figures/fig_tau1_headline.{pdf,png}.
 
 All figures 100% regenerable from this committed script.
-Uses Computer Modern (via rcParams), SE error bars over seeds, no shading,
-absolute DP values, clean academic style.
+Uses Computer Modern (via rcParams), SE error bars over seeds+attacks, no shading,
+absolute values, clean academic style.
 
 Run (analysis only, no training):
     python experiments/plot_tau1_headline.py
@@ -32,6 +40,7 @@ Run (analysis only, no training):
 Outputs:
     figures/fig_tau1_headline.pdf
     figures/fig_tau1_headline.png
+    + the 5 meeting-format Adult plots listed above
 """
 from __future__ import annotations
 
@@ -116,6 +125,31 @@ def summarize_by_alpha(rows: list[dict], dataset: str, attack: str) -> pd.DataFr
         wins = sum(1 for s in set(n_by_seed) & set(d_by_seed) if d_by_seed[s] < n_by_seed[s])
         row["dro_wins_this_alpha"] = wins
         row["seeds_this_alpha"] = len(set(n_by_seed) & set(d_by_seed))
+        recs.append(row)
+    return pd.DataFrame(recs)
+
+
+def summarize_metric(rows: list[dict], dataset: str, metric_key: str) -> pd.DataFrame:
+    """Return per-alpha mean+SE for naive and dro on any metric (acc_clean / if_clean / dp_clean).
+    Aggregates over all attacks + seeds for clean simple lines (Adult only).
+    """
+    if not rows:
+        return pd.DataFrame()
+    df = pd.DataFrame(rows)
+    sub = df[(df["dataset"] == dataset)].copy()
+    if sub.empty:
+        return pd.DataFrame()
+
+    recs = []
+    for alpha in sorted(sub["alpha"].unique()):
+        g = sub[sub["alpha"] == alpha]
+        row = {"alpha": float(alpha)}
+        for meth in ("naive", "dro"):
+            mg = g[g["method"] == meth]
+            vals = mg[metric_key].values if not mg.empty else np.array([])
+            row[f"{meth}_mean"] = float(np.mean(vals)) if len(vals) else np.nan
+            row[f"{meth}_se"]   = float(np.std(vals, ddof=1) / np.sqrt(len(vals))) if len(vals) > 1 else 0.0
+            row[f"{meth}_n"]    = len(vals)
         recs.append(row)
     return pd.DataFrame(recs)
 
@@ -231,6 +265,114 @@ def main():
     fig.tight_layout()
 
     savefig(fig, "fig_tau1_headline")
+
+    print("\nAGENT C MILESTONE: headline tau1 side-by-side fig complete, see figures/fig_tau1_headline.pdf (and .png)")
+    print(f"Evidence row counts used: tau1={len(tau1_rows)}, tau100={len(tau100_rows)} (Adult DP attack only for this fig)")
+    print("  (preliminary; regenerate after canonical_tau1.json lands by editing load paths in this script)")
+
+    # ======================================================================
+    # NEW: Kuldeep meeting-format plots (clean Adult-only, x=alpha, requested style)
+    # y starts at 0.78 for acc; serif/CM; simple lines+SE; match existing headline_meeting aesthetic.
+    # ======================================================================
+    print("\nGenerating meeting-format plots for Adult (tau ablations)...")
+
+    # Summaries aggregated over attacks/seeds for clean per-tau views
+    acc_tau1  = summarize_metric(tau1_rows,   "adult", "acc_clean")
+    acc_tau10 = summarize_metric(tau10_rows,  "adult", "acc_clean")
+    acc_tau100= summarize_metric(tau100_rows, "adult", "acc_clean")
+    if_tau1   = summarize_metric(tau1_rows,   "adult", "if_clean")
+    if_tau100 = summarize_metric(tau100_rows, "adult", "if_clean")
+
+    def make_acc_plot(summary: pd.DataFrame, tau_label: str, stem: str):
+        fig, ax = plt.subplots(figsize=(6.2, 4.0))
+        if not summary.empty:
+            for meth, marker in [("naive", "o"), ("dro", "s")]:
+                sub = summary.sort_values("alpha")
+                ax.errorbar(
+                    sub["alpha"], sub[f"{meth}_mean"], yerr=sub[f"{meth}_se"],
+                    marker=marker, color=COLORS[meth], label=METHOD_LABEL[meth],
+                    linewidth=1.6, capsize=3, markersize=5.5
+                )
+        clean_axes(ax)
+        ax.set_xlabel(r"corruption $\alpha$")
+        ax.set_ylabel("Accuracy")
+        ax.set_title(f"Adult Accuracy vs $\\alpha$ ($\\tau = {tau_label}$)")
+        ax.legend(loc="lower left", fontsize=9)
+        ax.set_ylim(bottom=0.78)  # per Kuldeep meeting style request
+        # nice ticks for alphas present
+        alphas_present = sorted([a for a in summary["alpha"].values]) if not summary.empty else []
+        if alphas_present:
+            ax.set_xticks(alphas_present)
+        fig.tight_layout()
+        savefig(fig, stem)
+
+    def make_if_plot(summary: pd.DataFrame, tau_label: str, stem: str):
+        fig, ax = plt.subplots(figsize=(6.2, 4.0))
+        if not summary.empty:
+            for meth, marker in [("naive", "o"), ("dro", "s")]:
+                sub = summary.sort_values("alpha")
+                ax.errorbar(
+                    sub["alpha"], sub[f"{meth}_mean"], yerr=sub[f"{meth}_se"],
+                    marker=marker, color=COLORS[meth], label=METHOD_LABEL[meth],
+                    linewidth=1.6, capsize=3, markersize=5.5
+                )
+        clean_axes(ax)
+        ax.set_xlabel(r"corruption $\alpha$")
+        ax.set_ylabel("IF violation")
+        ax.set_title(f"Adult IF violation vs $\\alpha$ ($\\tau = {tau_label}$)")
+        ax.legend(loc="upper right", fontsize=9)
+        if not summary.empty:
+            ax.set_xticks(sorted(summary["alpha"].values))
+        fig.tight_layout()
+        savefig(fig, stem)
+
+    # 1. tau=1 Accuracy (meeting)
+    if not acc_tau1.empty:
+        make_acc_plot(acc_tau1, "1", "adult_accuracy_tau1_meeting")
+    # 2. tau=100 Accuracy (meeting)
+    if not acc_tau100.empty:
+        make_acc_plot(acc_tau100, "100", "adult_accuracy_tau100_meeting")
+    # 3. tau=1 IF (meeting)
+    if not if_tau1.empty:
+        make_if_plot(if_tau1, "1", "adult_if_tau1_meeting")
+    # 4. tau=100 IF (meeting)
+    if not if_tau100.empty:
+        make_if_plot(if_tau100, "100", "adult_if_tau100_meeting")
+
+    # 5. Direct acc vs alpha comparison across tau=1,10,100 (key for "adjust τ for larger α")
+    fig, ax = plt.subplots(figsize=(7.0, 4.2))
+    tau_summaries = [
+        (acc_tau1, "1", COLORS["dro"], "o", "solid"),
+        (acc_tau10, "10", "#2ca02c", "s", "solid"),  # green for tau10
+        (acc_tau100, "100", "#d62728", "^", "solid"), # red for tau100
+    ]
+    for summ, tlab, col, mark, ls in tau_summaries:
+        if not summ.empty:
+            sub = summ.sort_values("alpha")
+            ax.errorbar(
+                sub["alpha"], sub["dro_mean"], yerr=sub["dro_se"],
+                marker=mark, color=col, label=f"DRO (τ={tlab})",
+                linewidth=1.6, capsize=3, markersize=5.5, linestyle=ls
+            )
+            # light naive for context (dashed, same color, lower alpha)
+            ax.errorbar(
+                sub["alpha"], sub["naive_mean"], yerr=sub["naive_se"],
+                marker=mark, color=col, label=f"Naive (τ={tlab})",
+                linewidth=1.0, capsize=2, markersize=4, linestyle="--", alpha=0.55
+            )
+    clean_axes(ax)
+    ax.set_xlabel(r"corruption $\alpha$")
+    ax.set_ylabel("Accuracy")
+    ax.set_title("Adult Accuracy vs $\\alpha$ — effect of fixed $\\tau$ (DRO solid; Naive dashed)")
+    ax.legend(loc="lower left", fontsize=8, ncol=2)
+    ax.set_ylim(bottom=0.78)
+    alphas_all = sorted(set(list(acc_tau1["alpha"].values) + list(acc_tau10["alpha"].values) + list(acc_tau100["alpha"].values))) if not acc_tau1.empty else []
+    if alphas_all:
+        ax.set_xticks(alphas_all)
+    fig.tight_layout()
+    savefig(fig, "adult_acc_vs_alpha_different_tau")
+
+    print("  saved meeting plots: adult_accuracy_tau{1,100}_meeting, adult_if_tau{1,100}_meeting, adult_acc_vs_alpha_different_tau  (.pdf+.png each)")
 
     print("\nAGENT C MILESTONE: headline tau1 side-by-side fig complete, see figures/fig_tau1_headline.pdf (and .png)")
     print(f"Evidence row counts used: tau1={len(tau1_rows)}, tau100={len(tau100_rows)} (Adult DP attack only for this fig)")

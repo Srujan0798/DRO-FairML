@@ -72,3 +72,12 @@ results/fairness_pgd_lsac.json
 
 # Session zip files
 session_*.zip
+
+# Local comfort duplicate folders (for chat comfort on laptop only; NOT part of project/repo)
+# These contain copies of meeting artifacts (plots, KULDEEP_DISCUSSION copy, ready message).
+# Originals stay in root (KULDEEP_DISCUSSION.md) and figures/ and results/.
+# Never commit these; they are purely local duplicates for user's personal use during chats.
+kuldeep_meeting/
+FRIEND/
+friend/
+FRIEND/
