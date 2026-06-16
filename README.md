@@ -41,12 +41,12 @@ Root now contains only the 5 persistent key docs above + standard entry points (
 - `src/` — implementation (Algorithm 1 trainer, FairnessTargetedPGD attack, radii, etc.)
 - `experiments/` — runners (run_canonical.py with K=10/tau=1/provenance, ablations, plot generators, UTK server script). Old one-offs in experiments/_archive/.
 - `results/` + `figures/` — all committed deliverables (json with full provenance rows, meeting-ready plots with CM serif fonts, error bars, absolute DP/IF values, no shading).
-- `docs/` — design notes (FAIRNESS_PGD_DESIGN, KEY_FORMULAS, UTKFACE_*, TAU1_ABLATION etc.) + `_archive/` (everything historical/one-off consolidated here for clarity — no more root clutter).
+- `docs/` — design notes (FAIRNESS_PGD_DESIGN, KEY_FORMULAS, UTKFACE_*, TAU1_ABLATION etc.) + `_archive/` (everything historical/one-off consolidated here for clarity — no more root clutter) + **CHAT_HISTORY_MAY_JUNE.md** (the *entire* conversation with Madam + Kuldeep stored very clearly: full timeline + all threads/Qs + decisions + links to results/plots).
 - `paper/`, `report/`, `submission/` — paper .tex + built PDFs.
 - `data/`, `configs/`, `tests/`, `scripts/`
 
 **Intentionally local / generated (gitignored, never in clones or "original project structure"):**
-- `kuldeep_meeting/` and `FRIEND/` — slim duplicate copies (meeting plots + KULDEEP_DISCUSSION snapshot + ready_chat_message.txt + conversation_key.txt) **only for your laptop comfort** during Kuldeep (and friend) chats. Do not put originals or full project source inside them. The real files live in the tracked locations above.
+- `kuldeep_meeting/` and `FRIEND/` — slim duplicate copies (meeting plots + KULDEEP_DISCUSSION snapshot + ready_chat_message.txt + conversation_key.txt + CHAT_HISTORY_MAY_JUNE.md copy) **only for your laptop comfort** during Kuldeep (and friend) chats. Do not put originals or full project source inside them. The real files live in the tracked locations above.
 - `logs/`, `packages/` (vendored wheels for offline), `venv/`
 
 See .gitignore for exact excludes. After any big run or meeting prep, archive transients under docs/_archive/ so the tree stays findable.
