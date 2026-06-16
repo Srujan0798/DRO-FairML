@@ -21,10 +21,6 @@ def main():
     parser.add_argument('--epochs', type=int, default=60)
     args = parser.parse_args()
 
-    # Monkey-patch get_temperature to return fixed tau
-    import experiments.run_fairness_pgd as fp
-    fp.get_temperature = lambda alpha: args.tau
-
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     out_path = f'results/tau_ablation_tau{args.tau:.0f}.json'
 
@@ -56,9 +52,14 @@ def main():
                             result = run_single_experiment(
                                 dataset, alpha, seed, attack, method,
                                 device=device, verbose=False,
-                                epochs=args.epochs, k_inner=args.k_inner, pgd_steps=args.pgd_steps
+                                epochs=args.epochs, k_inner=args.k_inner, pgd_steps=args.pgd_steps,
+                                tau=args.tau,  # explicit fixed tau (bypasses stepped get_temperature)
+                                lambda_init=0.0,
+                                radii_mode='uniform',
+                                coordinated=False,
+                                n_seeds_planned=args.n_seeds
                             )
-                            result['tau'] = args.tau  # tag with tau value
+                            # provenance now injected inside run_single_experiment via _add_provenance
                             elapsed = time.time() - t0
                             results.append(result)
                             completed.add(key)

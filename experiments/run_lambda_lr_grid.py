@@ -45,6 +45,7 @@ def run_one(alpha, seed, lambda_init, lr_lambda):
         lambda_max=1.5, tau=TAU, beta=5.0, k=5, gamma=0.0,
         K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15,
         lambda_init=lambda_init,
+        radii_mode='uniform',
         use_dp=True, use_if=False,  # DP-targeted attack → no IF constraint needed
     )
     trainer.fit(X_att, y_att, a_att, X_val=X_v, y_val=y_v, a_val=a_v, verbose=False)
@@ -55,8 +56,8 @@ def run_one(alpha, seed, lambda_init, lr_lambda):
 def main():
     alphas = [0.2, 0.3]
     seeds = [0, 1, 2]
-    lambda_inits = [0.0, 0.01, 0.1, 1.0]   # 0.0 = paper-spec baseline
-    lr_lambdas = [0.001, 0.005, 0.01]
+    lambda_inits = [0.0, 0.01, 0.1]   # useful subset per task (0.0 paper spec)
+    lr_lambdas = [0.001, 0.005]  # 1e-3,5e-3 ; note: current json has 1-row from reduced-epoch local fill; re-run with 60ep on server for full
 
     os.makedirs('results', exist_ok=True)
     out = 'results/lambda_lr_grid.json'
@@ -81,7 +82,16 @@ def main():
                         r.update({'dataset': DATASET, 'attack': ATTACK, 'tau': TAU,
                                   'alpha': alpha, 'seed': seed,
                                   'lambda_init': li, 'lr_lambda': lr,
-                                  'time': time.time()-t0})
+                                  'time': time.time()-t0,
+                                  # full provenance per hard constraint §0/§1 and §4:
+                                  'k_inner': 10,
+                                  'radii_mode': 'uniform',
+                                  'coordinated': False,
+                                  'pgd_steps': 20,
+                                  'n_seeds_planned': len(seeds),
+                                  'epochs': 60,
+                                  'use_if': False,  # for this Q1 speed optimization (DP only)
+                                  })
                         results.append(r)
                         json.dump(results, open(out, 'w'), indent=2)
                         print(f"   -> acc={r['acc']:.3f} dp={r['dp']:.4f} ({r['time']:.0f}s)", flush=True)

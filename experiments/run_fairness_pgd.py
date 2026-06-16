@@ -28,8 +28,29 @@ def get_temperature(alpha):
     return 1.0 if alpha >= 0.4 else 100.0
 
 
-def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=20):
-    """Run single (dataset, alpha, seed, attack, method) experiment."""
+def _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs):
+    """Ensure EVERY saved row records full config provenance per §1.4 and §4 of MASTER_PLAN.
+    Mandatory keys: k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
+    """
+    result.update({
+        'k_inner': int(k_inner),
+        'tau': float(tau),
+        'radii_mode': str(radii_mode),
+        'lambda_init': float(lambda_init),
+        'coordinated': bool(coordinated),
+        'pgd_steps': int(pgd_steps),
+        'n_seeds_planned': int(n_seeds_planned),
+        'epochs': int(epochs),
+    })
+    return result
+
+
+def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=20,
+                          tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3):
+    """Run single (dataset, alpha, seed, attack, method) experiment.
+    All callers must pass (or rely on defaults for) full provenance params so every row
+    includes k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
+    """
     import random
     random.seed(seed)
     np.random.seed(seed)
@@ -42,7 +63,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
     X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
         get_dataset(dataset_name, random_state=seed)
 
-    tau = get_temperature(alpha)
+    if tau is None:
+        tau = get_temperature(alpha)
     input_dim = X_train.shape[1]
 
     attack_obj = FairnessTargetedPGD(
@@ -51,7 +73,7 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         pgd_steps=pgd_steps,
         epsilon=0.3,
         pgd_step_size=0.02,
-        coordinated=False,
+        coordinated=coordinated,
         random_state=seed
     )
 
@@ -87,7 +109,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
             model, alpha=alpha, device=device,
             lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=1.5,
             tau=tau, beta=5.0, k=5, gamma=0.0,
-            K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15
+            K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15,
+            lambda_init=lambda_init, radii_mode=radii_mode
         )
         trainer.fit(X_train_att, y_train_att, a_train_att,
                      X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
@@ -101,6 +124,7 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
     result['if_clean'] = float(metrics['if_violation'])
     result['total_time'] = time.time() - start_time
 
+    result = _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs)
     return result
 
 
@@ -178,7 +202,12 @@ def main():
                             t0 = time.time()
                             result = run_single_experiment(
                                 dataset, alpha, seed, attack, method, device=device, verbose=False,
-                                epochs=smoke_epochs, k_inner=smoke_k_inner, pgd_steps=smoke_pgd_steps
+                                epochs=smoke_epochs, k_inner=smoke_k_inner, pgd_steps=smoke_pgd_steps,
+                                tau=None,  # rely on get_temperature inside (stepped) for this driver; canonical passes explicit 1.0
+                                lambda_init=0.0,
+                                radii_mode='uniform',
+                                coordinated=False,
+                                n_seeds_planned=args.n_seeds
                             )
                             elapsed = time.time() - t0
                             all_results.append(result)

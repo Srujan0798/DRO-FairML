@@ -60,9 +60,14 @@ def main():
                             result = run_single_experiment(
                                 dataset, alpha, seed, attack, method,
                                 device=device, verbose=False,
-                                epochs=args.epochs, k_inner=args.k_inner, pgd_steps=args.pgd_steps
+                                epochs=args.epochs, k_inner=args.k_inner, pgd_steps=args.pgd_steps,
+                                tau=1.0,  # knn ablations run at the verified tau=1
+                                lambda_init=0.0,
+                                radii_mode='uniform',
+                                coordinated=False,
+                                n_seeds_planned=args.n_seeds
                             )
-                            result['k_nn'] = args.k  # tag with k value
+                            result['k_nn'] = args.k  # tag with attack k (for IF); run_single injects full provenance too
                             elapsed = time.time() - t0
                             results.append(result)
                             completed.add(key)
