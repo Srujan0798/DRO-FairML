@@ -160,7 +160,7 @@ class NaiveFairTrainer:
                 from src.evaluation.metrics import compute_metrics_torch
                 metrics = compute_metrics_torch(
                     self.model, X_val, y_val, a_val,
-                    device=self.device, temperature=self.tau, k=self.k, gamma=self.gamma
+                    device=self.device, temperature=current_tau, k=self.k, gamma=self.gamma
                 )
                 history['val_acc'].append(metrics['accuracy'])
                 history['val_dp'].append(metrics['dp_violation'])

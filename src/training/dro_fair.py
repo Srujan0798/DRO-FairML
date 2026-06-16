@@ -29,7 +29,7 @@ class DroFairTrainer:
                  lr_p=5e-3, lambda_max=1.5, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
                  use_dp=True, use_if=True, tau_warmup_epochs=15,
-                 lambda_init=0.0):
+                 lambda_init=0.0, radii_mode='uniform'):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -50,6 +50,14 @@ class DroFairTrainer:
         self.use_dp = use_dp
         self.use_if = use_if
         self.tau_warmup_epochs = tau_warmup_epochs
+        # radii_mode (Kuldeep Q5): 'uniform' (default) uses the closed-form
+        # bias correction pi_clean = (pi_obs - alpha) / (1 - 2*alpha), which
+        # assumes the corruption budget is distributed uniformly across groups.
+        # 'empirical' exploits the known coordinated 70%-minority attack
+        # structure to invert the attribute-flip equations exactly.
+        if radii_mode not in ('uniform', 'empirical'):
+            raise ValueError(f"radii_mode must be 'uniform' or 'empirical', got {radii_mode!r}")
+        self.radii_mode = radii_mode
         self.rho_dp = None
         self.rho_if = None
         self.n_samples = None
@@ -59,17 +67,24 @@ class DroFairTrainer:
 
         FAIR VERSION: Uses clean validation data (a_val) to estimate true clean
         group proportions. Both Naive and DRO have access to clean validation data,
-        so this is NOT an oracle leak. Falls back to uniform-alpha formula if
-        a_val not provided (legacy behavior).
+        so this is NOT an oracle leak.
+
+        Kuldeep Q5: when a_val is unavailable, the trainer can still exploit
+        the known attack structure. 'uniform' (default) uses the generic
+        closed form pi_clean = (pi_obs - alpha) / (1 - 2*alpha). 'empirical'
+        assumes a coordinated attack with 70% of the corruption budget hitting
+        the minority group and the other 30% hitting the majority, and inverts
+        the resulting attribute-flip equations to recover the clean proportions
+        exactly. No true corruption mask is used (no oracle leak).
         """
         n = len(a)
         pi_obs = np.array([np.mean(a == j) for j in [0, 1]])
 
-        # Use clean validation data to get TRUE clean proportions (fair)
         if a_val is not None and len(a_val) > 0:
             pi_clean = np.array([np.mean(a_val == j) for j in [0, 1]])
+        elif self.radii_mode == 'empirical':
+            pi_clean = self._empirical_pi_clean(pi_obs)
         else:
-            # Fallback: estimate from corrupted data (old method, less accurate)
             pi_clean = np.zeros(2)
             for j in [0, 1]:
                 if self.alpha != 0.5:
@@ -84,6 +99,45 @@ class DroFairTrainer:
             rho_dp.append(self.alpha / denom if denom > 0 else 1.0)
         rho_if = 2 * self.alpha - self.alpha ** 2
         return rho_dp, rho_if
+
+    def _empirical_pi_clean(self, pi_obs):
+        """Recover clean group proportions from observed post-attack proportions.
+
+        Derivation (coordinated 70%-minority attack with attribute flips only):
+            Let n_c = alpha * n be the corruption budget. With coordinated
+            targeting, 0.7 * n_c samples from the (clean) minority group get
+            their attribute flipped to majority, and 0.3 * n_c samples from
+            the (clean) majority group get flipped to minority. Hence the
+            observed minority count is N_min - 0.7*n_c + 0.3*n_c
+            = N_min - 0.4*n_c, and the observed majority count is
+            N_maj - 0.3*n_c + 0.7*n_c = N_maj + 0.4*n_c. Dividing by n
+            gives:
+                pi_obs[minority] = pi_clean[minority] - 0.4 * alpha
+                pi_obs[majority] = pi_clean[majority] + 0.4 * alpha
+            Rearranging:
+                pi_clean[minority] = pi_obs[minority] + 0.4 * alpha
+                pi_clean[majority] = pi_obs[majority] - 0.4 * alpha
+            The minority here is the smaller of the two OBSERVED groups (the
+            attack swaps enough that the post-attack minority is the same as
+            the pre-attack minority for alpha <= 0.4, but the formula
+            doesn't need to know which was the original minority).
+
+        Validity: This is exact for the coordinated 70%-minority attack with
+        attribute flips, when alpha*n_corrupt < N_min (so the 70% allocation
+        is not capped). For alpha <= 0.4 on Adult/Credit/LSAC this holds.
+        """
+        if self.alpha == 0.0:
+            return pi_obs.copy()
+        minority_idx = int(np.argmin(pi_obs))
+        majority_idx = 1 - minority_idx
+        pi_clean = pi_obs.copy()
+        pi_clean[minority_idx] = pi_obs[minority_idx] + 0.4 * self.alpha
+        pi_clean[majority_idx] = pi_obs[majority_idx] - 0.4 * self.alpha
+        pi_clean = np.clip(pi_clean, 0.0, 1.0)
+        s = pi_clean.sum()
+        if s > 0:
+            pi_clean = pi_clean / s
+        return pi_clean
 
     def _build_knn_graph(self, X):
         """Precompute k-NN graph for IF."""

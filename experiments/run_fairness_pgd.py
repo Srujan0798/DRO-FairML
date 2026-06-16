@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Experiment driver for Fairness-Targeted PGD attacks on tabular datasets.
-Trains Naive-FAIR and DRO-FAIR on clean data, applies attacks, retrains, evaluates.
+Corrupts the training set with a fairness-targeted PGD attack, then trains
+Naive-FAIR and DRO-FAIR on the corrupted data and evaluates on clean test.
 
 Usage:
     python3 experiments/run_fairness_pgd.py --smoke

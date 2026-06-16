@@ -22,8 +22,13 @@ def compute_accuracy(y_true, y_pred):
 
 def compute_dp_violation(y_pred, a):
     """
-    Compute Demographic Parity violation: |P(h=1|A=0) - P(h=1|A=1)|.
-    
+    Compute Demographic Parity violation.
+
+    Binary: |P(h=1|A=0) - P(h=1|A=1)|.
+    Multigroup (>=2 groups, e.g. UTKFace race): max_g P(h=1|A=g) - min_g P(h=1|A=g).
+        This is the natural generalization — measures the worst-case disparity
+        between any two groups, which is what multi-group fairness requires.
+
     Args:
         y_pred: predictions (numpy array, can be soft [0,1] or hard {0,1})
         a: protected attributes (numpy array)
@@ -38,10 +43,12 @@ def compute_dp_violation(y_pred, a):
             rates.append(np.mean(y_pred[mask]))
         else:
             rates.append(0.0)
-    
-    if len(rates) >= 2:
+
+    if len(rates) < 2:
+        return 0.0
+    if len(rates) == 2:
         return abs(rates[0] - rates[1])
-    return 0.0
+    return float(np.max(rates) - np.min(rates))
 
 
 def compute_if_violation(X, y_pred, a=None, k=5, gamma=0.0, metric='euclidean'):
