@@ -1,38 +1,34 @@
-# DRO-FAIR - Fairness Research Project
+# DRO-FairML — Distributionally Robust Optimization for Fairness
 
-## ONE COMMAND (Does everything):
+Implements Algorithm 1 (min-max Lagrangian DRO-FAIR with corruption-calibrated TV
+uncertainty sets) vs a Naive-FAIR baseline, under **adversarial** fairness-targeted
+PGD attacks (DP / IF / combined). Datasets: Adult, Credit, LSAC (tabular), UTKFace (image).
+
+## Start here
+- **[HANDOFF.md](HANDOFF.md)** — full project state, history, every decision, and constraints. Read this first.
+- **[MASTER_PLAN.md](MASTER_PLAN.md)** — remaining work split into agent briefs (file-owned, parallel-safe).
+- **[MEETING_TODAY.md](MEETING_TODAY.md)** — current results story for the meeting.
+- **[ADULT_RESULTS_FOR_KULDEEP.md](ADULT_RESULTS_FOR_KULDEEP.md)** — latest Adult findings.
+- **[SERVER_RUNBOOK.md](SERVER_RUNBOOK.md)** — flair2 GPU setup for UTKFace (credentials NOT stored here; see your password manager / email supin.gopi for the flair2 account).
+
+## Key code
+- `src/training/dro_fair.py` — DRO-FAIR trainer (Algorithm 1).
+- `src/training/naive_fair.py` — Naive-FAIR baseline.
+- `src/corruption/adversarial.py` — `FairnessTargetedPGD` (the attack) + `RandomCorruptor` (baseline only).
+- `experiments/run_fairness_pgd.py` — main tabular experiment driver.
+- `experiments/run_tau_ablation.py`, `run_knn_ablation.py`, `run_lambda_lr_grid.py` — ablations.
+
+## Headline finding
+Fixing **tau=1** (vs the old stepped tau=100 schedule) makes DRO beat Naive on DP at
+every corruption level α on Adult, with the advantage growing in α. The earlier
+"DRO is fragile" result was a high-temperature artifact. See MEETING_TODAY.md.
+
+## Run (local CPU)
 ```bash
-cd /data/srujan.sai/DRO-FairML && git pull origin main && export PYTHONPATH=/data/srujan.sai/DRO-FairML && python3 scripts/test_fairness_pgd.py
+python3 experiments/run_fairness_pgd.py --datasets adult credit lsac --alphas 0.0 0.1 0.2 0.3 0.4 --n_seeds 3
 ```
 
-## PUSH CODE (For review):
-```bash
-cd /data/srujan.sai/DRO-FairML && git add . && git commit -m "NAME: did X" && git push origin main
-```
-
-## WRITE REPORT:
-```bash
-echo "DONE: DP results etc" >> /data/srujan.sai/DRO-FairML/REPORTS/daily.txt
-```
-
-## AUTO RUNNER (All in one):
-```bash
-bash /data/srujan.sai/DRO-FairML/scripts/auto_runner.sh
-```
-
----
-
-## Project Overview
-- **Goal**: Test Fairness-Targeted PGD attacks on ML models (DRO-FAIR framework)
-- **Datasets**: Adult, Credit, LSAC (tabular), UTKFace (image)
-- **Attack**: Gradient-based label flipping to maximize unfairness (DP violation)
-
-## Key Files
-- `src/corruption/adversarial.py` - FairnessTargetedPGD class
-- `scripts/test_fairness_pgd.py` - Main experiment script
-- `scripts/auto_runner.sh` - Runs everything automatically
-
-## Login
-- JupyterHub: http://flair2.iitgn.ac.in:8000/hub/login
-- User: srujan.sai | Pass: ss#081
-- Server: flair2.iitgn.ac.in (10.0.62.234)
+## Hard constraints (do not violate)
+Corruption is always adversarial (never RandomCorruptor as the method); `epochs=60`,
+`K_inner=10`; step order θ→λ→p; dual λ init 0.0; `lambda_max=1.5` all datasets; no oracle
+corruption rates to DRO. Full rationale in HANDOFF.md.
