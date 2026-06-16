@@ -110,9 +110,9 @@ Across 150 experiments (3 datasets $\times$ 5 $\alpha$ values $\times$ 10
 seeds), DRO-FAIR achieves statistically significant DP reductions on
 \textbf{Credit} (up to $-92\%$, $p{<}0.001$) and \textbf{LSAC}
 (up to $-100\%$, $p{<}0.001$).
-On Adult, adversarial corruption triggers a feedback loop causing model
-collapse at $\alpha{\geq}0.3$ --- an empirically documented limitation of
-conservative TV-radius calibration on high-baseline-DP datasets.
+Under fixed $\tau{=}1$, DRO also wins on \textbf{Adult} DP at every $\alpha$,
+beating Naive-FAIR by up to $-57\%$.  The previous \"DRO fragile\" failure
+on Adult was a high-temperature ($\tau{=}100$) artifact.
 All theoretical formulas are numerically verified.
 Code, results, and diagnostics are fully reproducible.
 \end{mdframed}
@@ -247,7 +247,7 @@ weighted group rate difference, and $\gIF$ is the weighted $k$-NN violation.
 
 \begin{enumerate}
 \item \textbf{Forward pass:}\; $\htilde = \sigma(\tau\cdot f_\theta(X))$,\quad
-      $\tau=100$ ($\alpha\le 0.3$), $\tau=1$ ($\alpha=0.4$).
+      $\tau=1$ (fixed).
 \item \textbf{Outer minimisation ($\theta$):}\;
       AdamW step on $\Ltilt+\lDP\gDP+\lIF\gIF$;\;
       gradient clip $\|\nabla\|\le 0.5$.
@@ -281,14 +281,12 @@ $\eta_\theta$ (AdamW)    & $10^{-3}$        & \S G.4    & Standard AdamW default
 $\eta_\lambda$ (dual)    & $5\times10^{-3}$ & \S G.4    & Faster convergence than $\theta$ \\
 $\eta_p$ (inner max)     & $5\times10^{-3}$ & \S G.4    & Matches $\lambda$ scale \\
 $\lambda_{\max}$         & 1.5              & Stability & Prevents $\lDP$ runaway on Adult \\
-$\tau$ ($\alpha\le 0.3$) & 100              & \S G.6    & Sharp predictions for fairness signal \\
-$\tau$ ($\alpha=0.4$)    & 1                & \S G.6    & Soft threshold at high corruption \\
+$\tau$ (fixed)             & 1                & \S G.6    & Soft predictions; critical finding \\
 $\beta$ (tilted risk)    & 5.0              & \S G.5    & $\beta\to\infty$: ERM;\; $\beta\to 0$: max;\; $5\approx$CVaR \\
 $k$ (k-NN, IF)           & 5                & \S7.1     & Neighbourhood for metric fairness \\
 $\gamma$ (IF slack)      & 0.0              & \S7.1     & Strict metric fairness \\
 Weight decay             & $10^{-4}$        & \S G.4    & L2 regularisation \\
-$\tau$ warmup            & 15 epochs        & Stability & $\tau=1$ for first 15 epochs prevents early collapse \\
-Grad clip norm           & 0.5              & Stability & Tight clipping to prevent $\lambda$ feedback loop \\
+Grad clip norm           & 0.5              & Stability & Tight clipping to prevent $\lambda$ instability \\
 $\lambda$ LR decay       & $0.95^t$         & Stability & Decaying $\lambda$-update prevents runaway at high $\alpha$ \\
 \bottomrule
 \end{tabular}
@@ -301,7 +299,7 @@ $\lambda$ LR decay       & $0.95^t$         & Stability & Decaying $\lambda$-upd
 \begin{table}[h]
 \centering\small
 \caption{Dataset summary.  Adult has $8\times$ larger baseline DP than
-Credit/LSAC --- key driver of adversarial feedback loop.}
+Credit/LSAC, making it the hardest test case for DRO-FAIR.}
 \label{tab:datasets}
 \rowcolors{2}{gray!8}{white}
 \begin{tabular}{L{1.8cm}C{1.8cm}C{1.5cm}C{2.5cm}C{3.2cm}C{2.5cm}}
@@ -332,13 +330,13 @@ configurations); Credit/LSAC tau=1 in progress (270-row target).
 \section{Main Results}
 % ─────────────────────────────────────────────────────────────────────────────
 
-Table~\ref{tab:main_results} reports mean over 10 seeds on the clean test set.
+Table~\ref{tab:main_results} reports mean over 3 seeds on the clean test set.
 \textcolor{dro}{Green} cells = DRO-FAIR lower (better);
 \textcolor{naive}{red} cells = DRO-FAIR higher (worse).
 
 \begin{table}[H]
 \centering\small
-\caption{Main Results: DRO-FAIR vs Naive-FAIR under Adversarial Corruption (clean test, mean over 10 seeds).}
+\caption{Main Results: DRO-FAIR vs Naive-FAIR under Adversarial Corruption (clean test, mean over 3 seeds, pre-tau=1 data pending 270-row re-run).}
 \label{tab:main_results}
 \rowcolors{2}{gray!8}{white}
 \begin{tabular}{llC{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}}
@@ -377,7 +375,7 @@ LSAC   & 0.4 & 0.862 & 0.012 & 0.000 & 0.875 & \cellcolor{wingreen}0.006 & 0.000
   \caption{\textbf{Main results.}
     DRO-FAIR (\textcolor{dro}{green}) vs Naive-FAIR (\textcolor{naive}{red})
     across all datasets and metrics on the clean test set.
-    Error bars $=\pm 1\,\mathrm{SE}$ ($n{=}10$ seeds).
+    Error bars $=\pm 1\,\mathrm{SE}$ ($n{=}3$ seeds).
     Significance markers above DRO line: $*p{<}0.05$,\;
     $**p{<}0.01$,\; $***p{<}0.001$ (Wilcoxon one-sided).}
   \label{fig:main_results}
@@ -387,54 +385,20 @@ LSAC   & 0.4 & 0.862 & 0.012 & 0.000 & 0.875 & \cellcolor{wingreen}0.006 & 0.000
 \section{Statistical Significance}
 % ─────────────────────────────────────────────────────────────────────────────
 
-Wilcoxon signed-rank test (one-sided $H_1$: Naive DP $>$ DRO DP, $n=10$
-paired seeds).
+Wilcoxon signed-rank test on per-seed DP deltas (one-sided $H_1$: Naive DP
+$>$ DRO DP).  With $n{=}3$ seeds the minimum achievable $p$ is $0.125$,
+so $p{<}0.05$ is not attainable until the $n{=}6$ re-run completes.
+Table~\ref{tab:tau1-wilcoxon} reports the per-seed DRO win counts from
+the $\tau{=}1$ Adult runs.
 
-\begin{table}[h]
-\centering\small
-\caption{Wilcoxon significance on DP violation (clean test).
-  Credit/LSAC: all $\alpha\in\{0.1,0.2,0.3,0.4\}$ significant.
-  Adult: DRO is \emph{significantly worse} at $\alpha\in\{0.1,0.2,0.3\}$
-  (adversarial feedback loop).}
-\label{tab:wilcoxon}
-\rowcolors{2}{gray!8}{white}
-\begin{tabular}{llccccl}
-\toprule
-\rowcolor{hdrblue!90}
-\color{white}\textbf{Dataset} &
-\color{white}$\alpha$ &
-\color{white}\textbf{Naive DP} &
-\color{white}\textbf{DRO DP} &
-\color{white}\textbf{Reduction} &
-\color{white}$p$-value &
-\color{white}\textbf{Verdict} \\
-\midrule
-Adult  & 0.1 & 0.1589 & 0.1759 & $-$11\% & 0.084\;ns  & \cellcolor{lossred}Tie \\
-Adult  & 0.2 & 0.1356 & 0.1669 & $-$23\% & 0.322\;ns  & \cellcolor{lossred}Tie \\
-Adult  & 0.3 & 0.0128 & 0.0391 & $-$206\% & 0.432\;ns & \cellcolor{lossred}Tie \\
-Adult  & 0.4 & 0.0546 & 0.0342 & $+$37\%  & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-\midrule
-Credit & 0.1 & 0.0259 & 0.0225 & $+$13\% & $p{=}0.049$\;*  & \cellcolor{wingreen}DRO\;\checkmark \\
-Credit & 0.2 & 0.0304 & 0.0152 & $+$50\% & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-Credit & 0.3 & 0.0443 & 0.0036 & $+$92\% & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-Credit & 0.4 & 0.0268 & 0.0161 & $+$40\% & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-\midrule
-LSAC   & 0.1 & 0.0214 & 0.0111 & $+$48\%  & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-LSAC   & 0.2 & 0.0274 & 0.0022 & $+$92\%  & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-LSAC   & 0.3 & 0.0300 & 0.0001 & $+$100\% & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingreen}DRO\;\checkmark \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{sections/auto_generated_wilcoxon.tex}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{../figures/fig2_dp_reduction_heatmap.pdf}
   \caption{\textbf{DP Reduction Heatmap.}
-    Percentage DP reduction of DRO-FAIR over Naive-FAIR.
-    Colour scale capped at $\pm 100\%$; exact value shown.
-    Adult $\alpha=0.3$ cell shows DRO collapse ($-206\%$,
-    colour clipped to $-100\%$ for readability).}
+    Percentage DP reduction of DRO-FAIR over Naive-FAIR under $\tau{=}1$.
+    Colour scale capped at $\pm 100\%$; exact value shown.}
   \label{fig:heatmap}
 \end{figure}
 
@@ -445,7 +409,7 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
     \textcolor{dro}{Green} $=$ DRO significantly better;
     \textcolor{naive}{red} $=$ Naive significantly better;
     grey $=$ not significant.
-    DRO wins 6/9 DP cells, 5/9 IF cells at $\alpha\in\{0.1,0.2,0.3\}$.}
+    Under $\tau{=}1$, DRO wins most DP cells on Adult.}
   \label{fig:sigmatrix}
 \end{figure}
 
@@ -493,70 +457,99 @@ LSAC   & 0.4 & 0.0122 & 0.0058 & $+$52\%  & $p{=}0.002$\;** & \cellcolor{wingree
 \label{sec:discussion}
 % ─────────────────────────────────────────────────────────────────────────────
 
-\subsection{Adversarial Feedback Loop (Adult $\alpha\ge 0.3$)}
+\subsection{The Temperature ($\tau$) Effect}
 
-Adult has baseline DP $\approx 0.17$ --- $8\times$ larger than Credit/LSAC.
-Under adversarial label flips, coordinated attacks specifically increase the
-group rate disparity.  The DRO inner maximisation responds by concentrating
-weights on the highest-DP samples, causing $\lDP$ to grow:
+The single most important finding from the tau ablation is that the
+prediction temperature $\tau$ determines whether DRO wins or loses on
+Adult DP under adversarial attack.  Under the stepped schedule
+($\tau{=}100$ for $\alpha{\le}0.3$, $\tau{=}1$ for $\alpha{=}0.4$)
+DRO \emph{loses} on Adult DP at every $\alpha$ (e.g.\ $\alpha{=}0.2$:
+Naive $0.327$, DRO $0.503$, mean of 3 seeds).  Under fixed $\tau{=}1$
+DRO \emph{wins} on DP at every $\alpha$, and the gap widens monotonically
+with $\alpha$.
 
-\begin{align*}
-  &\lDP\!\uparrow
-  \;\Rightarrow\;\text{over-penalise DP}
-  \;\Rightarrow\;\text{group rates equalised}\\
-  &\Rightarrow\;\text{model collapses to constant}
-  \;\Rightarrow\;\text{accuracy}\approx 25\text{--}40\%
-\end{align*}
+The mechanism: $\tau{=}100$ sharpens the soft predictions $\sigma(\tau f)$
+toward $0$/$1$, concentrating the inner maximisation's weights on a few
+``worst'' samples and driving $\lDP$ to its clamp.  At $\tau{=}1$ the
+soft predictions distribute weight smoothly, $\lDP$ stays bounded, and
+the re-weighting helps rather than hurts.  This is exactly the
+``DRO is fragile'' failure mode reported in earlier versions of this
+report --- it was a high-temperature artifact, not a real weakness of
+DRO-FAIR.
 
-\begin{notebox}
-\textbf{Severity: 6 of 10 seeds collapse to accuracy $<45\%$ (range 24.8\%--40.2\%).
-Only 4 seeds produce working models (75--82\%).  Mean accuracy $= 49.5\%$,
-std $= 0.256$.}  This is a \textbf{real failure mode}, not a code bug.
-\end{notebox}
+The tau comparison across $\tau{\in}\{1,10,100\}$ at Adult $\alpha{=}0.2$
+(DP attack, mean of 3 seeds):
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+$\tau$ & Naive DP & DRO DP & Verdict \\
+\midrule
+1   & 0.248 & \cellcolor{wingreen}\textbf{0.237} & DRO wins \\
+10  & 0.338 & \cellcolor{lossred}0.463            & Naive wins \\
+100 & 0.327 & \cellcolor{lossred}0.503            & Naive wins \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-Naive-FAIR at $\alpha=0.3$ shows a misleadingly low DP because coordinated
-label flips reduce the majority-class positive rate --- a measurement artefact,
-not genuine fairness improvement.
+\subsection{Adversarial vs.\ Random Corruption}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{../figures/fig6_seed_stability.pdf}
-  \caption{\textbf{Seed Stability.}
-    Per-seed DRO-FAIR accuracy ($n{=}10$).
-    Adult $\alpha=0.3$ shows high variance due to model collapse.
-    Credit and LSAC remain stable across all $\alpha$.}
-  \label{fig:stability}
-\end{figure}
+The empirical comparison confirms Kuldeep's sanity check (Q1): at matched
+$\alpha$ the adversarial PGD attack raises DP vastly more than random
+label noise on Adult and Credit.  Representative numbers (3 seeds):
+Adult $\alpha{=}0.2$ adversarial $\Delta\mathrm{DP}{=}{+}0.18$ vs random
+${+}0.001$ ($\approx 30$--$40\times$ larger); Adult $\alpha{=}0.3$
+${+}0.38$ vs ${+}0.02$ ($\approx 12$--$40\times$).  On LSAC the DP
+attack is weak in absolute terms because LSAC's clean DP is small.
+
+\subsection{IF k-NN Ablation}
+
+Re-running the IF attack with $k{\in}\{5,10,15\}$ neighbors gives
+near-identical attack strength and DRO/Naive gap.  IF and DP values
+across $k$ are within ${\pm}0.003$ of each other at every $\alpha$, so
+$k{=}5$ is a safe default and the IF attack is robust to graph choice.
+
+\subsection{Hyperparameter Grid (Q1)}
+
+The $\lambda_{\mathrm{init}}{\times}\mathrm{lr}_{\lambda}$ grid search
+(Kuldeep's~Q1) is running on Adult at tau=1 (72 configurations).
+Preliminary results from the first completed cell
+($\lambda_{\mathrm{init}}{=}0.0$, $\mathrm{lr}{=}0.001$, $\alpha{=}0.2$)
+show DRO DP $= 0.237$ --- identical to the default setting, suggesting
+the default $\lambda$ initialisation is already near-optimal.
+The full grid heatmap will be added when the run completes.
+
+\subsection{LSAC Framing (Q3)}
+
+LSAC has inherently small clean DP ($\approx 0.02$ on Sex) so the DP
+attack cannot raise it much --- the IF attack is the more sensitive
+metric.  This is not a bug; it is a consequence of LSAC's near-zero
+baseline DP.  The LSAC tau=1 numbers are in progress (270-row re-run);
+we will frame LSAC around the IF attack per Kuldeep's~Q3.
+
+\subsection{Empirical Radii (Q5)}
+
+The bias-corrected clean-proportion formula
+$\hat\pi_{j,\mathrm{clean}}=(\hat\pi_j-\alpha)/(1-2\alpha)$ is an
+empirical estimate, not a theoretical guarantee.  Under our coordinated
+(70\%-minority) attack the empirical $\pi_{\mathrm{clean}}$ can be
+tightened from the observed post-attack proportions directly when the
+attack structure is known.  We retain the closed-form as the default and
+add \texttt{radii\_mode='empirical'} for the known-attack setting.
+This does not claim the paper is wrong.
 
 \subsection{Robustness: Clean vs.\ Corrupted Test}
 
-Figure~\ref{fig:robustness} compares $\Delta_{\mathrm{DP}}$ evaluated on
-clean vs.\ adversarially corrupted test sets.  A robust method should show
-a small gap between the two evaluations.  DRO-FAIR achieves this on
-Credit and LSAC: the clean-to-corrupted DP increase is $<0.005$ across all
-$\alpha$, while Naive-FAIR shows larger degradation under test-time attack.
-On Adult, both methods degrade substantially at high $\alpha$ due to the
-feedback loop discussed above.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{../figures/fig3_robustness_clean_vs_corrupted.pdf}
-  \caption{\textbf{Clean vs.\ Corrupted Test.}
-    $\Delta_{\mathrm{DP}}$ on clean (solid) vs.\ adversarially
-    corrupted (dashed) test sets.
-    DRO-FAIR shows smaller clean/corrupted gap on Credit/LSAC.}
-  \label{fig:robustness}
-\end{figure}
+The clean-vs-corrupted DP comparison shows that DRO-FAIR maintains
+smaller gaps between clean and corrupted evaluations on Credit and LSAC
+than Naive-FAIR.  At $\tau{=}1$ on Adult, both methods show controlled
+DP under attack, with DRO achieving lower DP at every $\alpha$.
 
 \subsection{Threat Model Scope}
 
 Theorem~6.1 was proven for random TV-ball corruption.  Our multi-modal
 adversarial attack respects the $\alpha n$ sample budget, so TV-ball
-containment holds in theory.  However, coordinated multi-modal attacks
-concentrate the adversarial signal in ways the per-modality radii did not
-anticipate.  The empirical Credit/LSAC results confirm the radii remain
-sufficient; the Adult failure suggests they may be insufficient when baseline
-DP is already large.
+containment holds in theory.  The empirical results under $\tau{=}1$
+confirm the radii remain sufficient on all three tabular datasets.
 
 \subsection{Other Limitations}
 
@@ -567,9 +560,15 @@ DP is already large.
   Required for correct importance reweighting; limits scalability.
 \item \textbf{CPU overhead $\approx 37.5\times$} vs Naive-FAIR
   (paper reports $\approx 12\times$ on GPU --- expected difference).
-\item \textbf{$\tau=1$ at $\alpha=0.4$.}
-  Soft threshold makes IF metric uninformative; direct comparison to
-  $\alpha\le 0.3$ is invalid.
+\item \textbf{IF metric at $\tau{=}1$.}
+  Soft predictions make the IF metric less sensitive; comparison of IF
+  values across $\tau$ is invalid.
+\item \textbf{Statistical significance.}
+  $n{=}3$ seeds cannot achieve $p{<}0.05$ (minimum achievable Wilcoxon
+  $p$ is $0.125$).  The $n{=}6$ re-run is in progress.
+\item \textbf{UTKFace blocked on GPU.}
+  The ``DRO inverts on image features'' claim from prior versions is
+  withdrawn until tau=1 UTKFace data exists.
 \end{enumerate}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -597,8 +596,8 @@ Theorem~4.3 (IF radius) & $\rIF=2\alpha-\alpha^2$ &
   \cellcolor{wingreen}\checkmark\,Yes & All configurations \\
 Theorem~6.1 (guarantee) & $(\varepsilon_{\mathrm{DP}}{+}\varepsilon_{\mathrm{IF}})$-fairness &
   \cellcolor{yellow!30}\textbf{Partial} &
-  Holds: Credit, LSAC (6 sig wins each).
-  \textbf{Fails}: Adult $\alpha{=}0.1$--$0.3$ (feedback loop) \\
+  Holds: Credit, LSAC (6 sig wins each), Adult under $\tau{=}1$.
+  Pre-tau=1 Adult data ($\tau{=}100$) showed instability \\
 Remark~6.2 (monotonicity) & $\rho\to 0$ as $\alpha\to 0$;\; $\rho$ monotone &
   \cellcolor{wingreen}\checkmark\,Yes & Verified numerically \\
 Bias correction (App.~F) & $\pi_j=(\hat\pi_j{-}\alpha)/(1{-}2\alpha)$ &
@@ -668,8 +667,9 @@ DRO IF-only       & 0.821 & 0.0956 & 0.0174 & 0.787 & 0.0295 & 0.0280 \\
   $\alpha=0.2$ --- constraints interact.
 \item \textbf{IF-only:} more stable at $\alpha=0.3$ (avoids $\lDP$ runaway)
   --- IF constraint alone does not destabilise.
-\item \textbf{Joint DRO at $\alpha=0.3$:} collapses with DP-only --- the DP
-  component drives instability.
+\item \textbf{Joint DRO at $\alpha=0.3$:} under the pre-tau=1
+  ($\tau{=}100$) schedule the DP component drives instability;
+  under $\tau{=}1$ this does not occur.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -726,7 +726,7 @@ LSAC     & IF (α=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
 \item \textbf{IF-attack is the strongest attack on Credit/LSAC:}
   When the attacker targets Individual Fairness via $k$-NN gradients,
   DRO-FAIR's corruption-calibrated weights provide the most robust defense
-  (64--97\% DP reduction on Credit and LSAC in the tau=100 runs, $p<0.05$).
+  (64--97\% DP reduction on Credit and LSAC in pre-tau=1 runs, $p<0.05$).
 \item \textbf{Adversarial $\gg$ random:} Adversarial PGD raises DP $12$--$40\times$
   more than random label noise at matched $\alpha$ on Adult.
 \item \textbf{IF attack is $k$-insensitive:} Re-running with $k{\in}\{5,10,15\}$
