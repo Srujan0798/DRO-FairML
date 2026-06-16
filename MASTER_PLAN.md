@@ -149,3 +149,51 @@ B (src + Q5 math + provenance)  ──"src frozen"──►  A (canonical 6-seed
 - [ ] Repo tidy; HANDOFF current; no contaminated/duplicate result files.
 ```
 ```
+
+---
+
+## §10. REMAINING WORK TO 100/100 (current snapshot — assign these)
+
+> State as of now: code complete (tau=1, K=10, DP-PGD, α=0 guard, empirical radii,
+> classifier eval fix, provenance, 60 tests claimed green). Adult ablations done.
+> Report/paper updated to tau=1. The GAPS below are what stand between us and done.
+> §1 coordination rules still apply: **Agent A is the only one who launches runs**,
+> always `--k_inner 10`, every row carries provenance, never blanket-`pkill`.
+
+### Currently running (do not double-launch)
+- Grid `run_lambda_lr_grid.py` (12/72) — full CPU now. **BUG: resume not matching the 12 done rows (0 SKIP lines, recomputing from [1/72]); fix the key match — likely seed int/float or λ_init 0 vs 0.0.**
+- Canonical `run_canonical.py` PAUSED at 57/540 (resume-safe). Chain watcher PID 23515 auto-resumes it when the grid finishes.
+
+### AGENT A — Experiments (sole launcher; `experiments/`, `results/`, `logs/`)
+1. **Fix grid resume** (key-type mismatch), let grid finish 72/72. Then commit `lambda_lr_grid.json`.
+2. **Finish the canonical 540** (`canonical_tau1.json`): Credit + LSAC + seeds 0–5, k_inner=10, tau=1, full provenance. This is the publishable foundation. (~long; chain watcher already resumes it post-grid.)
+3. **Empirical-radii companion** `canonical_tau1_empirical.json` (DRO `radii_mode='empirical'`, same grid) for the Q5 comparison.
+4. **Extend IF k-NN ablation** (k 5/10/15) to Credit + LSAC if not already (Adult done).
+5. **UTKFace (Q13):** email supin.gopi for flair2; if access works, run canonical config (binary protected attr=gender). Else keep the documented block + local smoke.
+
+### AGENT B — Code/theory (sole `src/`) — mostly done; remaining:
+1. **Confirm the 60 tests actually pass** (paste `pytest` output) and that the empirical-radii unit test is real.
+2. Finish any leftover audit fixes (validation-τ consistency, `compute_dp_violation` >2 groups) if not already in; paste evidence.
+3. Keep "src frozen" — no edits during A's canonical run.
+
+### AGENT C — Analysis/figures/stats (`figures/`, `results/*.csv`)
+1. **n=6 Wilcoxon** from the FINISHED canonical (`canonical_wilcoxon.csv`) — report which cells hit p<0.05.
+2. **Regenerate ALL figures from FINAL canonical** (not the preliminary/contaminated `tau_ablation_tau1.json`): two-regime headline, win-curves (3 datasets), random-vs-adv (absolute DP), k-NN table, λ-grid heatmap, uniform-vs-empirical radii.
+3. **Grid analysis (Q1):** confirm/refute the preliminary signal that `lr_lambda=0.001` tightens DP (was DP 0.16 vs 0.24 at α=0.2, n=3 — needs full grid + more seeds; could be noise).
+4. **High-α figure:** use `results/high_alpha_tau_analysis.txt` — acc vs α across tau with the constant-predictor baseline line, showing tau isn't the lever and α≤0.2 is the meaningful regime.
+
+### AGENT D — Report/paper/docs (`report/`, `paper/`, `docs/`, top-level `*.md`)
+1. **Fold in the high-α finding** (from `analyze_high_alpha.py`): narrative = "DRO wins DP at every α; meaningful accuracy regime is α≤0.2; at α≥0.3 both methods degrade below the constant predictor but DRO still holds lower DP; tau is not the lever, λ/lr is the next knob." Honest framing.
+2. **Re-point every number to the FINAL canonical CSVs** once C regenerates them (the report currently cites preliminary/Adult-3-seed numbers).
+3. Q5 appendix (empirical radii derivation), LSAC-IF framing (Q3), Q7 inverse effect — confirm present.
+4. **Rebuild PDFs, paste build logs**; keep root minimal.
+
+### ORCHESTRATOR / QA GATE (verify, don't trust "done")
+- Actually run the test suite, build both PDFs, and spot-check ~5 report numbers against their CSV rows before declaring done. The "100% complete" claims must be evidence-backed.
+
+### DEFINITION OF 100/100
+- [ ] Grid 72/72 (resume fixed) + Q1 conclusion. [ ] Canonical 540/540 + empirical companion.
+- [ ] n=6 Wilcoxon with p<0.05 cells identified. [ ] All figures from FINAL canonical.
+- [ ] Report/paper numbers all trace to final CSVs; PDFs build clean (verified, not claimed).
+- [ ] High-α + tau-not-the-lever + λ-lever story written. [ ] UTKFace run or documented-blocked.
+- [ ] Tests pass (verified). [ ] Repo clean, HANDOFF current.
