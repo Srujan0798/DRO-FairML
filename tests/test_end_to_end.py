@@ -310,16 +310,96 @@ def test_adversarial_uses_model_gradients():
 def test_scaler_no_leakage():
     """MOD-2: StandardScaler should be fit on train only, not full dataset."""
     from src.data.datasets import get_dataset
-    
+
     X_train, _, _, X_val, _, _, X_test, _, _, _ = get_dataset('adult', random_state=42)
-    
+
     # The scaler was fit on train, so train mean should be ~0 but test mean might not be
     train_mean = np.mean(X_train, axis=0)
     test_mean = np.mean(X_test, axis=0)
-    
+
     # Train data should be standardized (mean ≈ 0, std ≈ 1)
     assert np.abs(train_mean).mean() < 0.1, \
         f"Train data not standardized: mean abs={np.abs(train_mean).mean():.4f}"
-    
+
     # Test data might not have mean ≈ 0 (no leakage), but should be close since train/test come from same distribution
     # This is a weak test — the main fix is in the code, not testable by data properties alone
+
+
+# ==================== AUDIT-FIX TESTS (Agent B) ====================
+
+def test_naive_fair_validation_uses_current_tau():
+    """During warmup, Naive-FAIR validation must use current_tau=1.0, not self.tau.
+
+    Regression: validation was passing temperature=self.tau=100.0 even during
+    the 15-epoch warmup when training uses current_tau=1.0. This made the
+    in-fit val metrics inconsistent with the actual training-time signals.
+    """
+    from src.training.naive_fair import NaiveFairTrainer
+    from src.evaluation import metrics as metrics_mod
+
+    X, y, a = _make_synthetic_data(n=200, d=5)
+    Xv, yv, av = _make_synthetic_data(n=80, d=5, seed=99)
+
+    captured = {"temps": []}
+    real_fn = metrics_mod.compute_metrics_torch
+
+    def spy(model, X_, y_, a_, **kwargs):
+        captured["temps"].append(kwargs.get("temperature", None))
+        return real_fn(model, X_, y_, a_, **kwargs)
+
+    metrics_mod.compute_metrics_torch = spy
+    try:
+        model = MLPClassifier(5, hidden_dims=[16, 8], dropout=0.0)
+        trainer = NaiveFairTrainer(
+            model, device='cpu', epochs=16, tau=100.0, k=3,
+            tau_warmup_epochs=15
+        )
+        trainer.fit(X, y, a, X_val=Xv, y_val=yv, a_val=av, verbose=False)
+    finally:
+        metrics_mod.compute_metrics_torch = real_fn
+
+    # Validation runs at epoch 5, 10, 15. Epochs 5 and 10 are warmup (current_tau=1.0).
+    # Epoch 15 is post-warmup (current_tau=self.tau=100.0). Verify that
+    # the warmup calls used temperature=1.0, NOT 100.0.
+    assert len(captured["temps"]) >= 2
+    warmup_temps = [t for t in captured["temps"] if t is not None and t < 10.0]
+    assert len(warmup_temps) >= 1, \
+        f"Expected at least one warmup validation with temperature=1.0, got {captured['temps']}"
+    assert all(t < 10.0 for t in warmup_temps), \
+        f"Warmup validations should use current_tau=1.0, got {captured['temps']}"
+
+
+def test_dro_fair_validation_uses_current_tau():
+    """DroFairTrainer validation must use current_tau=1.0 during warmup.
+
+    This is the same fix as the naive one, but for DroFairTrainer.
+    The fix was already in place before this audit; this test guards against regression.
+    """
+    from src.training.dro_fair import DroFairTrainer
+    from src.evaluation import metrics as metrics_mod
+
+    X, y, a = _make_synthetic_data(n=200, d=5)
+    Xv, yv, av = _make_synthetic_data(n=80, d=5, seed=99)
+
+    captured = {"temps": []}
+    real_fn = metrics_mod.compute_metrics_torch
+
+    def spy(model, X_, y_, a_, **kwargs):
+        captured["temps"].append(kwargs.get("temperature", None))
+        return real_fn(model, X_, y_, a_, **kwargs)
+
+    metrics_mod.compute_metrics_torch = spy
+    try:
+        model = MLPClassifier(5, hidden_dims=[16, 8], dropout=0.0)
+        trainer = DroFairTrainer(
+            model, alpha=0.0, device='cpu', epochs=16, K_inner=2,
+            tau=100.0, k=3, tau_warmup_epochs=15
+        )
+        trainer.fit(X, y, a, X_val=Xv, y_val=yv, a_val=av, verbose=False)
+    finally:
+        metrics_mod.compute_metrics_torch = real_fn
+
+    assert len(captured["temps"]) >= 2
+    warmup_temps = [t for t in captured["temps"] if t is not None and t < 10.0]
+    assert len(warmup_temps) >= 1, \
+        f"Expected warmup validation to use current_tau=1.0, got {captured['temps']}"

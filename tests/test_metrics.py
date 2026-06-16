@@ -24,6 +24,42 @@ def test_compute_dp_violation_nonzero():
     assert compute_dp_violation(y_pred, a) == 1.0
 
 
+def test_compute_dp_violation_three_groups():
+    """DP for >=3 groups (UTKFace race) should be max_rate - min_rate.
+
+    Rates: g0=1.0, g1=0.5, g2=0.0 → max-min = 1.0.
+    """
+    y_pred = np.array([1, 1, 1, 0, 1, 0, 0, 0, 0])
+    a = np.array([0, 0, 0, 1, 1, 1, 2, 2, 2])
+    assert compute_dp_violation(y_pred, a) == 1.0
+
+
+def test_compute_dp_violation_four_groups():
+    """DP for 4 groups: 0.0, 0.25, 0.5, 0.75 → max-min = 0.75."""
+    y_pred = np.array([0, 0, 0, 0,
+                       1, 0, 0, 0,
+                       1, 1, 0, 0,
+                       1, 1, 1, 0])
+    a = np.array([0] * 4 + [1] * 4 + [2] * 4 + [3] * 4)
+    assert abs(compute_dp_violation(y_pred, a) - 0.75) < 1e-9
+
+
+def test_compute_dp_violation_three_groups_equal():
+    """DP for 3 equal-rate groups should be 0."""
+    y_pred = np.array([1, 0, 1, 0, 1, 0])
+    a = np.array([0, 0, 1, 1, 2, 2])
+    assert compute_dp_violation(y_pred, a) == 0.0
+
+
+def test_compute_dp_violation_binary_matches_old_behavior():
+    """Binary DP should still be abs(rate_0 - rate_1) — preserves old behavior."""
+    rng = np.random.RandomState(0)
+    y_pred = rng.binomial(1, 0.6, 100).astype(np.float32)
+    a = rng.binomial(1, 0.5, 100)
+    expected = abs(y_pred[a == 0].mean() - y_pred[a == 1].mean())
+    assert abs(compute_dp_violation(y_pred, a) - expected) < 1e-9
+
+
 def test_compute_if_violation_zero():
     """IF violation should be 0 when all predictions are the same."""
     X = np.random.randn(10, 3)
