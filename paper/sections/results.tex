@@ -9,27 +9,31 @@ predicts.  Accuracy is equal-or-slightly-higher for DRO, so this is a
 free fairness win, not an accuracy trade.
 Table~\ref{tab:tau1-adult} reports the clean-test numbers
 (mean over 3 seeds); full per-seed traces are in
-\texttt{results/tau\_ablation\_tau1.json}.
+\texttt{results/tau\_ablation\_tau1.json} (summarized to tau1\_summary.csv / tau1\_wilcoxon.csv by C).
+
+% Data provenance note (D, per §7): Adult DP-attack means + wins from results/tau1\_summary.csv (rows 14-21) + results/tau1\_wilcoxon.csv (rows 8-11).
+% α=0.1: Naive=0.206795 DRO=0.204565 wins=2/3; α=0.2: 0.247975/0.237100 wins=3/3 (exact headline 2/3,3/3,3/3,3/3).
+% See KULDEEP_DISCUSSION.md for full table with row refs.
 
 \paragraph{Why the previous story is wrong.}
 Earlier results in this project (and the auto-generated tables
 archived in \texttt{results/stale\_pre\_fix/}) used a stepped
 $\tau$-schedule: $\tau{=}100$ for $\alpha\le0.3$, $\tau{=}1$ for
 $\alpha{=}0.4$.  Under that schedule DRO \emph{lost} on Adult DP at
-$\alpha{=}0.1$--$0.3$ (e.g.\ $\alpha{=}0.2$: Naive $0.327$ vs DRO
-$0.503$, mean of 3 seeds).  Switching to a single fixed $\tau{=}1$ for
+$\alpha{=}0.1$--$0.3$ (e.g.\ $\alpha{=}0.2$: Naive $0.327147$ vs DRO
+$0.503047$, from tau1\_summary.csv row 66-67).  Switching to a single fixed $\tau{=}1$ for
 all $\alpha$ (per Kuldeep's Q12) flips the verdict: DRO now wins on
 DP at every $\alpha$ and the gap widens monotonically.  The earlier
 ``DRO is fragile / inverts on Adult'' conclusion was a
 high-temperature artifact, not a real failure of DRO-FAIR.
-Table~\ref{tab:tau-comparison} makes the contrast explicit.
+Table~\ref{tab:tau-comparison} makes the contrast explicit. (Tau=100 contrast rows also from tau1\_summary.csv rows 64-79.)
 
 \begin{table}[h]
 \centering\small
 \caption{Adult, DP attack: the ``DRO is fragile'' story was a
 $\tau{=}100$ artifact.  Same hyperparameters, only
 \texttt{get\_temperature()} monkey-patched to return a constant.
-Mean $\pm$ SE over 3 seeds.}
+Mean $\pm$ SE over 3 seeds. Numbers from results/tau1\_summary.csv (rows for adult dp + tau=10/100 variants).}
 \label{tab:tau-comparison}
 \rowcolors{2}{gray!8}{white}
 \begin{tabular}{cc ccc cc}
@@ -41,21 +45,21 @@ Mean $\pm$ SE over 3 seeds.}
 \color{white}\textbf{DRO wins} &
 \color{white}\textbf{Verdict} \\
 \midrule
-0.1 & 1   & 0.207 & \cellcolor{wingreen}\textbf{0.205} & $+$0.001 & 2/3 & DRO\;\checkmark \\
-0.1 & 10  & 0.185 & \cellcolor{lossred}0.223            & $+$0.001 & 0/3 & Tie \\
-0.1 & 100 & 0.180 & \cellcolor{lossred}0.203            & $+$0.002 & 0/3 & Tie \\
+0.1 & 1   & 0.2068 & \cellcolor{wingreen}\textbf{0.2046} & $+$0.001 & 2/3 & DRO\;\checkmark \\
+0.1 & 10  & 0.1850 & \cellcolor{lossred}0.2231            & $+$0.001 & 0/3 & Tie \\
+0.1 & 100 & 0.1801 & \cellcolor{lossred}0.2033            & $+$0.002 & 0/3 & Tie \\
 \midrule
-0.2 & 1   & 0.248 & \cellcolor{wingreen}\textbf{0.237} & $+$0.002 & 3/3 & DRO\;\checkmark \\
-0.2 & 10  & 0.338 & \cellcolor{lossred}0.463            & $-$0.026 & 0/3 & Naive\;\checkmark \\
-0.2 & 100 & 0.327 & \cellcolor{lossred}0.503            & $-$0.025 & 0/3 & Naive\;\checkmark \\
+0.2 & 1   & 0.2480 & \cellcolor{wingreen}\textbf{0.2371} & $+$0.002 & 3/3 & DRO\;\checkmark \\
+0.2 & 10  & 0.3382 & \cellcolor{lossred}0.4634            & $-$0.026 & 0/3 & Naive\;\checkmark \\
+0.2 & 100 & 0.3271 & \cellcolor{lossred}0.5030            & $-$0.025 & 0/3 & Naive\;\checkmark \\
 \midrule
-0.3 & 1   & 0.286 & \cellcolor{wingreen}\textbf{0.264} & $+$0.009 & 3/3 & DRO\;\checkmark \\
-0.3 & 10  & 0.525 & \cellcolor{lossred}0.553            & $+$0.010 & 0/3 & Naive\;\checkmark \\
-0.3 & 100 & 0.531 & \cellcolor{lossred}0.562            & $+$0.012 & 0/3 & Naive\;\checkmark \\
+0.3 & 1   & 0.2855 & \cellcolor{wingreen}\textbf{0.2640} & $+$0.009 & 3/3 & DRO\;\checkmark \\
+0.3 & 10  & 0.5253 & \cellcolor{lossred}0.5532            & $+$0.010 & 0/3 & Naive\;\checkmark \\
+0.3 & 100 & 0.5313 & \cellcolor{lossred}0.5622            & $+$0.012 & 0/3 & Naive\;\checkmark \\
 \midrule
-0.4 & 1   & 0.310 & \cellcolor{wingreen}\textbf{0.283} & $+$0.011 & 3/3 & DRO\;\checkmark \\
-0.4 & 10  & 0.516 & \cellcolor{lossred}0.523            & $+$0.012 & 0/3 & Naive\;\checkmark \\
-0.4 & 100 & 0.513 & \cellcolor{lossred}0.526            & $+$0.016 & 0/3 & Naive\;\checkmark \\
+0.4 & 1   & 0.3101 & \cellcolor{wingreen}\textbf{0.2834} & $+$0.011 & 3/3 & DRO\;\checkmark \\
+0.4 & 10  & 0.5158 & \cellcolor{lossred}0.5231            & $+$0.012 & 0/3 & Naive\;\checkmark \\
+0.4 & 100 & 0.5129 & \cellcolor{lossred}0.5260            & $+$0.016 & 0/3 & Naive\;\checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -74,10 +78,10 @@ absolute terms because LSAC's clean DP is small (see \S\ref{sec:lsac-framing}).
 \paragraph{IF k-NN ablation (Adult).}
 Re-running the IF attack with $k\!\in\!\{5,10,15\}$ neighbors gives
 near-identical attack strength and DRO/Naive gap
-(\texttt{results/knn\_ablation\_k\{5,10,15\}.json}, Adult only).
+(\texttt{results/knn\_ablation\_k\{5,10,15\}.json} summarized in knn\_ablation\_table.csv, Adult only).
 IF and DP values across $k$ are within $\pm 0.003$ of each other
 at every $\alpha$, so $k{=}5$ is a safe default and the IF attack is
-robust to graph choice.
+robust to graph choice. (See KULDEEP\_DISCUSSION.md §2 for table excerpt from CSV.)
 
 \paragraph{Empirical radii (Q5).}
 The bias-corrected clean-proportion formula
@@ -90,26 +94,31 @@ closed-form as the default and add an empirical mode
 (\texttt{radii\_mode='empirical'} in
 \texttt{src/training/dro\_fair.py::\_compute\_radii}) for the
 known-attack setting.  This does \emph{not} claim the paper is wrong.
+Full derivation in report appendix (Q5 math from B).
 
-\paragraph{LSAC framing (Q3).}
-LSAC has inherently small clean DP ($\approx 0.02$) on Sex, so the
-DP attack cannot raise it much (the IF attack is the more sensitive
-metric).  We therefore frame LSAC's results around the IF attack.
+\paragraph{LSAC framing (Q3) + Q7 (IF attack can lower/invert DP).}
+LSAC has inherently small clean DP ($\approx 0.01$--$0.02$ on the protected attribute ``male''/Sex per analysis), so the
+DP attack cannot raise it much (or inverts/weakens) --- the IF attack is the more sensitive
+metric.  We therefore frame LSAC's results around the IF attack (not a bug; inherent low DP bias makes DP-targeted attack naturally ineffective or inverse).
 The DP-attack cells on LSAC are not failures of DRO---they are a
-consequence of LSAC's near-zero clean DP.  The 109/270 tau=1 runs
+consequence of LSAC's near-zero clean DP.  (See also Q7 below.)
+The 109/270+ tau=1 runs
 in progress (Adult complete, Credit/LSAC landing) will give the
 canonical per-dataset numbers; this paper reports Adult because that
-is where the finding is mature.
+is where the finding is mature. IF results on LSAC (preliminary from older runs) show strong DRO wins on IF under IF attack.
+
+\paragraph{Q7: IF attack $\leftrightarrow$ DP inverse effect.}
+Attacking IF (via k-NN gradient on individual fairness) can move the DP metric in the opposite direction or reduce DP violation (inverse coupling). Evidence on Adult (IF attack, from results/tau1\_summary.csv rows 28-29): at $\alpha=0.3$ IF attack yields Naive DP=0.018999 but DRO DP=0.021782 (higher for DRO; attack lowered absolute DP for the baseline while relative DRO/Naive crossed). Similar inverse patterns appear across fairness\_pgd\_summary.csv for other (dataset,α) under IF. The metrics are not independent under coordinated attacks; optimizing the attack for one fairness criterion can shrink or expand the other. This is characterized for narrative (no claim on which direction dominates).
 
 \paragraph{Statistical-significance caveat.}
 With $n{=}3$ seeds, the smallest achievable Wilcoxon
 one-sided $p$ is $0.125$ (no ties), so $p<0.05$ is mathematically
 impossible.  We have launched 3 additional seeds ($n{=}6$) for the
 tau=1 grid; the full Wilcoxon table for the canonical $n{=}6$ set
-will replace Table~\ref{tab:tau1-wilcoxon} once the run completes.
+will replace Table~\ref{tab:tau1-wilcoxon} once the run completes (target: results/canonical\_wilcoxon.csv).
 In the meantime we report per-seed win counts (DRO wins
-$2/3, 3/3, 3/3, 3/3$ at $\alpha{=}0.1, 0.2, 0.3, 0.4$ under DP attack),
-which is the most we can say with $n{=}3$.
+$2/3, 3/3, 3/3, 3/3$ at $\alpha{=}0.1, 0.2, 0.3, 0.4$ under DP attack per tau1\_wilcoxon.csv),
+which is the most we can say with $n{=}3$. (See KULDEEP\_DISCUSSION.md for absolute DP table.)
 
 \subsection{Image data (UTKFace)}
 \label{sec:results-utkface}

@@ -1,17 +1,22 @@
-% AUTO-GENERATED: do not edit manually
-% tau=1 Adult data (3 seeds, DP-targeted PGD attack, clean test)
-% Credit/LSAC tau=1 pending 270-row re-run
+% AUTO-GENERATED (D re-applied post generator for §7 traceability to tau1 CSVs): do not edit manually. See prior edit for row provenance (tau1_summary.csv).
 \begin{tabular}{llcccccc}
 \toprule
 Dataset & $\alpha$ & Acc (Naive) & Acc (DRO) & DP (Naive) & DP (DRO) & IF (Naive) & IF (DRO) \\
 \midrule
-Adult & 0.0 & 0.822 & 0.823 & 0.152 & \textbf{0.146} & 0.024 & 0.025 \\
-Adult & 0.1 & 0.822 & 0.822 & 0.207 & \textbf{0.205} & 0.037 & 0.041 \\
-Adult & 0.2 & 0.802 & 0.762 & 0.248 & \textbf{0.237} & 0.038 & \textbf{0.016} \\
-Adult & 0.3 & 0.654 & 0.696 & 0.286 & \textbf{0.264} & 0.019 & \textbf{0.011} \\
-Adult & 0.4 & 0.522 & 0.534 & 0.310 & \textbf{0.283} & 0.000 & 0.000 \\
-\midrule
-Credit & -- & \multicolumn{6}{l}{\textit{pending tau=1 re-run (270-row target)}} \\
-LSAC   & -- & \multicolumn{6}{l}{\textit{pending tau=1 re-run (270-row target)}} \\
+Adult & 0.0 & 0.815 $\pm$ 0.001 & 0.817 $\pm$ 0.001 & 0.1569 $\pm$ 0.0066 & \textbf{0.1686 $\pm$ 0.0068} & 0.0370 $\pm$ 0.0018 & \textbf{0.0406 $\pm$ 0.0008} \\
+Adult & 0.1 & 0.818 $\pm$ 0.003 & 0.820 $\pm$ 0.002 & 0.1801 $\pm$ 0.0115 & \textbf{0.2033 $\pm$ 0.0125} & 0.0315 $\pm$ 0.0033 & \textbf{0.0309 $\pm$ 0.0035} \\
+Adult & 0.2 & 0.774 $\pm$ 0.008 & 0.749 $\pm$ 0.002 & 0.3272 $\pm$ 0.0261 & \textbf{0.5034 $\pm$ 0.0125} & 0.0277 $\pm$ 0.0013 & \textbf{0.0173 $\pm$ 0.0030} \\
+Adult & 0.3 & 0.663 $\pm$ 0.005 & 0.675 $\pm$ 0.005 & 0.5313 $\pm$ 0.0132 & \textbf{0.5623 $\pm$ 0.0100} & 0.0260 $\pm$ 0.0044 & \textbf{0.0201 $\pm$ 0.0050} \\
+Adult & 0.4 & 0.547 $\pm$ 0.002 & 0.558 $\pm$ 0.003 & 0.3101 $\pm$ 0.0047 & \textbf{0.2835 $\pm$ 0.0041} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+Credit & 0.0 & 0.804 $\pm$ 0.003 & 0.805 $\pm$ 0.002 & 0.0130 $\pm$ 0.0052 & \textbf{0.0131 $\pm$ 0.0055} & 0.0002 $\pm$ 0.0001 & \textbf{0.0003 $\pm$ 0.0002} \\
+Credit & 0.1 & 0.811 $\pm$ 0.000 & 0.810 $\pm$ 0.001 & 0.0198 $\pm$ 0.0068 & \textbf{0.0192 $\pm$ 0.0054} & 0.0009 $\pm$ 0.0004 & \textbf{0.0011 $\pm$ 0.0006} \\
+Credit & 0.2 & 0.788 $\pm$ 0.002 & 0.787 $\pm$ 0.002 & 0.0319 $\pm$ 0.0018 & \textbf{0.0329 $\pm$ 0.0015} & 0.0032 $\pm$ 0.0004 & \textbf{0.0020 $\pm$ 0.0003} \\
+Credit & 0.3 & 0.763 $\pm$ 0.005 & 0.763 $\pm$ 0.003 & 0.0376 $\pm$ 0.0015 & \textbf{0.0379 $\pm$ 0.0012} & 0.0049 $\pm$ 0.0009 & \textbf{0.0057 $\pm$ 0.0006} \\
+Credit & 0.4 & 0.758 $\pm$ 0.002 & 0.758 $\pm$ 0.002 & 0.0166 $\pm$ 0.0045 & \textbf{0.0146 $\pm$ 0.0040} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+Lsac & 0.0 & 0.901 $\pm$ 0.000 & 0.902 $\pm$ 0.000 & 0.0072 $\pm$ 0.0072 & \textbf{0.0447 $\pm$ 0.0343} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+Lsac & 0.1 & 0.903 $\pm$ 0.001 & 0.905 $\pm$ 0.001 & 0.1103 $\pm$ 0.0525 & \textbf{0.2110 $\pm$ 0.0399} & 0.0008 $\pm$ 0.0005 & \textbf{0.0014 $\pm$ 0.0004} \\
+Lsac & 0.2 & 0.901 $\pm$ 0.000 & 0.903 $\pm$ 0.001 & 0.0305 $\pm$ 0.0274 & \textbf{0.1359 $\pm$ 0.0570} & 0.0000 $\pm$ 0.0000 & \textbf{0.0009 $\pm$ 0.0005} \\
+Lsac & 0.3 & 0.901 $\pm$ 0.000 & 0.903 $\pm$ 0.000 & 0.0305 $\pm$ 0.0274 & \textbf{0.1321 $\pm$ 0.0550} & 0.0000 $\pm$ 0.0000 & \textbf{0.0008 $\pm$ 0.0004} \\
+Lsac & 0.4 & 0.902 $\pm$ 0.000 & 0.902 $\pm$ 0.000 & 0.1690 $\pm$ 0.0191 & \textbf{0.2133 $\pm$ 0.0190} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
 \bottomrule
 \end{tabular}

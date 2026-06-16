@@ -1,24 +1,22 @@
-% AUTO-GENERATED: do not edit manually
-% tau=1 Adult data (3 seeds, DP-targeted PGD attack)
-% Credit/LSAC tau=1 pending 270-row re-run
-\begin{table}[h]
-\centering\small
-\caption{Wilcoxon win counts under fixed $\tau{=}1$ (Adult, $n{=}3$ seeds,
-DP-targeted PGD attack).  Minimum achievable $p$ with $n{=}3$ is $0.125$;
-$n{=}6$ re-run in progress for $p{<}0.05$.}
-\label{tab:tau1-wilcoxon}
-\rowcolors{2}{gray!8}{white}
-\begin{tabular}{llrrrc}
+% AUTO-GENERATED (D re-applied post generator for §7 traceability to tau1 CSVs): do not edit manually. Wins from tau1_wilcoxon.csv. See prior edit.
+\begin{tabular}{llrrrr}
 \toprule
-Dataset & $\alpha$ & Naive DP & DRO DP & DRO wins/3 & Verdict \\
+Dataset & $\alpha$ & $\Delta$DP\% & $p$-value & $\Delta$IF\% & $p$-value \\
 \midrule
-Adult & 0.1 & 0.207 & 0.205 & 2/3 & \cellcolor{wingreen}DRO \\
-Adult & 0.2 & 0.248 & 0.237 & 3/3 & \cellcolor{wingreen}DRO \\
-Adult & 0.3 & 0.286 & 0.264 & 3/3 & \cellcolor{wingreen}DRO \\
-Adult & 0.4 & 0.310 & 0.283 & 3/3 & \cellcolor{wingreen}DRO \\
-\midrule
-Credit & -- & \multicolumn{4}{l}{\textit{pending tau=1 re-run (270-row target)}} \\
-LSAC   & -- & \multicolumn{4}{l}{\textit{pending tau=1 re-run (270-row target)}} \\
+Adult & 0.0 & -7.4\% & 1.000 & -9.8\% & 1.000 \\
+Adult & 0.1 & -12.9\% & 1.000 & 2.0\% & 0.375 \\
+Adult & 0.2 & -53.9\% & 1.000 & 37.6\% & 0.125 \\
+Adult & 0.3 & -5.8\% & 1.000 & 22.6\% & 0.125 \\
+Adult & 0.4 & 8.6\% & 0.125 & 1.0\% & 0.375 \\
+Credit & 0.0 & -0.3\% & 0.625 & -27.9\% & 0.875 \\
+Credit & 0.1 & 3.4\% & 0.375 & -19.7\% & 0.750 \\
+Credit & 0.2 & -3.2\% & 1.000 & 36.1\% & 0.125 \\
+Credit & 0.3 & -0.6\% & 0.750 & -16.0\% & 0.875 \\
+Credit & 0.4 & 12.1\% & 0.125 & 0.0\% & 1.000 \\
+Lsac & 0.0 & -523.8\% & 1.000 & -131249.8\% & 1.000 \\
+Lsac & 0.1 & -91.4\% & 1.000 & -71.5\% & 1.000 \\
+Lsac & 0.2 & -345.7\% & 1.000 & -12620.9\% & 1.000 \\
+Lsac & 0.3 & -333.1\% & 1.000 & -11418.5\% & 1.000 \\
+Lsac & 0.4 & -26.2\% & 1.000 & 0.0\% & 1.000 \\
 \bottomrule
 \end{tabular}
-\end{table}

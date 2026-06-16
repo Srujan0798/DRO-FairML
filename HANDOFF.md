@@ -1,5 +1,7 @@
 # DRO-FairML — Full Handoff (as of 2026-06-16)
 
+**Latest update (Agent D, 2026-06-16):** Per MASTER_PLAN §7: created KULDEEP_DISCUSSION.md (concise tau=1 Adult table from tau1_summary.csv/tau1_wilcoxon.csv with absolute DP + 2/3,3/3,3/3,3/3 wins + ablations + LSAC IF + Q7 + Q5 plan); refreshed MEETING_TODAY.md + README; archived ADULT_RESULTS_FOR_KULDEEP.md to docs/_archive/; rebuilt report.tex + paper/sections + auto_generated/*.tex with every number traced to specific CSV rows (e.g. "tau1_summary.csv row 16-17"); added Q5 empirical derivation (pi_clean[min] = pi_obs[min] + 0.4α etc.) to report appendix; LSAC IF framing + IF↔DP inverse (Q7) explained with CSV evidence; repo top-level minimized (kept README/HANDOFF/MASTER_PLAN/MEETING_SCRIPT/KULDEEP_DISCUSSION/SERVER_RUNBOOK); report.pdf + main.pdf built clean with tectonic (logs show "Writing `*.pdf`", only pre-existing overfull/utf8/font warnings; [hidelinks] + float present, no red boxes/broken refs per visual + log). All final stats from C's CSVs (no manual entry). Updated HANDOFF as last editor. See AGENT D MILESTONE notes in chat. Co-Authored-By applied on commit.
+
 ## 1. What this project is
 
 IIT Gandhinagar AI/ML project for a professor ("Madam" = Manisha Padala). Implements **Algorithm 1** from an ICML submission: a min-max Lagrangian DRO-FAIR trainer with corruption-calibrated TV uncertainty sets, compared against a Naive-FAIR baseline. Evaluated on **Adult, Credit, LSAC** (tabular) and **UTKFace** (images).

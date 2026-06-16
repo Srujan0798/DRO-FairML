@@ -1,8 +1,12 @@
-# Meeting notes — today 4 PM
+# Meeting notes — today 4 PM (Kuldeep)
 
-> Story to present. All numbers from Adult, 3 seeds, K_inner=10, pgd_steps=20,
-> coordinated DP-targeted PGD attack. (Credit/LSAC tau=1 re-run + 6-seed runs in
-> progress — will refresh this file ~1 hr before the meeting with whatever lands.)
+> See the concise working doc: **KULDEEP_DISCUSSION.md** (created per §7 for this session).
+> It contains the tau=1 Adult table (absolute DP, exact 2/3 3/3 3/3 3/3 win counts from
+> results/tau1_summary.csv + tau1_wilcoxon.csv), ablations (k-NN, lambda grid in flight,
+> empirical radii Q5 math), LSAC IF framing + Q7 inverse, status (landing vs preliminary),
+> and asks. All numbers traceable to committed CSVs; no hand entry.
+>
+> This file kept as historical pointer. Adult headline verified; Credit/LSAC + 6 seeds landing.
 
 ## 1. What was asked
 - **Madam (Jun 2):** "Check the adversarial attack on DP and improve it, then redo all experiments." Show adversarial raises DP more than random noise.
@@ -39,7 +43,8 @@ DP violation under DP attack (lower = fairer), mean of 3 seeds:
 - **Done:** Adult tau + k-NN ablations; attack-vs-noise; 3 code bugfixes.
 - **Running:** tau=1 full re-run (Credit+LSAC), λ/lr grid, +3 seeds for n=6 significance.
 - **Done:** Q5 empirical radii (`radii_mode='empirical'` in `DroFairTrainer`) and all 4 audit bugfixes (CNN inference eval-mode; Naive-FAIR validation τ; docstring; multi-group DP). Committed in `f1f3a2d`. Tests 60/60 pass.
-- **Running:** tau=1 re-run at row 110/270 (Credit starting); λ/lr grid at row 1/72 (now with `use_if=False` for 5-10× speedup, DP-targeted grid doesn't need IF). 6-seed runs not yet started (waiting for tau=1 to finish).
+- **Adult K_inner=10 CONFIRMED:** DRO wins DP at every α (2/3 at α=0.1, 3/3 at α≥0.2); combined attack 3/3 everywhere. Win-curve fig + Wilcoxon regenerated (`figures/figC2_adult_win_curve.pdf`). Credit K_inner=10 in progress (row ~110/270).
+- **Running:** tau=1 re-run at row 110/270 (Credit α=0.1 s=0 in progress); λ/lr grid at row 1/72 (now with `use_if=False` for 5-10× speedup, DP-targeted grid doesn't need IF). 6-seed runs not yet started (waiting for tau=1 to finish).
 - **Open:** Wilcoxon p<0.05 needs n≥6 (3 seeds → min p=0.125). UTKFace still blocked on flair2 GPU (SSL/account).
 
 ## 7. Ask for the meeting

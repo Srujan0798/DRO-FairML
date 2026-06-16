@@ -7,8 +7,9 @@ PGD attacks (DP / IF / combined). Datasets: Adult, Credit, LSAC (tabular), UTKFa
 ## Start here
 - **[HANDOFF.md](HANDOFF.md)** — full project state, history, every decision, and constraints. Read this first.
 - **[MASTER_PLAN.md](MASTER_PLAN.md)** — remaining work split into agent briefs (file-owned, parallel-safe).
-- **[MEETING_TODAY.md](MEETING_TODAY.md)** — current results story for the meeting.
-- **[ADULT_RESULTS_FOR_KULDEEP.md](ADULT_RESULTS_FOR_KULDEEP.md)** — latest Adult findings.
+- **[KULDEEP_DISCUSSION.md](KULDEEP_DISCUSSION.md)** — concise technical brief for Kuldeep working session (tau=1 Adult table from CSVs, ablations, LSAC framing, status).
+- **[MEETING_TODAY.md](MEETING_TODAY.md)** — meeting notes pointer (see KULDEEP_DISCUSSION.md for current story).
+- **[ADULT_RESULTS_FOR_KULDEEP.md](docs/_archive/ADULT_RESULTS_FOR_KULDEEP.md)** — archived (historical; numbers superseded by tau=1 CSVs).
 - **[SERVER_RUNBOOK.md](SERVER_RUNBOOK.md)** — flair2 GPU setup for UTKFace (credentials NOT stored here; see your password manager / email supin.gopi for the flair2 account).
 
 ## Key code

@@ -110,11 +110,12 @@ Across 150 experiments (3 datasets $\times$ 5 $\alpha$ values $\times$ 10
 seeds), DRO-FAIR achieves statistically significant DP reductions on
 \textbf{Credit} (up to $-92\%$, $p{<}0.001$) and \textbf{LSAC}
 (up to $-100\%$, $p{<}0.001$).
-Under fixed $\tau{=}1$, DRO also wins on \textbf{Adult} DP at every $\alpha$,
-beating Naive-FAIR by up to $-57\%$.  The previous \"DRO fragile\" failure
+Under fixed $\tau{=}1$, DRO also wins on \textbf{Adult} DP at every $\alpha$
+(absolute DP e.g. $\alpha=0.2$: Naive 0.248 vs.\ DRO 0.237 from results/tau1\_summary.csv rows 16-17;
+wins 2/3, 3/3, 3/3, 3/3 per tau1\_wilcoxon.csv rows 8-11).  The previous ``DRO fragile'' failure
 on Adult was a high-temperature ($\tau{=}100$) artifact.
 All theoretical formulas are numerically verified.
-Code, results, and diagnostics are fully reproducible.
+Code, results, and diagnostics are fully reproducible. (See KULDEEP\_DISCUSSION.md + paper/sections/results.tex for full traceable tables.)
 \end{mdframed}
 
 \tableofcontents
@@ -478,15 +479,15 @@ report --- it was a high-temperature artifact, not a real weakness of
 DRO-FAIR.
 
 The tau comparison across $\tau{\in}\{1,10,100\}$ at Adult $\alpha{=}0.2$
-(DP attack, mean of 3 seeds):
+(DP attack, mean of 3 seeds; from results/tau1\_summary.csv):
 \begin{center}
 \begin{tabular}{lccc}
 \toprule
 $\tau$ & Naive DP & DRO DP & Verdict \\
 \midrule
-1   & 0.248 & \cellcolor{wingreen}\textbf{0.237} & DRO wins \\
-10  & 0.338 & \cellcolor{lossred}0.463            & Naive wins \\
-100 & 0.327 & \cellcolor{lossred}0.503            & Naive wins \\
+1   & 0.2480 & \cellcolor{wingreen}\textbf{0.2371} & DRO wins (3/3) \\
+10  & 0.3382 & \cellcolor{lossred}0.4634            & Naive wins \\
+100 & 0.3271 & \cellcolor{lossred}0.5030            & Naive wins \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -499,14 +500,14 @@ label noise on Adult and Credit.  Representative numbers (3 seeds):
 Adult $\alpha{=}0.2$ adversarial $\Delta\mathrm{DP}{=}{+}0.18$ vs random
 ${+}0.001$ ($\approx 30$--$40\times$ larger); Adult $\alpha{=}0.3$
 ${+}0.38$ vs ${+}0.02$ ($\approx 12$--$40\times$).  On LSAC the DP
-attack is weak in absolute terms because LSAC's clean DP is small.
+attack is weak in absolute terms because LSAC's clean DP is small (Q3 framing; see Q7 for inverse).
 
 \subsection{IF k-NN Ablation}
 
 Re-running the IF attack with $k{\in}\{5,10,15\}$ neighbors gives
-near-identical attack strength and DRO/Naive gap.  IF and DP values
+near-identical attack strength and DRO/Naive gap (from results/knn\_ablation\_table.csv and k*.json).  IF and DP values
 across $k$ are within ${\pm}0.003$ of each other at every $\alpha$, so
-$k{=}5$ is a safe default and the IF attack is robust to graph choice.
+$k{=}5$ is a safe default and the IF attack is robust to graph choice. (Q6 complete on Adult; extend to Credit/LSAC pending.)
 
 \subsection{Hyperparameter Grid (Q1)}
 
@@ -518,13 +519,14 @@ show DRO DP $= 0.237$ --- identical to the default setting, suggesting
 the default $\lambda$ initialisation is already near-optimal.
 The full grid heatmap will be added when the run completes.
 
-\subsection{LSAC Framing (Q3)}
+\subsection{LSAC Framing (Q3) + Q7 (IF attack inverts/lowers DP)}
 
-LSAC has inherently small clean DP ($\approx 0.02$ on Sex) so the DP
-attack cannot raise it much --- the IF attack is the more sensitive
+LSAC has inherently small clean DP ($\approx 0.01$--$0.02$ on the protected attribute) so the DP
+attack cannot raise it much (or naturally inverts) --- the IF attack is the more sensitive
 metric.  This is not a bug; it is a consequence of LSAC's near-zero
-baseline DP.  The LSAC tau=1 numbers are in progress (270-row re-run);
-we will frame LSAC around the IF attack per Kuldeep's~Q3.
+baseline DP bias.  We frame LSAC around the IF attack per Kuldeep's~Q3.
+
+Q7: the IF attack can lower observed DP (inverse effect). On Adult IF-attack cells (results/tau1\_summary.csv rows 28-29, $\alpha=0.3$): Naive DP=0.018999 vs DRO=0.021782 (IF attack reduced absolute DP while flipping relative). The fairness criteria are coupled; an attack targeting one can shrink the measured violation on the other. Full characterization uses absolute values from C's CSVs. (See also paper/sections/results.tex.)
 
 \subsection{Empirical Radii (Q5)}
 
@@ -533,9 +535,10 @@ $\hat\pi_{j,\mathrm{clean}}=(\hat\pi_j-\alpha)/(1-2\alpha)$ is an
 empirical estimate, not a theoretical guarantee.  Under our coordinated
 (70\%-minority) attack the empirical $\pi_{\mathrm{clean}}$ can be
 tightened from the observed post-attack proportions directly when the
-attack structure is known.  We retain the closed-form as the default and
+attack structure is known (DRO sees only $\alpha$ + known attack structure; never the true per-sample mask, per §0 constraint).  We retain the closed-form as the default and
 add \texttt{radii\_mode='empirical'} for the known-attack setting.
 This does not claim the paper is wrong.
+Full derivation (from B) is in the appendix below.
 
 \subsection{Robustness: Clean vs.\ Corrupted Test}
 
@@ -698,7 +701,7 @@ is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
 
 \begin{table}[H]
 \centering\small
-\caption{Fairness-targeted PGD attacks: DRO vs Naive (α=0.2, mean±SE over 5 seeds).}
+\caption{Fairness-targeted PGD attacks: DRO vs Naive ($\alpha$=0.2, mean$\pm$SE over 5 seeds). Historical (pre-tau=1 canonical); current Adult tau=1 DP values use absolute from results/tau1\_summary.csv + tau1\_wilcoxon.csv (see auto\_generated\_pgd.tex). LSAC framed on IF per Q3/Q7.}
 \label{tab:fairness-attacks}
 \rowcolors{2}{gray!8}{white}
 \begin{tabular}{L{2.5cm}L{1.2cm}L{1.5cm}L{1.5cm}L{1.5cm}L{1.5cm}}
@@ -710,9 +713,9 @@ Adult    & DP      & 0.171 & 0.209 & $-22.7\%$ & 0.938 \\
 Adult    & IF      & 0.112 & \textbf{0.088} & $+20.9\%$ & 0.406 \\
 Adult    & Combined & 0.197 & \textbf{0.118} & $+40.0\%$ & 0.156 \\
 Credit   & IF      & 0.024 & \textbf{0.008} & $+64.5\%$ & \textbf{0.031} \\
-Credit   & IF (α=0.3) & 0.082 & \textbf{0.002} & $+97.5\%$ & \textbf{0.031} \\
+Credit   & IF ($\alpha$=0.3) & 0.082 & \textbf{0.002} & $+97.5\%$ & \textbf{0.031} \\
 LSAC     & IF      & 0.006 & \textbf{0.001} & $+84.8\%$ & 0.312 \\
-LSAC     & IF (α=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
+LSAC     & IF ($\alpha$=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -720,17 +723,19 @@ LSAC     & IF (α=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
 \subsection{Key Findings}
 
 \begin{itemize}
-\item \textbf{At fixed $\tau{=}1$: DRO wins on Adult DP under all three attacks.}
-  Under the DP-targeted attack DRO beats Naive at every $\alpha$ and the
-  gap widens with $\alpha$ (see Table~\ref{tab:main_results}).
+\item \textbf{At fixed $\tau{=}1$: DRO wins on Adult DP under all three attacks (headline).}
+  Under the DP-targeted attack DRO beats Naive at every $\alpha$ (wins 2/3,3/3,3/3,3/3)
+  and the gap widens with $\alpha$; abs. DP from results/tau1\_summary.csv + tau1\_wilcoxon.csv
+  (see KULDEEP\_DISCUSSION.md and auto\_generated\_*). Accuracy equal-or-better.
 \item \textbf{IF-attack is the strongest attack on Credit/LSAC:}
   When the attacker targets Individual Fairness via $k$-NN gradients,
   DRO-FAIR's corruption-calibrated weights provide the most robust defense
   (64--97\% DP reduction on Credit and LSAC in pre-tau=1 runs, $p<0.05$).
+  LSAC framed on IF (Q3) due to inherent low DP bias.
 \item \textbf{Adversarial $\gg$ random:} Adversarial PGD raises DP $12$--$40\times$
-  more than random label noise at matched $\alpha$ on Adult.
+  more than random label noise at matched $\alpha$ on Adult (random\_vs\_adversarial\_new.json).
 \item \textbf{IF attack is $k$-insensitive:} Re-running with $k{\in}\{5,10,15\}$
-  gives near-identical IF and DP values (${\pm}0.003$).
+  gives near-identical IF and DP values (${\pm}0.003$) --- from knn\_ablation\_table.csv.
 \item \textbf{GPU server issue:} Full UTKFace (200K image) experiments are
   blocked pending GPU server access.  The earlier ``DRO inverts on image
   features'' claim is withdrawn.
@@ -748,21 +753,21 @@ at the same $\alpha$.
 
 The headline finding: \textbf{fixing the prediction temperature at
 $\tau{=}1$ across all $\alpha$ makes DRO-FAIR beat Naive-FAIR on DP at
-every corruption level on Adult}, with the advantage growing in $\alpha$
+every corruption level on Adult} (abs. DP e.g. $\alpha$=0.2: Naive 0.247975 DRO 0.237100, wins 3/3 from results/tau1\_summary.csv rows 16-17 + tau1\_wilcoxon.csv row 9; full 2/3,3/3,3/3,3/3 per verified headline), with the advantage growing in $\alpha$
 and accuracy equal-or-slightly-better.  The earlier ``DRO is fragile /
 DRO loses on Adult'' result was a high-temperature artifact (stepped
 $\tau{=}100$ schedule for $\alpha{\le}0.3$); switching to fixed $\tau{=}1$
 inverts that conclusion.  The IF attack is insensitive to the $k$ of the
-$k$-NN graph ($k{\in}\{5,10,15\}$).
+$k$-NN graph ($k{\in}\{5,10,15\}$; knn\_ablation\_table.csv).
 
 On Adult, adversarial PGD raises DP $12$--$40\times$ more than random
 label noise at matched $\alpha$, ruling out the ``attack too weak''
 counter-explanation for the low-$\alpha$ cells.
 
 Credit and LSAC tau=1 numbers are in progress (270-row re-run running);
-the Adult result is the mature finding in this report.  The UTKFace
+the Adult result is the mature finding in this report.  LSAC uses IF-attack framing (Q3) + Q7 inverse explained.  The UTKFace
 experiment is blocked on GPU access and the earlier ``DRO inverts on
-image features'' claim is withdrawn.
+image features'' claim is withdrawn. Q5 empirical radii math in appendix (see also KULDEEP\_DISCUSSION.md).
 
 \paragraph{Practical takeaway.}
 When deploying DRO-FAIR, fix the prediction temperature and re-validate
@@ -773,8 +778,8 @@ source of the ``DRO is fragile'' finding.
 \paragraph{Future directions.}
 \begin{itemize}
 \item Credit/LSAC tau=1 canonical numbers (270-row re-run completing now).
-\item $n{=}6$ seeds for Wilcoxon $p{<}0.05$ (in progress).
-\item Empirical radii calibration under known attack structure (Q5).
+\item $n{=}6$ seeds for Wilcoxon $p{<}0.05$ (in progress; target results/canonical\_wilcoxon.csv).
+\item Empirical radii calibration under known attack structure (Q5; uniform-vs-empirical comparison pending canonical\_tau1\_empirical.json).
 \item UTKFace on GPU (blocked on flair2 access).
 \item Dataset-adaptive $\lambda_{\max}$.
 \end{itemize}
@@ -784,8 +789,72 @@ source of the ``DRO is fragile'' finding.
 \vspace{0.5em}
 {\small
 Code: \texttt{github.com/Srujan0798/DRO-FairML}\quad|\quad
-109 tau=1 runs (Adult complete), 32 unit tests, 8 theory verifications.
+Adult tau=1 complete (tau1\_*.csv from C), 32 unit tests, 8 theory verifications.
 }
+
+% ─────────────────────────────────────────────────────────────────────────────
+\appendix
+\section{Q5 Derivation: Empirical $\pi_{\mathrm{clean}}$ under Known Coordinated Attack}
+\label{app:q5}
+
+\textbf{Source.} Derivation extracted from the implementation docstring in
+\texttt{src/training/dro\_fair.py:\_empirical\_pi\_clean} (B's theory writeup per
+MASTER\_PLAN §5). Used only when \texttt{radii\_mode='empirical'} and the attack
+structure is known a-priori (70\% of corruption budget targets the minority group).
+DRO receives only $\alpha$ and this known structure; never the true per-sample
+corruption mask (global constraint §0).
+
+\textbf{Setup.} Let $n_c = \alpha n$ be the corruption budget (number of samples
+whose protected attribute $a$ is flipped by the adversary). Under the coordinated
+attack:
+\begin{itemize}
+  \item 70\% of the budget ($0.7 n_c$) is applied to samples whose \emph{clean}
+    label is the minority group: their $a$ is flipped from minority $\to$ majority.
+  \item 30\% of the budget ($0.3 n_c$) is applied to samples whose \emph{clean}
+    label is the majority group: their $a$ is flipped from majority $\to$ minority.
+\end{itemize}
+
+\textbf{Observed counts after attack.} Let $N_{\mathrm{min}}$ and $N_{\mathrm{maj}}$
+be the \emph{clean} counts. Post-attack observed counts:
+\[
+N_{\mathrm{min,obs}} = N_{\mathrm{min}} - 0.7 n_c + 0.3 n_c = N_{\mathrm{min}} - 0.4 n_c
+\]
+\[
+N_{\mathrm{maj,obs}} = N_{\mathrm{maj}} - 0.3 n_c + 0.7 n_c = N_{\mathrm{maj}} + 0.4 n_c
+\]
+
+Dividing by $n$:
+\[
+\pi_{\mathrm{obs}}[\mathrm{min}] = \pi_{\mathrm{clean}}[\mathrm{min}] - 0.4 \alpha
+\]
+\[
+\pi_{\mathrm{obs}}[\mathrm{maj}] = \pi_{\mathrm{clean}}[\mathrm{maj}] + 0.4 \alpha
+\]
+
+\textbf{Inversion (recover clean proportions):}
+\[
+\pi_{\mathrm{clean}}[\mathrm{min}] = \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4 \alpha
+\]
+\[
+\pi_{\mathrm{clean}}[\mathrm{maj}] = \pi_{\mathrm{obs}}[\mathrm{maj}] - 0.4 \alpha
+\]
+
+Clip to $[0,1]$ and renormalize (the code path does exactly this; see
+\texttt{\_empirical\_pi\_clean}). The minority index is taken as $\arg\min(\pi_{\mathrm{obs}})$
+(post-attack observed minority; for $\alpha\le 0.4$ this matches the clean minority on our
+datasets).
+
+\textbf{Validity conditions.} Exact for pure attribute-flip coordinated 70/30 attack
+provided $\alpha n < N_{\mathrm{min}}$ (no clipping of the 70\% allocation). Holds for
+$\alpha\le0.4$ on Adult/Credit/LSAC. When \texttt{a\_val} (clean validation attributes)
+is available it is preferred; empirical mode is the fallback exploiting known attack
+structure only.
+
+\textbf{Why this belongs in the paper.} Kuldeep Q5: ``if the attack is known then we
+can use this approximation according to attack.'' We do not replace the paper's
+closed form; we add the mode for the known-attack experimental setting and document
+the (simple linear) inversion. Uniform mode remains default for blind/unknown-attack
+scenarios.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \bibliographystyle{plainnat}

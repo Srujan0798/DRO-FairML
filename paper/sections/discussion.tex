@@ -37,12 +37,13 @@ $\rho_{\mathrm{DP},j}=\alpha/((1-\alpha)\pi_j+\alpha)$ and the
 bias-corrected $\hat\pi_{j,\mathrm{clean}}=(\hat\pi_j-\alpha)/(1-2\alpha)$
 are empirical, not theoretical.  Under our coordinated (70\%-minority)
 attack structure they can be tightened by estimating $\pi_{\mathrm{clean}}$
-from the observed post-attack group proportions directly.  We
+from the observed post-attack group proportions directly (no per-sample mask; only $\alpha$ + known 70/30 structure).  We
 implement this as \texttt{radii\_mode='empirical'} in
 \texttt{src/training/dro\_fair.py} (default stays 'uniform').  This
 is in line with Kuldeep's Q5 ("if the attack is known then we can
 use this approximation according to the attack") and does not claim
 the paper is wrong.
+See report appendix for the clean inversion derivation: $\pi_{\mathrm{clean}}[\mathrm{min}] = \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4\alpha$, etc. (B's math).
 
 \subsection{Image data (UTKFace) --- pending GPU access}
 The earlier "DRO inverts on ResNet18 features" claim from prior
