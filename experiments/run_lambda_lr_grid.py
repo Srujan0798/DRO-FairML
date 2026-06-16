@@ -45,6 +45,7 @@ def run_one(alpha, seed, lambda_init, lr_lambda):
         lambda_max=1.5, tau=TAU, beta=5.0, k=5, gamma=0.0,
         K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15,
         lambda_init=lambda_init,
+        use_dp=True, use_if=False,  # DP-targeted attack → no IF constraint needed
     )
     trainer.fit(X_att, y_att, a_att, X_val=X_v, y_val=y_v, a_val=a_v, verbose=False)
     m = compute_metrics_torch(model, X_te, y_te, a_te, temperature=TAU, k=5, gamma=0.0)

@@ -38,7 +38,9 @@ DP violation under DP attack (lower = fairer), mean of 3 seeds:
 ## 6. Status & honest open items
 - **Done:** Adult tau + k-NN ablations; attack-vs-noise; 3 code bugfixes.
 - **Running:** tau=1 full re-run (Credit+LSAC), λ/lr grid, +3 seeds for n=6 significance.
-- **Open:** Wilcoxon p<0.05 needs n≥6 (3 seeds → min p=0.125); 6-seed runs in progress. UTKFace still blocked on flair2 GPU (SSL/account). Empirical-radii (Q5) and a few audit bug-fixes (inference eval-mode) being implemented.
+- **Done:** Q5 empirical radii (`radii_mode='empirical'` in `DroFairTrainer`) and all 4 audit bugfixes (CNN inference eval-mode; Naive-FAIR validation τ; docstring; multi-group DP). Committed in `f1f3a2d`. Tests 60/60 pass.
+- **Running:** tau=1 re-run at row 110/270 (Credit starting); λ/lr grid at row 1/72 (now with `use_if=False` for 5-10× speedup, DP-targeted grid doesn't need IF). 6-seed runs not yet started (waiting for tau=1 to finish).
+- **Open:** Wilcoxon p<0.05 needs n≥6 (3 seeds → min p=0.125). UTKFace still blocked on flair2 GPU (SSL/account).
 
 ## 7. Ask for the meeting
 - Confirm: adopt **fixed tau=1** as the production setting and regenerate the full report around it? (Adult evidence is strong; Credit/LSAC landing.)
