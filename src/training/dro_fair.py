@@ -28,7 +28,8 @@ class DroFairTrainer:
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lr_p=5e-3, lambda_max=1.5, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
-                 use_dp=True, use_if=True, tau_warmup_epochs=15):
+                 use_dp=True, use_if=True, tau_warmup_epochs=15,
+                 lambda_init=0.0):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -36,6 +37,9 @@ class DroFairTrainer:
         self.lr_lambda = lr_lambda
         self.lr_p = lr_p
         self.lambda_max = lambda_max
+        # lambda_init: paper spec is 0.0. Exposed only for Kuldeep's Q1
+        # hyperparameter ablation (try different initial dual values).
+        self.lambda_init = lambda_init
         self.tau = tau
         self.beta = beta
         self.k = k
@@ -189,8 +193,8 @@ class DroFairTrainer:
 
         opt_theta = torch.optim.AdamW(self.model.parameters(), lr=self.lr_theta, weight_decay=self.weight_decay)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(opt_theta, step_size=30, gamma=0.5)
-        lambda_dp = torch.tensor(0.0, device=self.device)
-        lambda_if = torch.tensor(0.0, device=self.device)
+        lambda_dp = torch.tensor(float(self.lambda_init), device=self.device)
+        lambda_if = torch.tensor(float(self.lambda_init), device=self.device)
         self._lambda_lr = self.lr_lambda
 
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)

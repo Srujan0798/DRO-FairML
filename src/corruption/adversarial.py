@@ -216,7 +216,7 @@ class FairnessTargetedPGD:
 
     def __init__(self, alpha=0.2, target_metric='dp', pgd_steps=20,
                  epsilon=0.3, pgd_step_size=0.02,
-                 coordinated=True, random_state=None):
+                 coordinated=True, random_state=None, k=5):
         """
         Args:
             alpha: fraction of samples to corrupt
@@ -227,6 +227,7 @@ class FairnessTargetedPGD:
             pgd_step_size: step size for PGD feature attack
             coordinated: if True, target minority group more aggressively
             random_state: random seed for reproducibility
+            k: number of neighbors for IF attack k-NN computation
         """
         self.alpha = alpha
         self.target_metric = target_metric
@@ -234,6 +235,7 @@ class FairnessTargetedPGD:
         self.epsilon = epsilon
         self.pgd_step_size = pgd_step_size
         self.coordinated = coordinated
+        self.k = k
         self.rng = np.random.RandomState(random_state)
 
     def compute_dp_gradient(self, y, a):
@@ -366,10 +368,10 @@ class FairnessTargetedPGD:
         if self.target_metric == 'dp':
             return self.compute_dp_gradient(y, a)
         elif self.target_metric == 'if':
-            return self.compute_if_gradient(y, a, X=X, precomputed_neighbors=precomputed_neighbors)
+            return self.compute_if_gradient(y, a, X=X, k=self.k, precomputed_neighbors=precomputed_neighbors)
         elif self.target_metric == 'combined':
             dp_grad = self.compute_dp_gradient(y, a)
-            if_grad = self.compute_if_gradient(y, a, X=X, precomputed_neighbors=precomputed_neighbors)
+            if_grad = self.compute_if_gradient(y, a, X=X, k=self.k, precomputed_neighbors=precomputed_neighbors)
             # Normalize to comparable scales before mixing (DP grad is ~1/count_g,
             # IF grad is in [-1,1]; without normalization IF dominates completely)
             finite_dp = dp_grad[np.isfinite(dp_grad)]
@@ -441,7 +443,7 @@ class FairnessTargetedPGD:
         # Precompute k-NN once for IF attacks (major speedup — was recomputing 3000×)
         precomputed_neighbors = None
         if self.target_metric in ('if', 'combined') and X is not None:
-            precomputed_neighbors = self._precompute_if_neighbors(X, a)
+            precomputed_neighbors = self._precompute_if_neighbors(X, a, k=self.k)
 
         # Coordinated targeting: track minority group budget
         group_counts = np.bincount(a.astype(int))
