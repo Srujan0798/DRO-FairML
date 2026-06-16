@@ -41,6 +41,38 @@ tmux attach -t dro_full
 
 ---
 
+## UTKFace on flair2 (original May 19 task + current priority)
+
+**Local proof (done)**: Canonical config smoke (K_inner=10, tau=1 fixed, provenance) → 2 rows in results/utkface_all_results.json "fairness_pgd" bucket.
+
+**Server script (hardened)**: experiments/run_utkface_server.py now supports --tau 1.0 --k_inner 10 --epochs 60 --pgd_steps 20, records full provenance, has canonical examples in --help.
+
+**Ready commands** (copy-paste on flair2 after git pull):
+
+```bash
+# Full grid (recommended: one attack per invocation, 6 seeds)
+nohup venv/bin/python3 experiments/run_utkface_server.py \
+  --attack dp --alphas 0.0 0.1 0.2 0.3 0.4 --n_seeds 6 \
+  --tau 1.0 --k_inner 10 --epochs 60 --pgd_steps 20 --device cuda \
+  > logs/utkface_dp_server.log 2>&1 &
+
+# tmux (strongly recommended)
+tmux new-session -d -s utk_dp 'cd /data/srujan.sai/DRO-FairML && \
+  venv/bin/python3 experiments/run_utkface_server.py \
+    --attack dp --alphas 0.0 0.1 0.2 0.3 0.4 --n_seeds 6 \
+    --tau 1.0 --k_inner 10 --epochs 60 --pgd_steps 20 --device cuda \
+    > logs/utkface_dp_server.log 2>&1'
+
+# Quick smoke (CPU, for validation)
+python3 experiments/run_utkface_server.py --attack dp --n_seeds 1 --alphas 0.2 \
+  --tau 1.0 --k_inner 3 --epochs 5 --pgd_steps 3 --device cpu
+```
+
+**Email to supin.gopi** (ready to send, full polished draft was archived during cleanup but the content above is what to include):
+Use the commands + "local smoke proof with canonical config (K=10, tau=1)" + request for flair2 account + public key.
+
+The original full draft + commands files were moved to docs/_archive during the June 16 structure cleanup to keep the root clean.
+
 ## Individual Commands
 
 If you only want to run specific items:
