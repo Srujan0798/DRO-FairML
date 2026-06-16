@@ -1,0 +1,40 @@
+[
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.7534549474847982,
+    "dp_clean": 0.03365296125411987,
+    "if_clean": 2.3066812993572225e-11,
+    "total_time": 140.43452286720276,
+    "k_inner": 3,
+    "tau": 1.0,
+    "radii_mode": "uniform",
+    "lambda_init": 0.0,
+    "coordinated": false,
+    "pgd_steps": 3,
+    "n_seeds_planned": 1,
+    "epochs": 5
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "dp",
+    "method": "dro",
+    "acc_clean": 0.7553344389165285,
+    "dp_clean": 0.03459295630455017,
+    "if_clean": 9.885776997245239e-12,
+    "total_time": 135.82336497306824,
+    "k_inner": 3,
+    "tau": 1.0,
+    "radii_mode": "uniform",
+    "lambda_init": 0.0,
+    "coordinated": false,
+    "pgd_steps": 3,
+    "n_seeds_planned": 1,
+    "epochs": 5
+  }
+]
