@@ -22,12 +22,20 @@ def _make_dummy_model(input_dim=5):
 def test_empirical_mode_recovers_clean_proportions():
     """Empirical mode should recover clean pi exactly under the coordinated attack model.
 
-    Setup: 1000 samples, 0.7 group-0 / 0.3 group-1 in clean data.
+    Per MASTER_PLAN Q5 validation requirement:
+    - Synthesizes a known coordinated attack (70% minority targeting, attribute flips only, exact alpha budget).
+    - Calls _empirical_pi_clean on the observed pi after attack.
+    - Asserts recovered pi_clean matches the true clean proportions within tol (1e-6).
+
+    Setup: 1000 samples, 0.7 group-0 (maj) / 0.3 group-1 (min) in clean data.
     Apply coordinated attack with alpha=0.2 → 70% of budget (140) hits minority,
     30% (60) hits majority. After attribute flip:
-        pi_obs[0] = 0.7 - 60/1000 + 140/1000 = 0.78
-        pi_obs[1] = 0.3 - 140/1000 + 60/1000 = 0.22
-    Empirical formula: minority (group 1) gets +0.4*0.2 = +0.08 → 0.30, majority -0.08 → 0.70. Exact recovery.
+        obs count0 = 700 -60 +140 = 780 → pi_obs[0]=0.78
+        obs count1 = 300 -140 +60 = 220 → pi_obs[1]=0.22
+    Empirical inversion (see _empirical_pi_clean and Q5_derivation):
+        minority_idx = argmin(pi_obs)=1; pi_clean[1] = 0.22 + 0.4*0.2 = 0.30
+        pi_clean[0] = 0.78 - 0.08 = 0.70
+    Exact recovery (no oracle mask used; only pi_obs + alpha + known 70/30 structure).
     """
     n = 1000
     a_clean = np.array([0] * 700 + [1] * 300, dtype=np.int64)
@@ -48,9 +56,9 @@ def test_empirical_mode_recovers_clean_proportions():
     a_corrupt[flip_maj] = 1
 
     pi_obs = np.array([np.mean(a_corrupt == j) for j in [0, 1]])
-    trainer = _make_dummy_model()
-    trainer.alpha = alpha
-    trainer.radii_mode = 'empirical'
+    # Must use DroFairTrainer (not dummy model) to call _empirical_pi_clean which relies on self.alpha
+    model = _make_dummy_model()
+    trainer = DroFairTrainer(model, alpha=alpha, radii_mode='empirical', epochs=1, K_inner=1)
     pi_clean = trainer._empirical_pi_clean(pi_obs)
 
     pi_true = np.array([0.7, 0.3])
@@ -61,8 +69,8 @@ def test_empirical_mode_recovers_clean_proportions():
 def test_empirical_mode_at_alpha_zero():
     """At alpha=0, empirical formula should be a no-op (pi_clean = pi_obs)."""
     pi_obs = np.array([0.7, 0.3])
-    trainer = _make_dummy_model()
-    trainer.alpha = 0.0
+    model = _make_dummy_model()
+    trainer = DroFairTrainer(model, alpha=0.0, radii_mode='empirical', epochs=1)
     pi_clean = trainer._empirical_pi_clean(pi_obs)
     assert np.allclose(pi_clean, pi_obs, atol=1e-9)
 
@@ -70,8 +78,8 @@ def test_empirical_mode_at_alpha_zero():
 def test_empirical_mode_handles_clamping():
     """When the formula pushes a value below 0, it should clip and renormalize."""
     pi_obs = np.array([0.1, 0.9])
-    trainer = _make_dummy_model()
-    trainer.alpha = 0.4
+    model = _make_dummy_model()
+    trainer = DroFairTrainer(model, alpha=0.4, radii_mode='empirical', epochs=1)
     pi_clean = trainer._empirical_pi_clean(pi_obs)
     assert np.all(pi_clean >= 0.0)
     assert np.all(pi_clean <= 1.0)

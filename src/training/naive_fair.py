@@ -64,7 +64,12 @@ class NaiveFairTrainer:
         )
 
     def _compute_dp_loss(self, h_tilde, a):
-        """Compute DP violation: |E[h|A=1] - E[h|A=0]|."""
+        """Compute DP violation: |E[h|A=1] - E[h|A=0]|.
+
+        NOTE (audit): hardcoded binary groups [0,1] (most datasets use binary protected attr).
+        See src/evaluation/metrics.compute_dp_violation which already supports >2 groups
+        (max - min rate) and is tested for 3/4 groups. Trainers keep binary loops.
+        """
         group_rates = []
         for j in [0, 1]:
             mask = a == j
@@ -156,6 +161,8 @@ class NaiveFairTrainer:
             history['train_loss'].append(total_loss.item())
 
             # Validation every 5 epochs
+            # Audit: uses epoch's current_tau (not self.tau) for consistency with training.
+            # Explicitly covered by test_naive_fair_validation_uses_current_tau.
             if X_val is not None and (epoch + 1) % 5 == 0:
                 from src.evaluation.metrics import compute_metrics_torch
                 metrics = compute_metrics_torch(

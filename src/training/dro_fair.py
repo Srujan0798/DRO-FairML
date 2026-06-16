@@ -3,11 +3,13 @@ DRO-FAIR trainer (Algorithm 1 from the paper).
 Implements min-max Lagrangian with corruption-calibrated TV uncertainty sets.
 
 CRITICAL FIX: Paper uses h̃ = σ(τ·f_θ(x)) [MULTIPLY], not σ(f_θ(x)/τ) [DIVIDE].
-With τ=100, multiply makes predictions sharp (almost binary) so fairness
-constraints are meaningful. Division makes all predictions ≈0.5, killing fairness signal.
+Multiply makes predictions sharp so fairness constraints are meaningful.
 
-TEMPERATURE: τ defaults to 100. Experiment runners use get_temperature(alpha)
-for the paper schedule: τ=100 for α≤0.3 and τ=1 for α=0.4.
+CANONICAL / MASTER_PLAN: fixed tau=1 (verified headline: DRO beats Naive on DP
+at every α on Adult; old fragility was tau=100 artifact). Use epochs=60,
+K_inner=10 (default here), lambda_init=0.0 (exposed ONLY for Q1 ablation),
+lambda_max=1.5 (all datasets), step order θ→λ→p, inner-max ascends ∇g (not λ∇g).
+Corruption always via FairnessTargetedPGD (adversarial); RandomCorruptor only baseline.
 
 ALGORITHM FIX: Per paper Algorithm 1 (page 33), order is:
 θ update (outer min) → λ dual ascent → inner maximization on p (K steps).
@@ -76,6 +78,9 @@ class DroFairTrainer:
         the minority group and the other 30% hitting the majority, and inverts
         the resulting attribute-flip equations to recover the clean proportions
         exactly. No true corruption mask is used (no oracle leak).
+
+        NOTE (audit): group proportions computed for binary a in [0,1] (see pi_obs).
+        Most datasets binary protected attr; metrics.compute_dp_violation supports >2.
         """
         n = len(a)
         pi_obs = np.array([np.mean(a == j) for j in [0, 1]])
@@ -103,28 +108,33 @@ class DroFairTrainer:
     def _empirical_pi_clean(self, pi_obs):
         """Recover clean group proportions from observed post-attack proportions.
 
-        Derivation (coordinated 70%-minority attack with attribute flips only):
-            Let n_c = alpha * n be the corruption budget. With coordinated
-            targeting, 0.7 * n_c samples from the (clean) minority group get
-            their attribute flipped to majority, and 0.3 * n_c samples from
-            the (clean) majority group get flipped to minority. Hence the
-            observed minority count is N_min - 0.7*n_c + 0.3*n_c
-            = N_min - 0.4*n_c, and the observed majority count is
-            N_maj - 0.3*n_c + 0.7*n_c = N_maj + 0.4*n_c. Dividing by n
-            gives:
-                pi_obs[minority] = pi_clean[minority] - 0.4 * alpha
-                pi_obs[majority] = pi_clean[majority] + 0.4 * alpha
-            Rearranging:
-                pi_clean[minority] = pi_obs[minority] + 0.4 * alpha
-                pi_clean[majority] = pi_obs[majority] - 0.4 * alpha
-            The minority here is the smaller of the two OBSERVED groups (the
-            attack swaps enough that the post-attack minority is the same as
-            the pre-attack minority for alpha <= 0.4, but the formula
-            doesn't need to know which was the original minority).
+        Q5: exploits *known attack structure* (coordinated 70%-minority attribute
+        flips) + only alpha (no per-sample mask, no oracle leak) to invert exactly.
+        Used when a_val unavailable for direct clean pi; see _compute_radii.
 
-        Validity: This is exact for the coordinated 70%-minority attack with
-        attribute flips, when alpha*n_corrupt < N_min (so the 70% allocation
-        is not capped). For alpha <= 0.4 on Adult/Credit/LSAC this holds.
+        Clean derivation (see also src/Q5_derivation.md):
+            Let n_c = alpha * n = corruption budget (exact).
+            Coordinated targeting: 0.7*n_c clean-minority samples flipped min->maj;
+            0.3*n_c clean-majority samples flipped maj->min.
+            Net effect on observed counts:
+                observed_min_count = N_min_clean - 0.7 n_c + 0.3 n_c = N_min_clean - 0.4 n_c
+                observed_maj_count = N_maj_clean - 0.3 n_c + 0.7 n_c = N_maj_clean + 0.4 n_c
+            Thus (divide by n):
+                pi_obs[min] = pi_clean[min] - 0.4 * alpha
+                pi_obs[maj] = pi_clean[maj] + 0.4 * alpha
+            Solve for clean (add 0.4 alpha to the observed min side):
+                pi_clean[min] = pi_obs[min] + 0.4 * alpha
+                pi_clean[maj] = pi_obs[maj] - 0.4 * alpha
+            Then clip to [0,1] and renormalize (sum to 1).
+
+            In code: minority_idx = argmin(pi_obs)  [post-attack observed smaller group
+            remains the original min for alpha<=0.4 on our data; formula uses whichever
+            is smaller in obs].
+
+        Validity: exact inversion under the 70/30 coordinated attr-flip model when
+        0.7*alpha*n <= clean_min_count (no capping of flips). Holds for alpha<=0.4
+        on Adult/Credit/LSAC. Uniform mode uses the generic (pi_obs - alpha)/(1-2alpha)
+        instead (assumes uniform corruption across groups).
         """
         if self.alpha == 0.0:
             return pi_obs.copy()
@@ -184,7 +194,13 @@ class DroFairTrainer:
         return torch.tensor(proj, dtype=p.dtype, device=p.device)
 
     def _compute_dp_loss_weighted(self, h_tilde, a, p_dp_dict, group_mask_dict):
-        """Weighted DP violation: |h̄_1 - h̄_0|."""
+        """Weighted DP violation: |h̄_1 - h̄_0|.
+
+        NOTE (audit): assumes binary protected attr (groups 0/1) — see group_mask_dict
+        built in fit(). Most datasets (Adult/Credit/LSAC) are binary; compute_dp_violation
+        in src/evaluation/metrics.py already generalizes to >2 groups via max_g - min_g
+        (tested in test_metrics.py for 3/4 groups). Trainers remain binary-only per current spec.
+        """
         group_rates = []
         for j in [0, 1]:
             mask = group_mask_dict[j]
@@ -328,6 +344,8 @@ class DroFairTrainer:
             history['g_if'].append(float(g_if.item()) if self.use_if else 0.0)
 
             # Validation (use same temperature as training for consistent signals)
+            # CRITICAL: must use the *epoch's* current_tau (computed from tau_warmup), NOT always self.tau.
+            # Verified by test_dro_fair_validation_uses_current_tau and explicit current_tau passing.
             if X_val is not None and (epoch + 1) % 5 == 0:
                 from src.evaluation.metrics import compute_metrics_torch
                 metrics = compute_metrics_torch(

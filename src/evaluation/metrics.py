@@ -29,6 +29,11 @@ def compute_dp_violation(y_pred, a):
         This is the natural generalization — measures the worst-case disparity
         between any two groups, which is what multi-group fairness requires.
 
+    Audit note (per MASTER_PLAN): currently most datasets (Adult, Credit, LSAC) use
+    binary protected attr, but implementation + tests (test_metrics.py) support >2
+    groups via max-min. Trainers (dro_fair, naive_fair) assume binary [0,1] for their
+    internal p/g computations; metrics layer is ready for multi. No hard assert(len==2).
+
     Args:
         y_pred: predictions (numpy array, can be soft [0,1] or hard {0,1})
         a: protected attributes (numpy array)
