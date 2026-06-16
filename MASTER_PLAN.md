@@ -116,3 +116,20 @@ Needs the flair2 GPU (email supin.gopi for the account; previous attempts hit SS
 - UTKFace (§6) → whoever frees up / you chase GPU access.
 
 **Critical ordering:** B finishes `src/` → A runs canonical n=6 set → C regenerates figures/CSVs → D writes report. Until B is done, A's in-flight tau=1 (n=3) runs are fine for the meeting; just don't treat them as final-canonical.
+
+---
+
+## §8. ⚠️ COORDINATION RULE (added after a 4-way write collision)
+
+**Only ONE process may write a given `results/*.json` at a time.** Multiple
+processes running the same experiment script clobber each other on save (we hit
+exactly this — `tau_ablation_tau1.json` froze at 109/270 with 4 duplicate
+processes). Rules:
+1. **Agent A is the SOLE launcher of training runs.** No other agent (or the
+   orchestrator) starts a `run_*.py` that writes a results file A is already running.
+2. **Always pass `--k_inner 10`** to `run_tau_ablation.py` (its default is 5 = spec
+   violation). The JSON does not record k_inner, so a mixed run is unusable.
+3. Before launching, check `ps aux | grep run_` — if it's already running, don't relaunch.
+4. The current `results/tau_ablation_tau1.json` is PRELIMINARY (mixed k_inner from the
+   collision). It's fine for today's meeting (k_inner 5≈10, finding holds), but the
+   **canonical** dataset must be a single clean `--k_inner 10` run (Agent A, §2).
