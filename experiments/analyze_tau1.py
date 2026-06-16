@@ -15,6 +15,7 @@ figures/figC1_tau_ablation.{pdf,png}
 figures/figC2_adult_win_curve.{pdf,png}
     x = alpha, y = DP(Naive) - DP(DRO) at tau=1. One line per attack
     (dp, if, combined). Shows the advantage growing with alpha.
+    (See also plot_win_curves_tau1.py for all 3 datasets.)
 figures/figC3_random_vs_adversarial.{pdf,png}
     Grouped bars per (dataset, alpha) showing absolute DP under clean,
     random, and adversarial corruption. One panel per dataset.
@@ -32,6 +33,9 @@ results/tau1_wilcoxon.csv
 results/knn_ablation_table.csv
 results/knn_ablation_table.tex
     IF and DP at k in {5,10,15} x dataset, mean of seeds.
+    (Currently Adult-only 24r per k; auto-extends to Credit+LSAC when A
+     populates knn_ablation_k{5,10,15}.json for all 3 datasets via
+     run_knn_ablation.py. Script loads the 3 json files and aggregates.)
 
 All figures use Computer Modern fonts, muted academic colors, SE error bars,
 no top/right spines, and no shaded grid bands.
@@ -524,7 +528,8 @@ def fig_knn_ablation(knn_runs: list[dict], alpha: float = 0.2):
                       fontsize=8, ncol=1, frameon=True)
 
     fig.suptitle(f"IF attack is insensitive to $k$ — DP violation (bars) and IF metric (dotted) "
-                 f"by neighbourhood size (fixed $\\alpha = {alpha}$)", fontsize=11, y=1.005)
+                 f"by neighbourhood size (fixed $\\alpha = {alpha}$); "
+                 f"3 datasets when knn jsons extended", fontsize=11, y=1.005)
     fig.tight_layout()
     savefig(fig, "figC4_knn_ablation")
 
@@ -568,7 +573,7 @@ def write_knn_table(knn_df: pd.DataFrame, csv_path: str, tex_path: str):
         f.write("\\centering\n")
         f.write("\\caption{IF attack is insensitive to the neighbourhood size "
                 "$k$. DP violation under the IF attack, mean over seeds, at "
-                "$\\tau{=}1$.}\n")
+                "$\\tau{=}1$. (Adult-only until canonical/knn ablations extended to Credit+LSAC.)}\n")
         f.write("\\label{tab:knn}\n")
         f.write("\\small\n")
         f.write("\\begin{tabular}{ll" + "rr" * len(cols) + "}\n")
@@ -616,13 +621,16 @@ def main():
     tau1, tau1_src = load_tau1()
     tau10  = load_json("tau_ablation_tau10.json")
     tau100 = load_json("tau_ablation_tau100.json")
+    # k-NN ablation: loads 3 json files (k=5/10/15). Currently Adult 24r each (72 total).
+    # When Agent A extends via run_knn_ablation.py for credit+lsac, this will
+    # automatically include 3 datasets in table + figC4. No code change needed.
     knn    = load_json("knn_ablation_k5.json") + load_json("knn_ablation_k10.json") + load_json("knn_ablation_k15.json")
     rvsa   = load_json("random_vs_adversarial_new.json")
 
     print(f"  tau=1:   {len(tau1)} rows  [{tau1_src}]")
     print(f"  tau=10:  {len(tau10)} rows")
     print(f"  tau=100: {len(tau100)} rows")
-    print(f"  k-NN:    {len(knn)} rows")
+    print(f"  k-NN:    {len(knn)} rows (loads k5+k10+k15 jsons; 3ds when available)")
     print(f"  rvsa:    {len(rvsa)} rows")
 
     print("\nGenerating figures ...")
@@ -652,6 +660,8 @@ def main():
     write_knn_table(knn_df,
                     os.path.join(RESULTS_DIR, "knn_ablation_table.csv"),
                     os.path.join(RESULTS_DIR, "knn_ablation_table.tex"))
+    # NOTE: table currently reflects only datasets present in the 3 knn json files
+    # (Adult as of snapshot). Re-run after A populates Credit/LSAC rows to complete.
 
     print("\nDone.")
 
