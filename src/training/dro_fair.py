@@ -251,7 +251,9 @@ class DroFairTrainer:
         lambda_if = torch.tensor(float(self.lambda_init), device=self.device)
         self._lambda_lr = self.lr_lambda
 
-        edge_i, edge_j, edge_dists = self._build_knn_graph(X)
+        edge_i = edge_j = edge_dists = None
+        if self.use_if:
+            edge_i, edge_j, edge_dists = self._build_knn_graph(X)
 
         history = {'train_loss': [], 'val_acc': [], 'val_dp': [], 'val_if': [],
                    'lambda_dp': [], 'lambda_if': [], 'g_dp': [], 'g_if': []}
