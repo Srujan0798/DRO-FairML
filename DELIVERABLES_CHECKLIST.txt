@@ -7,9 +7,9 @@ DELIVERABLES_CHECKLIST (live 2026-06-17)
 [x] Agent D delivered: report/PDFs + checklist + consistency fixes
 [x] Agent C delivered: figD1-4 (constant predictor x=α + 0.752), D5-10, heatmaps, manifest with extracted numbers
 [x] analyze_tau1.py + generate_report_tables + tectonic run (latest)
-[ ] Lambda grid full 72/72 (currently 41/72; α0.2 done, α0.1 14, α0.3 9; proc running)
-[ ] Canonical 540 (currently 69/540: adult α0.0 full 6 seeds, α0.1 33/36; on final adult row; proc running; will auto-continue to Credit+LSAC)
-[ ] Empirical (Q5) companion (after canonical)
+[ ] Lambda grid full 72/72 (currently 44/72; α0.2 done, α0.1 17, α0.3 9; proc running)
+[ ] Canonical 540 (currently 73/540: adult α0.0 full 6 seeds, α0.1 ~37/36 wait; on final adult rows; proc running; will auto-continue to Credit+LSAC)
+[ ] Empirical (Q5) companion (after canonical Credit/LSAC)
 [ ] Full n=6 Wilcoxon + final pub figures from complete 540
 [ ] UTKFace (draft email ready, access blocked)
 
@@ -20,9 +20,33 @@ Live commands:
 
 All non-training work complete. Experiments running single-writer. Evidence-based.
 
-As of 2026-06-17 20:55:
+As of 2026-06-17 20:55 (polled refresh 21:41 by Final-Polish):
 - Training right now:
-  - Lambda: row 14/72 → α=0.1 seed=1 λ_init=0.1 lr=0.001 (PID 16334)
-  - Canonical: row 70/540 → adult α=0.1 seed=5 if method=dro (PID 18580, last adult row)
+  - Lambda: row ~44/72 → α0.1/0.3 active (PID 16334)
+  - Canonical: row ~73/540 → adult α=0.1 finishing (PID 21531)
+- Verified: lambda=44/72 , canonical=73/540 (datasets all 'adult')
 
 [ x ] Agent C complete: constant-predictor figures (D1-D4 + supporting) with x=α + 0.752 bar, tradeoff, heatmaps, manifest, adult stats, high-alpha analysis. Verified against source CSVs (α=0.2 DRO 0.755>0.752; ≥0.3 below).
+
+[ x ] Agent A subagent completed work (58min): lambda advanced 40→44/72 (α0.1 at 17/18), canonical 69~73 (still Adult only). Proper commits, monitors left running, rules followed (ps, one writer, provenance, no empirical early).
+
+=== AGENT FINAL-POLISH STATUS (prep) ===
+- Polled and confirmed initial counts + files read (REMAINING_WORK, ORCHESTRATOR_LIVE_STATUS).
+- Plan prepared + documented in updated status files. Ready to execute in strict order when Lambda-Finisher + Canonical-Advancer signals via count thresholds + commits.
+- Will re-verify counts before any finalize/rebuild/doc update.
+- Will produce FINAL_EVIDENCE.txt only at very end with exact final numbers + "All agents delivered".
+Last update: Agent Final-Polish prep phase.
+
+=== CANONICAL-ADVANCER UPDATE (2026-06-17 ~21:43) ===
+[x] Agent Canonical-Advancer started role.
+- Verified initial: PID 21531 alive + canonical 73/540 only Adult.
+- Began frequent monitoring loop (ticks + bg monitor PID 24801 -> logs/canonical_advancer_monitor.log)
+- Multiple evidence pastes: counts 73 adult, ps (one canonical writer only), stale logs noted (json authoritative), git.
+- Confirmed NO Credit/LSAC rows yet (strict rule: do not launch empirical until personally see in json).
+- Updated ORCHESTRATOR_LIVE_STATUS.txt with detailed section + provenance.
+- All --k_inner 10, tau=1 enforced by runner.
+- Ready: will launch empirical companion immediately on detection of first non-Adult row, using:
+  nohup python3 experiments/run_canonical.py --k_inner 10 --radii_mode empirical >> logs/empirical.log 2>&1 &
+- Will then monitor empirical too, run analyze_tau1.py + generate_report_tables.py when partial in BOTH, update status, commit.
+Last check: still 73/540 adult. Monitoring continues.
+

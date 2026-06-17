@@ -3,17 +3,17 @@ Time: 2026-06-17 ~20:xx (post subagent)
 
 === Experiments (Agent A ran ~58min wall, followed all rules) ===
 lambda grid: 44/72
-  - PID 16334 still running (~50+ min elapsed, high CPU)
+  - PID 16334 still running (~60+ min elapsed, high CPU)
   - α=0.1: 17/18 (very close)
   - α=0.2: 18/18 (done)
   - α=0.3: 9/18
   - ~28 rows left (finish 0.1 + 0.3 + all 0.4)
 
-canonical: 72/540
+canonical: 73/540
   - PID 21531 (launched with --k_inner 10) still running
-  - Still only Adult dataset (~72 rows for Adult grid)
-  - Progress during Agent A: ~69 → 72
-  - Last Adult rows being completed; will auto-move to Credit next
+  - Still only Adult dataset (73 rows; started alpha=0.2 s=0)
+  - Progress: last rows of Adult in flight; 180 rows needed for full Adult. Will auto-move to Credit next.
+  - Verified provenance on rows: radii_mode=uniform, k_inner=10, tau=1.0
 
 Both processes: one writer only, resume-safe, full provenance (k_inner=10, tau=1, etc.)
 
@@ -23,7 +23,7 @@ Both processes: one writer only, resume-safe, full provenance (k_inner=10, tau=1
 - Monitored with background scripts in logs/
 - Committed progress:
   - lambda 40→44/72
-  - canonical 69→71/72
+  - canonical 69→73/540
 - Sample rows and by-alpha confirmed
 - Did NOT start empirical (correctly waiting for Credit/LSAC)
 
@@ -51,3 +51,66 @@ PIDs: 16334 (lambda), 21531 (canonical --k_inner 10)
    - Will handle full wilcoxon, final figures, report/PDF rebuild, docs cleanup, and final commit once the above two are done.
 
 All agents have clear briefs + MASTER_PLAN constraints.
+
+=== AGENT FINAL-POLISH PREP (added now, 2026-06-17) ===
+Agent Final-Polish active. Started per brief: read REMAINING_WORK.md + ORCHESTRATOR_LIVE_STATUS.txt first.
+Current verified counts (polled via json + finalize status + ps): lambda=44/72, canonical=73/540 (all Adult only).
+No Credit/LSAC yet, no empirical launched. Lambda-Finisher not triggered.
+
+**Prepared Plan (strict order, rules enforced):**
+- ALWAYS: poll/verify counts BEFORE any claim of "complete" or update. Use:
+  python3 -c 'import json; print("L", len(json.load(open("results/lambda_lr_grid.json"))), "C", len(json.load(open("results/canonical_tau1.json"))))'
+  + finalize_experiments.py status + dataset counters for canonical.
+- Rule: ONLY write/edit in docs/, report/, paper/, figures/, status files (*.md *.txt at root for status). NEVER edit experiments/, src/, results/ json main, logs/. Do NOT launch/kill/touch running procs (PIDs 16334, 21531).
+- Wait signals: poll counts, git log (for finisher commits), log tails (read only), ps (non mod).
+- Step 1 (lambda 72 + Lambda-Finisher finalized+committed):
+  - Re-poll verify exactly 72/72.
+  - Confirm finisher commit e.g. via git log containing finalize/lambda72.
+  - Re-run if needed: python3 experiments/analyze_tau1.py
+  - Rebuild tables+PDFs: python3 experiments/generate_report_tables.py ; (cd report && /opt/homebrew/bin/tectonic report.tex) ; (cd paper && /opt/homebrew/bin/tectonic main.tex)
+  - Update ONLY: KULDEEP_DISCUSSION.md + ORCHESTRATOR_LIVE_STATUS.txt + DELIVERABLES_CHECKLIST.txt + HANDOFF.md (append "lambda 72/72 complete" + timestamp)
+  - Optional: git add figures/ report/ paper/ [status] ; but defer main commit.
+- Step 2 (canonical Credit+LSAC + empirical running/done):
+  - Poll verify Credit and LSAC present in canonical_tau1.json (Counter dataset).
+  - Check empirical: look for canonical_tau1_empirical.json len or logs/empirical.log (read-only).
+  - Run: python3 experiments/compute_canonical_wilcoxon.py
+  - Regenerate figures: python3 experiments/analyze_tau1.py ; python3 experiments/generate_all_figures.py (or targeted)
+  - Rebuild pdfs from final data as above + generate_paper_tables.py if used.
+  - Update ALL key docs: HANDOFF.md, DELIVERABLES_CHECKLIST.txt, REMAINING_WORK.md, KULDEEP_DISCUSSION.md, ORCHESTRATOR_*.txt/md , etc.
+- Step 3 Final cleanup + commit:
+  - Cleanup limited: rm or mv to docs/_archive/ any .bak (e.g. report/report.tex.bak), unnecessary history only inside docs/report/paper/figures/ .
+  - Do NOT touch results/*.json history or logs/ .
+  - git status ; ensure only allowed files staged for final results.
+  - One commit: git commit -m "FINAL: lambda + canonical + empirical complete + all analysis + docs"
+  - Produce FINAL_EVIDENCE.txt (root status) containing:
+    - last verified counts (lambda 72/72, canonical 540/540)
+    - key numbers: Adult α=0.2 DRO vs Naive DP/acc (e.g. from tau1_summary: DRO acc~0.755 dp~0.237 ; Naive ~0.753/0.248), constant predictor 0.752 bar
+    - empirical status
+    - commit hashes (before/after)
+    - "All agents delivered."
+  - Update FINAL_FIGURES_MANIFEST.txt if needed (in figures/).
+- Always: evidence before claim. Spot check numbers match source CSVs after rebuilds. Use absolute values.
+- If conditions met during this, execute in order. Current: prepping, polling.
+
+Last poll time in prep: ~2026-06-17 21:41 . All rules followed.
+
+=== CANONICAL-ADVANCER LIVE UPDATE (2026-06-17 21:42) ===
+Agent Canonical-Advancer (new role) active.
+- Started: confirmed PID 21531 alive, canonical_tau1.json = 73/540 (100% adult)
+- Strict rule followed: NO launch of empirical until personally verify Credit or LSAC rows in json.
+- Monitoring loop active:
+  - Background monitor PID 24801 writing logs/canonical_advancer_monitor.log (every 30s)
+  - Multiple ticks performed: always 73/540 adult only, HAS_CREDIT_OR_LSAC=False
+  - Last observed row in json: adult alpha=0.2 seed=0 dp naive (radii_mode=uniform confirmed)
+- Logs note: root canonical.log stale (ends ~70); active stdout for PID is logs/canonical_run.log (0B visible, likely buffering; json is source of truth)
+- PS checks always before any action: only 21531 for canonical writer. Lambda 16334 separate.
+- Git: tracking changes to results/canonical_tau1.json etc.
+- No Credit/LSAC appeared yet. Adult still in flight (slow per-row on laptop: ~5min+/row est.).
+- Next: continue monitoring; when first Credit/LSAC detected in json: immediately ps check, then launch empirical via specified nohup to logs/empirical.log , record new PID.
+- Also will update status + commit with provenance after launches/analyze steps.
+- Current command for launch (when triggered): nohup python3 experiments/run_canonical.py --k_inner 10 --radii_mode empirical >> logs/empirical.log 2>&1 &
+
+All per user brief for Agent Canonical-Advancer + MASTER_PLAN §1 (one writer), §3 (canonical spec, empirical companion), §4.
+Evidence pasted at each step (counts, log tails, git, ps).
+
+Last update: 2026-06-17 ~21:43 . Verified no Credit/LSAC. Will re-poll.
