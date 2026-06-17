@@ -48,19 +48,9 @@ def run_one(alpha, seed, lambda_init, lr_lambda):
         radii_mode='uniform',
         use_dp=True, use_if=False,  # DP-targeted attack → no IF constraint needed
     )
-    history = trainer.fit(X_att, y_att, a_att, X_val=X_v, y_val=y_v, a_val=a_v, verbose=False)
+    trainer.fit(X_att, y_att, a_att, X_val=X_v, y_val=y_v, a_val=a_v, verbose=False)
     m = compute_metrics_torch(model, X_te, y_te, a_te, temperature=TAU, k=5, gamma=0.0)
-    result = {'acc': float(m['accuracy']), 'dp': float(m['dp_violation']), 'if': float(m['if_violation'])}
-    
-    # Save history to JSON file
-    import os
-    os.makedirs('results', exist_ok=True)
-    history_file = f'results/lambda_lr_grid_history_{alpha}_{seed}_{lambda_init}_{lr_lambda}.json'
-    with open(history_file, 'w') as f:
-        import json
-        json.dump(history, f, indent=2)
-    
-    return result
+    return {'acc': float(m['accuracy']), 'dp': float(m['dp_violation']), 'if': float(m['if_violation'])}
 
 
 def main():

@@ -362,22 +362,14 @@ class DroFairTrainer:
                           f"val_if={metrics['if_violation']:.4f}, "
                           f"lambda_dp={lambda_dp.item():.2f}, lambda_if={lambda_if.item():.2f}")
 
-        # Create new history format: list of dicts with per-epoch validation metrics
-        self.history = []
-        for i in range(self.epochs):
-            epoch_dict = {
-                'epoch': i,
-                'val_loss': history['train_loss'][i] if i < len(history['train_loss']) else 0.0,
-                'val_acc': history['val_acc'][i] if i < len(history['val_acc']) else 0.0,
-                'val_dp': history['val_dp'][i] if i < len(history['val_dp']) else 0.0
-            }
-            self.history.append(epoch_dict)
+        # Keep original history dict format for backward compatibility (tests rely on hist['train_loss'][-1])
+        self.history = history  # Also expose as self.history for Agent C's convergence plots
 
         if self.history_path:
             import json as _json
             with open(self.history_path, 'w') as _hf:
-                _json.dump(self.history, _hf, indent=2)
-        return self.history
+                _json.dump(history, _hf, indent=2)
+        return history
 
     def predict(self, X):
         """Make binary predictions."""
