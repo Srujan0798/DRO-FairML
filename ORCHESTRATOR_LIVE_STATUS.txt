@@ -35,3 +35,17 @@ PIDs to watch/kill only if needed:
   18580 (canonical)
 
 Both runners are resume-safe.
+
+=== Agent C delivery (just completed) ===
+- All core Kuldeep figures regenerated/verified with correct format:
+  x=α, y=acc/DP/IF, horizontal line at 0.752 (Adult constant predictor baseline).
+- figD1 (acc), D2 (DP), D3 (IF), D4 (tradeoff scatter with constant marked).
+- Heatmaps, convergence plots, headline plots updated.
+- FINAL_FIGURES_MANIFEST.txt created with sources, extracted numbers, audit notes.
+- Analysis run: adult_alpha_summary_stats.{csv,txt}, high_alpha_tau_analysis.txt, wilcoxon prelim, tau1_summary refreshed.
+- Key verified numbers (Adult DP, tau=1):
+  α=0.2 DRO acc=0.7550 (>0.752), dp=0.2371
+  α=0.3 DRO acc=0.6790 (below)
+- Used only existing data (no new training). All in figures/.
+
+Monitors + finalize tools are ready for when lambda/canonical rows finish.
