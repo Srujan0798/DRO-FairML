@@ -336,3 +336,9 @@ See logs/canonical_watcher.log , logs/canonical_advancer_monitor.log
 - Will auto-execute: finalize, analyze, wilcoxon, figures, PDFs, docs update, hygiene, commit + FINAL_EVIDENCE.
 - Logs to logs/final_orchestrator_monitor.log
 - Cross-coordinating with Lambda-Watcher and Canonical-Watcher.
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 22:50:35 ===
+lambda: 49/72 , canonical: 81/540
+datasets: {'adult': 81}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
