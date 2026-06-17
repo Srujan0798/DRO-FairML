@@ -37,3 +37,17 @@ When lambda hits 72 or canonical starts Credit:
   (then tables + PDFs)
 
 PIDs: 16334 (lambda), 21531 (canonical --k_inner 10)
+
+=== NEW AGENT ASSIGNMENTS (orchestrator just spawned) ===
+1. Agent Lambda-Finisher (id 019ed657-8b95-72a3-9207-b7a8c4707d0b)
+   - Watching PID 16334
+   - Will run finalize + commit exactly when lambda==72
+
+2. Agent Canonical-Advancer (id 019ed657-8b95-72a3-9207-b7b35c547c3b)
+   - Watching PID 21531
+   - Will launch empirical (correct --k_inner 10 --radii_mode empirical) ONLY after first Credit/LSAC row appears
+
+3. Agent Final-Polish (id 019ed657-bb1f-7663-ac56-35d4b810b1b6)
+   - Will handle full wilcoxon, final figures, report/PDF rebuild, docs cleanup, and final commit once the above two are done.
+
+All agents have clear briefs + MASTER_PLAN constraints.
