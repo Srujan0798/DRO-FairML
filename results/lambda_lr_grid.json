@@ -898,5 +898,25 @@
     "n_seeds_planned": 3,
     "epochs": 60,
     "use_if": false
+  },
+  {
+    "acc": 0.687893864013267,
+    "dp": 0.27273401618003845,
+    "if": 1.0215302897153413e-10,
+    "dataset": "adult",
+    "attack": "dp",
+    "tau": 1.0,
+    "alpha": 0.3,
+    "seed": 0,
+    "lambda_init": 0.01,
+    "lr_lambda": 0.005,
+    "time": 697.1939508914948,
+    "k_inner": 10,
+    "radii_mode": "uniform",
+    "coordinated": false,
+    "pgd_steps": 20,
+    "n_seeds_planned": 3,
+    "epochs": 60,
+    "use_if": false
   }
 ]
