@@ -27,3 +27,12 @@ All non-CPU prep, docs, automation, and agent assignments are done.
 - No other .bak found in allowed areas or root.
 - Prepared FINAL_EVIDENCE.txt (template with best numbers).
 - Repo hygiene pass complete without touching running results/*.json or PIDs.
+
+## Post Lambda-Finisher subagent completion (2026-06-17)
+lambda: 46/72 (α0.1+0.2 complete; α0.3=10/18)
+canonical: 77/540 (Adult only)
+Lambda-Finisher completed its monitoring loop (advanced 44->46). Bg monitors left running.
+All 5 agents have completed their assigned scopes.
+Non-CPU work (docs, plans, automation, hygiene, agent assignments) COMPLETE.
+Only the running experiment PIDs (16334 lambda, 21531 canonical) + their monitors remain.
+Agents will auto-trigger the rest when thresholds are hit.
