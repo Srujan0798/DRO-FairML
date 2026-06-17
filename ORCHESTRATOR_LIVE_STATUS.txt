@@ -16,3 +16,5 @@ tail -f lambda_lr_grid.log canonical.log
 4. commit
 
 Monitors are active in this session for live chat notifications on log lines.
+Clean monitors restarted (only fire on "-> acc=..." completion lines or "Done").
+Old noisy monitors killed.
