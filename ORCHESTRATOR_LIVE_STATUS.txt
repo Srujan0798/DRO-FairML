@@ -283,3 +283,56 @@ lambda: 49/72 , canonical: 79/540
 datasets: {'adult': 79}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+=== ORCHESTRATOR STATUS UPDATE: Final-Orchestrator active ===
+Time: 2026-06-17 22:42:27
+Current: lambda 49/72 canonical 79/540
+Monitors active:
+  final_orchestrator_monitor.py PID 39555
+  bg delayed poll launched
+Other watchers: canonical_advancer 25253, data_refresher 26540, lambda inline watchers
+Condition not met yet. Polling every 5min via bg + delayed polls.
+
+=== FINAL-ORCHESTRATOR POLL @ 2026-06-17 22:45 approx ===
+lambda: 49/72 canonical: 79/540 (adult only)
+Monitors: final_orch 39555 (5min loop + flag on condition), advancer 25253, lambda watcher active in /tmp, data_refresher 26540
+No Credit/LSAC or empirical yet. Only act on double-checked >=72 + Credit/LSAC + emp>0 rows.
+BG delayed polls scheduled. Coordinated via tail of logs/canonical_advancer_monitor.log , /tmp/lambda_watcher.log etc.
+
+=== AGENT CANONICAL-WATCHER (new sub-agent for final push) @ 2026-06-17 22:44 ===
+Current state per user: canonical: 79/540 (still only Adult)
+Process PID 21531 running.
+Canonical-Advancer monitor (25253) is already active.
+
+Polled:
+- Using logs/canonical_watcher_poll.py and logs/canonical_watcher.py (bg PID 39913)
+- Delayed polls scheduled (3min/5min)
+- Multiple quick polls (22:42-22:44): consistently 79/540, datasets={'adult':79}, HAS_CREDIT_LSAC=False
+- Last row provenance: dataset=adult, alpha=0.2, seed=1, attack=dp, method=naive, radii_mode=uniform, k_inner=10, tau=1.0
+- JSON mtime: Jun 17 22:23 (in-flight row on PID 21531)
+- No empirical.log or canonical_tau1_empirical.json
+- Confirmed with ps: no duplicate canonical running (only 21531 for main uniform run). Watcher 39913 + advancer 25253 separate, non-interfering.
+- Advancer monitor log confirms same counts + HAS=False
+
+Action: No launch yet (condition not met). Watcher active, polling every ~4min internally + scheduled.
+Will trigger ONLY when first credit or lsac row appears in JSON:
+  1. ps confirm no dup canonical
+  2. nohup python3 experiments/run_canonical.py --k_inner 10 --radii_mode empirical >> logs/empirical.log 2>&1 &
+  3. Record new PID to logs/empirical.pid
+  4. Monitor empirical for rows
+  5. Then: python3 experiments/analyze_tau1.py ; python3 experiments/generate_report_tables.py
+  6. Update status files.
+Keep until 540 or empirical launched.
+
+Evidence (counts/logs/PIDs):
+canonical: 79/540 adult only
+PIDs: 21531 (main), 25253 (advancer), 39913 (watcher)
+See logs/canonical_watcher.log , logs/canonical_advancer_monitor.log
+
+=== Final-Orchestrator subagent (019ed68e-9ef6-7172-be9c-6faa460dac9b) COMPLETED ===
+- Set up persistent bg monitor: /tmp/final_orchestrator_monitor.py (PID 39555)
+- Polled multiple times: lambda 49/72, canonical 79/540 (Adult only). Conditions NOT met yet.
+- No early finalize/analyze/commit executed (correct).
+- Prepared full plan for when lambda>=72 + Credit/LSAC + empirical producing rows.
+- Will auto-execute: finalize, analyze, wilcoxon, figures, PDFs, docs update, hygiene, commit + FINAL_EVIDENCE.
+- Logs to logs/final_orchestrator_monitor.log
+- Cross-coordinating with Lambda-Watcher and Canonical-Watcher.

@@ -109,3 +109,39 @@ PIDs still cooking.
 - Final-Orchestrator (019ed68e-9ef6-7172-be9c-6faa460dac9b): full final polish, commit, evidence when ready.
 
 Existing: data_refresher (26540), advancer monitor (25253).
+
+## AGENT CANONICAL-WATCHER (sub-agent id ~019ed68e-9ef5-...) LIVE POLLS @ 2026-06-17 22:44
+
+**Task:** Poll canonical count/datasets every 3-5 min. Launch empirical ONLY on Credit/LSAC rows seen in JSON. Strict ps no-dup check before launch. Do not interfere with 21531 or 25253.
+
+**Polls performed (evidence):**
+- Initial: 79/540 | {'adult': 79} | HAS_CREDIT_LSAC=False
+- Multiple polls 22:42:46 to 22:43:49 (30s spacing): stayed 79/540 Adult only. (See quick_poll_loop.sh output)
+- Delayed polls scheduled at +180s, +300s, +240s (watcher loop)
+- Clean poll at 22:44:06: canonical: 79/540 datasets: {'adult': 79} HAS=False
+- Last row: adult alpha=0.2 seed=1 dp/naive , k_inner=10, tau=1.0, radii_mode=uniform
+- JSON file mtime unchanged since 22:23 (row in-flight)
+- No emp log or json yet.
+
+**PS confirmations (no dup):**
+- 21531: experiments/run_canonical.py --k_inner 10   (CPU 10-96% fluctuating)
+- 25253: logs/canonical_advancer_monitor.py
+- 39913: logs/canonical_watcher.py   (my bg watcher)
+Only 21531 writing canonical main.
+
+**Watcher setup:**
+- logs/canonical_watcher.py launched via nohup (PID 39913)
+- Internal loop: poll + sleep(240)
+- Will auto: on has_credit_or_lsac: ps check, launch exact nohup cmd for empirical, record PID, monitor, run analyze + generate_report_tables, update statuses.
+- Logs to logs/canonical_watcher.log
+
+**Current:** Still only Adult. No trigger. Polling continues. Will keep until 540/540 or empirical running.
+
+**Commands ready (when triggered):**
+- Launch: nohup python3 experiments/run_canonical.py --k_inner 10 --radii_mode empirical >> logs/empirical.log 2>&1 &
+- Record: logs/empirical.pid
+- Post: python3 experiments/analyze_tau1.py ; python3 experiments/generate_report_tables.py
+
+
+## Final-Orchestrator subagent completed setup (019ed68e-9ef6-7172-be9c-6faa460dac9b)
+Bg monitor PID 39555 running. Conditions not met (49/72 lambda, 79/540 Adult only). Ready to drive full final when thresholds hit.
