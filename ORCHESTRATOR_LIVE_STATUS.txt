@@ -226,3 +226,11 @@ lambda: 46/72 , canonical: 77/540
 datasets: {'adult': 77}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== Lambda-Finisher subagent (019ed657-8b95-72a3-9207-b7a8c4707d0b) COMPLETED ===
+- Monitored 44 -> 46/72.
+- Advanced α0.1 to complete, α0.3 to 10/18.
+- Set up bg monitors (e.g. /tmp/poll_lambda_grid.py, lambda_watcher).
+- Prepared exact plan for 72: run finalize, commit results/lambda_*.json + history, update MDs, report evidence.
+- Never relaunched (correct). PID 16334 still alive ~1h26m.
+- Will continue in bg until 72 or stop.
