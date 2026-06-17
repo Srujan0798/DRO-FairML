@@ -149,3 +149,9 @@ Bg monitor PID 39555 running. Conditions not met (49/72 lambda, 79/540 Adult onl
 ## Post-wait poll (background task 019ed692-1b6a-7662-8011-e2f9a0d2587c completed)
 lambda: 49/72 (no change), canonical: 79/540 (no change). Conditions still not met.
 Sub-agents still running.
+
+## Latest poll (after waiting for background poll)
+lambda: 49/72 (no change in this poll)
+canonical: 79/540 (no change)
+Sub-agents still running in bg. No thresholds crossed yet.
+PIDs still alive but CPU lower (perhaps between rows or slow row).
