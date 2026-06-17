@@ -145,3 +145,7 @@ Only 21531 writing canonical main.
 
 ## Final-Orchestrator subagent completed setup (019ed68e-9ef6-7172-be9c-6faa460dac9b)
 Bg monitor PID 39555 running. Conditions not met (49/72 lambda, 79/540 Adult only). Ready to drive full final when thresholds hit.
+
+## Post-wait poll (background task 019ed692-1b6a-7662-8011-e2f9a0d2587c completed)
+lambda: 49/72 (no change), canonical: 79/540 (no change). Conditions still not met.
+Sub-agents still running.
