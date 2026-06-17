@@ -33,3 +33,15 @@ Current:
 - python3 watch_and_finalize.py   (can be left running)
 - Clean monitors (if active in session)
 
+## AGENT FINAL-POLISH PREP NOTE (2026-06-17)
+Agent Final-Polish (orchestrator cleanup/docs) has read initial files and is monitoring.
+- Verified live counts via polls: lambda 44/72, canonical 73/540 (Adult only). 
+- Plan prepared per mission order (see ORCHESTRATOR_LIVE_STATUS.txt for full detailed plan).
+- Will act ONLY when Lambda-Finisher signals via finalize+commit at 72/72, THEN Canonical-Advancer for Credit/LSAC + empirical.
+- Strict: verify counts + git signals before EVERY "complete" claim or edit.
+- Will ONLY modify: docs/ report/ paper/ figures/ status *.md/*.txt files.
+- Will run generators only (analyze_tau1.py, compute_canonical_wilcoxon.py, generate_*tables.py, tectonic for PDFs) when conditions met.
+- No interference with procs. No empirical launch (reserved).
+- Cleanup limited to .bak/history inside allowed dirs only (currently only report/report.tex.bak candidate).
+- Final: one commit as specified + FINAL_EVIDENCE.txt .
+Current state: waiting/polling. Last poll ~21:41.
