@@ -63,3 +63,11 @@ Existing bg: data_refresher_loop (26540), advancer monitor (25253)
 These align with the handoff's Agent A (experiments) and C (figures/final).
 
 Existing active: data_refresher_loop (26540), canonical_advancer_monitor (25253), and previous sub-agents' monitors.
+
+## Sub-agent assignments for remaining (latest, 2026-06-17)
+- Lambda-Watcher (019ed68e-9ef4-7840-a69f-74efe334a4b2): monitor lambda to 72/72, run finalize, commit, update docs.
+- Canonical-Watcher (019ed68e-9ef5-70f3-951e-040d78971584): launch empirical on Credit/LSAC, monitor, trigger analyze.
+- Final-Orchestrator (019ed68e-9ef6-7172-be9c-6faa460dac9b): full final when ready, polish, commit, evidence.
+
+These are now running in background to complete.
+Existing: data_refresher (26540), advancer_monitor (25253), previous subs.
