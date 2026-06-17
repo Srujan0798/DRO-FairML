@@ -114,3 +114,13 @@ All per user brief for Agent Canonical-Advancer + MASTER_PLAN §1 (one writer), 
 Evidence pasted at each step (counts, log tails, git, ps).
 
 Last update: 2026-06-17 ~21:43 . Verified no Credit/LSAC. Will re-poll.
+=== CANONICAL-ADVANCER POST-COMMIT UPDATE (2026-06-17 21:45) ===
+- Committed: 1707821 "Agent Canonical-Advancer: monitoring started (73/540 Adult only)..."
+- Monitor now: PID 25253 running logs/canonical_advancer_monitor.py (polls json every ~30s)
+- Still: canonical 73/540 Adult only (last: adult 0.2/0/dp/naive; provenance k_inner=10 tau=1.0 radii_mode=uniform)
+- JSON mtime frozen at 21:33 (current row in-flight, no append yet). CPU time on 21531 increasing.
+- Repeated PS checks: only canonical writer=21531; monitor separate.
+- Empirical launch pending strict trigger (Credit or LSAC row in json or Adult==180)
+- git status shows results/canonical_tau1.json modified by running process (not staged by us)
+- Next action: continue bg monitoring; on trigger condition: 1. ps check writers 2. confirm row in json via python 3. launch empirical nohup 4. record new PID 5. update status+commit 6. when partial both: run analyze + generate_report_tables
+All rules followed. Paste at every major: counts, logs, git, ps.
