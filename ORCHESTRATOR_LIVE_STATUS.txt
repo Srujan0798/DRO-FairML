@@ -1,0 +1,18 @@
+# ORCHESTRATOR LIVE STATUS (updated 2026-06-17 20:56:09)
+
+**Experiments still running (confirmed):**
+- lambda PID 16334: 41/72 , elapsed ~15:40 , ~98% CPU , currently inside row [14/72] α=0.1 s=1 λ_init=0.1 lr=0.001
+- canonical PID 18580: 69/540 , elapsed ~4 min on this invocation , ~98% CPU , inside final adult row [70/540] adult α=0.1 seed=5 if-dro
+
+**Best commands right now:**
+python3 finalize_experiments.py status
+python3 watch_and_finalize.py     # optional: watches and auto-refreshes when counts change
+tail -f lambda_lr_grid.log canonical.log
+
+**When you see a new "-> acc=..." line in the logs or counts increase:**
+1. python3 finalize_experiments.py
+2. Review new results
+3. git add results/tau1_* figures/ report/ paper/ (avoid committing .json mid-run)
+4. commit
+
+Monitors are active in this session for live chat notifications on log lines.
