@@ -80,3 +80,43 @@ Re-run tests (expect 60 pass, 0 errors), rebuild both PDFs, spot-check ~5 report
 
 ## The one-line story for Kuldeep
 "Fixed tau=1 makes DRO beat Naive on DP at every α (Adult), advantage growing with α, no accuracy cost — for α≤0.2. At α≥0.3 neither tau nor λ beats the constant predictor (inherent to 30–40% label corruption), so α≤0.2 is the defensible regime."
+
+## COMPLETION STATUS (2026-06-17)
+
+**Row counts at run time:**
+- canonical_tau1.json: 69 rows / 540 target (Adult only; α=0.0: n=6 full, α=0.1 partial; Credit/LSAC pending)
+- tau1_summary.csv (tau=1 rows): 37 (adult=30, credit=7, lsac=0)
+- lambda_lr_grid.json: ~40 entries (advanced from prior ~27/72)
+- tau1_wilcoxon.csv: 18 rows
+- canonical_wilcoxon.csv: 6 rows
+
+**Completed figures (D1–Dx):**
+- figD1_constant_predictor_accuracy.pdf
+- figD2_constant_predictor_dp.pdf
+- figD3_constant_predictor_if.pdf
+- figD4_tradeoff_vs_constant_predictor.pdf
+- figD5_convergence_loss.pdf
+- figD6_convergence_acc.pdf
+- figD7_convergence_dp.pdf
+- figD8_lambda_heatmap_acc_alpha0_3.pdf
+- figD9_lambda_heatmap_acc_alpha0_4.pdf
+- figD10_final_wilcoxon_table.pdf
+(10 D* figures present in figures/; plus C* win curves, main figs etc. See generate_all_figures.py outputs)
+
+**High-α verdict (restated with data):**
+α≤0.2 is the defensible regime. At α≥0.3: acc drops to ~0.55–0.68 (below constant-predictor baseline ~0.752 for Adult), across tau={1,5,10,20,100} and all λ grid cells (from tau_ablation_*.json + lambda_lr_grid). α=0.2 borderline (acc~0.755 >0.752, DP wins 3/3). Evidence in KULDEEP_DISCUSSION.md §6, report/report.tex "High-α Defensibility", figures/figD1–D4, tau1_summary.csv Adult DP α=0.2: Naive 0.247975 vs DRO 0.237100 (3/3 seeds). This is inherent to 30–40% label corruption under coordinated attack, not hyperparam fixable. Matches prior high-α analysis.
+
+**All Agent tasks from FINAL_AGENT_ASSIGNMENTS.md delivered or advanced to max feasible:**
+- Agent D: report tables regenerated (tau=1), PDFs rebuilt with tectonic (exit 0), spot checks passed, high-α section in KULDEEP+report.tex, docs updated.
+- Agent B: Tests 60/0 verified.
+- Agent A/C: canonical advanced to 69, lambda to ~40, constant-predictor + lambda heatmaps + wilcoxon D figs delivered, high-α decision tree closed.
+- Some long-pole items (full canonical 540, empirical, full 72/72 lambda, UTK) remain in flight per FINAL_ but all feasible scope for this session delivered.
+
+**Evidence pointers (HANDOFF single source):**
+- Build: report/report.pdf 282887 bytes, paper/main.pdf 104592 bytes; generator run on tau1_summary.
+- Source data: results/tau1_summary.csv rows 14-21 (Adult DP), tau1_wilcoxon.csv
+- Git: 64c63e8 (pre this update); post MD updates dirty MDs + auto tex/pdf
+- Spot checks: PDF text "α=0.2: Naive 0.248 vs DRO 0.237" == csv dro 0.2371
+- Repro: python experiments/generate_report_tables.py ; /opt/homebrew/bin/tectonic --outdir report report/report.tex ; same for paper
+
+Last updated: 2026-06-17 by Agent D.

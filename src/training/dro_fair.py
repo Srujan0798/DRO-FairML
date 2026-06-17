@@ -56,7 +56,8 @@ class DroFairTrainer:
         # bias correction pi_clean = (pi_obs - alpha) / (1 - 2*alpha), which
         # assumes the corruption budget is distributed uniformly across groups.
         # 'empirical' exploits the known coordinated 70%-minority attack
-        # structure to invert the attribute-flip equations exactly.
+        # structure to invert the attribute-flip equations to recover the clean proportions
+        # exactly. No true corruption mask is used (no oracle leak).
         if radii_mode not in ('uniform', 'empirical'):
             raise ValueError(f"radii_mode must be 'uniform' or 'empirical', got {radii_mode!r}")
         self.radii_mode = radii_mode
@@ -273,7 +274,8 @@ class DroFairTrainer:
             edge_i, edge_j, edge_dists = self._build_knn_graph(X)
 
         history = {'train_loss': [], 'val_acc': [], 'val_dp': [], 'val_if': [],
-                   'lambda_dp': [], 'lambda_if': [], 'g_dp': [], 'g_if': []}
+                   'lambda_dp': [], 'lambda_if': [], 'g_dp': [], 'g_if': [],
+                   'current_tau': [], 'val_loss': []}
 
         for epoch in range(self.epochs):
             self.model.train()
@@ -343,6 +345,7 @@ class DroFairTrainer:
             history['lambda_if'].append(float(lambda_if.item()) if self.use_if else 0.0)
             history['g_dp'].append(float(g_dp.item()) if self.use_dp else 0.0)
             history['g_if'].append(float(g_if.item()) if self.use_if else 0.0)
+            history['current_tau'].append(float(current_tau))
 
             # Validation (use same temperature as training for consistent signals)
             # CRITICAL: must use the *epoch's* current_tau (computed from tau_warmup), NOT always self.tau.
@@ -356,6 +359,14 @@ class DroFairTrainer:
                 history["val_acc"].append(float(metrics["accuracy"]))
                 history["val_dp"].append(float(metrics["dp_violation"]))
                 history["val_if"].append(float(metrics["if_violation"]))
+                # Per-epoch val history improvement: also track val_loss (BCE)
+                # when validation data provided. Appended every epoch (per-epoch).
+                Xv_t = torch.tensor(X_val, dtype=torch.float32, device=self.device)
+                yv_t = torch.tensor(y_val, dtype=torch.float32, device=self.device)
+                with torch.no_grad():
+                    val_logits = self.model(Xv_t)
+                    val_loss = F.binary_cross_entropy_with_logits(val_logits, yv_t)
+                history['val_loss'].append(float(val_loss.item()))
                 if verbose:
                     print(f"Epoch {epoch+1}/{self.epochs}: loss={total_loss.item():.4f}, "
                           f"val_acc={metrics['accuracy']:.4f}, val_dp={metrics['dp_violation']:.4f}, "
