@@ -199,3 +199,17 @@ High-alpha different-tau priority (per Kuldeep "different tau value 1st"):
 Next per plan: let canonical finish Adult → Credit+LSAC; finish lambda grid; empirical companion; full final figures + HANDOFF update + commit when 72/540.
 
 All monitors/orchestrators active. No early action.
+
+## Live Update @ 2026-06-17 23:34 (POLL#4 from orchestrator)
+lambda grid: 53/72 (α0.1/0.2 complete 18/18 each; α0.3 at 17/18)
+canonical (K=10, fixed tau=1, 6 seeds): 85/540
+  - Adult: α0.0 full (36 rows, n=6), α0.1 full (36), α0.2 at 13 rows (progressing)
+  - Still no Credit/LSAC.
+
+From completed Adult low-α (0.0/0.1): DRO competitive or better on DP even at α=0 (from earlier α0.0 block). α0.2 partial consistent with previous tau1 runs (DRO edge on DP, acc stable).
+
+High-α (from tau ablations + lambda grid): across τ=1/5/10/20/100, acc at 0.3/0.4 remains below constant predictor baseline (~0.752) due to 30-40% corruption ceiling. Different tau first (per Kuldeep) did not lift it above; acc plots confirm.
+
+All per history: main fixed-tau=1 canonical + lambda grid running; high-alpha tau check prioritized and confirms ceiling. Orchestrator (53588) polling correctly, waiting for 72+540+Credit/LSAC.
+
+Runners healthy (PIDs 16334/21531). No interference.

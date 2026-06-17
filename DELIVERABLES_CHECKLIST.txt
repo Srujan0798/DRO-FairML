@@ -230,3 +230,29 @@ lambda: 52/72 , canonical: 83/540
 datasets: {'adult': 83}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:28:23 ===
+lambda: 53/72 , canonical: 83/540
+datasets: {'adult': 83}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:30:32 ===
+lambda: 53/72 , canonical: 83/540
+datasets: {'adult': 83}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:32:44 ===
+lambda: 53/72 , canonical: 85/540
+datasets: {'adult': 85}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== Live @ 23:34 (after POLL#4) ===
+[x] Lambda 53/72 (α0.3=17/18; progressing)
+[x] Canonical 85/540 (adult α0.0/0.1 full n=6; α0.2=13 rows)
+[ ] Full 72/540 + Credit/LSAC + empirical
+[ ] Full final figures (use generate_final_figures.py when ready)
+[ ] HANDOFF.md FINAL DELIVERY section + commit
+Orchestrator polling correctly (no early fire). High-alpha tau check done (ceiling confirmed).
