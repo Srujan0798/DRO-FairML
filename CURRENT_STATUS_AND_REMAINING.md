@@ -87,3 +87,11 @@ Existing bg monitors: data_refresher_loop.sh (26540), canonical_advancer_monitor
 
 These cover the remaining from handoff (A experiments, C figures/final).
 Existing: data_refresher_loop.sh (26540), canonical_advancer_monitor.py (25253)
+
+## Sub-agent assignments for final push (Grok, 2026-06-17)
+- Lambda-Watcher (019ed68e-9ef4-7840-a69f-74efe334a4b2): Monitor lambda to 72/72, run finalize_experiments.py, commit, update status. Running bg.
+- Canonical-Watcher (019ed68e-9ef5-70f3-951e-040d78971584): Detect Credit/LSAC in canonical, launch empirical --radii_mode empirical, monitor, trigger analyze. Running bg.
+- Final-Orchestrator (019ed68e-9ef6-7172-be9c-6faa460dac9b): Once data ready (lambda72 + canonical Credit/LSAC + empirical), run full final: wilcoxon, figures, PDFs, docs update, cleanup, final commit + FINAL_EVIDENCE. Running bg.
+
+These align with handoff Agent A (experiments) and C (final/figures).
+Existing bg: data_refresher_loop.sh, canonical_advancer_monitor.py
