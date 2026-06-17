@@ -31,7 +31,7 @@ FIGURES_DIR = os.path.join(ROOT, "figures")
 os.makedirs(FIGURES_DIR, exist_ok=True)
 
 LAMBDA_GRID_PATH = os.path.join(RESULTS_DIR, "lambda_lr_grid.json")
-CONSTANT_PREDICTOR_ACC = 0.78
+CONSTANT_PREDICTOR_ACC = 0.752
 
 # ---- Style -----------------------------------------------------------------
 plt.rcParams.update({

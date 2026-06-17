@@ -51,3 +51,9 @@ Last update: Agent Final-Polish prep phase.
 Last check: still 73/540 adult. Monitoring continues.
 
 [ ] Canonical-Advancer loop complete, monitor running, ready for Credit/LSAC trigger
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 21:47:46 ===
+lambda: 45/72 , canonical: 73/540
+datasets: {'adult': 73}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+

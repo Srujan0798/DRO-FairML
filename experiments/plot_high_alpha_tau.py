@@ -37,7 +37,7 @@ TAU_FILES = {
     100: os.path.join(RESULTS_DIR, "tau_ablation_tau100.json"),
 }
 
-CONSTANT_PREDICTOR_ACC = 0.78
+CONSTANT_PREDICTOR_ACC = 0.752
 
 # ---- Style -----------------------------------------------------------------
 plt.rcParams.update({

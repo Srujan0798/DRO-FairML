@@ -1347,5 +1347,43 @@
     "pgd_steps": 20,
     "n_seeds_planned": 6,
     "epochs": 60
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 5,
+    "attack": "combined",
+    "method": "dro",
+    "acc_clean": 0.8118297401879492,
+    "dp_clean": 0.13711631298065186,
+    "if_clean": 4.9428884986226196e-12,
+    "total_time": 1030.8119790554047,
+    "k_inner": 10,
+    "tau": 1.0,
+    "radii_mode": "uniform",
+    "lambda_init": 0.0,
+    "coordinated": false,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "dp",
+    "method": "naive",
+    "acc_clean": 0.7535655058043118,
+    "dp_clean": 0.2576161324977875,
+    "if_clean": 3.4600219490358334e-11,
+    "total_time": 21.877970933914185,
+    "k_inner": 10,
+    "tau": 1.0,
+    "radii_mode": "uniform",
+    "lambda_init": 0.0,
+    "coordinated": false,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60
   }
 ]
