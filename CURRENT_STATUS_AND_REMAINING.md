@@ -45,3 +45,12 @@ All 5 sub-agents have now completed their assigned scopes.
 Non-CPU work (docs, plans, automation, hygiene, agent assignments) = COMPLETE.
 Only wall-time on running PIDs (16334 lambda, 21531 canonical) + their monitors remains.
 Agents will auto-trigger finalize, empirical launch, and full final when conditions met.
+
+## New sub-agents spawned for final push (2026-06-17)
+- Lambda-Watcher: 019ed68e-9ef4-7840-a69f-74efe334a4b2 (monitoring lambda to 72/72 then finalize)
+- Canonical-Watcher: 019ed68e-9ef5-70f3-951e-040d78971584 (will launch empirical on Credit/LSAC)
+- Final-Orchestrator: 019ed68e-9ef6-7172-be9c-6faa460dac9b (will drive last steps, full final, commit when ready)
+
+These are now running in background to complete the remaining.
+
+Existing bg: data_refresher_loop (26540), advancer monitor (25253)
