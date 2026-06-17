@@ -368,3 +368,21 @@ Data-Refresher ran analyze+report_tables successfully on current data.
 finalize_experiments.py status confirms "not yet".
 No early triggers. All per handoff plan.
 PIDs healthy. Leave cooking.
+
+=== CANONICAL-WATCHER SUBAGENT COMPLETED (2026-06-17) ===
+Subagent ID: 019ed68e-9ef5-70f3-951e-040d78971584 (general-purpose)
+- Created + launched persistent bg watcher: logs/canonical_watcher.py (PID 39913)
+- Supporting: logs/canonical_watcher_poll.py, delayed_poll.py, quick_poll_loop.sh
+- Strict behavior verified across multiple polls: only observed 79/540 → later 81/540, all adult, HAS_CREDIT_LSAC=False, no empirical artifacts.
+- Confirmed via repeated ps: main writer only 21531; advancer 25253 untouched; watcher 39913 separate.
+- Trigger logic implemented and ready (exact launch: nohup ... --radii_mode empirical >> logs/empirical.log; record empirical.pid; post-launch analyze + tables + status update).
+- Appended evidence + trigger plan to ORCHESTRATOR_LIVE_STATUS.txt + CURRENT_STATUS_AND_REMAINING.md
+- No interference with running canonical PID.
+- Background polling continues (240s cycles) until Credit/LSAC detected or 540 done.
+Current (post subagent): canonical 81/540 adult only. Ready for auto-advance.
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:01:14 ===
+lambda: 50/72 , canonical: 81/540
+datasets: {'adult': 81}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+

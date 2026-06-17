@@ -556,3 +556,11 @@ PIDs still alive but CPU lower (perhaps between rows or slow row).
 - When ready: ./finish_everything_when_ready.sh (or watchers will drive)
 
 All automation/docs prepped. Only wall time left on PIDs + auto triggers.
+
+## Canonical-Watcher subagent completed @ 2026-06-17
+- ID 019ed68e-9ef5-70f3-951e-040d78971584
+- Launched logs/canonical_watcher.py (bg PID 39913) + poll helpers
+- Verified state repeatedly (79/540 adult only at launch time, progressed to 81)
+- No Credit/LSAC yet → no empirical launch (correct)
+- Full trigger path coded + tested in logic: PS confirm → launch empirical --k_inner 10 --radii_mode empirical → monitor rows → analyze + tables → status update
+- All monitors (advancer 25253, watcher 39913, final-orchestrator, lambda watchers) active and non-interfering.
