@@ -71,3 +71,11 @@ Existing active: data_refresher_loop (26540), canonical_advancer_monitor (25253)
 
 These are now running in background to complete.
 Existing: data_refresher (26540), advancer_monitor (25253), previous subs.
+
+## Sub-agent assignments for final push (Grok orchestrator, aligned with handoff)
+- Lambda-Watcher (019ed68e-9ef4-7840-a69f-74efe334a4b2): Monitor lambda grid, when ==72 run finalize_experiments.py, commit, update status. Running in bg.
+- Canonical-Watcher (019ed68e-9ef5-70f3-951e-040d78971584): Detect Credit/LSAC in canonical, launch empirical, monitor, trigger analyze. Running in bg.
+- Final-Orchestrator (019ed68e-9ef6-7172-be9c-6faa460dac9b): Once data ready, run full final (wilcoxon, figures, PDFs, docs update, cleanup, commit, FINAL_EVIDENCE). Running in bg.
+
+These cover the remaining from the handoff (Agent A experiments, Agent C figures/final).
+Existing bg monitors: data_refresher_loop.sh (26540), canonical_advancer_monitor (25253)
