@@ -49,3 +49,30 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def print_live_status():
+    import json, os, subprocess, time
+    print(f"\n=== LIVE STATUS @ {time.strftime('%H:%M:%S')} ===")
+    try:
+        lam = json.load(open("results/lambda_lr_grid.json"))
+        print(f"lambda: {len(lam)}/72")
+    except: print("lambda: ?")
+    try:
+        can = json.load(open("results/canonical_tau1.json"))
+        print(f"canonical: {len(can)}/540")
+    except: print("canonical: ?")
+
+    # last non-skip lines
+    for name in ("lambda_lr_grid.log", "canonical.log"):
+        if os.path.exists(name):
+            for line in reversed(open(name).read().splitlines()):
+                if line.strip() and "->" not in line:
+                    print(f"{name}: {line.strip()[:90]}")
+                    break
+    print("procs:")
+    print(subprocess.getoutput("ps -p 16334,18580 -o pid,etime,pcpu 2>/dev/null || echo none"))
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "status":
+        print_live_status()

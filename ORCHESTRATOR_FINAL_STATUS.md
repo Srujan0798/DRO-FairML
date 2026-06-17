@@ -53,3 +53,10 @@ cat figures/FINAL_FIGURES_MANIFEST.txt
 All non-CPU work complete. Experiments running under proper single-writer discipline. MASTER_PLAN §0/§1 respected. Evidence before assertions.
 
 Last commit: fefd35c (or newer)
+
+## Live update 2026-06-17 ~20:55
+- lambda still training the same row: [14/72] α=0.1 seed=1 λ_init=0.1 lr_lambda=0.001 (PID 16334, ~14.5 min elapsed on this row, 98% CPU)
+- canonical on the final adult row: [70/540] adult α=0.1 seed=5 if dro (PID 18580, ~3 min into this row, 99%+ CPU)
+- No new rows appended yet (normal — full training per row).
+
+Monitors are running and will notify on the next "-> acc=..." or "Done" line.

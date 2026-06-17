@@ -19,3 +19,8 @@ Live commands:
   python3 finalize_experiments.py   # run when lambda done
 
 All non-training work complete. Experiments running single-writer. Evidence-based.
+
+As of 2026-06-17 20:55:
+- Training right now:
+  - Lambda: row 14/72 → α=0.1 seed=1 λ_init=0.1 lr=0.001 (PID 16334)
+  - Canonical: row 70/540 → adult α=0.1 seed=5 if method=dro (PID 18580, last adult row)
