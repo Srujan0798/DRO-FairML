@@ -277,3 +277,9 @@ Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 - Canonical advanced to 79/540 (from 57 in handoff)
 - All 5 Grok sub-agents completed their scopes, aligned with the 4-agent OpenCode plan in the handoff.
 - Non-CPU work + automation COMPLETE.
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 22:41:21 ===
+lambda: 49/72 , canonical: 79/540
+datasets: {'adult': 79}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+

@@ -95,3 +95,10 @@ Existing: data_refresher_loop.sh (26540), canonical_advancer_monitor.py (25253)
 
 These align with handoff Agent A (experiments) and C (final/figures).
 Existing bg: data_refresher_loop.sh, canonical_advancer_monitor.py
+
+## Update after Lambda-Finisher subagent (2026-06-17)
+From sub-agent output: monitored 44→46/72, set up bg monitors, prepared plan for 72.
+Current poll: lambda 49/72, canonical 79/540.
+All 5 + 3 new sub-agents assigned/running.
+Artifacts refreshed.
+PIDs still cooking.
