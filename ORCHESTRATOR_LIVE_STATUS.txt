@@ -386,3 +386,45 @@ lambda: 50/72 , canonical: 81/540
 datasets: {'adult': 81}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:08:25 ===
+lambda: 51/72 , canonical: 81/540
+datasets: {'adult': 81}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== CLAUDE/OPENCODE AGENT ASSIGNMENTS STATUS (cross-check 2026-06-17) ===
+Claude (OpenCode) launched three background tasks based on snapshot at ~48/79:
+
+1. Agent A FINAL SPRINT (task b160z3j2z)
+   - Prompt: finish lambda 48→72 + resume canonical 79→540 (run the py scripts directly).
+   - Actual behavior (from its .output): Detected that PIDs 16334 (lambda) + 21531 (canonical) were *already running* (launched previously). Did monitoring/sleep loops, checked counts (~48-49 lambda /79 canonical at its polls), noted slow rows and log mtimes. Did NOT launch duplicate runners. Correctly followed "both already running".
+   - Current reality alignment: Lambda advanced to 51/72 (α0.3=15/18), canonical 81/540 (adult). The CPU work continues on the same PIDs. Our lambda_watcher.py + inline watcher + Grok monitors cover the "finish" trigger.
+
+2. Agent C FINAL (task bgsrng18n)
+   - Prompt: Monitor for 72/540 then regenerate 15+ fig_final_* (constant-predictor, tradeoff, lambda heatmaps @0.3+0.4, wilcoxon, convergence if avail). Use CM style etc.
+   - Actual: Ran successfully on *partial* data. Created experiments/generate_final_figures.py (full generator matching the spec exactly). Produced + committed (9b2025c):
+     - 7 PDFs + 7 PNGs: constant-predictor (acc/dp/if), tradeoff, lambda heatmaps for α=0.3 (acc+dp), wilcoxon table.
+     - Skipped convergence (no history).
+     - Noted "incomplete data — re-run when full 72/540".
+   - Good foundation delivered. Our future full regen can simply call `python3 experiments/generate_final_figures.py` once conditions met.
+
+3. FINAL DELIVERY (task b27pohxoq)
+   - Prompt: repo cleanup, update HANDOFF.md with exact "FINAL DELIVERY (2026-06-17)" section + checklist, final commit with evidence.
+   - Actual: 0-byte output file. The opencode shell for it is still present in ps (long eval waiting on conditions that are false). Correctly blocked (data not at 72/540 + full figures).
+   - Will remain pending until real completion.
+
+Grok coverage (our watchers/sub-agents):
+- Lambda-Finisher / lambda_watcher (39704 + inline 27449): will auto finalize + commit at exactly 72.
+- Canonical-Advancer + canonical_watcher (39913): will launch empirical on first Credit/LSAC.
+- Final-Orchestrator (39555 + previous subagent): polls for full condition, prepares polish.
+- Data refresher has kept artifacts fresh.
+- We have been updating status MDs + committing non-result changes.
+
+Alignment: Our existing automation + the Claude-created generate_final_figures.py together cover all the "NEW TASK ASSIGNMENTS" in the pasted /tmp/NEW_ASSIGNMENTS.md. No conflicting runners. One writer rule respected on the experiment JSONs.
+
+Next trigger points remain the same:
+- lambda 72 → watcher finalize
+- Credit/LSAC in canonical → empirical launch
+- 72 + 540 + (emp if used) → full figure regen (via the new script) + HANDOFF update (exact text from Claude prompt) + final commit.
+

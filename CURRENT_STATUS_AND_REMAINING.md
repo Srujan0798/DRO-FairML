@@ -564,3 +564,18 @@ All automation/docs prepped. Only wall time left on PIDs + auto triggers.
 - No Credit/LSAC yet → no empirical launch (correct)
 - Full trigger path coded + tested in logic: PS confirm → launch empirical --k_inner 10 --radii_mode empirical → monitor rows → analyze + tables → status update
 - All monitors (advancer 25253, watcher 39913, final-orchestrator, lambda watchers) active and non-interfering.
+
+## Claude/OpenCode Agent Tasks (monitored 2026-06-17)
+User launched via opencode (separate from our Grok sub-agents):
+- b160z3j2z "Agent A FINAL SPRINT" — observed existing runners (16334/21531), no new launches, monitored slow progress. Covered by our watchers.
+- bgsrng18n "Agent C FINAL" — **succeeded on partial data**: created experiments/generate_final_figures.py + committed 14 fig_final_* files (partial constant-predictor, tradeoff, 0.3 heatmaps, wilcoxon). Noted needs full re-run. Excellent prep.
+- b27pohxoq "FINAL DELIVERY" — 0 output (correctly waiting; assumes full data + 15+ figs).
+
+Our Grok automation (lambda_watcher, canonical_watcher 39913, advancer 25253, final_orchestrator 39555) + the Claude-generated figure script now together implement the full "NEW ASSIGNMENTS" plan.
+
+When counts hit targets we will:
+1. Let watchers trigger finalize/empirical.
+2. Re-invoke the generator for complete figs.
+3. Apply the exact HANDOFF "FINAL DELIVERY" section text + checklist + commit.
+
+Current (this snapshot): lambda 51/72, canonical 81/540. Runners healthy. All aligned.
