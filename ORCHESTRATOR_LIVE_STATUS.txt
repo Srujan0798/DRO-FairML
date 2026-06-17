@@ -136,3 +136,10 @@ All per strict rules. One writer (21531), --k_inner 10 only.
 lambda now at 45/72 (α0.1 fully complete).
 Artifacts refreshed via analyze_tau1 + generate_report_tables.
 New Data-Refresher sub-agent spawned (019ed65e-2d25-7133-a2eb-112ed7076eef) to keep things fresh continuously.
+
+=== UPDATE: Agent Canonical-Advancer completed monitoring loop ===
+- canonical still 73/540, Adult only (as of ~16:15)
+- Background monitor set up: logs/canonical_advancer_monitor.py (PID 25253)
+- Will auto-launch empirical ONLY on first Credit/LSAC row
+- Status files + commits updated by the agent
+- Strict rule followed: no early launch
