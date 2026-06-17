@@ -2,7 +2,7 @@
 Date: 2026-06-17
 
 ## Live Experiments (already launched, do not duplicate)
-- lambda grid: 44/72 , PID 16334
+- lambda grid: 45/72 , PID 16334
 - canonical: 73/540 (Adult only so far), PID 21531 (--k_inner 10)
 
 ## Assigned Sub-Agents (orchestrator spawned)

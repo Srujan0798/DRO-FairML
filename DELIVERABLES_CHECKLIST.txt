@@ -65,3 +65,33 @@ Bg refresher active (PID 26540), will auto rerun on count change or periodic.
 Timestamp: 2026-06-17 21:48:10
 Only worked with existing data; no new runs launched.
 
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 21:48:52 ===
+lambda: 45/72 , canonical: 75/540
+datasets: {'adult': 75}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== AGENT DATA-REFRESHER (change detected + refresh) @ 2026-06-17 21:49:07 ===
+lambda: 45/72 , canonical: 75/540 (Adult only)
+- Detected canonical row increase during session
+- Re-ran: finalize_experiments.py status
+- Re-ran: experiments/analyze_tau1.py  (tau1: 109+ rows read)
+- Re-ran: experiments/generate_report_tables.py 
+- Updated artifacts and status files
+Bg loop (26540) will continue monitoring.
+
+
+=== AGENT DATA-REFRESHER (periodic) @ 2026-06-17 21:49:48 ===
+lambda: 45/72 , canonical: 75/540 (Adult only: yes)
+- Executed periodic: finalize_experiments.py status + analyze_tau1.py + generate_report_tables.py
+- Confirmed no launch of training; only existing data.
+- Bg monitor PID 26540 active for ongoing detection.
+- Timestamp recorded.
+
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 21:50:59 ===
+lambda: 45/72 , canonical: 75/540
+datasets: {'adult': 75}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
