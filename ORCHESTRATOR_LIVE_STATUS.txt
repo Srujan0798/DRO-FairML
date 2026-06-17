@@ -1,51 +1,39 @@
-ORCHESTRATOR LIVE STATUS
-Updated: 2026-06-17 ~20:58
+ORCHESTRATOR LIVE STATUS (updated after Agent A completion)
+Time: 2026-06-17 ~20:xx (post subagent)
 
-Experiments (confirmed running at high CPU):
+=== Experiments (Agent A ran ~58min wall, followed all rules) ===
+lambda grid: 44/72
+  - PID 16334 still running (~50+ min elapsed, high CPU)
+  - α=0.1: 17/18 (very close)
+  - α=0.2: 18/18 (done)
+  - α=0.3: 9/18
+  - ~28 rows left (finish 0.1 + 0.3 + all 0.4)
 
-lambda grid (PID 16334, 16+ min elapsed, 99%+ CPU)
-  rows: 41/72
-  current: training [14/72] α=0.1 seed=1 λ_init=0.1 lr_lambda=0.001
-  (no new rows appended yet)
+canonical: 72/540
+  - PID 21531 (launched with --k_inner 10) still running
+  - Still only Adult dataset (~72 rows for Adult grid)
+  - Progress during Agent A: ~69 → 72
+  - Last Adult rows being completed; will auto-move to Credit next
 
-canonical (PID 18580, ~5 min on current invocation, 99%+ CPU)
-  rows: 69/540
-  current: training [70/540] adult α=0.1 seed=5 if method=dro   <-- LAST ADULT ROW
-  (will auto continue to Credit + LSAC after this)
+Both processes: one writer only, resume-safe, full provenance (k_inner=10, tau=1, etc.)
 
-Tooling:
+=== Recent Agent A actions (self-contained, evidence-based) ===
+- Strict ps checks before any launch
+- Specific PID kills only for dups
+- Monitored with background scripts in logs/
+- Committed progress:
+  - lambda 40→44/72
+  - canonical 69→71/72
+- Sample rows and by-alpha confirmed
+- Did NOT start empirical (correctly waiting for Credit/LSAC)
 
-- Live one-shot status:
-  python3 finalize_experiments.py status
+=== Tooling (ready) ===
+- python3 finalize_experiments.py status
+- python3 watch_and_finalize.py
+- Clean monitors (completion lines only)
 
-- Auto-watch + auto-finalize when counts change:
-  python3 watch_and_finalize.py
-
-- Clean monitors active in this Grok session (only real completion lines will appear as chat events):
-  - lambda completions
-  - canonical completions / Credit/LSAC start
-
-When you see a completion line or run the status and see higher counts:
-
+When lambda hits 72 or canonical starts Credit:
   python3 finalize_experiments.py
-  # then review + commit safe artifacts (tau1_summary, figures, pdfs, etc. -- NOT the .json while still writing)
+  (then tables + PDFs)
 
-PIDs to watch/kill only if needed:
-  16334 (lambda)
-  18580 (canonical)
-
-Both runners are resume-safe.
-
-=== Agent C delivery (just completed) ===
-- All core Kuldeep figures regenerated/verified with correct format:
-  x=α, y=acc/DP/IF, horizontal line at 0.752 (Adult constant predictor baseline).
-- figD1 (acc), D2 (DP), D3 (IF), D4 (tradeoff scatter with constant marked).
-- Heatmaps, convergence plots, headline plots updated.
-- FINAL_FIGURES_MANIFEST.txt created with sources, extracted numbers, audit notes.
-- Analysis run: adult_alpha_summary_stats.{csv,txt}, high_alpha_tau_analysis.txt, wilcoxon prelim, tau1_summary refreshed.
-- Key verified numbers (Adult DP, tau=1):
-  α=0.2 DRO acc=0.7550 (>0.752), dp=0.2371
-  α=0.3 DRO acc=0.6790 (below)
-- Used only existing data (no new training). All in figures/.
-
-Monitors + finalize tools are ready for when lambda/canonical rows finish.
+PIDs: 16334 (lambda), 21531 (canonical --k_inner 10)
