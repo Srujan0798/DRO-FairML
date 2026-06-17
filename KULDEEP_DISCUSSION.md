@@ -121,6 +121,9 @@ Thanks Mam! Looking forward to the discussion.
 ---
 *Last updated: 2026-06-17. Decision tree closed. Defensible regime = α≤0.2. Lambda grid + canonical running via launchd.*
 
+**Grok Final-Delivery-Orchestrator note (2026-06-17 23:17):** Autonomous poll loop launched (logs/grok_final_delivery_orchestrator.log) to detect exact lambda>=72 + canonical>=540. Will perform full FINAL DELIVERY actions + update this file + HANDOFF with "FINAL DELIVERY (2026-06-17 end-of-day)" section containing the α≤0.2 key findings + one-line story. Double checks + targeted staging only. Will write FINAL_DELIVERY_EVIDENCE.txt on commit.
+
+
 **Grok cont (doing all):** Canonical+lambda+high-tau launched bg. Comforts 18 slim. Harvest. Next: monitor high alpha for acc, send email.
 
 **Grok cont (doing all):** Canonical+lambda+high-tau launched bg. Comforts 18 slim. Harvest. Next: monitor high alpha for acc vs constant, send email.
@@ -182,3 +185,17 @@ Thanks Mam! Looking forward to the discussion.
 - Repro: python experiments/generate_report_tables.py ; /opt/homebrew/bin/tectonic --outdir report report/report.tex ; same for paper
 
 Last updated: 2026-06-17 by Agent D.
+
+## Latest Orchestrator Update (2026-06-17, post Kuldeep advice on different tau first)
+Current live (main fixed-tau=1 runs):
+- Lambda grid: 52/72 (α0.3 at 16/18; Q1 hyperparam search in flight)
+- Canonical (K=10, tau=1 fixed, 6 seeds): 83/540 (Adult α=0.2 ongoing; α=0.0 full n=6 DRO slightly better even at zero corruption)
+
+High-alpha different-tau priority (per Kuldeep "different tau value 1st"):
+- Tau ablations harvested for 0.3/0.4 (tau=1,5,10,20,100).
+- Plots refreshed (adult_acc_vs_alpha_different_tau, fig_high_alpha_tau_acc etc.).
+- Verdict holding: even best tau, acc at ≥0.3 drops below constant-predictor ~0.752 due to 30-40% corruption ceiling. For α≤0.2 DRO robust on DP, acc stable ≥0.78.
+
+Next per plan: let canonical finish Adult → Credit+LSAC; finish lambda grid; empirical companion; full final figures + HANDOFF update + commit when 72/540.
+
+All monitors/orchestrators active. No early action.
