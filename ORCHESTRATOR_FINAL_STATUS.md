@@ -1,33 +1,55 @@
-# ORCHESTRATOR (Grok) FINAL STATUS — 2026-06-17
+# ORCHESTRATOR (Grok) FINAL STATUS — 2026-06-17 (updated)
 
-Claude out. I acted as full orchestrator + assigned work to self via 4 subagents (A/B/C/D) + direct controlled launches for long experiments. All per MASTER_PLAN §0/1.
+Claude out. Full orchestrator + self-assigned sub-agents (A/B/C/D) + direct experiment control.
 
-## Subagent Deliverables (completed, evidence-backed)
-- **Agent B** (src/tests): 60 pass / 0 errors (multiple runs pasted). Verified 3 core fixes (K_inner alpha>0 guard, theta-lambda-p order, classifier .eval+no_grad, dp-targeted abs(p0-p1) in pgd). One additive improvement: history['current_tau'], history['val_loss'] for C convergence plots (backward compat). Provenance rows checked.
-- **Agent D** (report/docs): generate_report_tables run (37 tau=1 rows), both PDFs rebuilt (report 276K exit0, paper 102K exit0).  Spot checks: Adult α=0.2 DP DRO=0.2371 matches tau1_summary row. High-α verdict + captions fixed. DELIVERABLES_CHECKLIST created. All *.md + HANDOFF updated as single source + COMPLETION STATUS appended.
-- **Agent A / C**: Running long (C in deep figure verification+regen using current data; A explored). Direct launches handled the experiment part.
+## Live experiment status (this poll)
+- **lambda_lr_grid.json**: 41 / 72
+  - α=0.2: 18/18 (complete)
+  - α=0.1: 14/18
+  - α=0.3: 9/18
+  - Proc 16334 running, actively training next row.
+- **canonical_tau1.json**: 69 / 540
+  - Adult only: α=0.0 full (6 seeds × everything = 36 rows), α=0.1 almost full (33/36 rows)
+  - Current in-flight: adult α=0.1 seed=5 if + dro (the very last adult config)
+  - Proc 18580 running the last adult row (slow on laptop).
+  - Will auto-continue to Credit + LSAC when adult finishes.
 
-## Experiments (orchestrator launched, single writer, monitored)
-- lambda_lr_grid: 40/72 (skipping done, now executing remaining α=0.1 + will do 0.3/0.4). Log: lambda_lr_grid.log . One writer.
-- canonical_tau1: 69/540 (adult α<=0.1 complete or near; now finishing last adult rows per log, then Credit/LSAC). Log: canonical.log .
-- Empirical: not started (needs more canonical coverage + src frozen confirmation).
+**Note on speed**: Each row = attack (PGD 20 steps) + full 60-epoch DRO/Naive training + validation on Adult. Laptop is slow for this; server recommended for Credit/LSAC.
 
-**High-α data confirms Kuldeep**: α=0.2 DRO DP wins (0.237 < 0.248, acc 0.755 > const 0.752). α=0.3 acc~0.67-0.68 (lambda grid max~0.686) << 0.752. Defensible α≤0.2.
+## Subagent work (already delivered + committed)
+- B: 60 tests pass, core algorithm invariants verified in src/ (with line numbers), history fields added for val convergence (compat), provenance spot-checked.
+- D: report tables regenerated from current tau1_summary (37 tau=1), both PDFs rebuilt (276K + 102K), spot checks pass (Adult 0.2 DRO dp=0.2371), high-α conclusion in docs + report, captions cleaned, DELIVERABLES_CHECKLIST + status files.
+- C: Produced/audited figD1_constant_predictor_*.pdf (x=α + 0.752 bar), tradeoff, heatmaps, convergence, manifest. Numbers in manifest match the data.
+- A: Coordinated; direct launches used for the runners.
 
-## Report / QA
-- Tests: 60/0 verified live.
-- PDFs: rebuilt, spot-checked vs source.
-- No tau=100 in main tables.
+## Fresh artifacts (latest analyze + report run)
+- results/tau1_summary.csv + tau1_wilcoxon.csv updated
+- report/ + paper/ tables + PDFs rebuilt after last analyze_tau1
+- figures/FINAL_FIGURES_MANIFEST.txt + figD* + figC* present
 
-## Git
-Commit: c66358f (ORCHESTRATOR: Subagents B+D delivered...)
-Ahead of origin. Working tree has remaining (experiments results in-flight, figures from C).
+## Helper for completion
+- `finalize_experiments.py` created. Run it any time (it detects when lambda==72 and auto-refreshes everything).
+- When lambda reaches 72: run `python3 finalize_experiments.py` then commit the summary/figures/PDFs.
+- When canonical reaches more (Credit/LSAC): re-run analyze_tau1 + tables if you want interim numbers; full 540 for final paper numbers.
 
-## Next (user or continued)
-- Let lambda finish (monitor or wc -l results/lambda_lr_grid.json until 72).
-- Let canonical run (or move to server/flair2; it will resume).
-- When done: run summarizers (analyze_tau1 etc), re-gen figures + wilcoxon (C), re-gen tables/PDFs, final commit.
-- UTK: email draft ready.
+## Remaining (CPU-bound or external)
+- Finish lambda grid (currently 41 → will get to 72 if left running)
+- Finish canonical adult last row → Credit + LSAC (6 seeds)
+- Empirical companion (radii_mode=empirical) — run after canonical has good coverage
+- n=6 full wilcoxon + final figures from 540 rows
+- UTKFace (email draft at root; flair2 access pending)
 
-All possible completed in this session. Evidence before claims. MASTER_PLAN followed.
+## Evidence commands (always current)
+```bash
+python3 -c 'import json; print("lambda", len(json.load(open("results/lambda_lr_grid.json"))), "/72"); print("canonical", len(json.load(open("results/canonical_tau1.json"))), "/540")'
+python3 -m pytest tests/ -q
+python3 experiments/analyze_tau1.py
+python3 experiments/generate_report_tables.py
+# then tectonic in report/ and paper/
+cat DELIVERABLES_CHECKLIST.txt
+cat figures/FINAL_FIGURES_MANIFEST.txt
+```
 
+All non-CPU work complete. Experiments running under proper single-writer discipline. MASTER_PLAN §0/§1 respected. Evidence before assertions.
+
+Last commit: fefd35c (or newer)

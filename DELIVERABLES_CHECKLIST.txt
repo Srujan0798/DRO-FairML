@@ -1,21 +1,21 @@
-DELIVERABLES_CHECKLIST.txt (orchestrator updated 2026-06-17)
-[x] Tests 60/0 (verified multiple times)
-[x] Report/Paper PDFs tau=1 consistent + rebuilt (37 tau=1 rows in summary)
-[x] High-α verdict documented (α≤0.2 defensible)
-[x] Docs + HANDOFF updated, COMPLETION STATUS appended
-[x] Generator + tectonic run after analyze_tau1 refresh
-[x] figD1-4 + other D figs + manifest from Agent C (correct x=α + 0.752 bar)
-[x] analyze_tau1.py run: tau1_summary + wilcoxon + figC* refreshed
-[ ] Lambda grid 72/72 (41/72, running PID active)
-[ ] Canonical 540 (69/540 adult near done; restarted to finish last row + Credit/LSAC)
-[ ] Empirical companion
-[ ] Full n=6 + final figures from 540
-[x] All feasible Agent tasks + orchestrator actions completed this session
+DELIVERABLES_CHECKLIST (live 2026-06-17)
+[x] Tests: 60 passed, 1 warning (clean)
+[x] Report + paper PDFs: rebuilt from current tau1_summary (37 tau=1 rows), spot checks pass (0.2371)
+[x] High-α verdict + evidence in KULDEEP_DISCUSSION.md + report.tex (α≤0.2 only defensible regime)
+[x] All docs updated (HANDOFF single source, status appended, FINAL_AGENT_ASSIGNMENTS etc.)
+[x] Agent B delivered: src invariants + tests + history fields
+[x] Agent D delivered: report/PDFs + checklist + consistency fixes
+[x] Agent C delivered: figD1-4 (constant predictor x=α + 0.752), D5-10, heatmaps, manifest with extracted numbers
+[x] analyze_tau1.py + generate_report_tables + tectonic run (latest)
+[ ] Lambda grid full 72/72 (currently 41/72; α0.2 done, α0.1 14, α0.3 9; proc running)
+[ ] Canonical 540 (currently 69/540: adult α0.0 full 6 seeds, α0.1 33/36; on final adult row; proc running; will auto-continue to Credit+LSAC)
+[ ] Empirical (Q5) companion (after canonical)
+[ ] Full n=6 Wilcoxon + final pub figures from complete 540
+[ ] UTKFace (draft email ready, access blocked)
 
-Current (poll):
-- lambda: 41/72 (advancing)
-- canonical: 69/540
-- summary tau=1: 37
-- PDFs: report 276K, paper 102K (fresh)
+Live commands:
+  python3 -c 'import json; print("L", len(json.load(open("results/lambda_lr_grid.json"))), "C", len(json.load(open("results/canonical_tau1.json"))))'
+  tail -f lambda_lr_grid.log | grep -E "α=|->|SKIP|Done"
+  python3 finalize_experiments.py   # run when lambda done
 
-Repro: python3 experiments/analyze_tau1.py ; python3 experiments/generate_report_tables.py ; tectonic in report/ and paper/
+All non-training work complete. Experiments running single-writer. Evidence-based.
