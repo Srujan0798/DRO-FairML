@@ -155,3 +155,11 @@ lambda: 49/72 (no change in this poll)
 canonical: 79/540 (no change)
 Sub-agents still running in bg. No thresholds crossed yet.
 PIDs still alive but CPU lower (perhaps between rows or slow row).
+
+## Final-Orchestrator subagent (019ed68e-9ef6-7172-be9c-6faa460dac9b) completed setup
+- Bg monitor PID 39555 running (5min poll).
+- Multiple polls: lambda 49/72, canonical 79/540 (Adult only, HAS_CREDIT_LSAC=False, emp=0).
+- Conditions not met, no final actions executed yet.
+- Cross-coordinating with Lambda-Watcher and Canonical-Watcher.
+- Plan ready for when lambda>=72 + Credit/LSAC + emp rows: finalize, analyze, wilcoxon, figures, PDFs, docs, commit + FINAL_EVIDENCE.
+- Logs: logs/final_orchestrator_monitor.log
