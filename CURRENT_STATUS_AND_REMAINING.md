@@ -102,3 +102,10 @@ Current poll: lambda 49/72, canonical 79/540.
 All 5 + 3 new sub-agents assigned/running.
 Artifacts refreshed.
 PIDs still cooking.
+
+## Sub-agents for final push (assigned now, running bg)
+- Lambda-Watcher (019ed68e-9ef4-7840-a69f-74efe334a4b2): monitor lambda (49/72) to 72, run finalize, commit, update status.
+- Canonical-Watcher (019ed68e-9ef5-70f3-951e-040d78971584): on Credit/LSAC launch empirical, monitor, trigger analyze.
+- Final-Orchestrator (019ed68e-9ef6-7172-be9c-6faa460dac9b): full final polish, commit, evidence when ready.
+
+Existing: data_refresher (26540), advancer monitor (25253).
