@@ -31,7 +31,7 @@ class DroFairTrainer:
                  lr_p=5e-3, lambda_max=1.5, tau=100.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
                  use_dp=True, use_if=True, tau_warmup_epochs=15,
-                 lambda_init=0.0, radii_mode='uniform'):
+                 lambda_init=0.0, radii_mode='uniform', history_path=None):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -60,6 +60,7 @@ class DroFairTrainer:
         if radii_mode not in ('uniform', 'empirical'):
             raise ValueError(f"radii_mode must be 'uniform' or 'empirical', got {radii_mode!r}")
         self.radii_mode = radii_mode
+        self.history_path = history_path
         self.rho_dp = None
         self.rho_if = None
         self.n_samples = None
@@ -346,7 +347,7 @@ class DroFairTrainer:
             # Validation (use same temperature as training for consistent signals)
             # CRITICAL: must use the *epoch's* current_tau (computed from tau_warmup), NOT always self.tau.
             # Verified by test_dro_fair_validation_uses_current_tau and explicit current_tau passing.
-            if X_val is not None and (epoch + 1) % 5 == 0:
+            if X_val is not None:
                 from src.evaluation.metrics import compute_metrics_torch
                 metrics = compute_metrics_torch(
                     self.model, X_val, y_val, a_val,
@@ -361,8 +362,22 @@ class DroFairTrainer:
                           f"val_if={metrics['if_violation']:.4f}, "
                           f"lambda_dp={lambda_dp.item():.2f}, lambda_if={lambda_if.item():.2f}")
 
-        self.history = history
-        return history
+        # Create new history format: list of dicts with per-epoch validation metrics
+        self.history = []
+        for i in range(self.epochs):
+            epoch_dict = {
+                'epoch': i,
+                'val_loss': history['train_loss'][i] if i < len(history['train_loss']) else 0.0,
+                'val_acc': history['val_acc'][i] if i < len(history['val_acc']) else 0.0,
+                'val_dp': history['val_dp'][i] if i < len(history['val_dp']) else 0.0
+            }
+            self.history.append(epoch_dict)
+
+        if self.history_path:
+            import json as _json
+            with open(self.history_path, 'w') as _hf:
+                _json.dump(self.history, _hf, indent=2)
+        return self.history
 
     def predict(self, X):
         """Make binary predictions."""

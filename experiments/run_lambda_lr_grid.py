@@ -48,13 +48,23 @@ def run_one(alpha, seed, lambda_init, lr_lambda):
         radii_mode='uniform',
         use_dp=True, use_if=False,  # DP-targeted attack → no IF constraint needed
     )
-    trainer.fit(X_att, y_att, a_att, X_val=X_v, y_val=y_v, a_val=a_v, verbose=False)
+    history = trainer.fit(X_att, y_att, a_att, X_val=X_v, y_val=y_v, a_val=a_v, verbose=False)
     m = compute_metrics_torch(model, X_te, y_te, a_te, temperature=TAU, k=5, gamma=0.0)
-    return {'acc': float(m['accuracy']), 'dp': float(m['dp_violation']), 'if': float(m['if_violation'])}
+    result = {'acc': float(m['accuracy']), 'dp': float(m['dp_violation']), 'if': float(m['if_violation'])}
+    
+    # Save history to JSON file
+    import os
+    os.makedirs('results', exist_ok=True)
+    history_file = f'results/lambda_lr_grid_history_{alpha}_{seed}_{lambda_init}_{lr_lambda}.json'
+    with open(history_file, 'w') as f:
+        import json
+        json.dump(history, f, indent=2)
+    
+    return result
 
 
 def main():
-    alphas = [0.2, 0.3]
+    alphas = [0.1, 0.2, 0.3, 0.4]
     seeds = [0, 1, 2]
     lambda_inits = [0.0, 0.01, 0.1]   # useful subset per task (0.0 paper spec)
     lr_lambdas = [0.001, 0.005]  # 1e-3,5e-3 ; note: current json has 1-row from reduced-epoch local fill; re-run with 60ep on server for full
@@ -62,7 +72,9 @@ def main():
     os.makedirs('results', exist_ok=True)
     out = 'results/lambda_lr_grid.json'
     results = json.load(open(out)) if os.path.exists(out) else []
-    done = {(r['alpha'], r['seed'], r['lambda_init'], r['lr_lambda']) for r in results}
+    # Normalize types for robust resume: JSON may store seed as int or float,
+    # lambda_init as 0 vs 0.0, etc. Ensure consistent (float,float,float,float).
+    done = {(float(r['alpha']), float(r['seed']), float(r['lambda_init']), float(r['lr_lambda'])) for r in results}
 
     total = len(alphas)*len(seeds)*len(lambda_inits)*len(lr_lambdas)
     n = 0
@@ -71,7 +83,7 @@ def main():
             for lr in lr_lambdas:
                 for seed in seeds:
                     n += 1
-                    key = (alpha, seed, li, lr)
+                    key = (float(alpha), float(seed), float(li), float(lr))
                     if key in done:
                         print(f"[{n}/{total}] SKIP α={alpha} s={seed} λ0={li} lr={lr}")
                         continue

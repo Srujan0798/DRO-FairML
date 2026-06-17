@@ -242,3 +242,58 @@ k ∈ {5, 10, 15} give nearly identical IF and DP under the IF attack (IF ~0.025
 6. **[blocked]** UTKFace on flair2 GPU — still needs the supin.gopi account / SSL fix. Lower priority until Adult discussion converges.
 
 **Important:** all current committed results/figures/report (`fairness_pgd_wilcoxon.csv`, `fig8/fig9`, `report.tex` tables) were generated under the **old stepped tau schedule** and therefore show DRO losing. They are NOT wrong, but they will be superseded once tau=1 is adopted. Do not present them as the final story.
+
+## Grok 4.3 Session Hand-off (added June 2026, post-Kuldeep chat)
+
+**How we worked (rules followed the whole time):**
+- Stuck to all non-negotiable specs: K_inner=10 mandatory everywhere, tau=1 fixed for main/canonical runs (per Q12), full provenance on every row (k_inner/tau/radii_mode/lambda_init/coordinated/pgd_steps/n_seeds/epochs), absolute DP values (not % from tiny baselines), adversarial only (FairnessTargetedPGD, no RandomCorruptor as method), θ→λ→p order, ∇g only, lambda_max=1.5 all DS, empirical radii option for known coordinated attacks.
+- Followed Kuldeep's last exact feedback as priority: "Different tau value 1st if not improving then change learning rates for lamda or something else check loss convergence plots and choose according to it on validation set".
+- Structure kept clean: root super minimal (only HANDOFF.md, KULDEEP_DISCUSSION.md, MASTER_PLAN.md, README.md, SERVER_RUNBOOK.md + EMAIL draft + requirements.txt); all historical/prep/one-off stuff archived under docs/_archive/. No new clutter.
+- Comfort folders (kuldeep_meeting/ + FRIEND/): **pure laptop duplicates only** for chat comfort. Never originals, never committed, never mixed with project source. Always 18 files max (meeting plots in exact requested format + KULDEEP copy + ready_chat_message.txt + conversation_key.txt + CHAT_HISTORY_MAY_JUNE.md copy).
+- Tool limitations on very long bg runs (timeouts ~5s): launched what possible here, always provided exact nohup commands for user to run locally in terminal for full long experiments.
+- Every harvest: ran analyze_tau1.py + compute_canonical_wilcoxon.py, refreshed CSVs/summaries, appended fresh numbers + status to KULDEEP_DISCUSSION.md. When meeting plots produced, copied only to the two comfort folders (kept slim).
+- Stored the entire mixed Madam/Kuldeep conversation history clearly once: docs/CHAT_HISTORY_MAY_JUNE.md (chronological timeline + 5 threads extracted + what was actually delivered per point + live canonical numbers).
+
+**What was delivered / results got:**
+- Canonical (K=10 + tau=1 fixed for all α, 6 seeds, full provenance on every row): 57 rows. Alpha 0.0 block complete n=6 (DRO edge on DP, some p<0.05 in wilcoxon). Alpha 0.1 partial (~21 adult rows) — DRO still competitive or better on DP. Still running.
+- Lambda grid (Q1): 12-13 rows (Adult, in flight).
+- High-alpha different-tau runs (direct response to Kuldeep last): tau=5 and tau=10 launched on alpha 0.3/0.4 Adult K=10 (3 seeds). (Logs came back empty here due to tool bg timeout on long exps; no output yet.)
+- Meeting plots in the **exact format Kuldeep requested** (x=α, y=acc/IF, adult acc >=0.78, vs constant predictor baseline, tau=1 vs tau=100 + direct 1/10/100 different-tau comparison): adult_accuracy_tau1_meeting.pdf/png, tau100 versions, adult_acc_vs_alpha_different_tau, adult_if_tau1/tau100_meeting, headline/win-curve etc. (in figures/ as originals + copied to comfort folders).
+- KULDEEP_DISCUSSION.md: kept live/updated with 57-row numbers, post-chat focus (removed old "asks for today"), empirical radii, kNN ablation summary, lambda in flight, random-vs-adv 12-40x, LSAC IF framing. Fresh hand-off notes appended.
+- Entire mixed conversation stored clearly: docs/CHAT_HISTORY_MAY_JUNE.md (full timeline from May 19 Madam tasks through reschedules, Jun 9 Q1-Q13 list + Kuldeep replies, latest June accuracy/IF/tau/lambda chat + user's reply).
+- UTKFace (May 19 task 2): local canonical smoke (2 rows) + hardened experiments/run_utkface_server.py + SERVER_RUNBOOK.md with exact commands. Email draft ready at root.
+- All prior ablations leveraged (kNN insensitive, empirical radii implemented/tested, random-vs-adv strong effect). Used in plots/tables.
+- Root kept minimal/clean throughout; comfort folders always confirmed 18 files, pure dups only.
+
+**Current state (as of latest harvest):**
+- Canonical: 57 rows (alpha 0.0 full n=6 DRO edge; alpha 0.1 partial, DRO good on DP). Still running.
+- Lambda: 12-13 rows.
+- High-alpha tau runs: launched (tau=5/10 on 0.3/0.4), logs empty (run locally for data).
+- UTK email draft at root ready to send (now chat with Kuldeep ended).
+- Comfort folders: 18 files each (laptop-only slim dups, clean).
+- Structure: root minimal, history clear in docs/CHAT_HISTORY_MAY_JUNE.md, KULDEEP updated.
+
+**Exact next to continue (per Kuldeep last + open items):**
+1. High-alpha different-tau (priority 1 — different tau first for acc at 0.3/0.4):
+   ```
+   nohup python3 experiments/run_tau_ablation.py --tau 5 --alphas 0.3 0.4 --datasets adult --n_seeds 3 --k_inner 10 --epochs 60 --pgd_steps 20 > logs/tau_high_alpha_tau5.log 2>&1 &
+   nohup python3 experiments/run_tau_ablation.py --tau 10 --alphas 0.3 0.4 --datasets adult --n_seeds 3 --k_inner 10 --epochs 60 --pgd_steps 20 > logs/tau_high_alpha_tau10.log 2>&1 &
+   tail -f logs/tau_high_alpha_tau5.log
+   ```
+   Once data: check acc (better/stable vs constant predictor?), run conv plots on val set (`plot_convergence.py` adapt), then lambda lr if needed.
+2. Let canonical keep running (K=10 tau=1 fixed, 6 seeds): `tail -f logs/canonical_540_full.log`. Harvest when more rows (alpha 0.1 full + higher).
+3. Finish lambda grid (still low rows).
+4. UTKFace: send email draft now (chat ended): `cat EMAIL_TO_SUPIN_GOPI_DRAFT.txt | pbcopy` then send.
+5. When new data: harvest, append to KULDEEP_DISCUSSION.md, copy any new meeting-format plots to comfort folders only (keep 18-file slim dups).
+
+**Key files/locations (unchanged, clean):**
+- `docs/CHAT_HISTORY_MAY_JUNE.md` — full cleaned mixed convo (timeline + threads + delivered per point).
+- `KULDEEP_DISCUSSION.md` (root) — live tables/numbers, post-chat focus, hand-off notes.
+- `EMAIL_TO_SUPIN_GOPI_DRAFT.txt` (root) — UTK ready.
+- `figures/` — real/original meeting plots.
+- `kuldeep_meeting/` + `FRIEND/` — laptop-only slim dups (18 files, never originals/committed).
+- Results CSVs/JSONs (canonical_tau1.json, lambda_lr_grid.json, tau1_summary.csv, wilcoxon etc.) with provenance.
+
+**For Claude / next session:** Continue exactly from Kuldeep's last feedback. High-alpha tau=5/10 runs need local nohup (tool env can't complete long runs). Keep canonical + lambda going. Send UTK email. Harvest/update KULDEEP + comfort plots when data. Maintain clean structure + pure 18-file comfort dups only. All evidence from committed results + logs. Align with docs/CHAT_HISTORY_MAY_JUNE.md for full convo context.
+
+(Added during Grok session; merged/updated here for continuity. Comfort folders untouched. Structure remains minimal.)
