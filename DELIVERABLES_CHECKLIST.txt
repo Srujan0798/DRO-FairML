@@ -167,3 +167,18 @@ lambda: 49/72 , canonical: 81/540
 datasets: {'adult': 81}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 22:57:56 ===
+lambda: 50/72 , canonical: 81/540
+datasets: {'adult': 81}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== ORCHESTRATOR SYNC @ 2026-06-17 22:59 ===
+[x] Current live counts recorded: lambda 50/72 (α0.3 at 14/18), canonical 81/540 adult
+[x] All watchers confirmed running and correctly gated (no early empirical)
+[x] Data refresh executed (analyze_tau1.py + generate_report_tables.py) — artifacts updated for latest Adult rows
+[x] Status docs (CURRENT_*, ORCHESTRATOR_*, this file, FINAL_EVIDENCE) appended with live snapshot
+[ ] lambda 72/72 (Lambda-Watcher will auto finalize+commit)
+[ ] canonical Credit + LSAC + empirical launch (Canonical-Advancer monitor)
+[ ] full 540 + final polish + wilcoxon + PDFs + commit (Final-Orchestrator)

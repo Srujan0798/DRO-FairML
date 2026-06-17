@@ -538,3 +538,21 @@ PIDs still alive but CPU lower (perhaps between rows or slow row).
 - Cross-coordinating with Lambda-Watcher and Canonical-Watcher.
 - Plan ready for when lambda>=72 + Credit/LSAC + emp rows: finalize, analyze, wilcoxon, figures, PDFs, docs, commit + FINAL_EVIDENCE.
 - Logs: logs/final_orchestrator_monitor.log
+
+## LIVE ORCHESTRATOR SNAPSHOT @ 2026-06-17 22:59
+- lambda: **50/72** (PID 16334, 96.7% CPU, elapsed ~2h19m)
+  - by alpha: 0.1:18/18, 0.2:18/18, 0.3:14/18
+  - last row (from json): alpha=0.3 seed=1 li=0.1 lr=0.001 acc~0.681 dp~0.235
+  - log active: [14/72] α=0.1 ... (order may interleave; progress real via count)
+- canonical: **81/540** (PID 21531, ~95-99% CPU) — still Adult only (last: adult α=0.2 s=1 if naive)
+- Watchers/monitors confirmed active:
+  - lambda_watcher.py (bg, polls ~4min, will finalize+commit on 72/72, never touches 16334)
+  - logs/canonical_advancer_monitor.py (PID ~25253), canonical_watcher.py (39913)
+  - Final-Orchestrator bg: /tmp/final_orchestrator_monitor.py (5min polls, waits for 72 + Credit/LSAC + emp>0)
+  - Data-Refresher active (recent runs at 50/81: did analyze + report_tables)
+- No empirical yet (correct — waiting for Credit/LSAC in canonical)
+- Derived refresh done: analyze_tau1 + generate_report_tables (updated figs C2-C4, tau1_*.csv, report/paper tex includes)
+- Status cmd: python3 finalize_experiments.py status
+- When ready: ./finish_everything_when_ready.sh (or watchers will drive)
+
+All automation/docs prepped. Only wall time left on PIDs + auto triggers.

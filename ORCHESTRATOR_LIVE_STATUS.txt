@@ -348,3 +348,23 @@ lambda: 49/72 , canonical: 81/540
 datasets: {'adult': 81}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 22:57:56 ===
+lambda: 50/72 , canonical: 81/540
+datasets: {'adult': 81}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== LIVE SNAPSHOT @ 2026-06-17 22:59 (orchestrator sync) ===
+lambda: 50/72   (α0.1+0.2=36/36 done; α0.3=14/18)
+  PID 16334 alive high CPU (96%+)
+canonical: 81/540 (adult only; progressing through α0.2 seeds)
+  PID 21531 alive high CPU
+Watchers:
+- Lambda watcher (lambda_watcher.py + /tmp/lambda_watcher.log) armed for ==72
+- Canonical advancer/watcher (25253, 39913) armed for Credit/LSAC → empirical launch
+- Final-Orchestrator monitor (/tmp/final_orchestrator_monitor.py , logs/final_orchestrator_monitor.log) polling 5min for triple condition
+Data-Refresher ran analyze+report_tables successfully on current data.
+finalize_experiments.py status confirms "not yet".
+No early triggers. All per handoff plan.
+PIDs healthy. Leave cooking.

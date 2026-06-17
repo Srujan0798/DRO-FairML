@@ -75,3 +75,25 @@ Constant predictor acc baseline = 0.752
 
 Evidence-based. All numbers absolute from CSVs (not rounded in template where precise).
 End of template. Final version will replace placeholders + re-verify on full data.
+
+## Final-Orchestrator Monitoring Started (2026-06-17)
+- Polling loop active (bg PID 39555, 5min intervals, logs/final_orchestrator_monitor.log)
+- Also delayed 5min polls + interim checks.
+- Current at start of monitoring: lambda 49/72 (alpha0.3=13/18), canonical 79/540 (adult only)
+- Coordinated: read canonical_advancer_monitor.log, lambda_watcher.log, data_refresher.log, ps, finalize status, json direct.
+- Condition check (lambda>=72 AND has Credit/LSAC AND empirical rows>0): NOT MET yet.
+- Will double-check counts, run finalize_experiments.py , full analyze+wilcoxon+generate_* + tectonic PDFs, update MDs, hygiene, git commit specific, append here with final Adult alpha=0.2 numbers + hashes.
+- Other watchers (Lambda-Finisher bg, Canonical-Advancer) logs monitored.
+
+=== ORCHESTRATOR LIVE SYNC 2026-06-17 22:59 ===
+lambda: 50/72 (α breakdown: 0.1=18/18, 0.2=18/18, 0.3=14/18)
+  last: alpha=0.3 s=1 lambda_init=0.1 lr_lambda=0.001 acc=0.6809 dp=0.2351 (from json)
+canonical: 81/540 (adult only)
+  last: adult alpha=0.2 seed=1 attack=if method=naive
+PIDs: 16334 (lambda, 96.7% 2h18m), 21531 (canonical)
+Automation: lambda_watcher armed; canonical_advancer + canonical_watcher armed; Final-Orchestrator /tmp monitor polling 5min for (72 and hasCL and emp>0); Data-Refresher ran + artifacts refreshed.
+Derived: tau1_summary.csv, wilcoxon, report tables, C2/C3/C4 figs updated.
+No Credit/LSAC/empirical yet. All conditions correct.
+Next auto: when lambda==72 → watcher does finalize_experiments.py + commit lambda part.
+When Credit/LSAC → advancer launches empirical.
+When triple ready → Final-Orchestrator / manual finish_everything_when_ready.sh
