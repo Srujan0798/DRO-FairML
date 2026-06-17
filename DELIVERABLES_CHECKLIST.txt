@@ -57,3 +57,11 @@ lambda: 45/72 , canonical: 73/540
 datasets: {'adult': 73}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== AGENT DATA-REFRESHER MANUAL @ 2026-06-17 21:48:10 ===
+lambda: 45/72 , canonical: 73/540 (all Adult)
+Ran: python3 finalize_experiments.py status ; python3 experiments/analyze_tau1.py ; python3 experiments/generate_report_tables.py
+Bg refresher active (PID 26540), will auto rerun on count change or periodic.
+Timestamp: 2026-06-17 21:48:10
+Only worked with existing data; no new runs launched.
+

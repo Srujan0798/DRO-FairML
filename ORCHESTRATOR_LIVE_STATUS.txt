@@ -154,3 +154,20 @@ lambda: 45/72 , canonical: 73/540
 datasets: {'adult': 73}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== Live poll 2026-06-17 21:48 ===
+lambda: 45/72 (α0.1 + α0.2 complete; α0.3 9/18)
+canonical: 73/540 (Adult only, in-flight on final Adult rows)
+PIDs: 16334 (lambda), 21531 (canonical), 25253 (advancer monitor)
+Lambda-Finisher subagent still active (monitoring loop).
+Canonical-Advancer completed initial loop + monitor running.
+No Credit/LSAC yet → empirical not launched.
+Artifacts fresh, finish script ready.
+
+=== AGENT DATA-REFRESHER MANUAL @ 2026-06-17 21:48:10 ===
+lambda: 45/72 , canonical: 73/540 (all Adult)
+Ran: python3 finalize_experiments.py status ; python3 experiments/analyze_tau1.py ; python3 experiments/generate_report_tables.py
+Bg refresher active (PID 26540), will auto rerun on count change or periodic.
+Timestamp: 2026-06-17 21:48:10
+Only worked with existing data; no new runs launched.
+
