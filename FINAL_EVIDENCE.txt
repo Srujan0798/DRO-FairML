@@ -97,3 +97,15 @@ No Credit/LSAC/empirical yet. All conditions correct.
 Next auto: when lambda==72 → watcher does finalize_experiments.py + commit lambda part.
 When Credit/LSAC → advancer launches empirical.
 When triple ready → Final-Orchestrator / manual finish_everything_when_ready.sh
+
+=== Live snapshot 2026-06-17 23:34 (post POLL#4) ===
+lambda grid: 53/72 (α0.1+0.2=36/36 done; α0.3=17/18)
+canonical (K=10 tau=1 fixed 6 seeds): 85/540
+  adult α0.0: 36 rows (full n=6, DRO edge even at 0 corruption per prior)
+  adult α0.1: 36 rows (full)
+  adult α0.2: 13 rows (in flight)
+High-α (0.3/0.4): tau ablations + lambda grid confirm acc < constant predictor baseline across taus (different-tau first per Kuldeep did not overcome ceiling).
+
+Orchestrator (53588) + all watchers active, correctly waiting (no Credit/LSAC yet).
+Analysis/tables refreshed from completed low-α blocks.
+All per full chat history + Kuldeep recs.
