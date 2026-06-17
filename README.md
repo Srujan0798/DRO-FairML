@@ -50,3 +50,21 @@ Root now contains only the 5 persistent key docs above + standard entry points (
 - `logs/`, `packages/` (vendored wheels for offline), `venv/`
 
 See .gitignore for exact excludes. After any big run or meeting prep, archive transients under docs/_archive/ so the tree stays findable.
+
+## Project Flow & Structure (added for clarity)
+See **[docs/PROJECT_FLOW.md](docs/PROJECT_FLOW.md)** for the complete end-to-end flow:
+- Launch (run_canonical with K=10/tau=1 + lambda grid + tau ablations)
+- Analysis (analyze_tau1 + wilcoxon + tables)
+- Viz (meeting-format plots + final figures, high-α tau first per Kuldeep)
+- Report (paper/report + auto sections)
+- Automation (orchestrators wait for 72/540 + Credit/LSAC → full polish + HANDOFF update + commit)
+
+**Clean structure (post-cleanup):**
+- Root: only key persistent docs (HANDOFF, KULDEEP, MASTER_PLAN, SERVER, README) + entrypoints.
+- `scripts/`: all orchestration (finalize_experiments.py, finish_..., watchers).
+- `docs/project_management/`: all status/orchestrator MDs (moved from root clutter).
+- `docs/_archive/`: full history (never pollute root).
+- `logs/`: everything log-related + watcher scripts.
+- Comfort dups only in FRIEND/ + kuldeep_meeting/ (laptop-only, no full source).
+
+After runs/meetings: move transients to _archive/. Root stays minimal + scannable.
