@@ -519,6 +519,15 @@ show DRO DP $= 0.237$ --- identical to the default setting, suggesting
 the default $\lambda$ initialisation is already near-optimal.
 The full grid heatmap will be added when the run completes.
 
+\subsection{High-α Defensibility (α≥0.3)}
+
+We also investigated whether DRO-FAIR can beat the constant-label predictor
+at high corruption levels ($\alpha\ge0.3$). The answer is no: both tau and
+lambda tuning fail to recover accuracy above the constant-predictor baseline
+(acc≈0.752) at $\alpha\ge0.3$. This is because the coordinated attack corrupts
+30–40% of labels, creating an inherent ceiling that no hyperparameter tuning
+can overcome. The defensible regime for DRO-FAIR is therefore $\alpha\le0.2$.
+
 \subsection{LSAC Framing (Q3) + Q7 (IF attack inverts/lowers DP)}
 
 LSAC has inherently small clean DP ($\approx 0.01$--$0.02$ on the protected attribute) so the DP
