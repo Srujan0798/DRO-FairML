@@ -469,3 +469,35 @@ lambda: 52/72 , canonical: 83/540
 datasets: {'adult': 83}
 Ran: analyze_tau1.py + generate_report_tables.py + finalize status
 
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:28:23 ===
+lambda: 53/72 , canonical: 83/540
+datasets: {'adult': 83}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== Final-Delivery-Orchestrator POLL#3 @ 2026-06-17 23:27:53 ===
+lambda=52/72 canonical=83/540 (adult only, α0.2 at 11 rows)
+HAS_CREDIT_LSAC=False, emp=0
+Runners: 16334 (82.4% CPU, ~2h47m), 21531 (83.2% CPU, ~2h11m)
+No condition met. Sleeping 5min.
+(Note: by 23:28 status, lambda ticked to 53/72 - slow but real progress on α0.3)
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:30:32 ===
+lambda: 53/72 , canonical: 83/540
+datasets: {'adult': 83}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== AGENT DATA-REFRESHER @ 2026-06-17 23:32:44 ===
+lambda: 53/72 , canonical: 85/540
+datasets: {'adult': 85}
+Ran: analyze_tau1.py + generate_report_tables.py + finalize status
+
+
+=== Final-Delivery-Orchestrator POLL#4 @ 2026-06-17 23:32:53 ===
+lambda=53/72 canonical=85/540 (adult only)
+HAS_CREDIT_LSAC=False, emp=0
+Runners healthy: 16334 (~87% CPU), 21531 (~93% CPU)
+CHANGE DETECTED (progress on both). Correctly sleeping 5min.
+No action taken (thresholds not met). All per plan.

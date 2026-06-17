@@ -579,3 +579,10 @@ When counts hit targets we will:
 3. Apply the exact HANDOFF "FINAL DELIVERY" section text + checklist + commit.
 
 Current (this snapshot): lambda 51/72, canonical 81/540. Runners healthy. All aligned.
+
+## POLL#4 from Final-Delivery-Orchestrator (2026-06-17 23:32)
+lambda: 53/72
+canonical: 85/540 (adult α0.0=36, α0.1=36, α0.2=13)
+Still adult-only, no Credit/LSAC, no empirical.
+Orchestrator correctly detected change, PS-confirmed runners (16334/21531 healthy), sleeping 5min.
+No trigger yet (per design).
