@@ -124,3 +124,10 @@ Last update: 2026-06-17 ~21:43 . Verified no Credit/LSAC. Will re-poll.
 - git status shows results/canonical_tau1.json modified by running process (not staged by us)
 - Next action: continue bg monitoring; on trigger condition: 1. ps check writers 2. confirm row in json via python 3. launch empirical nohup 4. record new PID 5. update status+commit 6. when partial both: run analyze + generate_report_tables
 All rules followed. Paste at every major: counts, logs, git, ps.
+
+=== CANONICAL-ADVANCER FINAL SESSION NOTE (2026-06-17 ~21:46) ===
+Monitoring continues via bg PID 25253. 73/540 confirmed again. JSON not advanced (in-flight row). No Credit/LSAC. Empirical launch command prepared and will be executed exactly when condition met with full ps+count verification.
+Recent commits:
+- 1707821 : initial monitoring + monitor.py + status
+- 2941041 : post monitoring status+checklist
+All per strict rules. One writer (21531), --k_inner 10 only. 
