@@ -50,3 +50,4 @@ Last update: Agent Final-Polish prep phase.
 - Will then monitor empirical too, run analyze_tau1.py + generate_report_tables.py when partial in BOTH, update status, commit.
 Last check: still 73/540 adult. Monitoring continues.
 
+[ ] Canonical-Advancer loop complete, monitor running, ready for Credit/LSAC trigger
