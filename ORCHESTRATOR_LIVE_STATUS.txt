@@ -1,20 +1,37 @@
-# ORCHESTRATOR LIVE STATUS (updated 2026-06-17 20:56:09)
+ORCHESTRATOR LIVE STATUS
+Updated: 2026-06-17 ~20:58
 
-**Experiments still running (confirmed):**
-- lambda PID 16334: 41/72 , elapsed ~15:40 , ~98% CPU , currently inside row [14/72] α=0.1 s=1 λ_init=0.1 lr=0.001
-- canonical PID 18580: 69/540 , elapsed ~4 min on this invocation , ~98% CPU , inside final adult row [70/540] adult α=0.1 seed=5 if-dro
+Experiments (confirmed running at high CPU):
 
-**Best commands right now:**
-python3 finalize_experiments.py status
-python3 watch_and_finalize.py     # optional: watches and auto-refreshes when counts change
-tail -f lambda_lr_grid.log canonical.log
+lambda grid (PID 16334, 16+ min elapsed, 99%+ CPU)
+  rows: 41/72
+  current: training [14/72] α=0.1 seed=1 λ_init=0.1 lr_lambda=0.001
+  (no new rows appended yet)
 
-**When you see a new "-> acc=..." line in the logs or counts increase:**
-1. python3 finalize_experiments.py
-2. Review new results
-3. git add results/tau1_* figures/ report/ paper/ (avoid committing .json mid-run)
-4. commit
+canonical (PID 18580, ~5 min on current invocation, 99%+ CPU)
+  rows: 69/540
+  current: training [70/540] adult α=0.1 seed=5 if method=dro   <-- LAST ADULT ROW
+  (will auto continue to Credit + LSAC after this)
 
-Monitors are active in this session for live chat notifications on log lines.
-Clean monitors restarted (only fire on "-> acc=..." completion lines or "Done").
-Old noisy monitors killed.
+Tooling:
+
+- Live one-shot status:
+  python3 finalize_experiments.py status
+
+- Auto-watch + auto-finalize when counts change:
+  python3 watch_and_finalize.py
+
+- Clean monitors active in this Grok session (only real completion lines will appear as chat events):
+  - lambda completions
+  - canonical completions / Credit/LSAC start
+
+When you see a completion line or run the status and see higher counts:
+
+  python3 finalize_experiments.py
+  # then review + commit safe artifacts (tau1_summary, figures, pdfs, etc. -- NOT the .json while still writing)
+
+PIDs to watch/kill only if needed:
+  16334 (lambda)
+  18580 (canonical)
+
+Both runners are resume-safe.
