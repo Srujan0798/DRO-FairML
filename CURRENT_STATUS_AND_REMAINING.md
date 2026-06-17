@@ -36,3 +36,12 @@ All 5 agents have completed their assigned scopes.
 Non-CPU work (docs, plans, automation, hygiene, agent assignments) COMPLETE.
 Only the running experiment PIDs (16334 lambda, 21531 canonical) + their monitors remain.
 Agents will auto-trigger the rest when thresholds are hit.
+
+## Post Lambda-Finisher subagent (019ed657-8b95-72a3-9207-b7a8c4707d0b) - 2026-06-17
+lambda: 46/72 (α0.1+0.2 complete; α0.3=10/18)
+canonical: 77/540 (Adult only)
+Lambda-Finisher completed monitoring loop (44→46). Bg monitors left running.
+All 5 sub-agents have now completed their assigned scopes.
+Non-CPU work (docs, plans, automation, hygiene, agent assignments) = COMPLETE.
+Only wall-time on running PIDs (16334 lambda, 21531 canonical) + their monitors remains.
+Agents will auto-trigger finalize, empirical launch, and full final when conditions met.
