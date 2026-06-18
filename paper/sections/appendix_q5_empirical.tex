@@ -1,0 +1,25 @@
+\subsection{Q5: Empirical Radii Under Coordinated Attacks}
+\label{app:empirical-radii}
+
+This appendix clarifies the calculation of uncertainty radii $\pi_{clean}$ used in our DRO-FairML objective under different assumption modes.
+
+\paragraph{Uniform vs. Empirical Mode}
+In the \textit{uniform mode}, we assume no prior knowledge of the attack structure beyond the total corruption budget $\alpha$. The cleaned group proportions are calculated as:
+\begin{equation}
+    \pi_{clean} = \frac{\pi_{obs} - \alpha}{1 - 2\alpha}
+\end{equation}
+This represents a conservative estimate where corruption is assumed to be distributed uniformly across groups.
+
+\paragraph{Coordinated Attack Structure}
+In the \textit{empirical mode}, we exploit the observation that real-world adversarial attacks are often coordinated, targeting specific demographic groups. Specifically, we model a scenario where 70\% of the corruption budget is directed at the minority group. The empirical clean proportions are adjusted as follows:
+\begin{align}
+    \pi_{clean}[min] &= \pi_{obs}[min] + 0.4\alpha \\
+    \pi_{clean}[maj] &= \pi_{obs}[maj] - 0.4\alpha
+\end{align}
+Values are clipped to the $[0, 1]$ range and renormalized to ensure $\sum \pi_{clean} = 1$. 
+
+\paragraph{Information Constraints}
+It is critical to note that there is \textbf{no oracle leak} in this implementation. The model does not have access to per-sample corruption masks. Instead, it only utilizes the global budget $\alpha$ and the \textit{known structure} of the dataset's demographic distribution to refine its robustness radii. This allows the model to be more robust against group-targeted attacks without requiring ground-truth labels for which samples were actually corrupted.
+
+\paragraph{Implementation}
+This logic is implemented in \texttt{src/training/dro_fair.py} within the \texttt{\_empirical\_pi\_clean()} method. The implementation is verified to be valid for corruption budgets $\alpha \le 0.4$ across all evaluated datasets (Adult, Law School, and UTKFace).
