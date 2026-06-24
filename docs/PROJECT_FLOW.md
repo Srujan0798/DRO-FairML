@@ -85,3 +85,13 @@ lambda 53/72, canonical 85/540 (adult α0.2 advancing). Low-α adult complete n=
 
 See KULDEEP_DISCUSSION.md for tables + exact Kuldeep asks alignment.
 See docs/project_management/ for live orchestrator notes.
+
+## Latest (POLL#5 23:37)
+lambda=54/72 (α0.3 now 18/18 complete!)
+canonical=85/540 (adult α0.2=13 rows)
+All automation healthy, waiting correctly per design.
+
+## POLL#6 @ 2026-06-17 23:42
+lambda=54/72 (α0.3 complete)
+canonical=85/540 (adult α0.2 progressing slowly)
+Orchestrator still correctly waiting, no Credit/LSAC. Structure cleaned, flow doc up to date.
