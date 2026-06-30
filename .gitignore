@@ -81,3 +81,5 @@ kuldeep_meeting/
 FRIEND/
 friend/
 FRIEND/
+packages/
+results/*.STALE_*
