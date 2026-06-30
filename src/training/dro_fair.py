@@ -87,10 +87,15 @@ class DroFairTrainer:
         n = len(a)
         pi_obs = np.array([np.mean(a == j) for j in [0, 1]])
 
-        if a_val is not None and len(a_val) > 0:
-            pi_clean = np.array([np.mean(a_val == j) for j in [0, 1]])
-        elif self.radii_mode == 'empirical':
+        if self.radii_mode == 'empirical':
+            # Q5: empirical mode DELIBERATELY ignores clean a_val and infers the
+            # clean group proportions from the KNOWN coordinated attack structure.
+            # This demonstrates the "attack known, no clean validation" scenario
+            # Kuldeep asked about. Requires coordinated=True so the 70/30 inversion
+            # in _empirical_pi_clean matches the actual attack (see run_canonical_empirical.py).
             pi_clean = self._empirical_pi_clean(pi_obs)
+        elif a_val is not None and len(a_val) > 0:
+            pi_clean = np.array([np.mean(a_val == j) for j in [0, 1]])
         else:
             pi_clean = np.zeros(2)
             for j in [0, 1]:

@@ -4,8 +4,10 @@ Canonical empirical companion (DRO-only, radii_mode='empirical').
 
 Per MASTER_PLAN.md §4,§8:
 - 270 rows: 3 datasets x 5 alphas x 3 attacks x 1 method(dro) x 6 seeds
-- Fixed: tau=1.0, K_inner=10, epochs=60, pgd_steps=20, coordinated=False, lambda_max=1.5,
+- Fixed: tau=1.0, K_inner=10, epochs=60, pgd_steps=20, coordinated=True, lambda_max=1.5,
   radii_mode='empirical', lambda_init=0.0
+  (coordinated=True is REQUIRED: the empirical radii inversion assumes the 70/30
+   minority-targeting structure; see _empirical_pi_clean in src/training/dro_fair.py)
 - Output: results/canonical_tau1_empirical.json
 - Resume-safe, incremental append+save.
 - Full provenance per row.
@@ -40,7 +42,12 @@ def main():
 
     TAU = 1.0
     LAMBDA_INIT = 0.0
-    COORDINATED = False
+    # Q5 empirical companion: coordinated=True is REQUIRED so the 70/30 minority
+    # targeting matches the assumption inside _empirical_pi_clean (the inversion
+    # pi_clean[min] = pi_obs[min] + 0.4*alpha is only exact for the coordinated attack).
+    # This is a standalone Q5 study (known coordinated attack -> empirical radii,
+    # no clean validation), distinct from the coordinated=False main canonical.
+    COORDINATED = True
     LAMBDA_MAX = 1.5
     RADII_MODE = 'empirical'
     N_SEEDS_PLANNED = args.n_seeds
