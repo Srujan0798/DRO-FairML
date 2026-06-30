@@ -118,7 +118,7 @@ def load_tau1():
 
     Returns (rows, source_label).
     """
-    canonical = load_json("tau_ablation_tau1.json")
+    canonical = load_json("canonical_tau1.json") or load_json("tau_ablation_tau1.json")
     bak       = load_json("tau_ablation_tau1_KINNER5_BAK.json")
 
     if not canonical and not bak:

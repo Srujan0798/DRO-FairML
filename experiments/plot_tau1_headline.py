@@ -63,7 +63,7 @@ FIGURES_DIR = os.path.join(ROOT, "figures")
 os.makedirs(FIGURES_DIR, exist_ok=True)
 
 # Current scaffolding (preliminary data). Change to canonical_tau1.json later.
-TAU1_PATH   = os.path.join(RESULTS_DIR, "tau_ablation_tau1.json")
+TAU1_PATH   = os.path.join(RESULTS_DIR, "canonical_tau1.json")
 TAU10_PATH  = os.path.join(RESULTS_DIR, "tau_ablation_tau10.json")
 TAU100_PATH = os.path.join(RESULTS_DIR, "tau_ablation_tau100.json")
 

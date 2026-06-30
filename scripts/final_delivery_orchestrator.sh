@@ -21,7 +21,7 @@ git add results/canonical_tau1.json && git commit -m "Canonical COMPLETE: 540/54
 
 # PHASE 2: launch empirical companion via opencode, wait for 270
 if [ "$(count results/canonical_tau1_empirical.json)" -lt 270 ]; then
-  nohup python experiments/run_canonical_empirical.py > logs/empirical_run.log 2>&1 &
+  nohup python3 experiments/run_canonical_empirical.py > logs/empirical_run.log 2>&1 &
   echo "$(date): empirical launched PID $!" >> $LOG
 fi
 while true; do
@@ -32,16 +32,14 @@ while true; do
 done
 git add results/canonical_tau1_empirical.json && git commit -m "Empirical companion COMPLETE: 270/270 (DRO radii_mode=empirical)" >> $LOG 2>&1
 
-# PHASE 3: final figures + wilcoxon + report — dispatch to opencode (NOT claude)
-echo "$(date): dispatching final regen to opencode" >> $LOG
-opencode run "Canonical 540 + empirical 270 are COMPLETE. Final regeneration. Working dir /Users/srujansai/Desktop/DRO-FairML.
-1. python experiments/compute_canonical_wilcoxon.py (n=6 wilcoxon, all datasets)
-2. python experiments/generate_final_figures.py (all publication figures from final canonical)
-3. python experiments/generate_report_tables.py (regen report tables from final data)
-4. cd report && tectonic -X compile --outdir . report.tex; cd ..
-5. cd paper && tectonic -X compile --outdir . main.tex 2>/dev/null; cd ..
-6. git add -A && git commit -m 'FINAL: figures+wilcoxon+report regenerated from complete canonical 540 + empirical 270'
-Report what was generated." >> $LOG 2>&1
+# PHASE 3: final figures + wilcoxon + report — run directly
+echo "$(date): running final regen scripts" >> $LOG
+python3 experiments/compute_canonical_wilcoxon.py >> $LOG 2>&1 && echo "$(date): wilcoxon done" >> $LOG
+python3 experiments/generate_final_figures.py >> $LOG 2>&1 && echo "$(date): figures done" >> $LOG
+python3 experiments/generate_report_tables.py >> $LOG 2>&1 && echo "$(date): report tables done" >> $LOG
+cd report && tectonic -X compile --outdir . report.tex >> $LOG 2>&1 && echo "$(date): report.pdf rebuilt" >> $LOG; cd ..
+cd paper && tectonic -X compile --outdir . main.tex >> $LOG 2>&1 && echo "$(date): main.pdf rebuilt" >> $LOG; cd ..
+git add -A && git commit -m "FINAL: figures+wilcoxon+report regenerated from complete canonical 540 + empirical 270" >> $LOG 2>&1
 
 # PHASE 4: write HANDOFF final section
 cat >> HANDOFF.md << 'EOF'

@@ -41,7 +41,7 @@ RESULTS_DIR = os.path.join(ROOT, "results")
 FIGURES_DIR = os.path.join(ROOT, "figures")
 os.makedirs(FIGURES_DIR, exist_ok=True)
 
-TAU1_PATH = os.path.join(RESULTS_DIR, "tau_ablation_tau1.json")  # prelim; -> canonical_tau1.json
+TAU1_PATH = os.path.join(RESULTS_DIR, "canonical_tau1.json")  # canonical data
 
 # ---- Style (match paper: CM + clean) ---------------------------------------
 plt.rcParams.update({

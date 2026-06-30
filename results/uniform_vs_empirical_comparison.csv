@@ -1,3 +1,4 @@
-# Placeholder — awaiting canonical_tau1.json + canonical_tau1_empirical.json
-# Per MASTER_PLAN §3: both must be produced by A (540 rows uniform + empirical companion).
-dataset,alpha,attack,n_seeds,uniform_dp_mean,emp_dp_mean,dp_delta_emp_minus_uniform
+dataset,alpha,attack,n_seeds,uniform_dp_mean,emp_dp_mean,dp_delta_emp_minus_uniform,uniform_acc_mean,emp_acc_mean,acc_delta
+adult,0.000000,combined,3,0.145703,0.145704,0.000000,0.816621,0.816621,0.000000
+adult,0.000000,dp,3,0.145703,0.145704,0.000000,0.816621,0.816621,0.000000
+adult,0.000000,if,3,0.145703,0.145704,0.000000,0.816621,0.816621,0.000000

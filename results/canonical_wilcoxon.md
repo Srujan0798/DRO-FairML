@@ -1,6 +1,6 @@
 # Wilcoxon signed-rank tests (one-sided) — canonical_tau1 data
 
-Source: canonical (261 rows, 6 seeds expected)
+Source: canonical (307 rows, 6 seeds expected)
 n=6 (canonical) — p<0.05 achievable for consistent effects. Previously n=3 limited min p~0.125.
 
 H_a: Naive_DP > DRO_DP  (i.e., DRO yields strictly lower DP violation)
@@ -27,8 +27,13 @@ Columns: n_seeds, means, diff=naive-dro (positive good for DRO), wins_dro = #see
 | adult | if | 0.4 | 6 | 0.0073 | 0.0048 | +0.0025 | 5/6 | 0.1562 |  | +0.0000 | 0.5000 |  |
 | credit | combined | 0.0 | 6 | 0.0127 | 0.0119 | +0.0008 | 6/6 | 0.0156 | * | +0.0000 | 0.5000 |  |
 | credit | combined | 0.1 | 6 | 0.0117 | 0.0106 | +0.0011 | 5/6 | 0.0312 | * | +0.0000 | 1.0000 |  |
+| credit | combined | 0.2 | 6 | 0.0135 | 0.0121 | +0.0014 | 6/6 | 0.0156 | * | +0.0000 | 1.0000 |  |
+| credit | combined | 0.3 | 3 | 0.0154 | 0.0131 | +0.0023 | 3/3 | 0.1250 |  | +0.0000 | 1.0000 |  |
 | credit | dp | 0.0 | 6 | 0.0127 | 0.0119 | +0.0008 | 6/6 | 0.0156 | * | +0.0000 | 0.5000 |  |
 | credit | dp | 0.1 | 6 | 0.0151 | 0.0134 | +0.0017 | 6/6 | 0.0156 | * | +0.0000 | 0.5000 |  |
-| credit | dp | 0.2 | 2 | 0.0171 | 0.0154 | +0.0016 | 2/2 | 0.2500 |  | -0.0000 | 1.0000 |  |
+| credit | dp | 0.2 | 6 | 0.0198 | 0.0178 | +0.0020 | 6/6 | 0.0156 | * | -0.0000 | 1.0000 |  |
+| credit | dp | 0.3 | 3 | 0.0222 | 0.0199 | +0.0023 | 3/3 | 0.1250 |  | +0.0000 | 1.0000 |  |
 | credit | if | 0.0 | 6 | 0.0127 | 0.0119 | +0.0008 | 6/6 | 0.0156 | * | +0.0000 | 0.5000 |  |
 | credit | if | 0.1 | 6 | 0.0074 | 0.0064 | +0.0010 | 5/6 | 0.0469 | * | -0.0000 | 1.0000 |  |
+| credit | if | 0.2 | 6 | 0.0057 | 0.0047 | +0.0009 | 6/6 | 0.0156 | * | +0.0000 | 1.0000 |  |
+| credit | if | 0.3 | 3 | 0.0027 | 0.0017 | +0.0010 | 3/3 | 0.1250 |  | -0.0000 | 1.0000 |  |

@@ -119,7 +119,7 @@ def generate_wilcoxon_tex(wdf, outpath):
     print(f"Saved {outpath}")
 
 
-def generate_pgd_results_tex(summary_df, outpath):
+def generate_pgd_results_tex(summary_df, wdf, outpath):
     """Fairness-Targeted PGD attack results table."""
     datasets = ['adult', 'credit', 'lsac']
     attacks = ['dp', 'if', 'combined']
@@ -142,7 +142,9 @@ def generate_pgd_results_tex(summary_df, outpath):
                 dp_n = naive['dp_mean'].values[0]
                 dp_d = dro['dp_mean'].values[0]
                 red = 100 * (dp_n - dp_d) / (dp_n + 1e-8)
-                lines.append(f"{ds.capitalize()} & {atk.upper()} & {alpha:.1f} & {dp_n:.4f} & {dp_d:.4f} & {red:.1f}\\% & TBD \\\\")
+                pv = wdf[(wdf['dataset'] == ds) & (wdf['attack'] == atk) & (wdf['alpha'] == alpha)]['dp_pvalue']
+                pv_str = f"{pv.values[0]:.3f}" if len(pv) > 0 else "TBD"
+                lines.append(f"{ds.capitalize()} & {atk.upper()} & {alpha:.1f} & {dp_n:.4f} & {dp_d:.4f} & {red:.1f}\\% & {pv_str} \\\\")
 
     lines.append("\\bottomrule")
     lines.append("\\end{tabular}")
@@ -259,7 +261,7 @@ def main():
 
     generate_main_results_tex(summary, os.path.join(OUT_DIR, 'auto_generated_main_results.tex'))
     generate_wilcoxon_tex(wdf, os.path.join(OUT_DIR, 'auto_generated_wilcoxon.tex'))
-    generate_pgd_results_tex(summary, os.path.join(OUT_DIR, 'auto_generated_pgd.tex'))
+    generate_pgd_results_tex(summary, wdf, os.path.join(OUT_DIR, 'auto_generated_pgd.tex'))
 
     generate_paper_tabular_results_tex(summary, os.path.join(PAPER_OUT_DIR, 'tabular_results.tex'))
     generate_paper_wilcoxon_tex(wdf, os.path.join(PAPER_OUT_DIR, 'wilcoxon.tex'))

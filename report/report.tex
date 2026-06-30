@@ -337,37 +337,10 @@ Table~\ref{tab:main_results} reports mean over 3 seeds on the clean test set.
 
 \begin{table}[H]
 \centering\small
-\caption{Main Results: DRO-FAIR vs Naive-FAIR under Adversarial Corruption (clean test, mean over 3 seeds, tau=1 canonical (results/tau1\_summary.csv 37 rows; see auto\_generated)).}
+\caption{Main Results: DRO-FAIR vs Naive-FAIR under Adversarial Corruption (clean test, mean $\pm$ SE over 3 seeds, $\tau{=}1$ canonical).}
 \label{tab:main_results}
 \rowcolors{2}{gray!8}{white}
-\begin{tabular}{llC{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}C{1.2cm}}
-\toprule
-\rowcolor{hdrblue!90}
-\color{white}\textbf{Dataset} & \color{white}$\alpha$ &
-\multicolumn{3}{c}{\color{white}\textbf{Naive-FAIR}} &
-\multicolumn{3}{c}{\color{white}\textbf{DRO-FAIR}} \\
-\rowcolor{hdrblue!70}
-& & \color{white}Acc & \color{white}DP & \color{white}IF & \color{white}Acc & \color{white}DP & \color{white}IF \\
-\midrule
-Adult  & 0.0 & 0.822 & 0.176 & 0.024 & 0.823 & 0.172 & 0.025 \\
-Adult  & 0.1 & 0.826 & 0.159 & 0.025 & 0.826 & \cellcolor{lossred}0.176 & 0.026 \\
-Adult  & 0.2 & 0.825 & 0.136 & 0.030 & 0.796 & \cellcolor{lossred}0.167 & \cellcolor{wingreen}0.022 \\
-Adult  & 0.3 & 0.777 & 0.013 & 0.036 & \cellcolor{lossred}0.495 & \cellcolor{lossred}0.039 & \cellcolor{wingreen}0.014 \\
-Adult  & 0.4 & 0.644 & 0.055 & 0.000 & 0.639 & \cellcolor{wingreen}0.034 & 0.000 \\
-\midrule
-Credit & 0.0 & 0.809 & 0.022 & 0.001 & 0.810 & 0.024 & 0.002 \\
-Credit & 0.1 & 0.810 & 0.026 & 0.002 & 0.810 & \cellcolor{wingreen}0.022 & 0.002 \\
-Credit & 0.2 & 0.812 & 0.030 & 0.002 & 0.793 & \cellcolor{wingreen}0.015 & 0.002 \\
-Credit & 0.3 & 0.801 & 0.044 & 0.007 & 0.782 & \cellcolor{wingreen}0.004 & \cellcolor{wingreen}0.000 \\
-Credit & 0.4 & 0.738 & 0.027 & 0.000 & 0.747 & \cellcolor{wingreen}0.016 & 0.000 \\
-\midrule
-LSAC   & 0.0 & 0.907 & 0.022 & 0.001 & 0.908 & 0.023 & 0.001 \\
-LSAC   & 0.1 & 0.907 & 0.021 & 0.001 & 0.906 & \cellcolor{wingreen}0.011 & \cellcolor{wingreen}0.000 \\
-LSAC   & 0.2 & 0.906 & 0.027 & 0.001 & 0.903 & \cellcolor{wingreen}0.002 & \cellcolor{wingreen}0.000 \\
-LSAC   & 0.3 & 0.903 & 0.030 & 0.006 & 0.902 & \cellcolor{wingreen}0.000 & \cellcolor{wingreen}0.000 \\
-LSAC   & 0.4 & 0.862 & 0.012 & 0.000 & 0.875 & \cellcolor{wingreen}0.006 & 0.000 \\
-\bottomrule
-\end{tabular}
+\input{sections/auto_generated_main_results.tex}
 \end{table}
 
 \begin{figure}[H]
@@ -710,23 +683,10 @@ is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
 
 \begin{table}[H]
 \centering\small
-\caption{Fairness-targeted PGD attacks: DRO vs Naive ($\alpha$=0.2, mean$\pm$SE over 5 seeds). tau=1 canonical (auto\_generated\_pgd.tex + tau1\_summary.csv). LSAC framed on IF per Q3/Q7.}
+\caption{Fairness-targeted PGD attacks: DRO vs Naive (mean over 3 seeds, $\tau{=}1$ canonical).}
 \label{tab:fairness-attacks}
 \rowcolors{2}{gray!8}{white}
-\begin{tabular}{L{2.5cm}L{1.2cm}L{1.5cm}L{1.5cm}L{1.5cm}L{1.5cm}}
-\toprule
-\rowcolor{hdrblue!90}
-\color{white}\textbf{Dataset} & \color{white}\textbf{Attack} & \color{white}\textbf{Naive DP} & \color{white}\textbf{DRO DP} & \color{white}\textbf{Reduction} & \color{white}\textbf{p-value} \\
-\midrule
-Adult    & DP      & 0.171 & 0.209 & $-22.7\%$ & 0.938 \\
-Adult    & IF      & 0.112 & \textbf{0.088} & $+20.9\%$ & 0.406 \\
-Adult    & Combined & 0.197 & \textbf{0.118} & $+40.0\%$ & 0.156 \\
-Credit   & IF      & 0.024 & \textbf{0.008} & $+64.5\%$ & \textbf{0.031} \\
-Credit   & IF ($\alpha$=0.3) & 0.082 & \textbf{0.002} & $+97.5\%$ & \textbf{0.031} \\
-LSAC     & IF      & 0.006 & \textbf{0.001} & $+84.8\%$ & 0.312 \\
-LSAC     & IF ($\alpha$=0.3) & 0.024 & \textbf{0.001} & $+96.2\%$ & \textbf{0.031} \\
-\bottomrule
-\end{tabular}
+\input{sections/auto_generated_pgd.tex}
 \end{table}
 
 \subsection{Key Findings}
