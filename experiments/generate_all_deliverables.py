@@ -18,6 +18,8 @@ This script creates the exact figures requested in the task:
 import os
 import sys
 import json
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from experiments.loaders import constant_predictor_acc
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -78,7 +80,7 @@ DS_LABEL = {'adult': 'Adult'}
 OUT = 'figures'
 
 # Constant predictor baseline
-CONSTANT_PREDICTOR_ACC = 0.752
+CONSTANT_PREDICTOR_ACC = constant_predictor_acc('adult')
 
 
 def load_results():

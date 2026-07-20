@@ -123,7 +123,7 @@ def main():
                 with open(path) as f:
                     merged.extend(json.load(f))
         
-        merged_path = 'results/fairness_pgd_results.json'
+        merged_path = 'results/canonical_tau1.json'
         with open(merged_path, 'w') as f:
             json.dump(merged, f, indent=2)
         print(f"Merged {len(merged)} results -> {merged_path}")

@@ -156,7 +156,7 @@ def main():
     print(f"Device: {device}")
 
     os.makedirs('results', exist_ok=True)
-    results_path = 'results/fairness_pgd_results.json'
+    results_path = 'results/canonical_tau1.json'
 
     # Load any existing results to support resuming
     if os.path.exists(results_path):

@@ -21,9 +21,10 @@ We compare Naive-FAIR (fixed Lagrange multiplier) vs.\ DRO-FAIR
 (adaptive worst-case reweighting within a TV uncertainty set).
 Attacks: DP-only, IF-only, Combined, with $\alpha\in\{0.0, 0.1, 0.2,
 0.3, 0.4\}$ (tabular) and $\alpha\in\{0.0, 0.1, 0.2\}$ (UTKFace, when
-unblocked).  3 seeds per cell in this paper; 3 additional seeds
-($n{=}6$) are running to enable Wilcoxon $p<0.05$ (the minimum
-achievable $p$ with $n{=}3$ is $0.125$).
+unblocked).  The canonical $\tau{=}1$, $k_{\mathrm{inner}}{=}10$ grid
+uses $n{=}6$ seeds (0--5) and achieves Wilcoxon $p{<}0.05$ at
+$\alpha\le0.2$ on Adult and Credit under the DP-targeted and Combined
+attacks.
 
 Prediction temperature is fixed at $\tau{=}1$ across all
 $\alpha$ (per Kuldeep's Q12).  The earlier $\tau{=}100$ schedule for

@@ -6,8 +6,10 @@ soft-max temperature $\tau$ is the dominant knob for whether DRO
 wins or loses on Adult DP.  Under a stepped schedule
 ($\tau{=}100$ for $\alpha\le 0.3$, $\tau{=}1$ for $\alpha{=}0.4$)
 DRO loses on Adult DP almost everywhere; under a fixed $\tau{=}1$
-schedule DRO wins on Adult DP at every $\alpha$ and the gap widens
-monotonically.  This is consistent with the theory: $\tau{=}100$
+schedule DRO wins on Adult DP at $\alpha\le0.2$ (no method claim is
+made at $\alpha\ge0.3$, where both methods fall below the
+constant predictor).  At $\alpha\le0.2$ the gap widens monotonically.
+This is consistent with the theory: $\tau{=}100$
 sharpens the predictions toward $0$/$1$ and so makes the inner
 re-weighting concentrate weights on a few ``worst'' samples,
 driving $\lambda_{\mathrm{DP}}$ to its clamp and causing the
@@ -17,7 +19,7 @@ distribute weight smoothly and $\lambda$ stays bounded, so the
 re-weighting helps rather than hurts.
 
 \subsection{Adversarial vs.\ Random Corruption}
-The empirical comparison (\texttt{results/random\_vs\_adversarial\_new.json})
+The empirical comparison (adversarial-vs-random runs)
 confirms that adversarial PGD raises DP $12$--$40\times$ more than
 random label noise at matched $\alpha$ on Adult, and $2$--$22\times$
 on Credit.  This rules out the ``attack is too weak''

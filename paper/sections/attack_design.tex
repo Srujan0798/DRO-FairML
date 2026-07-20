@@ -23,5 +23,5 @@ classification loss only for the IF attack), (2) rank samples by
 gradient magnitude, (3) flip the top-$\alpha$ labels, (4) repeat.
 After all steps we enforce the exact $\alpha$ budget by keeping
 only the top-$\alpha$ flips ranked by final gradient magnitude.
-The IF attack uses a k-NN graph ($k{=}5$ default; the ablation in
-\S\ref{sec:results-tabular} shows the attack is insensitive to $k$).
+The IF attack uses a k-NN graph ($k{=}5$ default; the graph construction
+is insensitive to $k\!\in\!\{5,10,15\}$, see \S\ref{sec:results-tabular}).

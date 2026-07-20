@@ -20,6 +20,8 @@ from __future__ import annotations
 import json
 import os
 import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from experiments.loaders import constant_predictor_acc
 from collections import defaultdict
 
 import numpy as np
@@ -41,7 +43,7 @@ CANONICAL_PATH = os.path.join(RESULTS_DIR, "canonical_tau1.json")
 LAMBDA_GRID_PATH = os.path.join(RESULTS_DIR, "lambda_lr_grid.json")
 WILCOXON_PATH = os.path.join(RESULTS_DIR, "canonical_wilcoxon.csv")
 
-CONSTANT_PREDICTOR_ACC = 0.752
+CONSTANT_PREDICTOR_ACC = constant_predictor_acc('adult')
 
 # ── Publication Style (Kuldeep preferences) ──────────────────────────────────
 plt.rcParams.update({

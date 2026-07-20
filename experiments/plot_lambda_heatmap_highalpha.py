@@ -17,6 +17,9 @@ import json
 import os
 import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from experiments.loaders import constant_predictor_acc
+
 import numpy as np
 import pandas as pd
 
@@ -31,7 +34,7 @@ FIGURES_DIR = os.path.join(ROOT, "figures")
 os.makedirs(FIGURES_DIR, exist_ok=True)
 
 LAMBDA_GRID_PATH = os.path.join(RESULTS_DIR, "lambda_lr_grid.json")
-CONSTANT_PREDICTOR_ACC = 0.752
+CONSTANT_PREDICTOR_ACC = constant_predictor_acc('adult')
 
 # ---- Style -----------------------------------------------------------------
 plt.rcParams.update({

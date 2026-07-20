@@ -11,48 +11,72 @@ import sys
 import json
 import numpy as np
 import pandas as pd
+from collections import defaultdict
 from scipy.stats import wilcoxon
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-TAU1_SUMMARY_PATH = 'results/tau1_summary.csv'
-WILCOXON_PATH = 'results/tau1_wilcoxon.csv'
+CANONICAL_PATH = 'results/canonical_tau1.json'
 OUT_DIR = 'report/sections'
 PAPER_OUT_DIR = 'paper/auto_generated'
 
 
-def load_tau1_summary(path=TAU1_SUMMARY_PATH):
-    if not os.path.exists(path):
-        print(f"WARNING: {path} not found")
-        return pd.DataFrame()
-    df = pd.read_csv(path)
-    # Filter to tau=1 only (canonical data)
-    df = df[df['tau'] == 1.0].copy()
-    print(f"Loaded {len(df)} tau=1 rows from {path}")
-    return df
+def load_canonical_rows():
+    """Load the canonical 540-row grid (results/canonical_tau1.json)."""
+    from experiments.loaders import load_canonical_tau1
+    return load_canonical_tau1()
 
 
-def load_wilcoxon(path=WILCOXON_PATH):
-    if not os.path.exists(path):
-        print(f"WARNING: {path} not found")
-        return pd.DataFrame()
-    df = pd.read_csv(path)
-    print(f"Loaded {len(df)} wilcoxon rows from {path}")
-    return df
+def build_summary(rows):
+    """Per (dataset, alpha, attack, method) mean/sem of acc/dp/if."""
+    recs = []
+    groups = defaultdict(list)
+    for r in rows:
+        groups[(r['dataset'], r['alpha'], r['attack'], r['method'])].append(r)
+    for (ds, alpha, atk, method), rs in groups.items():
+        acc = np.array([x['acc_clean'] for x in rs])
+        dp = np.array([x['dp_clean'] for x in rs])
+        ifv = np.array([x['if_clean'] for x in rs])
+        n = len(acc)
+        se = lambda a: a.std(ddof=1) / np.sqrt(n) if n > 1 else 0.0
+        recs.append({
+            'dataset': ds, 'alpha': alpha, 'attack': atk, 'method': method,
+            'acc_mean': acc.mean(), 'acc_se': se(acc),
+            'dp_mean': dp.mean(), 'dp_se': se(dp),
+            'if_mean': ifv.mean(), 'if_se': se(ifv),
+        })
+    return pd.DataFrame(recs)
 
 
-def summarize(df):
-    """tau1_summary.csv already has precomputed stats; just return it grouped."""
-    return df
-
-
-def wilcoxon_table_from_csv(path=WILCOXON_PATH):
-    """Load precomputed Wilcoxon results from tau1_wilcoxon.csv."""
-    if not os.path.exists(path):
-        print(f"WARNING: {path} not found")
-        return pd.DataFrame()
-    df = pd.read_csv(path)
-    return df
+def build_wilcoxon(rows):
+    """One-sided Wilcoxon (DRO better = naive DP - dro DP > 0) per (dataset,alpha,attack)."""
+    recs = []
+    groups = defaultdict(lambda: {'naive': [], 'dro': []})
+    for r in rows:
+        groups[(r['dataset'], r['alpha'], r['attack'])][r['method']].append(r)
+    for (ds, alpha, atk), md in groups.items():
+        nv = np.array([x['dp_clean'] for x in md['naive']])
+        dv = np.array([x['dp_clean'] for x in md['dro']])
+        diff = nv - dv
+        p = 1.0
+        if len(diff) >= 2 and np.std(diff) > 0:
+            _, p = wilcoxon(diff, alternative='greater')
+        if_nv = np.array([x['if_clean'] for x in md['naive']])
+        if_dv = np.array([x['if_clean'] for x in md['dro']])
+        if_diff = if_nv - if_dv
+        if_p = 1.0
+        if len(if_diff) >= 2 and np.std(if_diff) > 0:
+            _, if_p = wilcoxon(if_diff, alternative='greater')
+        recs.append({
+            'dataset': ds, 'alpha': alpha, 'attack': atk,
+            'dp_naive_mean': nv.mean() if len(nv) else float('nan'),
+            'dp_diff_mean': diff.mean() if len(diff) else float('nan'),
+            'dp_pvalue': p,
+            'if_naive_mean': if_nv.mean() if len(if_nv) else float('nan'),
+            'if_diff_mean': if_diff.mean() if len(if_diff) else float('nan'),
+            'if_pvalue': if_p,
+        })
+    return pd.DataFrame(recs)
 
 
 def generate_main_results_tex(summary_df, outpath):
@@ -243,11 +267,11 @@ def generate_paper_wilcoxon_tex(wdf, outpath):
 
 
 def main():
-    df = load_tau1_summary()
-    print(f"Loaded {len(df)} tau=1 summary rows")
+    rows = load_canonical_rows()
+    print(f"Loaded {len(rows)} canonical rows from {CANONICAL_PATH}")
 
-    if len(df) == 0:
-        print("No tau=1 results yet — generating placeholder files")
+    if len(rows) == 0:
+        print("No canonical results yet — generating placeholder files")
         os.makedirs(OUT_DIR, exist_ok=True)
         for name in ['auto_generated_main_results.tex', 'auto_generated_wilcoxon.tex', 'auto_generated_pgd.tex']:
             path = os.path.join(OUT_DIR, name)
@@ -256,8 +280,8 @@ def main():
             print(f"Saved placeholder {path}")
         return
 
-    summary = summarize(df)
-    wdf = load_wilcoxon()
+    summary = build_summary(rows)
+    wdf = build_wilcoxon(rows)
 
     generate_main_results_tex(summary, os.path.join(OUT_DIR, 'auto_generated_main_results.tex'))
     generate_wilcoxon_tex(wdf, os.path.join(OUT_DIR, 'auto_generated_wilcoxon.tex'))
@@ -266,7 +290,7 @@ def main():
     generate_paper_tabular_results_tex(summary, os.path.join(PAPER_OUT_DIR, 'tabular_results.tex'))
     generate_paper_wilcoxon_tex(wdf, os.path.join(PAPER_OUT_DIR, 'wilcoxon.tex'))
 
-    print("\nDone. Report tables generated in report/sections/ + paper/auto_generated/ (from tau=1 canonical data)")
+    print("\nDone. Report tables generated in report/sections/ + paper/auto_generated/ (from results/canonical_tau1.json)")
 
 
 if __name__ == '__main__':

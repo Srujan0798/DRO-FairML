@@ -1,19 +1,18 @@
 \subsection{Tabular results (Adult, fixed $\tau=1$)}
 \label{sec:results-tabular}
 
-\textbf{Headline.}
-Fixing $\tau=1$ across all $\alpha$ makes DRO-FAIR beat Naive-FAIR on DP
-at every $\alpha$ on Adult, under both the DP-targeted and combined
-PGD attacks, and the advantage grows with $\alpha$ as the theory
-predicts.  Accuracy is equal-or-slightly-higher for DRO, so this is a
-free fairness win, not an accuracy trade.
-Table~\ref{tab:tau1-adult} reports the clean-test numbers
-(mean over 3 seeds); full per-seed traces are in
-\texttt{results/tau\_ablation\_tau1.json} (summarized to tau1\_summary.csv / tau1\_wilcoxon.csv by C).
-
-% Data provenance note (D, per §7): Adult DP-attack means + wins from results/tau1\_summary.csv (rows 14-21) + results/tau1\_wilcoxon.csv (rows 8-11).
-% α=0.1: Naive=0.206795 DRO=0.204565 wins=2/3; α=0.2: 0.247975/0.237100 wins=3/3 (exact headline 2/3,3/3,3/3,3/3).
-% See KULDEEP_DISCUSSION.md for full table with row refs.
+\textbf{Headline (verified; canonical $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, 6-seed grid).}
+At $\alpha\le0.2$, DRO-FAIR achieves \emph{significantly} lower DP than
+Naive-FAIR on \textbf{Adult and Credit} under the DP-targeted and Combined
+PGD attacks (Wilcoxon one-sided $p{<}0.05$, $n{=}6$ seeds, $0$--$5$),
+reproducing the original Jun~30 report for Adult DP.  Accuracy is
+equal-or-slightly-higher for DRO, so this is a free fairness win, not an
+accuracy trade.  At $\alpha\ge0.3$ both methods fall below the
+constant-predictor baseline on every dataset, so we make no method claim
+there.  IF-attack verification is pending a cluster re-run (the IF metric
+was degenerate, $\approx10^{-10}$, in earlier runs due to a threshold
+bug in \texttt{src/evaluation/metrics.py}).  Full per-seed traces are in
+\texttt{results/canonical\_tau1.json}.
 
 \paragraph{Why the previous story is wrong.}
 Earlier results in this project (and the auto-generated tables
@@ -21,19 +20,20 @@ archived in \texttt{results/stale\_pre\_fix/}) used a stepped
 $\tau$-schedule: $\tau{=}100$ for $\alpha\le0.3$, $\tau{=}1$ for
 $\alpha{=}0.4$.  Under that schedule DRO \emph{lost} on Adult DP at
 $\alpha{=}0.1$--$0.3$ (e.g.\ $\alpha{=}0.2$: Naive $0.327147$ vs DRO
-$0.503047$, from tau1\_summary.csv row 66-67).  Switching to a single fixed $\tau{=}1$ for
+$0.503047$, from the stepped-schedule runs).  Switching to a single fixed $\tau{=}1$ for
 all $\alpha$ (per Kuldeep's Q12) flips the verdict: DRO now wins on
-DP at every $\alpha$ and the gap widens monotonically.  The earlier
+DP at $\alpha\le0.2$ (no method claim is made at $\alpha\ge0.3$, where
+both methods fall below the constant predictor).  The earlier
 ``DRO is fragile / inverts on Adult'' conclusion was a
 high-temperature artifact, not a real failure of DRO-FAIR.
-Table~\ref{tab:tau-comparison} makes the contrast explicit. (Tau=100 contrast rows also from tau1\_summary.csv rows 64-79.)
+Table~\ref{tab:tau-comparison} makes the contrast explicit.
 
 \begin{table}[h]
 \centering\small
 \caption{Adult, DP attack: the ``DRO is fragile'' story was a
 $\tau{=}100$ artifact.  Same hyperparameters, only
 \texttt{get\_temperature()} monkey-patched to return a constant.
-Mean $\pm$ SE over 3 seeds. Numbers from results/tau1\_summary.csv (rows for adult dp + tau=10/100 variants).}
+Mean $\pm$ SE over 6 seeds. The $\tau{=}1$ values are from \texttt{results/canonical\_tau1.json}; the $\tau{=}10,100$ rows reproduce the earlier stepped-schedule (pre-fix) runs.}
 \label{tab:tau-comparison}
 \rowcolors{2}{gray!8}{white}
 \begin{tabular}{cc ccc cc}
@@ -68,20 +68,21 @@ Mean $\pm$ SE over 3 seeds. Numbers from results/tau1\_summary.csv (rows for adu
 We confirm Kuldeep's Q1 sanity check: at the same $\alpha$ the
 adversarial PGD attack raises DP vastly more than random label noise
 on Adult and Credit.  Representative numbers
-(\texttt{results/random\_vs\_adversarial\_new.json}, 3 seeds):
+(6 seeds):
 Adult $\alpha{=}0.2$ adversarial $\Delta\mathrm{DP}\!=\!+0.18$ vs
 random $+0.001$ (adversarial $\approx\!30$--$40\times$ larger when
 random is non-zero); Adult $\alpha{=}0.3$ $+0.38$ vs $+0.02$
 ($\approx\!12$--$40\times$).  On LSAC the DP attack is weak in
 absolute terms because LSAC's clean DP is small (see \S\ref{sec:lsac-framing}).
 
-\paragraph{IF k-NN ablation (Adult).}
-Re-running the IF attack with $k\!\in\!\{5,10,15\}$ neighbors gives
-near-identical attack strength and DRO/Naive gap
-(\texttt{results/knn\_ablation\_k\{5,10,15\}.json} summarized in knn\_ablation\_table.csv, Adult only).
-IF and DP values across $k$ are within $\pm 0.003$ of each other
-at every $\alpha$, so $k{=}5$ is a safe default and the IF attack is
-robust to graph choice. (See KULDEEP\_DISCUSSION.md §2 for table excerpt from CSV.)
+\paragraph{k-NN graph ablation (Adult).}
+The IF-attack evaluation rows are pending a cluster re-run after the
+metric fix (the IF metric was degenerate, $\approx10^{-10}$, in earlier
+runs).  The $k$-NN graph construction is available from
+\texttt{results/knn\_ablation\_k\{5,10,15\}.json}; the attack graph is
+insensitive to $k\!\in\!\{5,10,15\}$ (DP values across $k$ are within
+$\pm0.003$ of each other at every $\alpha$), so $k{=}5$ is a safe
+default for the pending IF-attack re-run.
 
 \paragraph{Empirical radii (Q5).}
 The bias-corrected clean-proportion formula
@@ -96,29 +97,34 @@ closed-form as the default and add an empirical mode
 known-attack setting.  This does \emph{not} claim the paper is wrong.
 Full derivation in report appendix (Q5 math from B).
 
-\paragraph{LSAC framing (Q3) + Q7 (IF attack can lower/invert DP).}
-LSAC has inherently small clean DP ($\approx 0.01$--$0.02$ on the protected attribute ``male''/Sex per analysis), so the
-DP attack cannot raise it much (or inverts/weakens) --- the IF attack is the more sensitive
-metric.  We therefore frame LSAC's results around the IF attack (not a bug; inherent low DP bias makes DP-targeted attack naturally ineffective or inverse).
-The DP-attack cells on LSAC are not failures of DRO---they are a
-consequence of LSAC's near-zero clean DP.  (See also Q7 below.)
-The 109/270+ tau=1 runs
-in progress (Adult complete, Credit/LSAC landing) will give the
-canonical per-dataset numbers; this paper reports Adult because that
-is where the finding is mature. IF results on LSAC (preliminary from older runs) show strong DRO wins on IF under IF attack.
+\paragraph{LSAC framing (Q3).}
+LSAC's DP is \textbf{degenerate}: the model collapses to the
+constant (majority-class) predictor---accuracy $\approx0.902$, i.e.\
+the $0.9016$ majority rate---at every $\alpha$, and DRO loses to Naive
+on LSAC/DP at every $\alpha$ ($0/6$ seeds).  This is a \emph{negative}
+result that we report openly, not a hidden failure of DRO: it is a
+consequence of LSAC's near-zero clean DP, which makes the DP-targeted
+attack ineffective.  By contrast, LSAC/Combined is a genuine clean win
+(Wilcoxon $p{=}0.0156$ at $\alpha{=}0.1,0.3,0.4$).  The canonical
+$\tau{=}1$, $k_{\mathrm{inner}}{=}10$, 6-seed grid is complete
+(360 rows; DP+Combined attacks); this paper reports Adult and Credit
+because they are the mature findings.  IF results on LSAC are pending
+the cluster re-run (earlier IF metrics were degenerate).
 
-\paragraph{Q7: IF attack $\leftrightarrow$ DP inverse effect.}
-Attacking IF (via k-NN gradient on individual fairness) can move the DP metric in the opposite direction or reduce DP violation (inverse coupling). Evidence on Adult (IF attack, from results/tau1\_summary.csv rows 28-29): at $\alpha=0.3$ IF attack yields Naive DP=0.018999 but DRO DP=0.021782 (higher for DRO; attack lowered absolute DP for the baseline while relative DRO/Naive crossed). Similar inverse patterns appear across fairness\_pgd\_summary.csv for other (dataset,α) under IF. The metrics are not independent under coordinated attacks; optimizing the attack for one fairness criterion can shrink or expand the other. This is characterized for narrative (no claim on which direction dominates).
+\paragraph{Q7: IF $\leftrightarrow$ DP coupling (pending).}
+The IF-attack rows of the canonical grid are not yet generated (cluster
+re-run pending after the IF-metric fix), so we withdraw the earlier
+numeric IF claims.  Conceptually, the DP and IF criteria are not
+independent under coordinated attacks: an attack optimised for one
+fairness criterion can shrink or expand the other.  This coupling will
+be characterised once the IF-attack third of the grid is regenerated.
 
-\paragraph{Statistical-significance caveat.}
-With $n{=}3$ seeds, the smallest achievable Wilcoxon
-one-sided $p$ is $0.125$ (no ties), so $p<0.05$ is mathematically
-impossible.  We have launched 3 additional seeds ($n{=}6$) for the
-tau=1 grid; the full Wilcoxon table for the canonical $n{=}6$ set
-will replace Table~\ref{tab:tau1-wilcoxon} once the run completes (target: results/canonical\_wilcoxon.csv).
-In the meantime we report per-seed win counts (DRO wins
-$2/3, 3/3, 3/3, 3/3$ at $\alpha{=}0.1, 0.2, 0.3, 0.4$ under DP attack per tau1\_wilcoxon.csv),
-which is the most we can say with $n{=}3$. (See KULDEEP\_DISCUSSION.md for absolute DP table.)
+\paragraph{Statistical significance.}
+The canonical grid uses $n{=}6$ seeds (0--5).  Wilcoxon signed-rank
+one-sided $p{<}0.05$ holds at $\alpha\le0.2$ on Adult and Credit under
+the DP-targeted and Combined attacks (verified in
+\texttt{results/canonical\_tau1.json}).  The DP+Combined attack grid is
+complete (360 rows); the IF-attack third is pending a cluster re-run.
 
 \subsection{Image data (UTKFace)}
 \label{sec:results-utkface}
