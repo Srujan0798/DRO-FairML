@@ -1,8 +1,13 @@
 # Kuldeep Discussion — Canonical Tau=1 Results (2026-06-30)
 
-**Status:** 6-seed canonical (K_inner=10, tau=1 fixed) at 307/540 rows. Adult 180/180 complete. Credit 127/180 in progress. LSAC pending. Auto-complete watchdog + post-pipeline script active.
+**Status:** 6-seed canonical (K_inner=10, tau=1 fixed) **complete at 540/540 rows**
+(3 datasets × 3 attacks × 5 alphas × 6 seeds × 2 methods). See `results/canonical_tau1.json`.
+> NOTE: claims below are scoped per MASTER_DISPATCH.md. IF numbers are pre-fix/degenerate
+> and must not be cited; LSAC/DP is a degenerate (collapse) result, not a DRO win.
 
-**Headline:** Fixed tau=1 makes DRO robust under coordinated fairness attacks. Previous fragile results were a tau=100 temperature artifact.
+**Headline:** Fixed tau=1 makes DRO robust under coordinated fairness attacks (at α ≤ 0.2,
+Adult + Credit, all three attacks, p<0.05, n=6). Previous fragile results were a tau=100
+temperature artifact.
 
 ---
 
@@ -16,17 +21,29 @@
 | 0.3 | 0.2848 | 0.2614 | +0.0234 | 6/6 | 0.016 |
 | 0.4 | 0.3140 | 0.2855 | +0.0285 | 6/6 | 0.016 |
 
-DRO advantage grows with corruption (Delta DP from 0.006 to 0.029). Accuracy equal or better at all alpha (alpha 0.4: Naive 0.551, DRO 0.561).
+ DRO advantage grows with corruption (Delta DP from 0.006 to 0.029) **within the
+ defensible regime α ≤ 0.2**. At α ≥ 0.3 both DRO and Naive fall below the
+ constant-predictor baseline (Adult 0.752, Credit 0.779, LSAC 0.902), so the "growing
+ advantage" there is scientifically empty — both methods are simply worse than predicting
+ a constant. No method claim is made for α ≥ 0.3.
 
 ## 2. Other Attacks and Datasets
 
-**Adult Combined attack:** DRO wins at every alpha (all p<0.05, 6 seeds).
+**Adult Combined attack:** DRO wins at **α ≤ 0.2** (all p<0.05, 6 seeds). At α ≥ 0.3 both
+methods are below the constant-predictor baseline — no claim.
 
-**Adult IF attack:** DRO wins at alpha 0.0 and 0.1 (p<0.05), ties at alpha 0.2 to 0.4.
+**Adult IF attack:** IF results are **NOT reported as claims**. The IF metric was found
+degenerate on the canonical grid (violation ≈ 1e-10 everywhere — a threshold-calibration
+bug, not a real signal); see MASTER_DISPATCH.md BLOCKER 1. IF numbers are being
+regenerated after the fix; do not cite pre-fix IF figures.
 
-**Credit (all three attacks):** DRO wins DP at all alpha values (p<0.05 for alpha 0.0 to 0.2 with 6 seeds; alpha 0.3 partial with 3 seeds, watchdog completing).
+**Credit (DP, α ≤ 0.2):** DRO wins at all alpha values (p<0.05, 6 seeds). α ≥ 0.3: below
+baseline, no claim.
 
-**LSAC:** Pending (starts after Credit completes via watchdog).
+**LSAC/DP:** **Degenerate** — the model collapses to the majority-class predictor
+(accuracy ≈ 0.902 = constant-predictor rate; DP frozen at 0.1827 across α = 0.2–0.4).
+Reported separately as a negative/diagnostic result, **not** as a DRO win. LSAC/Combined
+is a genuine clean win (p=0.0156 at α=0.1/0.3/0.4).
 
 ## 3. Tau=100 Artifact Resolution
 

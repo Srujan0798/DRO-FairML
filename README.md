@@ -19,10 +19,14 @@ All other historical meeting prep, one-pagers, timelines, launch snapshots and a
 - `experiments/run_fairness_pgd.py` — main tabular experiment driver.
 - `experiments/run_tau_ablation.py`, `run_knn_ablation.py`, `run_lambda_lr_grid.py` — ablations.
 
-## Headline finding
-Fixing **tau=1** (vs the old stepped tau=100 schedule) makes DRO beat Naive on DP at
-every corruption level α on Adult, with the advantage growing in α. The earlier
-"DRO is fragile" result was a high-temperature artifact. See KULDEEP_DISCUSSION.md for the current tables (sourced from committed results/*.csv + canonical_tau1.json).
+## Headline finding (scoped — see docs/MASTER_DISPATCH.md BLOCKER 3)
+At **α ≤ 0.2**, DRO-FAIR achieves lower DP than Naive-FAIR on **Adult and Credit** under
+all three attacks (p<0.05, n=6). **LSAC/DP is degenerate** (model collapses to the
+majority-class predictor) and is reported separately, not as a DRO win. At **α ≥ 0.3**
+both methods fall below the constant-predictor baseline, so **no method claim is made**
+there. The earlier "DRO is fragile" result was a **tau=100 temperature artifact**, fixed
+by the canonical tau=1. Current tables: KULDEEP_DISCUSSION.md (sourced from
+`results/canonical_tau1.json`).
 
 ## Run (local CPU)
 ```bash
