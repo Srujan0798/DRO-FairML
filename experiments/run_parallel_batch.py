@@ -77,7 +77,7 @@ def main():
     parser.add_argument('--methods', nargs='+', default=['naive', 'dro'])
     parser.add_argument('--n_seeds', type=int, default=3)
     parser.add_argument('--device', default='cpu')
-    parser.add_argument('--k_inner', type=int, default=5)
+    parser.add_argument('--k_inner', type=int, default=10)
     parser.add_argument('--pgd_steps', type=int, default=20)
     parser.add_argument('--epochs', type=int, default=60)
     parser.add_argument('--parallel', action='store_true', help='Run datasets in parallel subprocesses')

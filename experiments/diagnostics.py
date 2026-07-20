@@ -24,7 +24,7 @@ from src.corruption.adversarial import AdversarialCorruptor
 from src.training.standard_ml import StandardMLTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.evaluation.metrics import compute_metrics_torch
-from experiments.run_experiments import get_temperature
+from src.temperature import get_temperature
 
 
 def run_diagnostic(dataset_name, alpha, seed, output_dir='figures/diagnostics'):
@@ -129,7 +129,7 @@ def run_diagnostic(dataset_name, alpha, seed, output_dir='figures/diagnostics'):
                 if p_if_grad.grad is not None:
                     with torch.no_grad():
                         p_if = p_if_grad + self.lr_p * p_if_grad.grad
-                        p_if = self._project_if_weights(p_if, self.p_if_center, self.rho_if)
+                        p_if = self._project_dp_weights(p_if, self.p_if_center, self.rho_if)
 
             # Log
             with torch.no_grad():

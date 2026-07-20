@@ -15,7 +15,7 @@ def main():
     result = run_single_experiment(
         'adult', alpha, seed, attack, method,
         device='cpu', verbose=False,
-        epochs=60, k_inner=5, pgd_steps=20
+        epochs=60, k_inner=10, pgd_steps=20
     )
     
     with open(out_file, 'w') as f:

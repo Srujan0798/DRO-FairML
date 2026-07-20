@@ -22,10 +22,7 @@ from src.corruption.adversarial import FairnessTargetedPGD
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.evaluation.metrics import compute_metrics_torch
-
-
-def get_temperature(alpha):
-    return 1.0 if alpha >= 0.4 else 100.0
+from src.temperature import get_temperature
 
 
 def _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs):
@@ -203,7 +200,7 @@ def main():
                             result = run_single_experiment(
                                 dataset, alpha, seed, attack, method, device=device, verbose=False,
                                 epochs=smoke_epochs, k_inner=smoke_k_inner, pgd_steps=smoke_pgd_steps,
-                                tau=None,  # rely on get_temperature inside (stepped) for this driver; canonical passes explicit 1.0
+                                tau=1.0,  # Use fixed tau=1 for all alphas (artifact bug: stepped tau caused DRO fragility)
                                 lambda_init=0.0,
                                 radii_mode='uniform',
                                 coordinated=False,

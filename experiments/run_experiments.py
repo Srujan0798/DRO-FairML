@@ -28,26 +28,16 @@ from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.training.standard_ml import StandardMLTrainer
 from src.evaluation.metrics import compute_accuracy, compute_dp_violation, compute_if_violation, compute_metrics_torch
-
-
-def get_temperature(alpha):
-    """Tune temperature τ based on corruption level.
-    Paper line 1797-1799: τ=100 for α≤0.3, τ=1 at α=0.4 on Adult."""
-    return 1.0 if alpha >= 0.4 else 100.0
+from src.temperature import get_temperature
 
 
 def get_lambda_max(dataset, alpha):
     """Dataset-adaptive lambda_max cap.
 
-    Adult has baseline DP ~0.17 (8x higher than Credit/LSAC's ~0.02).
-    With lambda_max=1.5, the DP penalty (lambda*DP) can reach 0.255 on Adult,
-    dominating the BCE loss and forcing model collapse via runaway dual ascent.
-
-    Cap lambda_max proportional to baseline DP to prevent the feedback loop on
-    high-baseline-DP datasets while preserving full strength on Credit/LSAC.
+    Cap lambda_max proportional to baseline DP to prevent runaway dual ascent.
+    Adult has baseline DP ~0.17 (8x higher than Credit/LSAC's ~0.02). Paper says λ_max=1.5 for all datasets.
+    The lambda_max violation is a bug; use 1.5 for all.
     """
-    if dataset == 'adult' and alpha >= 0.2:
-        return 0.5
     return 1.5
 
 
@@ -81,7 +71,7 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
     X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
         get_dataset(dataset_name, random_state=seed)
 
-    # Paper §G.6: τ=100 for α≤0.3, τ=1 for α≥0.4 (same for train and eval).
+    # Canonical τ=1.0 for every α (stepped τ=100 schedule was the retracted artifact).
     tau_train = get_temperature(alpha)
     tau_eval = tau_train
     input_dim = X_train.shape[1]
@@ -157,7 +147,7 @@ def run_single_experiment(dataset_name, alpha, seed, device='cpu', verbose=False
         lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=lambda_max,
         tau=tau_train, beta=5.0, k=5, gamma=0.0,
         K_inner=10, epochs=60, weight_decay=1e-4, tau_warmup_epochs=15,
-        lambda_warmstart=0.01
+        lambda_init=0.0
     )
 
     if verbose:

@@ -25,6 +25,7 @@ from src.corruption.adversarial import AdversarialCorruptor, FairnessTargetedPGD
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.evaluation.metrics import compute_metrics_torch
+from src.temperature import get_temperature
 
 
 def _add_utkface_provenance(result, k_inner, tau, lambda_max, attack, pgd_steps, n_seeds_planned, epochs, coordinated=False, radii_mode='uniform'):
@@ -43,10 +44,6 @@ def _add_utkface_provenance(result, k_inner, tau, lambda_max, attack, pgd_steps,
         'radii_mode': str(radii_mode),
     })
     return result
-
-
-def get_temperature(alpha):
-    return 1.0 if alpha >= 0.4 else 100.0
 
 
 def _make_synthetic_utkface(n=1000, dim=512, seed=42):

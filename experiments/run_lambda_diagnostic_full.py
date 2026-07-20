@@ -24,6 +24,7 @@ from src.models.classifier import MLPClassifier
 from src.corruption.adversarial import AdversarialCorruptor
 from src.training.dro_fair import DroFairTrainer
 from src.evaluation.metrics import compute_metrics_torch
+from src.temperature import get_temperature
 
 
 def set_seed(seed):
@@ -49,7 +50,7 @@ def run_one(dataset_name, alpha, seed, lambda_max, tag, device='cpu'):
         coordinated=True, random_state=seed)
     X_a, y_a, a_a, _ = attack.corrupt(X_tr, y_tr, a_tr, model=None, device=device)
 
-    tau = 100.0
+    tau = get_temperature(alpha)
     model = MLPClassifier(X_a.shape[1], hidden_dims=[128, 64], dropout=0.1)
     trainer = DroFairTrainer(
         model, alpha=alpha, device=device,

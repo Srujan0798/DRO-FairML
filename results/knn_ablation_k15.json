@@ -2206,5 +2206,25 @@
     "n_seeds_planned": 6,
     "epochs": 60,
     "k_nn": 15
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 3,
+    "attack": "if",
+    "method": "naive",
+    "acc_clean": 0.8091763405196241,
+    "dp_clean": 0.07059785723686218,
+    "if_clean": 0.04212905839085579,
+    "total_time": 179.98747181892395,
+    "k_inner": 10,
+    "tau": 1.0,
+    "radii_mode": "uniform",
+    "lambda_init": 0.0,
+    "coordinated": false,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "k_nn": 15
   }
 ]

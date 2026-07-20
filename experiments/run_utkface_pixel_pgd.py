@@ -41,10 +41,7 @@ from src.training.dro_fair import DroFairTrainer
 from src.evaluation.metrics import compute_metrics_torch
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-
-
-def get_temperature(alpha):
-    return 1.0 if alpha >= 0.4 else 100.0
+from src.temperature import get_temperature
 
 
 def set_seed(seed):

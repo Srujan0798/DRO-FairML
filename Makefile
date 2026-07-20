@@ -1,4 +1,4 @@
-.PHONY: help install test monitor experiments results deliverables review clean
+.PHONY: help install test monitor experiments results deliverables review paper report clean
 
 help:
 	@echo "DRO-FAIR Project"
@@ -10,7 +10,9 @@ help:
 	@echo "  experiments   - Run full experiment suite (150 exps)"
 	@echo "  results       - Generate tables and plots from existing results"
 	@echo "  deliverables  - Generate ALL deliverables (tables + plots + ablations + theory)"
-	@echo "  review        - Open self-review checklist (docs/REVIEW_CHECKLIST.md)"
+	@echo "  review        - Open self-review checklist (docs/_archive/REVIEW_CHECKLIST.md)"
+	@echo "  paper         - Build the paper PDF with tectonic (paper/main.tex)"
+	@echo "  report        - Build the report PDF with tectonic (report/report.tex)"
 	@echo "  full          - Run experiments then generate results"
 	@echo "  clean         - Remove Python cache files"
 
@@ -21,7 +23,8 @@ test:
 	python3 -m pytest tests/ -v
 
 monitor:
-	@echo "Monitor script removed. Use: python3 -c \"import json; d=json.load(open('results/all_results.json')); print(len(d), '/150 experiments')\""
+	@python3 -c "import json,glob,os; f=sorted(glob.glob('results/*.json')); print('result files:', len(f))" 2>/dev/null || true
+	@echo "Live watcher: python3 scripts/canonical_watcher.py"
 
 validate:
 	python3 experiments/validate_results.py
@@ -39,9 +42,15 @@ deliverables:
 	python3 experiments/generate_all_deliverables.py
 
 review:
-	@echo "Self-review: docs/REVIEW_CHECKLIST.md"
-	@echo "Verification: docs/VERIFICATION_PROTOCOL.md"
-	@echo "Release check: docs/RELEASE_CHECKLIST.md"
+	@echo "Self-review:    docs/_archive/REVIEW_CHECKLIST.md"
+	@echo "Verification:   docs/_archive/VERIFICATION_PROTOCOL.md"
+	@echo "Release check:  docs/_archive/RELEASE_CHECKLIST.md"
+
+paper:
+	tectonic -X compile paper/main.tex
+
+report:
+	tectonic -X compile report/report.tex
 
 full:
 	python3 main.py --full-pipeline

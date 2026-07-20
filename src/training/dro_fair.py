@@ -28,7 +28,7 @@ class DroFairTrainer:
     """DRO-FAIR trainer with robust fairness guarantees."""
 
     def __init__(self, model, alpha, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
-                 lr_p=5e-3, lambda_max=1.5, tau=100.0, beta=5.0, k=5, gamma=0.0,
+                 lr_p=5e-3, lambda_max=1.5, tau=1.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
                  use_dp=True, use_if=True, tau_warmup_epochs=15,
                  lambda_init=0.0, radii_mode='uniform', history_path=None):
@@ -104,6 +104,10 @@ class DroFairTrainer:
                 else:
                     pi_clean[j] = pi_obs[j]
                 pi_clean[j] = np.clip(pi_clean[j], 0.0, 1.0)
+            # Renormalize to ensure valid probability distribution (sum to 1)
+            pi_sum = np.sum(pi_clean)
+            if pi_sum > 0:
+                pi_clean = pi_clean / pi_sum
 
         rho_dp = []
         for j in [0, 1]:
@@ -188,13 +192,6 @@ class DroFairTrainer:
 
     def _project_dp_weights(self, p, center, radius):
         """Project onto simplex ∩ L1-ball (TV distance → L1 radius = 2ρ)."""
-        p_np = p.detach().cpu().numpy()
-        center_np = center.detach().cpu().numpy()
-        proj = project_simplex_l1_ball(p_np, center_np, 2 * radius, max_iter=500, tol=1e-5)
-        return torch.tensor(proj, dtype=p.dtype, device=p.device)
-
-    def _project_if_weights(self, p, center, radius):
-        """Project global IF weights onto simplex ∩ L1-ball."""
         p_np = p.detach().cpu().numpy()
         center_np = center.detach().cpu().numpy()
         proj = project_simplex_l1_ball(p_np, center_np, 2 * radius, max_iter=500, tol=1e-5)
@@ -343,7 +340,7 @@ class DroFairTrainer:
                     if p_if_grad.grad is not None:
                         with torch.no_grad():
                             p_if = p_if_grad + self.lr_p * p_if_grad.grad
-                            p_if = self._project_if_weights(p_if, self.p_if_center, self.rho_if)
+                            p_if = self._project_dp_weights(p_if, self.p_if_center, self.rho_if)
 
             history['train_loss'].append(float(total_loss.item()))
             history['lambda_dp'].append(float(lambda_dp.item()) if self.use_dp else 0.0)

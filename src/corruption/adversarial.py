@@ -290,45 +290,54 @@ class FairnessTargetedPGD:
 
         return grad
 
-    def _precompute_if_neighbors(self, X, a, k=5):
-        """Precompute k-NN neighbor indices for IF gradient (computed once, reused)."""
-        from sklearn.neighbors import NearestNeighbors
-        neighbors = {}
-        for g in [0, 1]:
-            mask_g = (a == g)
-            if mask_g.sum() <= k:
-                continue
-            idx_g = np.where(mask_g)[0]
-            X_g = X[idx_g]
-            k_eff = min(k, len(idx_g) - 1)
-            nbrs = NearestNeighbors(n_neighbors=k_eff + 1).fit(X_g)
-            _, neighbor_idx = nbrs.kneighbors(X_g)
-            neighbor_idx = neighbor_idx[:, 1:]  # drop self
-            neighbors[g] = {'idx_g': idx_g, 'neighbor_idx': neighbor_idx, 'k_eff': k_eff}
-        return neighbors
+    def _precompute_if_neighbors(self, X, a, k=5, metric='cosine'):
+        """Precompute k-NN neighbor indices and distances for IF gradient.
 
-    def compute_if_gradient(self, y, a, X=None, k=5, precomputed_neighbors=None):
+        CALIBRATION/GRAPH-ALIGNMENT FIX (Agent A): Previously this built the
+        graph separately within each protected group, while training and
+        evaluation built it over ALL samples. We now build one global k-NN
+        graph so the attack optimizes the same quantity that is measured at
+        evaluation time.  Distances are also returned so the IF gradient can
+        weight neighbors by their feature distance.
+        """
+        from sklearn.neighbors import NearestNeighbors
+        n = len(X)
+        k_eff = min(k, n - 1)
+        nbrs = NearestNeighbors(n_neighbors=k_eff + 1, metric=metric, n_jobs=1).fit(X)
+        distances, indices = nbrs.kneighbors(X)
+        return {
+            'global': {
+                'idx_g': np.arange(n),
+                'neighbor_idx': indices[:, 1:],      # drop self
+                'neighbor_dist': distances[:, 1:],
+                'k_eff': k_eff,
+            }
+        }
+
+    def compute_if_gradient(self, y, a, X=None, k=5, precomputed_neighbors=None,
+                            gamma=0.0):
         """
         Compute gradient of Individual Fairness w.r.t. each sample's label.
 
-        IF violation = (1/|N_k|) Σ_{(i,j)∈N_k} max(0, |y_i - y_j| - d(x_i,x_j) - γ)
-        where N_k are k-NN pairs in feature space.
+        IF violation (after calibration) =
+            (1/(n-1)) Σ_{(i,j)∈N_k} max(0, |y_i - y_j| - d(x_i,x_j) - γ)
+        where N_k are k-NN pairs in feature space and d is cosine distance.
 
-        Flipping y_i increases IF violation when y_i agrees with most of its
-        k-nearest neighbors (because flipping creates new disagreements).
-        Conversely, flipping reduces IF violation when y_i disagrees with most
-        neighbors (because flipping fixes the disagreement).
-
-        Gradient sign:
-            +1: flipping increases IF violation (target for attack)
-            -1: flipping decreases IF violation (avoid)
+        For binary labels, flipping y_i changes |y_i - y_j| by ±1.  The marginal
+        gain of flipping i is therefore:
+            + max(0, 1 - d_{ij} - γ)  if y_i == y_j  (creates a disagreement)
+            - max(0, 1 - d_{ij} - γ)  if y_i != y_j  (removes a disagreement)
+        We average this over the k neighbors.  This is the exact discrete gradient
+        of the measured IF objective; the previous implementation ignored d_{ij}
+        and γ entirely.
 
         Args:
             y: labels (n,)
-            a: protected attribute (n,) — k-NN is computed WITHIN same group
-            X: features (n, d) — required for proper k-NN gradient
+            a: protected attribute (n,) — unused; IF graph is global
+            X: features (n, d) — required for k-NN
             k: number of neighbors
             precomputed_neighbors: dict from _precompute_if_neighbors() for speed
+            gamma: IF slack parameter
 
         Returns:
             grad: array where grad[i] > 0 means flipping y[i] INCREASES IF violation
@@ -342,19 +351,23 @@ class FairnessTargetedPGD:
         if precomputed_neighbors is None:
             precomputed_neighbors = self._precompute_if_neighbors(X, a, k)
 
-        # Use precomputed k-NN within each protected group (vectorized)
-        for g, info in precomputed_neighbors.items():
-            idx_g = info['idx_g']
-            neighbor_idx = info['neighbor_idx']
-            k_eff = info['k_eff']
-            y_g = y[idx_g]
+        info = precomputed_neighbors.get('global')
+        if info is None:
+            return grad
 
-            # Vectorized: y_g[neighbor_idx] has shape (n_g, k_eff)
-            # Compare each sample's label to its neighbors' labels
-            neighbor_labels = y_g[neighbor_idx]  # shape: (n_g, k_eff)
-            agree = np.sum(neighbor_labels == y_g[:, None], axis=1)  # shape: (n_g,)
-            disagree = k_eff - agree
-            grad[idx_g] = (agree - disagree) / k_eff
+        idx_g = info['idx_g']
+        neighbor_idx = info['neighbor_idx']
+        neighbor_dist = info['neighbor_dist']
+        k_eff = info['k_eff']
+
+        y_g = y[idx_g]
+        neighbor_labels = y_g[neighbor_idx]            # shape: (n, k_eff)
+        agree = (neighbor_labels == y_g[:, None])      # shape: (n, k_eff)
+        # Marginal contribution: +1 if agree (creates violation), -1 if disagree
+        signs = np.where(agree, 1.0, -1.0)
+        # Magnitude depends on distance and gamma: max(0, 1 - d - gamma)
+        magnitudes = np.maximum(0.0, 1.0 - neighbor_dist - gamma)
+        grad[idx_g] = np.sum(signs * magnitudes, axis=1) / k_eff
 
         return grad
 
@@ -368,10 +381,12 @@ class FairnessTargetedPGD:
         if self.target_metric == 'dp':
             return self.compute_dp_gradient(y, a)
         elif self.target_metric == 'if':
-            return self.compute_if_gradient(y, a, X=X, k=self.k, precomputed_neighbors=precomputed_neighbors)
+            return self.compute_if_gradient(y, a, X=X, k=self.k, precomputed_neighbors=precomputed_neighbors,
+                                            gamma=0.0)
         elif self.target_metric == 'combined':
             dp_grad = self.compute_dp_gradient(y, a)
-            if_grad = self.compute_if_gradient(y, a, X=X, k=self.k, precomputed_neighbors=precomputed_neighbors)
+            if_grad = self.compute_if_gradient(y, a, X=X, k=self.k, precomputed_neighbors=precomputed_neighbors,
+                                               gamma=0.0)
             # Normalize to comparable scales before mixing (DP grad is ~1/count_g,
             # IF grad is in [-1,1]; without normalization IF dominates completely)
             finite_dp = dp_grad[np.isfinite(dp_grad)]
@@ -380,44 +395,6 @@ class FairnessTargetedPGD:
             return 0.5 * (dp_grad / dp_max) + 0.5 * (if_grad / if_max)
         else:
             raise ValueError(f"Unknown metric: {self.target_metric}")
-
-    def _select_targets(self, grad, n_corrupt, a):
-        """
-        Select the top-n_corrupt samples to flip based on gradient.
-
-        If coordinated=True, prioritize minority group samples.
-
-        Returns:
-            target_idx: indices of samples to flip
-        """
-        n = len(grad)
-
-        if self.coordinated:
-            # Target minority group more aggressively
-            group_counts = np.bincount(a.astype(int))
-            minority_group = int(np.argmin(group_counts))
-            minority_indices = np.where(a == minority_group)[0]
-            majority_indices = np.where(a != minority_group)[0]
-
-            # Allocate 70% of corruption budget to minority
-            n_minority = min(int(0.7 * n_corrupt), len(minority_indices))
-            n_majority = n_corrupt - n_minority
-
-            # Get top-k from each group
-            minority_grad = grad[minority_indices]
-            majority_grad = grad[majority_indices]
-
-            # Sort by gradient magnitude (descending)
-            minority_top = minority_indices[np.argsort(-minority_grad)[:n_minority]]
-            majority_top = majority_indices[np.argsort(-majority_grad)[:n_majority]]
-
-            target_idx = np.concatenate([minority_top, majority_top])
-        else:
-            # Random selection from top gradient samples
-            top_k = np.argsort(-grad)[:n_corrupt]
-            target_idx = self.rng.choice(top_k, n_corrupt, replace=False)
-
-        return target_idx
 
     def _attack_labels_fairness(self, y, a, X=None):
         """
@@ -441,9 +418,10 @@ class FairnessTargetedPGD:
         flipped = np.zeros(n, dtype=bool)
 
         # Precompute k-NN once for IF attacks (major speedup — was recomputing 3000×)
+        # CALIBRATION FIX (Agent A): use cosine metric and global graph.
         precomputed_neighbors = None
         if self.target_metric in ('if', 'combined') and X is not None:
-            precomputed_neighbors = self._precompute_if_neighbors(X, a, k=self.k)
+            precomputed_neighbors = self._precompute_if_neighbors(X, a, k=self.k, metric='cosine')
 
         # Coordinated targeting: track minority group budget
         group_counts = np.bincount(a.astype(int))
@@ -537,25 +515,6 @@ class FairnessTargetedPGD:
 
         return LRSurrogate().to(device)
 
-    def _attack_features_fgsm(self, X, y, corrupt_idx):
-        """FGSM-style feature perturbation (no model needed)."""
-        X_adv = X.copy()
-        if len(corrupt_idx) == 0:
-            return X_adv
-
-        col_stds = np.std(X, axis=0, keepdims=True)
-        col_stds[col_stds == 0] = 1.0
-
-        for idx in corrupt_idx:
-            target_label = 1 - int(y[idx])
-            direction = 2 * target_label - 1
-            noise = self.rng.randn(X.shape[1])
-            noise = noise / (np.linalg.norm(noise) + 1e-8)
-            perturbation = self.epsilon * direction * col_stds.squeeze() * noise
-            X_adv[idx] = X[idx] + perturbation
-
-        return X_adv
-
     def _attack_features_pgd(self, X, y, a, corrupt_idx, model, device):
         """PGD-style feature perturbation targeting the chosen fairness metric.
 
@@ -600,6 +559,36 @@ class FairnessTargetedPGD:
 
         X_adv[corrupt_idx] = X_batch.detach().cpu().numpy()
         return X_adv
+
+    def compute_if_marginal_gain(self, y, a, X=None, candidate_idx=None, k=5, gamma=0.0):
+        """
+        Exact marginal gain in the measured IF objective from flipping each
+        candidate sample.  Used by _attack_labels_fairness when the greedy
+        gradient would re-flip samples.  This mirrors compute_if_gradient but
+        recomputes the full global graph, so it is slower and used only as a
+        tie-breaker / sanity check.
+        """
+        n = len(y)
+        if X is None or candidate_idx is None or len(candidate_idx) == 0:
+            return np.zeros(n)
+
+        k_eff = min(k, n - 1)
+        from sklearn.neighbors import NearestNeighbors
+        nbrs = NearestNeighbors(n_neighbors=k_eff + 1, metric='cosine', n_jobs=1).fit(X)
+        distances, indices = nbrs.kneighbors(X)
+        distances = distances[:, 1:]
+        indices = indices[:, 1:]
+
+        gain = np.zeros(n)
+        for i in candidate_idx:
+            for idx in range(k_eff):
+                j = indices[i, idx]
+                d = distances[i, idx]
+                if y[i] == y[j]:
+                    gain[i] += max(0.0, 1.0 - d - gamma) / k_eff
+                else:
+                    gain[i] -= max(0.0, 1.0 - d - gamma) / k_eff
+        return gain
 
     def _attack_attributes(self, a, corrupt_idx):
         """Flip protected attributes."""

@@ -15,6 +15,7 @@ from src.models.classifier import MLPClassifier
 from src.corruption.adversarial import FairnessTargetedPGD
 from src.training.naive_fair import NaiveFairTrainer
 from src.evaluation.metrics import compute_metrics_torch
+from src.temperature import get_temperature
 
 
 def run_comparison(dataset_name, alpha, seed, device='cpu'):
@@ -24,7 +25,7 @@ def run_comparison(dataset_name, alpha, seed, device='cpu'):
     X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
         get_dataset(dataset_name, random_state=seed)
 
-    tau = 100.0 if alpha < 0.4 else 1.0
+    tau = get_temperature(alpha)
     input_dim = X_train.shape[1]
 
     results = {'dataset': dataset_name, 'alpha': alpha, 'seed': seed}

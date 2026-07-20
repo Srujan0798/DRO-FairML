@@ -1,3 +1,3 @@
-from .adversarial import AdversarialCorruptor, RandomCorruptor
+from .adversarial import AdversarialCorruptor, FairnessTargetedPGD, RandomCorruptor
 
-__all__ = ['AdversarialCorruptor', 'RandomCorruptor']
+__all__ = ['AdversarialCorruptor', 'FairnessTargetedPGD', 'RandomCorruptor']

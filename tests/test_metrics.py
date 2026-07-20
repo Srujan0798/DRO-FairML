@@ -62,7 +62,8 @@ def test_compute_dp_violation_binary_matches_old_behavior():
 
 def test_compute_if_violation_zero():
     """IF violation should be 0 when all predictions are the same."""
-    X = np.random.randn(10, 3)
+    rng = np.random.RandomState(0)
+    X = rng.randn(10, 3)
     y_pred = np.ones(10)
     assert compute_if_violation(X, y_pred, k=3) == 0.0
 
@@ -73,3 +74,24 @@ def test_compute_if_violation_nonzero():
     y_pred = np.array([0.0, 1.0, 0.0])
     if_viol = compute_if_violation(X, y_pred, k=2)
     assert if_viol > 0.0
+
+
+def test_compute_if_violation_constant_is_zero():
+    """Agent A regression: constant predictor must have zero IF violation."""
+    rng = np.random.RandomState(7)
+    X = rng.randn(50, 4)
+    y_pred = np.full(50, 0.5)
+    assert compute_if_violation(X, y_pred, k=5) == 0.0
+
+
+def test_compute_if_violation_unfair_is_nonzero():
+    """Agent A regression: deliberately unfair predictor must have IF > 1e-4."""
+    # Two nearby clusters assigned opposite hard predictions.
+    rng = np.random.RandomState(7)
+    X = np.vstack([
+        rng.randn(10, 3) * 0.01,
+        rng.randn(10, 3) * 0.01 + 0.02,
+    ])
+    y_pred = np.array([0.0] * 10 + [1.0] * 10)
+    if_viol = compute_if_violation(X, y_pred, k=3)
+    assert if_viol > 1e-4, f"Expected meaningful IF, got {if_viol}"

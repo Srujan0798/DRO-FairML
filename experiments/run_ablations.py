@@ -24,10 +24,7 @@ from src.training.standard_ml import StandardMLTrainer
 from src.training.naive_fair import NaiveFairTrainer
 from src.training.dro_fair import DroFairTrainer
 from src.evaluation.metrics import compute_accuracy, compute_dp_violation, compute_if_violation
-
-
-def get_temperature(alpha):
-    return 1.0 if alpha >= 0.4 else 100.0
+from src.temperature import get_temperature
 
 
 def train_warm_start(X_train, y_train, input_dim, device='cpu', epochs=10):
@@ -43,7 +40,7 @@ def run_ablation(dataset_name, alpha, seed, use_adversarial=True, device='cpu'):
     X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
         get_dataset(dataset_name, random_state=seed)
 
-    # Paper §G.6: τ=100 for α≤0.3, τ=1 for α≥0.4 — same τ for train and eval.
+    # Canonical τ=1.0 for every α (stepped τ=100 schedule was the retracted artifact).
     tau_train = get_temperature(alpha)
     input_dim = X_train.shape[1]
 

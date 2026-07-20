@@ -63,7 +63,11 @@ Thumbs.db
 # Project specific
 paper_text.txt
 .last_checkpoint
-_archive/
+/_archive/
+
+# Large / retracted PDFs and dead process-id files
+paper/ICML_submission.pdf
+*.pid
 
 # Temporary per-dataset result files (merged into fairness_pgd_results.json)
 results/fairness_pgd_adult.json
