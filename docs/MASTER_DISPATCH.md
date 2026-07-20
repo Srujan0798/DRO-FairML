@@ -81,6 +81,21 @@ Adult and Credit are clean, complete, and genuinely positive at n=6:
 
 ---
 
+## 0.5 PROGRESS (2026-07-20, end of session)
+
+| Agent | Status | Notes |
+|---|---|---|
+| F | **DONE** (commit `1e4e35d`) | Deletions, untrack, moves, τ-zombie→`src/temperature.py`, dead-code removal. 62 tests pass. |
+| E | **DONE (written)** | `docs/ABLATION_STATUS_REPORT.md`: tau/lambda/random-vs-adv formally scoped or dropped; empirical radii deferred. kNN **backfill in progress** (36 Adult rows, k=5/k=15, PIDs 100/101) — writes `results/canonical_tau1.json` at completion. |
+| A | **DONE (code) — 180-row IF re-run BLOCKED on cluster** | `compute_if_violation` uses cosine (constant→0.0, unfair→0.28 on real Adult); IF attack gradient aligned (`max(0,1-d-γ)`, global k-NN); regression tests in `tests/test_metrics.py` pass. DP/Combined rows NOT re-run. |
+| B | **DONE** (commit `3f1e9a3`) | `docs/LSAC_DEGENERACY.md`: LSAC/DP degenerate (radii-on-imbalanced artifact); LSAC/Combined kept as genuine win; α=0 anomaly flagged. |
+| D | **DONE** (commit `3f1e9a3`) | `README.md` + `KULDEEP_DISCUSSION.md` scoped to α≤0.2/Adult+Credit; LSAC/DP degenerate + α≥0.3 below-baseline caveats; IF flagged degenerate/pre-fix. |
+| C | **PARTIAL** (commit `fe8f960`) | Step 1 (commit canonical) done. Step 3 (loader landmines) done: `experiments/loaders.py` added with fail-loud `load_canonical_tau1()` / `load_fairness_pgd_results()`; `analyze_tau1.load_tau1()` + `compute_canonical_wilcoxon.load_preferred()` fixed; 8 active readers of the contaminated `fairness_pgd_results.json` now raise. Steps 2,4,5,6 (full regeneration of tables/figures/PDFs, per-dataset baseline, stale archive) **BLOCKED on cluster compute** — require the 180 IF rows (A) first. |
+
+**Verify before final regeneration:** `load_fairness_pgd_results()` raises on the contaminated 270-row file; `load_canonical_tau1()` returns the committed canonical (373 rows currently; becomes 540 after kNN backfill lands).
+
+---
+
 ## 1. Dispatch — 6 agents
 
 Agents A and B are **blocking**. C, D, E, F may run in parallel with them but must not produce final artifacts until A and B land.
