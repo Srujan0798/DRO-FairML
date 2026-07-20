@@ -1,5 +1,9 @@
 # DRO-FairML — Clear Project Flow
 
+> **Historical:** this documents the original experiment-launch flow. The canonical grid as
+> committed is **360 rows (DP + Combined only)**; the IF-attack third is pending a cluster
+> re-run. Current truth and commands live in `STATUS.md` and `docs/MASTER_DISPATCH.md`.
+
 ## Overview (from full chat history)
 DRO vs Naive under adversarial fairness-targeted PGD (DP/IF/combined attacks).
 Core insight (per Kuldeep): **fixed tau=1** (not stepped high-tau) makes DRO robust for α ≤ 0.2 on Adult (DP wins/advantage grows, acc ≥ 0.78 stable). At α ≥ 0.3: inherent 30-40% corruption ceiling (acc drops below constant predictor ~0.752 even with different tau or lambda tuning). Different tau first for high-α to test improvement, then lambda/lr or convergence plots.

@@ -61,13 +61,12 @@ See **[docs/PROJECT_FLOW.md](docs/PROJECT_FLOW.md)** for the complete end-to-end
 - Analysis (analyze_tau1 + wilcoxon + tables)
 - Viz (meeting-format plots + final figures, high-α tau first per Kuldeep)
 - Report (paper/report + auto sections)
-- Automation (orchestrators wait for 72/540 + Credit/LSAC → full polish + HANDOFF update + commit)
+- Automation: `make results` / `make deliverables` / `make validate` / `make paper` / `make report` regenerate all artifacts from `results/canonical_tau1.json` (360 rows, DP+Combined; IF pending cluster).
 
 **Clean structure (post-cleanup):**
 - Root: only key persistent docs (HANDOFF, KULDEEP, MASTER_PLAN, SERVER, README) + entrypoints.
 - `scripts/`: all orchestration (finalize_experiments.py, finish_..., watchers).
-- `docs/project_management/`: all status/orchestrator MDs (moved from root clutter).
-- `docs/_archive/`: full history (never pollute root).
+- `docs/_archive/`: full history incl. prior status/orchestrator MDs (never pollute root).
 - `logs/`: everything log-related.
 - Comfort dups only in FRIEND/ (laptop-only, no full source).
 

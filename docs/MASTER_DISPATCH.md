@@ -6,7 +6,7 @@
 
 ## 0. READ THIS FIRST — the situation
 
-The 540-row canonical experiment grid **completed on 2026-07-02 at 18:35**. It is complete, uniform, and provenance-clean: 3 datasets × 3 attacks × 5 alphas × 6 seeds × 2 methods, every row `tau=1.0, k_inner=10, epochs=60, pgd_steps=20, lambda_init=0.0`. Zero missing cells, zero duplicates.
+The 540-row canonical experiment grid was *believed* complete on 2026-07-02 — **CORRECTION (see §0.5): the committed grid is 360 rows (DP + Combined only); the IF-attack third (180 rows) was never generated because the IF metric was degenerate, and is cluster-blocked.** For the DP+Combined rows that do exist: 3 datasets × 2 attacks × 5 alphas × 6 seeds × 2 methods, every row `tau=1.0, k_inner=10, epochs=60, pgd_steps=20, lambda_init=0.0`. Zero missing cells, zero duplicates within the 360.
 
 **Nothing downstream has been regenerated since.** Every CSV, LaTeX table, figure, PDF, and prose doc in this repo was built from the 307/540 partial snapshot on Jun 30. The last commit says so out loud: `21e6775 interim: ... from 307/540 canonical`.
 
@@ -92,7 +92,7 @@ assumed IF rows existed; they did not. All regeneration below is against the 360
 |---|---|---|
 | F | **DONE** (`1e4e35d`) | Deletions, untrack, moves, τ-zombie→`src/temperature.py`, dead-code removal; 62 tests pass. |
 | E | **DONE (written)** | `docs/ABLATION_STATUS_REPORT.md`: tau/lambda/random-vs-adv dropped; kNN backfill retracted (was actually the Adult IF config, subsumed by Agent A cluster run). |
-| A | **DONE (code) — 180-row IF re-run BLOCKED on cluster** | `compute_if_violation` cosine-based (constant→0.0, unfair→0.28 on real Adult); IF attack gradient aligned (`max(0,1-d-γ)`, global k-NN); `tests/test_metrics.py` pass. Cluster job ready at `scripts/run_if_rerun_cluster.sh`. DP/Combined rows NOT re-run. |
+| A | **DONE (code) — 180-row IF re-run BLOCKED on cluster** | `compute_if_violation` cosine-based (constant→0.0, unfair→0.28 on real Adult); IF attack gradient aligned (`max(0,1-d-γ)`, global k-NN); `tests/test_metrics.py` pass. Cluster job ready at `scripts/run_if_rerun_cluster.sh`. **Local POC confirmed:** a single Adult α=0.2 config produced `if_clean=0.0333` (non-degenerate) — but at ~20 min/config on this CPU the full 180-row sweep is infeasible here; needs the cluster. DP/Combined rows NOT re-run. |
 | B | **DONE** (`3f1e9a3`) | `docs/LSAC_DEGENERACY.md`: LSAC/DP degenerate (radii-on-imbalanced artifact); LSAC/Combined genuine win; α=0 anomaly flagged. |
 | D | **DONE** (`3f1e9a3` + `f8d3bb4`) | README/KULDEEP scoped to α≤0.2/Adult+Credit; LSAC/DP degenerate; IF withdrawn pending re-run; n=3→n=6; archived refs removed; PDFs rebuilt. |
 | C | **DONE (local) — IF figures pending cluster** (`f8d3bb4`+`c156628`+`324e148`) | canonical committed (360 dp/combined). `generate_report_tables.py` from canonical. `loaders.py` + 2 named landmines + 8 readers fixed; writers repointed. Figures: fig1–fig7 via `canonical_to_all_results.py`+`generate_figures.py`; figD1–D10 via `generate_all_deliverables.py` (repointed to `stale_archived/`, `0.752`→`constant_predictor_acc`). Stale results archived (C6). `make results`/`deliverables`/`validate`/`paper`/`report` all pass. Obsolete orchestrators + stale-loaders moved to `experiments/_archive/`. |

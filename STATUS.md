@@ -39,8 +39,11 @@ degenerate, ~1e-10) and is cluster-blocked — see §7.
 - **Defensible regime: α ≤ 0.2** on Adult and Credit. At α ≥ 0.3 both methods fall *below* the
   constant-predictor baseline (Adult 0.752, Credit 0.779, LSAC 0.902) → no method claim there.
 - **IF:** metric is fixed (cosine-based) in `src/evaluation/metrics.py`, but the 180 IF-attack
-  rows are NOT regenerated. IF cells currently read 0.0000 (degenerate pre-fix metric). **No IF
-  claim is made** until the cluster re-run.
+  rows are NOT regenerated; IF cells currently read 0.0000 (degenerate pre-fix metric). **No IF
+  claim is made** until the cluster re-run. A local proof-of-concept (Adult, α=0.2, 1 config)
+  produced `if_clean = 0.0333` — non-degenerate, confirming the fix works on real data
+  (evidence: `results/if_poc_adult.json`). The full 180-row sweep still needs the cluster
+  (~20 min/config on this CPU → ~60 h; GPU-capable cluster is the only feasible path).
 
 ## 4. Ablations
 Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dropped with

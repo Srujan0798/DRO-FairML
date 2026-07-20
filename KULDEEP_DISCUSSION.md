@@ -1,7 +1,10 @@
 # Kuldeep Discussion — Canonical Tau=1 Results (2026-06-30)
 
-**Status:** 6-seed canonical (K_inner=10, tau=1 fixed) **complete at 540/540 rows**
-(3 datasets × 3 attacks × 5 alphas × 6 seeds × 2 methods). See `results/canonical_tau1.json`.
+**Status:** 6-seed canonical (K_inner=10, tau=1 fixed) **complete at 360/360 rows**
+(3 datasets × {DP, Combined} attacks × 5 alphas × 6 seeds × 2 methods). The IF-attack
+third (180 rows) was never generated — the IF metric was degenerate pre-fix — and is
+pending a cluster re-run (see `STATUS.md` / `docs/MASTER_DISPATCH.md`). See
+`results/canonical_tau1.json`.
 > NOTE: claims below are scoped per MASTER_DISPATCH.md. IF numbers are pre-fix/degenerate
 > and must not be cited; LSAC/DP is a degenerate (collapse) result, not a DRO win.
 
