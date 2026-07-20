@@ -90,9 +90,15 @@ Adult and Credit are clean, complete, and genuinely positive at n=6:
 | A | **DONE (code) — 180-row IF re-run BLOCKED on cluster** | `compute_if_violation` uses cosine (constant→0.0, unfair→0.28 on real Adult); IF attack gradient aligned (`max(0,1-d-γ)`, global k-NN); regression tests in `tests/test_metrics.py` pass. DP/Combined rows NOT re-run. |
 | B | **DONE** (commit `3f1e9a3`) | `docs/LSAC_DEGENERACY.md`: LSAC/DP degenerate (radii-on-imbalanced artifact); LSAC/Combined kept as genuine win; α=0 anomaly flagged. |
 | D | **DONE** (commit `3f1e9a3`) | `README.md` + `KULDEEP_DISCUSSION.md` scoped to α≤0.2/Adult+Credit; LSAC/DP degenerate + α≥0.3 below-baseline caveats; IF flagged degenerate/pre-fix. |
-| C | **PARTIAL** (commit `fe8f960`) | Step 1 (commit canonical) done. Step 3 (loader landmines) done: `experiments/loaders.py` added with fail-loud `load_canonical_tau1()` / `load_fairness_pgd_results()`; `analyze_tau1.load_tau1()` + `compute_canonical_wilcoxon.load_preferred()` fixed; 8 active readers of the contaminated `fairness_pgd_results.json` now raise. Steps 2,4,5,6 (full regeneration of tables/figures/PDFs, per-dataset baseline, stale archive) **BLOCKED on cluster compute** — require the 180 IF rows (A) first. |
+| C | **DONE (DP/Combined); IF figures pending cluster** (commit `f8d3bb4` + figures commit) | Step 1 done. Step 2 done (`generate_report_tables.py`). Step 3 done (`fe8f960`). Step 4 DONE for DP/Combined: added `experiments/canonical_to_all_results.py` (flat canonical → nested `all_results.json`, DP attack) and ran `generate_figures.py` to regenerate fig1–fig7 from canonical; `paper/main.pdf` + `report/report.pdf` rebuilt with tectonic. IF-attack panels still pending the cluster IF re-run (Agent A5). Step 5 done (`constant_predictor_acc`). Step 6 done (stale archived). |
+| D | **DONE** (commit `3f1e9a3` README/KULDEEP + `f8d3bb4` paper/report LaTeX) | Claims scoped to α≤0.2/Adult+Credit; LSAC/DP degenerate; IF withdrawn pending re-run; n=3→n=6; archived-file references removed; PDFs rebuilt. |
 
-**Verify before final regeneration:** `load_fairness_pgd_results()` raises on the contaminated 270-row file; `load_canonical_tau1()` returns the committed canonical (373 rows currently; becomes 540 after kNN backfill lands).
+**Cluster-blocked (cannot complete on this CPU box — each IF config ≈5 min; 180 configs ≈15 h):**
+- **Agent A step 5:** re-run the IF-attack third of the grid (180 rows) with the fixed metric; write to `results/canonical_tau1.json`. Validated that `run_fairness_pgd.py --datasets <ds> --attacks if --alphas <a> --methods naive dro --n_seeds 6` produces non-trivial IF rows on CPU, but the full sweep needs the cluster.
+- **Agent C step 4 figures:** regenerate all figures from `canonical_tau1.json` (DP/Combined now; IF after A). The legacy `generate_all_deliverables.py` must be repointed off the archived `tau_ablation_*`/`individual/` inputs first.
+- **Agent E kNN backfill:** the earlier backfill was actually the Adult IF config (k_inner is hardcoded 10); it is subsumed by the Agent A IF re-run. Re-run under canonical config on the cluster.
+
+**Verify:** `load_fairness_pgd_results()` raises on the contaminated 270-row file; `load_canonical_tau1()` returns the clean 360-row DP+Combined grid (k_inner=10); `make paper` and `make report` build.
 
 ---
 
