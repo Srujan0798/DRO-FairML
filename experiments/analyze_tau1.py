@@ -112,29 +112,16 @@ def load_json(name: str):
 
 
 def load_tau1():
-    """Load the tau=1 ablation data, preferring the file with the most
-    rows so the figures stay complete while the canonical K_inner=10 run
-    is in progress.
+    """Load the tau=1 results from the canonical 540-row grid.
 
+    Fails loudly (via experiments.loaders) rather than silently falling back
+    to a stale K_inner=5 backup or the mixed-k_inner tau_ablation file.
     Returns (rows, source_label).
     """
-    canonical = load_json("canonical_tau1.json") or load_json("tau_ablation_tau1.json")
-    bak       = load_json("tau_ablation_tau1_KINNER5_BAK.json")
-
-    if not canonical and not bak:
-        return [], "no data"
-    if canonical and not bak:
-        ki = canonical[0].get("k_inner", "unknown")
-        return canonical, f"canonical (K_inner={ki})"
-    if bak and not canonical:
-        return bak, "FALLBACK K_inner=5 (canonical K_inner=10 run not yet started)"
-    # Both exist — pick whichever has more rows
-    if len(canonical) >= len(bak):
-        ki = canonical[0].get("k_inner", "unknown")
-        return canonical, f"canonical (K_inner={ki}, {len(canonical)} rows)"
-    return bak, (f"FALLBACK K_inner=5 ({len(bak)} rows) — "
-                 f"canonical K_inner=10 has only {len(canonical)} row(s); "
-                 f"regenerate when canonical completes")
+    from experiments.loaders import load_canonical_tau1
+    rows = load_canonical_tau1()
+    ki = rows[0].get("k_inner", "unknown") if rows else "unknown"
+    return rows, f"canonical (K_inner={ki}, {len(rows)} rows)"
 
 
 def savefig(fig, stem: str):

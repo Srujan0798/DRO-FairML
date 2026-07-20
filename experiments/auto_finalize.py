@@ -57,20 +57,18 @@ def generate_summary():
     lines = ["# Experiment Summary\n", f"Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"]
 
     # Load tabular results
-    tabular_path = os.path.join(RESULTS_DIR, 'fairness_pgd_results.json')
-    if os.path.exists(tabular_path):
-        with open(tabular_path) as f:
-            tabular = json.load(f)
-        lines.append(f"\n## Tabular Results ({len(tabular)} runs)\n")
-        import pandas as pd
-        df = pd.DataFrame(tabular)
-        summary = df.groupby(['dataset', 'attack', 'alpha', 'method']).agg(
-            acc_mean=('acc_clean', 'mean'),
-            dp_mean=('dp_clean', 'mean'),
-            if_mean=('if_clean', 'mean'),
-            n=('seed', 'count')
-        ).reset_index()
-        lines.append(summary.to_markdown(index=False))
+    from experiments.loaders import load_fairness_pgd_results
+    tabular = load_fairness_pgd_results()
+    lines.append(f"\n## Tabular Results ({len(tabular)} runs)\n")
+    import pandas as pd
+    df = pd.DataFrame(tabular)
+    summary = df.groupby(['dataset', 'attack', 'alpha', 'method']).agg(
+        acc_mean=('acc_clean', 'mean'),
+        dp_mean=('dp_clean', 'mean'),
+        if_mean=('if_clean', 'mean'),
+        n=('seed', 'count')
+    ).reset_index()
+    lines.append(summary.to_markdown(index=False))
 
     # Load lambda diagnostic
     lambda_path = os.path.join(RESULTS_DIR, 'lambda_diagnostic_full.json')

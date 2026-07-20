@@ -20,8 +20,8 @@ import matplotlib.pyplot as plt
 
 
 def load_results(path='results/fairness_pgd_results.json'):
-    with open(path) as f:
-        return json.load(f)
+    from experiments.loaders import load_fairness_pgd_results
+    return load_fairness_pgd_results()
 
 
 def summarize(results):

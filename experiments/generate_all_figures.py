@@ -20,6 +20,7 @@ import json
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from experiments.loaders import load_fairness_pgd_results
 
 import matplotlib
 matplotlib.use('Agg')
@@ -298,7 +299,7 @@ def save(fig, stem):
 def main():
     print("Loading results...")
     data = {
-        'fairness_pgd': load(os.path.join(RESULTS_DIR, 'fairness_pgd_results.json')),
+        'fairness_pgd': load_fairness_pgd_results(),
         'utkface_baseline': load(os.path.join(RESULTS_DIR, 'utkface_results.json')),
         'utkface_lambda_max_cap': load(os.path.join(RESULTS_DIR, 'utkface_lambda_max_cap.json')),
         'utkface_alpha_sweep': load(os.path.join(RESULTS_DIR, 'utkface_alpha_sweep.json')),

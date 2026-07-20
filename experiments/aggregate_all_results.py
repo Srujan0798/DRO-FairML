@@ -27,6 +27,7 @@ import numpy as np
 from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from experiments.loaders import load_fairness_pgd_results
 
 
 def load_json(path):
@@ -170,7 +171,7 @@ def main():
     results_dir = Path('results')
 
     data = {
-        'fairness_pgd': load_json(results_dir / 'fairness_pgd_results.json'),
+        'fairness_pgd': load_fairness_pgd_results(),
         'utkface_baseline': load_json(results_dir / 'utkface_results.json'),
         'utkface_baseline_server': load_json(results_dir / 'utkface_results_server.json'),
         'utkface_lambda_max_cap': load_json(results_dir / 'utkface_lambda_max_cap.json'),

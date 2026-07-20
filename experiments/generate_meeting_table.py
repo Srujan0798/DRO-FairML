@@ -8,11 +8,8 @@ from collections import defaultdict
 
 
 def load_results():
-    path = 'results/fairness_pgd_results.json'
-    if not os.path.exists(path):
-        return []
-    with open(path) as f:
-        return json.load(f)
+    from experiments.loaders import load_fairness_pgd_results
+    return load_fairness_pgd_results()
 
 
 def generate_table(results):

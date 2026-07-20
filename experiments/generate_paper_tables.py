@@ -25,11 +25,8 @@ OUT_DIR_REPORT = 'report/sections'
 
 
 def load_results(path=RESULTS_PATH):
-    if not os.path.exists(path):
-        print(f"WARNING: {path} not found. Tables will be empty.")
-        return []
-    with open(path) as f:
-        return json.load(f)
+    from experiments.loaders import load_fairness_pgd_results
+    return load_fairness_pgd_results()
 
 
 def summarize(df):

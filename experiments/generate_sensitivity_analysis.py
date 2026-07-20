@@ -15,8 +15,8 @@ plt.rcParams.update({
 })
 
 # Load tabular results
-with open('results/fairness_pgd_results.json') as f:
-    results = json.load(f)
+from experiments.loaders import load_fairness_pgd_results
+results = load_fairness_pgd_results()
 
 # Group by (dataset, attack, alpha, method)
 from collections import defaultdict

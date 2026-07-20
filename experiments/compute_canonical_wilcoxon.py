@@ -53,15 +53,9 @@ OUT_MD  = os.path.join(RESULTS_DIR, "canonical_wilcoxon.md")
 
 
 def load_preferred() -> tuple[list[dict], str]:
-    if os.path.exists(CANONICAL_PATH):
-        with open(CANONICAL_PATH) as f:
-            rows = json.load(f)
-        return rows, f"canonical ({len(rows)} rows, 6 seeds expected)"
-    if os.path.exists(TAU1_FALLBACK):
-        with open(TAU1_FALLBACK) as f:
-            rows = json.load(f)
-        return rows, f"fallback tau_ablation_tau1 ({len(rows)} rows, n<=3 seeds)"
-    return [], "no data"
+    from experiments.loaders import load_canonical_tau1
+    rows = load_canonical_tau1()
+    return rows, f"canonical ({len(rows)} rows, 6 seeds expected)"
 
 
 def compute_wilcoxon(rows: list[dict]) -> pd.DataFrame:
