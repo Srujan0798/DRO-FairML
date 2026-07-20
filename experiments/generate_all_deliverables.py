@@ -10,8 +10,8 @@ This script creates the exact figures requested in the task:
 - figD5: Val-loss convergence (loss)
 - figD6: Val-loss convergence (accuracy)
 - figD7: Val-loss convergence (DP)
-- figD8: Lambda heatmap accuracy α=0.3
-- figD9: Lambda heatmap accuracy α=0.4
+- figD8: Lambda heatmap accuracy \alpha=0.3
+- figD9: Lambda heatmap accuracy \alpha=0.4
 - figD10: Wilcoxon significance table
 """
 
@@ -84,18 +84,18 @@ CONSTANT_PREDICTOR_ACC = constant_predictor_acc('adult')
 
 
 def load_results():
-    """Load all results from JSON files."""
+    """Load all results from JSON files (tau-ablation set, now archived)."""
     results = []
-    
+
     # Load tau ablation results
     tau_files = {
-        1: 'results/tau_ablation_tau1.json',
-        5: 'results/tau_ablation_tau5.json',
-        10: 'results/tau_ablation_tau10.json',
-        20: 'results/tau_ablation_tau20.json',
-        100: 'results/tau_ablation_tau100.json',
+        1: 'results/stale_archived/tau_ablation_tau1.json',
+        5: 'results/stale_archived/tau_ablation_tau5.json',
+        10: 'results/stale_archived/tau_ablation_tau10.json',
+        20: 'results/stale_archived/tau_ablation_tau20.json',
+        100: 'results/stale_archived/tau_ablation_tau100.json',
     }
-    
+
     for tau_val, path in tau_files.items():
         if os.path.exists(path):
             with open(path) as f:
@@ -103,32 +103,29 @@ def load_results():
                 for row in data:
                     row['tau'] = tau_val
                     results.append(row)
-    
+
     return results
 
 
 def load_high_alpha_summary():
-    """Load high_alpha_summary.csv."""
-    df = pd.read_csv('results/high_alpha_summary.csv')
-    return df
+    """Load high_alpha_summary.csv (archived)."""
+    return pd.read_csv('results/stale_archived/high_alpha_summary.csv')
 
 
 def load_tau1_summary():
-    """Load tau1_summary.csv."""
-    df = pd.read_csv('results/tau1_summary.csv')
-    return df
+    """Load tau1_summary.csv (archived)."""
+    return pd.read_csv('results/stale_archived/tau1_summary.csv')
 
 
 def load_lambda_grid():
-    """Load lambda_lr_grid.json."""
-    with open('results/lambda_lr_grid.json') as f:
+    """Load lambda_lr_grid.json (archived)."""
+    with open('results/stale_archived/lambda_lr_grid.json') as f:
         return json.load(f)
 
 
 def load_canonical_wilcoxon():
-    """Load canonical_wilcoxon.csv."""
-    df = pd.read_csv('results/canonical_wilcoxon.csv')
-    return df
+    """Load canonical_wilcoxon.csv (archived)."""
+    return pd.read_csv('results/stale_archived/canonical_wilcoxon.csv')
 
 
 def _ms(vals):
@@ -170,7 +167,7 @@ def _save(fig, name):
 
 
 def figD1_constant_predictor_accuracy():
-    """Plot 1: Constant predictor accuracy (Adult DP attack preferred): x=α, y=acc, lines for different tau + Naive + horizontal 0.752 line + caption about α≤0.2."""
+    """Plot 1: Constant predictor accuracy (Adult DP attack preferred): x=\alpha, y=acc, lines for different tau + Naive + horizontal 0.752 line + caption about \alpha≤0.2."""
     print("Generating figD1: Constant-predictor accuracy")
     
     fig, ax = plt.subplots(figsize=(8.5, 5.5))
@@ -219,21 +216,22 @@ def figD1_constant_predictor_accuracy():
     ax.axhline(y=CONSTANT_PREDICTOR_ACC, color='gray', linestyle='--', linewidth=1.5,
                label=f'Constant predictor ({CONSTANT_PREDICTOR_ACC})')
     
-    ax.set_xlabel(r"$lpha$ (corruption level)", fontsize=11)
+    ax.set_xlabel(r"$alpha$ (corruption level)", fontsize=11)
     ax.set_ylabel('Accuracy', fontsize=11)
-    ax.set_title('Constant-predictor accuracy figure (Adult, DP attack)\nx=$\alpha$ ; lines for τ + Naive + horiz 0.752', fontsize=12)
+    ax.set_title('Constant-predictor accuracy figure (Adult, DP attack)\n'
+                 r'x=$\alpha$ ; lines for $\tau$ + Naive + horiz 0.752', fontsize=12)
     ax.set_xticks(ALPHAS)
     ax.set_ylim(0.45, 0.86)
     ax.legend(loc='lower left', fontsize=8, ncol=2)
     ax.grid(True, alpha=0.25, linestyle='--')
     
-    cap = 'For α≤0.2 DRO (τ=1) stays near/above 0.752; α≥0.3 all variants drop below (use τ=1 for best DP in defensible regime).'
+    cap = 'For \alpha≤0.2 DRO (τ=1) stays near/above 0.752; \alpha≥0.3 all variants drop below (use τ=1 for best DP in defensible regime).'
     fig.text(0.5, 0.01, cap, ha='center', va='bottom', fontsize=9, style='italic')
     _save(fig, 'figD1_constant_predictor_accuracy')
 
 
 def figD2_constant_predictor_dp():
-    """Similar for DP: x=α, y=dp, lines different tau + Naive."""
+    """Similar for DP: x=\alpha, y=dp, lines different tau + Naive."""
     print("Generating figD2: Constant-predictor DP")
     fig, ax = plt.subplots(figsize=(8.5, 5.5))
     
@@ -266,7 +264,7 @@ def figD2_constant_predictor_dp():
                 ax.errorbar(xs, ys, yerr=yerr if any(e>0 for e in yerr) else None,
                             fmt=mmarker + mls, color=color, label=lbl,
                             capsize=2, markersize=5, linewidth=1.5)
-    ax.set_xlabel(r"$lpha$ (corruption level)", fontsize=11)
+    ax.set_xlabel(r"$alpha$ (corruption level)", fontsize=11)
     ax.set_ylabel('DP Violation', fontsize=11)
     ax.set_title(r"Constant-predictor DP (Adult, DP attack) x=$\alpha$", fontsize=12)
     ax.set_xticks(ALPHAS)
@@ -309,7 +307,7 @@ def figD3_constant_predictor_if():
                 ax.errorbar(xs, ys, yerr=yerr if any(e>0 for e in yerr) else None,
                             fmt=mmarker + mls, color=color, label=lbl,
                             capsize=2, markersize=5, linewidth=1.5)
-    ax.set_xlabel(r"$lpha$ (corruption level)", fontsize=11)
+    ax.set_xlabel(r"$alpha$ (corruption level)", fontsize=11)
     ax.set_ylabel('IF Violation', fontsize=11)
     ax.set_title(r"Constant-predictor IF (Adult, DP attack) x=$\alpha$", fontsize=12)
     ax.set_xticks(ALPHAS)
@@ -334,9 +332,9 @@ def figD4_tradeoff_vs_constant_predictor():
             dp = row['dp_mean']
             color = C_DRO if method == 'dro' else C_NAIVE
             marker = 's' if method == 'dro' else 'o'
-            lbl = f'{method.upper()} (τ=1, α={alpha})' if not plotted else None
+            lbl = f'{method.upper()} (τ=1, \alpha={alpha})' if not plotted else None
             ax.scatter(dp, acc, color=color, marker=marker, s=90, edgecolor='k', linewidth=0.5, label=lbl, alpha=0.85)
-            ax.annotate(f'α{alpha}', (dp, acc), xytext=(3,3), textcoords='offset points', fontsize=7)
+            ax.annotate(f'\alpha{alpha}', (dp, acc), xytext=(3,3), textcoords='offset points', fontsize=7)
             plotted = True
     
     ax.scatter(0, CONSTANT_PREDICTOR_ACC, marker='*', s=220, color='red', edgecolors='k', linewidth=1, label='Constant predictor (0, 0.752)', zorder=5)
@@ -349,7 +347,7 @@ def figD4_tradeoff_vs_constant_predictor():
     ax.set_xlim(-0.01, 0.4)
     ax.set_ylim(0.45, 0.86)
     
-    fig.text(0.5, 0.01, 'Constant predictor acc=0.752, DP~0 ; points below horiz line are degenerate at high α.', ha='center', fontsize=9, style='italic')
+    fig.text(0.5, 0.01, 'Constant predictor acc=0.752, DP~0 ; points below horiz line are degenerate at high \alpha.', ha='center', fontsize=9, style='italic')
     _save(fig, 'figD4_tradeoff_vs_constant_predictor')
 
 
@@ -361,7 +359,7 @@ def figD5_convergence_loss():
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Load individual result files
-    results_dir = 'results/individual'
+    results_dir = 'results/stale_archived/individual'
     epochs_data = {}
     
     for filename in os.listdir(results_dir):
@@ -383,12 +381,12 @@ def figD5_convergence_loss():
     # Plot convergence curves
     for (dataset, alpha, seed), history in epochs_data.items():
         if dataset == 'adult' and alpha in [0.3, 0.4]:
-            ax.plot(history, label=f'α={alpha}, seed={seed}')
+            ax.plot(history, label=f'\alpha={alpha}, seed={seed}')
     
     # Formatting
     ax.set_xlabel('Epoch', fontsize=12)
     ax.set_ylabel('Validation Loss', fontsize=12)
-    ax.set_title('Val-loss convergence (α=0.3, 0.4 DRO runs)', fontsize=14)
+    ax.set_title('Val-loss convergence (\alpha=0.3, 0.4 DRO runs)', fontsize=14)
     ax.legend(fontsize=8, ncol=2)
     ax.grid(True, alpha=0.3, linestyle='--')
     
@@ -402,7 +400,7 @@ def figD6_convergence_acc():
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Load individual result files
-    results_dir = 'results/individual'
+    results_dir = 'results/stale_archived/individual'
     epochs_data = {}
     
     for filename in os.listdir(results_dir):
@@ -423,12 +421,12 @@ def figD6_convergence_acc():
     # Plot convergence curves
     for (dataset, alpha, seed), history in epochs_data.items():
         if dataset == 'adult' and alpha in [0.3, 0.4]:
-            ax.plot(history, label=f'α={alpha}, seed={seed}')
+            ax.plot(history, label=f'\alpha={alpha}, seed={seed}')
     
     # Formatting
     ax.set_xlabel('Epoch', fontsize=12)
     ax.set_ylabel('Validation Accuracy', fontsize=12)
-    ax.set_title('Val-accuracy convergence (α=0.3, 0.4 DRO runs)', fontsize=14)
+    ax.set_title('Val-accuracy convergence (\alpha=0.3, 0.4 DRO runs)', fontsize=14)
     ax.legend(fontsize=8, ncol=2)
     ax.grid(True, alpha=0.3, linestyle='--')
     
@@ -442,7 +440,7 @@ def figD7_convergence_dp():
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Load individual result files
-    results_dir = 'results/individual'
+    results_dir = 'results/stale_archived/individual'
     epochs_data = {}
     
     for filename in os.listdir(results_dir):
@@ -463,12 +461,12 @@ def figD7_convergence_dp():
     # Plot convergence curves
     for (dataset, alpha, seed), history in epochs_data.items():
         if dataset == 'adult' and alpha in [0.3, 0.4]:
-            ax.plot(history, label=f'α={alpha}, seed={seed}')
+            ax.plot(history, label=f'\alpha={alpha}, seed={seed}')
     
     # Formatting
     ax.set_xlabel('Epoch', fontsize=12)
     ax.set_ylabel('Validation DP Violation', fontsize=12)
-    ax.set_title('Val-DP convergence (α=0.3, 0.4 DRO runs)', fontsize=14)
+    ax.set_title('Val-DP convergence (\alpha=0.3, 0.4 DRO runs)', fontsize=14)
     ax.legend(fontsize=8, ncol=2)
     ax.grid(True, alpha=0.3, linestyle='--')
     
@@ -476,8 +474,8 @@ def figD7_convergence_dp():
 
 
 def figD8_lambda_heatmap_acc_alpha0_3():
-    """Plot 8: Lambda heatmap accuracy α=0.3."""
-    print("Generating figD8: Lambda heatmap accuracy α=0.3")
+    """Plot 8: Lambda heatmap accuracy \alpha=0.3."""
+    print("Generating figD8: Lambda heatmap accuracy \alpha=0.3")
     
     fig, ax = plt.subplots(figsize=(10, 8))
     
@@ -485,7 +483,7 @@ def figD8_lambda_heatmap_acc_alpha0_3():
     lambda_data = load_lambda_grid()
     df = pd.DataFrame(lambda_data)
     
-    # Filter for α=0.3, attack=dp
+    # Filter for \alpha=0.3, attack=dp
     sub = df[(df['alpha'] == 0.3) & (df['attack'] == 'dp')]
     
     # Create pivot table
@@ -536,8 +534,8 @@ def figD8_lambda_heatmap_acc_alpha0_3():
 
 
 def figD9_lambda_heatmap_acc_alpha0_4():
-    """Plot 9: Lambda heatmap accuracy α=0.4."""
-    print("Generating figD9: Lambda heatmap accuracy α=0.4")
+    """Plot 9: Lambda heatmap accuracy \alpha=0.4."""
+    print("Generating figD9: Lambda heatmap accuracy \alpha=0.4")
     
     fig, ax = plt.subplots(figsize=(10, 8))
     
@@ -545,7 +543,7 @@ def figD9_lambda_heatmap_acc_alpha0_4():
     lambda_data = load_lambda_grid()
     df = pd.DataFrame(lambda_data)
     
-    # Filter for α=0.4, attack=dp
+    # Filter for \alpha=0.4, attack=dp
     sub = df[(df['alpha'] == 0.4) & (df['attack'] == 'dp')]
     
     # Create pivot table
@@ -608,7 +606,7 @@ def figD10_final_wilcoxon_table():
     
     # Create table data
     table_data = []
-    headers = ['Dataset', 'Attack', 'α', 'Acc p-value', 'DP p-value', 'IF p-value']
+    headers = ['Dataset', 'Attack', '\alpha', 'Acc p-value', 'DP p-value', 'IF p-value']
     
     for _, row in wilcoxon_df.iterrows():
         table_data.append([

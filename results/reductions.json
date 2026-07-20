@@ -1,0 +1,212 @@
+[
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "eval": "clean",
+    "dp_reduction": 4.3074801901611295,
+    "if_reduction": -17.004557598617026
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "eval": "corrupted",
+    "dp_reduction": 4.3074801901611295,
+    "if_reduction": -17.004557598617026
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "eval": "clean",
+    "dp_reduction": 1.3164363492892301,
+    "if_reduction": 12.597547380156069
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "eval": "corrupted",
+    "dp_reduction": 1.3164363492892301,
+    "if_reduction": 12.597547380156069
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "eval": "clean",
+    "dp_reduction": 4.835723379565813,
+    "if_reduction": -180.54919908466817
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "eval": "corrupted",
+    "dp_reduction": 4.835723379565813,
+    "if_reduction": -180.54919908466817
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "eval": "clean",
+    "dp_reduction": 8.226689004531654,
+    "if_reduction": 1.4218009478673048
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "eval": "corrupted",
+    "dp_reduction": 8.226689004531654,
+    "if_reduction": 1.4218009478673048
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "eval": "clean",
+    "dp_reduction": 9.079605789139782,
+    "if_reduction": 43.05418719211823
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "eval": "corrupted",
+    "dp_reduction": 9.079605789139782,
+    "if_reduction": 43.05418719211823
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "eval": "clean",
+    "dp_reduction": 6.3230845394472155,
+    "if_reduction": 100.0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "eval": "corrupted",
+    "dp_reduction": 6.3230845394472155,
+    "if_reduction": 100.0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "eval": "clean",
+    "dp_reduction": 11.267408698186653,
+    "if_reduction": 100.0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "eval": "corrupted",
+    "dp_reduction": 11.267408698186653,
+    "if_reduction": 100.0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "eval": "clean",
+    "dp_reduction": 9.88141816166015,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "eval": "corrupted",
+    "dp_reduction": 9.88141816166015,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "eval": "clean",
+    "dp_reduction": 9.865944049995717,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "eval": "corrupted",
+    "dp_reduction": 9.865944049995717,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "eval": "clean",
+    "dp_reduction": 10.75513609488126,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "eval": "corrupted",
+    "dp_reduction": 10.75513609488126,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "eval": "clean",
+    "dp_reduction": -26.36678481438069,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "eval": "corrupted",
+    "dp_reduction": -26.36678481438069,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "eval": "clean",
+    "dp_reduction": -15.352555030964051,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "eval": "corrupted",
+    "dp_reduction": -15.352555030964051,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "eval": "clean",
+    "dp_reduction": -22.065926958252543,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "eval": "corrupted",
+    "dp_reduction": -22.065926958252543,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "eval": "clean",
+    "dp_reduction": -21.52757116746571,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "eval": "corrupted",
+    "dp_reduction": -21.52757116746571,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "eval": "clean",
+    "dp_reduction": -21.022517696716935,
+    "if_reduction": 0
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "eval": "corrupted",
+    "dp_reduction": -21.022517696716935,
+    "if_reduction": 0
+  }
+]
