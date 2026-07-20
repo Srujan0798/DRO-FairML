@@ -569,8 +569,10 @@ confirm the radii remain sufficient on all three tabular datasets.
   \texttt{results/canonical\_tau1.json}).  The IF-attack third of the
   grid is pending a cluster re-run (earlier IF metrics were degenerate).
 \item \textbf{UTKFace blocked on GPU.}
-  The ``DRO inverts on image features'' claim from prior versions is
-  withdrawn until tau=1 UTKFace data exists.
+  No real UTKFace image experiment has been run; the prior reported
+  numbers were synthetic smoke tests (random Gaussian features).  The
+  ``DRO inverts on image features'' claim from prior versions is
+  withdrawn until real tau=1 UTKFace data exists.
 \end{enumerate}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -729,8 +731,9 @@ is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
   are not yet generated (cluster re-run pending after the IF-metric fix);
   the earlier IF metrics were degenerate ($\approx10^{-10}$).  The $k$-NN
   graph is insensitive to $k{\in}\{5,10,15\}$ (DP within ${\pm}0.003$).
-\item \textbf{GPU server issue:} Full UTKFace (200K image) experiments are
-  blocked pending GPU server access.  The earlier ``DRO inverts on image
+\item \textbf{GPU server issue:} UTKFace experiments are blocked pending
+  GPU server access; the only UTKFace outputs to date are synthetic smoke
+  tests (random Gaussian features), so the earlier ``DRO inverts on image
   features'' claim is withdrawn.
 \end{itemize}
 
@@ -765,8 +768,9 @@ The canonical DP+Combined grid is complete (360 rows); Adult and Credit
 at $\alpha\le0.2$ are the mature findings.  LSAC/Combined is a genuine win
 ($p{=}0.0156$); LSAC/DP is a degenerate negative result.  The IF-attack
 rows are pending a cluster re-run.  The UTKFace
-experiment is blocked on GPU access and the earlier ``DRO inverts on
-image features'' claim is withdrawn. Q5 empirical radii math in appendix (see also KULDEEP\_DISCUSSION.md).
+experiment is blocked on GPU access (no real run to date; prior numbers
+were synthetic smoke tests) and the earlier ``DRO inverts on image
+features'' claim is withdrawn. Q5 empirical radii math in appendix (see also KULDEEP\_DISCUSSION.md).
 
 \paragraph{Practical takeaway.}
 When deploying DRO-FAIR, fix the prediction temperature and re-validate

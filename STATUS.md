@@ -1,92 +1,85 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-06-27. Supersedes the archived handoff docs in `docs/archive/`._
+_Last updated: 2026-07-20. Supersedes all prior STATUS / handoff docs._
 
 ## 1. What this project is
-Implement **DRO-FAIR** (Algorithm 1, min-max Lagrangian with corruption-calibrated TV
-uncertainty sets) and show it is robust to **adversarial** fairness corruption, versus the
-**Naive-FAIR** baseline. Corruption is a **Fairness-Targeted PGD** attack (not random noise).
-Datasets: Adult, Credit, LSAC. Metrics: DP (demographic parity), IF (individual fairness), accuracy.
+Implement **DRO-FAIR** (min-max Lagrangian with corruption-calibrated TV uncertainty
+sets) and show it is robust to **adversarial** fairness corruption vs the **Naive-FAIR**
+baseline. Corruption is a **Fairness-Targeted PGD** attack (not random noise).
+Datasets: Adult, Credit, LSAC. Metrics: DP (demographic parity), IF (individual
+fairness), accuracy.
 
-Professor: Manisha Padala. Technical reviewer: Kuldeep. Trigger directive (Jun 2): *"Check the
-adversarial attack on DP and improve it. Then redo all experiments."*
+## 2. Canonical configuration (locked)
+| Param | Value |
+|-------|-------|
+| tau | 1.0 (fixed) — the old stepped tau=100 was the artifact that made DRO look fragile |
+| K_inner | 10 |
+| epochs | 60 |
+| pgd_steps | 20 |
+| seeds | 6 (n≥6 for Wilcoxon p<0.05) |
+| lambda_init | 0.0 |
+| radii_mode | uniform |
+| coordinated | False |
 
-## 2. Canonical configuration (locked — do not change)
-| Param | Value | Why |
-|-------|-------|-----|
-| tau | **1.0 fixed (all α)** | old stepped tau=100 was the artifact that made DRO look fragile (Q12) |
-| K_inner | **10** | paper-mandatory |
-| epochs | **60** | paper-mandatory |
-| pgd_steps | 20 | full attack strength |
-| seeds | **6** | n≥6 needed for Wilcoxon p<0.05 (Q9) |
-| lambda_init | 0.0 | paper spec; exposed only for Q1 ablation; NOT used in inner gradient |
-| lambda_max | 1.5 | all datasets |
-| radii_mode | uniform (main) / empirical (Q5 companion) | see §4 |
-| coordinated | **False** (main canonical) / **True** (empirical companion) | see §4 |
+**Grid actually completed: 3 datasets × 5 α × {DP, Combined} × 6 seeds × 2 methods =
+360 rows** in `results/canonical_tau1.json` (verify: `python3 -c "import json,collections;
+d=json.load(open('results/canonical_tau1.json')); print(len(d), collections.Counter(r['attack']
+for r in d))"`). The **IF-attack third (180 rows) was never generated** (the IF metric was
+degenerate, ~1e-10) and is cluster-blocked — see §7.
 
-Grid = 3 datasets × 5 α × 3 attacks × 2 methods × 6 seeds = **540 rows** → `results/canonical_tau1.json`.
+## 3. Verified results (n=6, read from canonical_tau1.json)
+- **Adult / DP:** DRO wins at every α (6/6), p ≤ 0.031.
+- **Adult / Combined:** 6/6 wins at every α, p = 0.016.
+- **Credit / DP + Combined:** DRO wins at essentially every cell, p < 0.05.
+- **LSAC / Combined:** genuine win, p = 0.016 at α = 0.1 / 0.3 / 0.4.
+- **LSAC / DP:** DEGENERATE NEGATIVE — DRO loses to Naive at every α (0/6 seeds); DRO DP is
+  *higher* (worse) than Naive; accuracy is pinned to the majority-class baseline (~0.90) and
+  Naive DP is frozen at 0.1827 for α ≥ 0.2. The model collapses to the constant predictor.
+  See `docs/LSAC_DEGENERACY.md`.
+- **Defensible regime: α ≤ 0.2** on Adult and Credit. At α ≥ 0.3 both methods fall *below* the
+  constant-predictor baseline (Adult 0.752, Credit 0.779, LSAC 0.902) → no method claim there.
+- **IF:** metric is fixed (cosine-based) in `src/evaluation/metrics.py`, but the 180 IF-attack
+  rows are NOT regenerated. IF cells currently read 0.0000 (degenerate pre-fix metric). **No IF
+  claim is made** until the cluster re-run.
 
-## 3. Verified-correct (audit 2026-06-27, line-by-line)
-- **Integration**: train on poisoned data, evaluate fairness on **clean test** — `run_fairness_pgd.py:80,102`.
-- **DP attack improved** (madam Jun 2): direct gradient ascent on |p0−p1|, NOT BCE — `adversarial.py:589`; exact analytical DP label-gradient — `adversarial.py:241`.
-- **IF attack** within-group k-NN (Q6), k∈{5,10,15} ablation — `adversarial.py:297`.
-- **DRO trainer**: tau-multiply `σ(τ·f)` (`dro_fair.py:289`); step order θ→λ→p (`:298-341`); λ NOT in inner gradient (`:327`); radii ρ_DP=α/((1−α)π+α), ρ_IF=2α−α² (`:103-107`); α=0 guard fixing the LSAC anomaly Q4 (`:321`).
-- **Tests**: 60/60 pass.
+## 4. Ablations
+Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dropped with
+written reasons; kNN retracted (was actually the Adult IF config, subsumed by the cluster
+re-run). None are part of the canonical claim.
 
-## 4. Q5 empirical radii — FIXED 2026-06-27 (commit 44c6a31)
-Earlier the empirical companion was a **no-op duplicate**: clean `a_val` always overrode
-`radii_mode` in `_compute_radii`, so empirical produced identical radii to uniform. Fixes:
-1. `_compute_radii`: empirical now takes precedence over `a_val` → the known-attack inversion
-   `pi_clean = pi_obs + 0.4α` actually computes the radii. Uniform/canonical path unchanged.
-2. `run_canonical_empirical.py`: `coordinated=True` (was False) — REQUIRED so the 70/30
-   minority-targeting matches the inversion assumption; otherwise it inverts the wrong attack.
-
-**Q5 result**: the empirical inversion recovers radii nearly identical to clean validation —
-i.e. *you don't need clean validation if you know the attack*. Standalone study, distinct from
-the coordinated=False main canonical.
-
-## 5. Headline result (real 6-seed canonical, Adult DP attack)
-DRO ≥ Naive on **both** DP and accuracy at **every** α. Advantage on DP grows with α.
-
-| α | naive DP | DRO DP | DRO acc | regime |
-|---|----------|--------|---------|--------|
-| 0.0 | 0.149 | 0.143 | 0.815 | ✅ acc≥0.78 |
-| 0.1 | 0.203 | 0.200 | 0.818 | ✅ acc≥0.78 |
-| 0.2 | 0.245 | 0.233 | 0.759 | ⚠ beats constant predictor (0.752), <0.78 |
-| 0.3 | 0.285 | 0.261 | 0.676 | ❌ below constant predictor |
-| 0.4 | 0.314 | 0.286 | 0.561 | ❌ below constant predictor |
-
-**Defensible regime = α≤0.2** (DRO beats the constant-label predictor). At α≥0.3 the constant
-predictor wins due to a 30–40% label-corruption ceiling — not fixable by tau or lambda
-(verified by full tau {1,5,10,20,100} and lambda {init×lr} ablations). Figures/report must state
-the acc≥0.78 bound holds strictly only to **α≤0.1**.
+## 5. UTKFace (image modality)
+**No real UTKFace image experiment has ever been run.** GPU access to flair2.iitgn.ac.in was
+never granted (the access request in `docs/EMAIL_TO_SUPIN_GOPI_DRAFT.txt` was drafted but
+never sent), so the pipeline substitutes `_make_synthetic_utkface` (random Gaussian 512-d
+features) when images are absent. The only UTKFace outputs were **synthetic smoke tests**, not
+a real GPU run, and the earlier "DRO inverts on image features" claim is withdrawn. Blocked /
+future work. (Full write-up moved to `docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md`.)
 
 ## 6. Deliverables status
 | Item | State |
 |------|-------|
-| Canonical 540 (uniform) | running — see `results/canonical_tau1.json` |
-| Empirical 270 (Q5, fixed config) | running — `results/canonical_tau1_empirical.json` |
-| Lambda grid Q1 (72) | ✅ done |
-| k-NN ablation Q6 (k=5/10/15, all datasets) | ✅ done (120 rows) |
-| tau ablation Q12 (1/5/10/20/100) | tau1/10/20/100 done; tau5 finishing |
-| n=6 Wilcoxon (all datasets) | auto-regen by orchestrator at 540 |
-| Final figures (from final canonical) | auto-regen by orchestrator at 540 |
-| Report + paper PDFs | rebuild clean (tectonic); auto-regen at 540 |
-| UTKFace (Q13) | **BLOCKED** — flair2.iitgn.ac.in unresponsive; Prof. aware (Jun 19); local smoke confirms pipeline |
+| Canonical (DP+Combined, 360 rows) | ✅ committed |
+| IF-attack third (180 rows) | ❌ cluster-blocked (G1) |
+| Tables / figures / both PDFs | ✅ regenerated from canonical (`make paper` / `make report`) |
+| Kuldeep correction note | ✅ `docs/KULDEEP_CORRECTION.md` (draft — human reviews & sends) |
+| UTKFace | ⛔ no real run; synthetic-only; blocked |
 
-## 7. How to run / recover
+## 7. What remains (only two items)
+1. **IF cluster re-run (G1):** generate the 180 IF-attack rows on a cluster
+   (`scripts/run_if_rerun_cluster.sh`, resume-safe — appends only missing keys), then
+   regenerate tables/figures/PDFs. ~15 h single-CPU; GPU not required. The IF metric code fix
+   is verified (`tests/test_metrics.py` pass).
+2. **UTKFace decision (human):** either send the flair2 access email or formally drop UTKFace
+   from scope.
+
+## 8. How to run / verify
 ```bash
-# Canonical (resume-safe)
-nohup python3 -u experiments/run_canonical.py > logs/canonical_resume.log 2>&1 &
-# Empirical companion (resume-safe, fixed config)
-nohup python3 -u experiments/run_canonical_empirical.py > logs/empirical_resume.log 2>&1 &
-# Orchestrator: polls canonical→540, then auto regen figures+wilcoxon+report+PDFs
-nohup bash scripts/final_delivery_orchestrator.sh > /dev/null 2>&1 &
-# Monitor
-python3 -c "import json;print(len(json.load(open('results/canonical_tau1.json'))),'/540')"
+make paper && make report     # rebuild both PDFs from canonical
+make validate                 # Wilcoxon: DP wins 6/9 at p<0.05; LSAC not significant; IF=0.0000
+make results && make deliverables   # regenerate tables + figures
 ```
 
-## 8. Constraints
+## 9. Constraints
 - Private repo, professor only. No publicity.
 - No oracle leak: DRO knows only α (+ known attack structure for empirical radii) — never the
   true per-sample corruption mask.

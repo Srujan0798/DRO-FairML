@@ -126,19 +126,17 @@ the DP-targeted and Combined attacks (verified in
 \texttt{results/canonical\_tau1.json}).  The DP+Combined attack grid is
 complete (360 rows); the IF-attack third is pending a cluster re-run.
 
-\subsection{Image data (UTKFace)}
+\subsection{Image data (UTKFace) --- future work, no real run to date}
 \label{sec:results-utkface}
 
-The UTKFace experiment is the third task of the project but is
-\textbf{blocked on GPU access} to \texttt{flair2.iitgn.ac.in}
-(\texttt{SERVER\_RUNBOOK.md} documents the credentials / SSL issue).
-Until that is unblocked, the modality question (DRO vs.\ Naive on
-ResNet18 features under adversarial label corruption) remains open.
-We therefore \emph{withdraw} the earlier ``DRO inverts on image
-features'' claim from prior versions of this section; the data that
-supported it was generated under the $\tau{=}100$ schedule and we
-have no tau=1 UTKFace results yet.  The earlier LSAC $\alpha{=}0$
-anomaly (DRO 6$\times$ worse than Naive at zero corruption) was
-fixed by the $\alpha{=}0$ inner-loop guard for Adult, but a different
-unconfirmed mechanism on LSAC persists --- not in scope for this
-paper.
+UTKFace is the third task of the project but \textbf{no real UTKFace
+image experiment has ever been run}.  GPU access to
+\texttt{flair2.iitgn.ac.in} was never granted (the access request was
+drafted but never sent), so the pipeline substitutes
+\texttt{\_make\_synthetic\_utkface} --- random Gaussian 512-d features
+--- whenever real images are absent.  The only UTKFace outputs produced
+to date are therefore \emph{synthetic smoke tests}, not a real GPU run,
+and the prior ``DRO inverts on image features'' claim is
+\emph{withdrawn}.  The modality question (DRO vs.\ Naive on ResNet18
+features under adversarial label corruption) remains open pending real
+image data.
