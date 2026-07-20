@@ -83,22 +83,29 @@ Adult and Credit are clean, complete, and genuinely positive at n=6:
 
 ## 0.5 PROGRESS (2026-07-20, end of session)
 
+**CORRECTION:** the canonical grid is **360 rows (DP + Combined attacks only)** at `k_inner=10`,
+6 seeds — the IF-attack third (180 rows) was **never generated** (its IF metric was
+degenerate pre-fix), so it is cluster-blocked. The "540-row completed grid" framing in §0
+assumed IF rows existed; they did not. All regeneration below is against the 360-row truth.
+
 | Agent | Status | Notes |
 |---|---|---|
-| F | **DONE** (commit `1e4e35d`) | Deletions, untrack, moves, τ-zombie→`src/temperature.py`, dead-code removal. 62 tests pass. |
-| E | **DONE (written)** | `docs/ABLATION_STATUS_REPORT.md`: tau/lambda/random-vs-adv formally scoped or dropped; empirical radii deferred. kNN **backfill in progress** (36 Adult rows, k=5/k=15, PIDs 100/101) — writes `results/canonical_tau1.json` at completion. |
-| A | **DONE (code) — 180-row IF re-run BLOCKED on cluster** | `compute_if_violation` uses cosine (constant→0.0, unfair→0.28 on real Adult); IF attack gradient aligned (`max(0,1-d-γ)`, global k-NN); regression tests in `tests/test_metrics.py` pass. DP/Combined rows NOT re-run. |
-| B | **DONE** (commit `3f1e9a3`) | `docs/LSAC_DEGENERACY.md`: LSAC/DP degenerate (radii-on-imbalanced artifact); LSAC/Combined kept as genuine win; α=0 anomaly flagged. |
-| D | **DONE** (commit `3f1e9a3`) | `README.md` + `KULDEEP_DISCUSSION.md` scoped to α≤0.2/Adult+Credit; LSAC/DP degenerate + α≥0.3 below-baseline caveats; IF flagged degenerate/pre-fix. |
-| C | **DONE (DP/Combined); IF figures pending cluster** (commit `f8d3bb4` + figures commit) | Step 1 done. Step 2 done (`generate_report_tables.py`). Step 3 done (`fe8f960`). Step 4 DONE for DP/Combined: added `experiments/canonical_to_all_results.py` (flat canonical → nested `all_results.json`, DP attack) and ran `generate_figures.py` to regenerate fig1–fig7 from canonical; `paper/main.pdf` + `report/report.pdf` rebuilt with tectonic. IF-attack panels still pending the cluster IF re-run (Agent A5). Step 5 done (`constant_predictor_acc`). Step 6 done (stale archived). |
-| D | **DONE** (commit `3f1e9a3` README/KULDEEP + `f8d3bb4` paper/report LaTeX) | Claims scoped to α≤0.2/Adult+Credit; LSAC/DP degenerate; IF withdrawn pending re-run; n=3→n=6; archived-file references removed; PDFs rebuilt. |
+| F | **DONE** (`1e4e35d`) | Deletions, untrack, moves, τ-zombie→`src/temperature.py`, dead-code removal; 62 tests pass. |
+| E | **DONE (written)** | `docs/ABLATION_STATUS_REPORT.md`: tau/lambda/random-vs-adv dropped; kNN backfill retracted (was actually the Adult IF config, subsumed by Agent A cluster run). |
+| A | **DONE (code) — 180-row IF re-run BLOCKED on cluster** | `compute_if_violation` cosine-based (constant→0.0, unfair→0.28 on real Adult); IF attack gradient aligned (`max(0,1-d-γ)`, global k-NN); `tests/test_metrics.py` pass. Cluster job ready at `scripts/run_if_rerun_cluster.sh`. DP/Combined rows NOT re-run. |
+| B | **DONE** (`3f1e9a3`) | `docs/LSAC_DEGENERACY.md`: LSAC/DP degenerate (radii-on-imbalanced artifact); LSAC/Combined genuine win; α=0 anomaly flagged. |
+| D | **DONE** (`3f1e9a3` + `f8d3bb4`) | README/KULDEEP scoped to α≤0.2/Adult+Credit; LSAC/DP degenerate; IF withdrawn pending re-run; n=3→n=6; archived refs removed; PDFs rebuilt. |
+| C | **DONE (local) — IF figures pending cluster** (`f8d3bb4`+`c156628`+`324e148`) | canonical committed (360 dp/combined). `generate_report_tables.py` from canonical. `loaders.py` + 2 named landmines + 8 readers fixed; writers repointed. Figures: fig1–fig7 via `canonical_to_all_results.py`+`generate_figures.py`; figD1–D10 via `generate_all_deliverables.py` (repointed to `stale_archived/`, `0.752`→`constant_predictor_acc`). Stale results archived (C6). `make results`/`deliverables`/`validate`/`paper`/`report` all pass. Obsolete orchestrators + stale-loaders moved to `experiments/_archive/`. |
 
 **Cluster-blocked (cannot complete on this CPU box — each IF config ≈5 min; 180 configs ≈15 h):**
-- **Agent A step 5:** re-run the IF-attack third of the grid (180 rows) with the fixed metric; write to `results/canonical_tau1.json`. Validated that `run_fairness_pgd.py --datasets <ds> --attacks if --alphas <a> --methods naive dro --n_seeds 6` produces non-trivial IF rows on CPU, but the full sweep needs the cluster.
-- **Agent C step 4 figures:** regenerate all figures from `canonical_tau1.json` (DP/Combined now; IF after A). The legacy `generate_all_deliverables.py` must be repointed off the archived `tau_ablation_*`/`individual/` inputs first.
-- **Agent E kNN backfill:** the earlier backfill was actually the Adult IF config (k_inner is hardcoded 10); it is subsumed by the Agent A IF re-run. Re-run under canonical config on the cluster.
+- **Agent A step 5:** re-run the IF-attack third (180 rows) with the fixed metric; append to `results/canonical_tau1.json`. `scripts/run_if_rerun_cluster.sh` is written, resume-safe, and regenerates tables/figures/PDFs after the run. Validated on CPU that the fixed metric yields non-trivial IF rows; the full sweep needs the cluster.
+- **Agent C IF-attack panels:** regen fig1 IF-attack panel + IF Wilcoxon tables after the A cluster run. All DP/Combined figures/tables/PDFs already rebuilt from canonical.
 
-**Verify:** `load_fairness_pgd_results()` raises on the contaminated 270-row file; `load_canonical_tau1()` returns the clean 360-row DP+Combined grid (k_inner=10); `make paper` and `make report` build.
+**Verify (current):**
+- `load_fairness_pgd_results()` raises on the contaminated 270-row file.
+- `load_canonical_tau1()` returns the clean 360-row DP+Combined grid (`k_inner=10`).
+- `make validate` → **PASS** (DP wins 6/9 at p<0.05; LSAC NOT significant; IF = 0.0000, i.e. degenerate-metric confirmed).
+- `make paper` / `make report` build with tectonic; `make deliverables` regenerates figD1–D10.
 
 ---
 
