@@ -8,11 +8,13 @@ Dataset & Samples & Features & Protected & Task \\
 Adult & 45,222 & 12 & Sex & Income $>$50K \\
 Credit & 30,000 & 22 & Sex & Default \\
 LSAC & 18,692 & 10 & Sex & Bar passage \\
-UTKFace & 23,705 & 512 (ResNet18) & Sex (binary) & Age $>$ 25 \\
+UTKFace & 23,705 & 512 (ResNet18) & Sex (binary) & Age $>$ 25 (not run) \\
 \bottomrule
 \end{tabular}
-\caption{Datasets used in evaluation.  UTKFace results are pending GPU
-access (\texttt{SERVER\_RUNBOOK.md}).}
+\caption{Datasets planned for evaluation.  Only Adult, Credit and LSAC
+were actually run; UTKFace is \textbf{blocked on GPU access}
+(\texttt{SERVER\_RUNBOOK.md}) and was \emph{not} evaluated --- the
+earlier ``DRO inverts on image features'' claim is withdrawn.}
 \label{tab:datasets}
 \end{table}
 
@@ -20,8 +22,9 @@ access (\texttt{SERVER\_RUNBOOK.md}).}
 We compare Naive-FAIR (fixed Lagrange multiplier) vs.\ DRO-FAIR
 (adaptive worst-case reweighting within a TV uncertainty set).
 Attacks: DP-only, IF-only, Combined, with $\alpha\in\{0.0, 0.1, 0.2,
-0.3, 0.4\}$ (tabular) and $\alpha\in\{0.0, 0.1, 0.2\}$ (UTKFace, when
-unblocked).  The canonical $\tau{=}1$, $k_{\mathrm{inner}}{=}10$ grid
+0.3, 0.4\}$ (tabular).  UTKFace was \textbf{not} run (blocked on GPU access);
+if pursued, it would use $\alpha\in\{0.0, 0.1, 0.2\}$.  The canonical
+$\tau{=}1$, $k_{\mathrm{inner}}{=}10$ grid
 uses $n{=}6$ seeds (0--5) and achieves Wilcoxon $p{<}0.05$ at
 $\alpha\le0.2$ on Adult and Credit under the DP-targeted and Combined
 attacks.

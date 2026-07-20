@@ -1,3 +1,17 @@
+================================================================================
+STATUS (added by AGENT G2, 2026-07-20): DRAFTED BUT NEVER SENT. DO NOT SEND.
+--------------------------------------------------------------------------------
+This email was never sent to supin.gopi and the flair2 GPU account was never
+granted. Consequently, no real UTKFace image experiment was ever run; the
+numbers in docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md are synthetic
+(random-Gaussian smoke test) and the derived figures have been deleted.
+
+DECISION PENDING HUMAN REVIEW: Given UTKFace is now confirmed blocked/synthetic,
+decide whether to (a) formally drop UTKFace from scope (note in STATUS.md), or
+(b) still send this request to unblock a real run. Do NOT send without that
+decision. Left in place for the human to act on.
+================================================================================
+
 Subject: Request for GPU account on flair2.iitgn.ac.in for UTKFace DRO-FairML experiments (IITGN, under Prof. Manisha Padala)
 
 Dear Supin,
