@@ -1,12 +1,14 @@
 adult DP-attack | constant-predictor baseline acc=0.752
 alpha=0.0 tau=1: 1 |    0.817   0.1457 |     0.815   0.1520 | OK
+alpha=0.0 tau=10: 10 |    0.815   0.1693 |     0.813   0.1590 | OK
+alpha=0.0 tau=100: 100 |    0.815   0.1694 |     0.813   0.1576 | OK
 alpha=0.1 tau=1: 1 |    0.819   0.2046 |     0.818   0.2068 | OK
-alpha=0.1 tau=10: 10 |    0.819   0.2231 |     0.818   0.1850 | OK
-alpha=0.1 tau=100: 100 |    0.820   0.2033 |     0.818   0.1801 | OK
+alpha=0.1 tau=10: 10 |    0.819   0.2231 |     0.817   0.1820 | OK
+alpha=0.1 tau=100: 100 |    0.820   0.2033 |     0.817   0.1760 | OK
 alpha=0.2 tau=1: 1 |    0.755   0.2371 |     0.753   0.2480 | OK
 alpha=0.2 tau=10: 10 |    0.750   0.4634 |     0.777   0.3382 | DEGENERATE
 alpha=0.2 tau=100: 100 |    0.749   0.5030 |     0.774   0.3271 | DEGENERATE
-alpha=0.3 tau=1: 1 |    0.679   0.2640 |     0.670   0.2855 | DEGENERATE
+alpha=0.3 tau=1: 1 |    0.679   0.2640 |     0.667   0.2848 | DEGENERATE
 alpha=0.3 tau=10: 10 |    0.676   0.5532 |     0.666   0.5253 | DEGENERATE
 alpha=0.3 tau=100: 100 |    0.675   0.5622 |     0.663   0.5313 | DEGENERATE
 alpha=0.4 tau=1: 1 |    0.558   0.2834 |     0.547   0.3101 | DEGENERATE
