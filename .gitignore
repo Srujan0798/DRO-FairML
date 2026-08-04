@@ -101,3 +101,7 @@ logs/*_paused.txt
 # Large local image dumps (features npz is enough)
 data/raw/utkface/
 data/raw/**/UTKFace/
+
+# Offline pip wheel caches (flair2 GPU setup) — never commit these
+wheelhouse/
+*.whl
