@@ -1,6 +1,6 @@
-# UTKFace multi-group (5-race) summary — PARTIAL
+# UTKFace multi-group (5-race) summary
 
-rows: **27/30**
+rows: **30/30**
 
 wins = DRO strict lower DP; ties if |N−D| < 1e-5 (not counted as wins).
 
@@ -10,7 +10,7 @@ wins = DRO strict lower DP; ties if |N−D| < 1e-5 (not counted as wins).
 | 0.1 | 6 | 0.0480 | 0.0519 | 0/0/6 | 0.1319 | 0.1283 | 4/0/6 | +0.0037 |
 | 0.2 | 6 | 0.1572 | 0.1590 | 2/0/6 | 0.2256 | 0.2218 | 5/0/6 | +0.0038 |
 | 0.3 | 6 | 0.1832 | 0.1808 | 4/0/6 | 0.2417 | 0.2368 | 5/1/6 | +0.0049 |
-| 0.4 | 3 | 0.2264 | 0.2152 | 3/0/3 | 0.2774 | 0.2603 | 3/0/3 | +0.0170 |
+| 0.4 | 6 | 0.2230 | 0.2136 | 6/0/6 | 0.2742 | 0.2606 | 6/0/6 | +0.0136 |
 
 ### DRO group positive rates (mean over seeds)
 
@@ -18,15 +18,18 @@ wins = DRO strict lower DP; ties if |N−D| < 1e-5 (not counted as wins).
 - α=0.1 n=6: max **Other** 0.544 / min **White** 0.416 — {'White': 0.416, 'Black': 0.433, 'Asian': 0.514, 'Indian': 0.437, 'Other': 0.544}
 - α=0.2 n=6: max **Other** 0.510 / min **White** 0.288 — {'White': 0.288, 'Black': 0.418, 'Asian': 0.484, 'Indian': 0.423, 'Other': 0.51}
 - α=0.3 n=6: max **Other** 0.537 / min **White** 0.301 — {'White': 0.301, 'Black': 0.457, 'Asian': 0.521, 'Indian': 0.452, 'Other': 0.537}
-- α=0.4 n=3: max **Asian** 0.582 / min **White** 0.321 — {'White': 0.321, 'Black': 0.522, 'Asian': 0.582, 'Indian': 0.496, 'Other': 0.579}
+- α=0.4 n=6: max **Asian** 0.584 / min **White** 0.323 — {'White': 0.323, 'Black': 0.518, 'Asian': 0.584, 'Indian': 0.502, 'Other': 0.576}
 
-### Per-seed multi @ α=0.4 (n=3)
+### Per-seed multi @ α=0.4 (n=6)
 
 - s0: multi N=0.2659 D=0.2558 → **DRO** (bin N=0.2206 D=0.2126 → DRO)
 - s1: multi N=0.2814 D=0.2564 → **DRO** (bin N=0.2326 D=0.2180 → DRO)
 - s2: multi N=0.2849 D=0.2688 → **DRO** (bin N=0.2262 D=0.2149 → DRO)
-- bin↔multi winner agreement: **3/3** (disagreements=0; multi max-min can flip vs binary White/non-White)
+- s3: multi N=0.2794 D=0.2723 → **DRO** (bin N=0.2289 D=0.2227 → DRO)
+- s4: multi N=0.2587 D=0.2543 → **DRO** (bin N=0.2082 D=0.2056 → DRO)
+- s5: multi N=0.2752 D=0.2559 → **DRO** (bin N=0.2217 D=0.2074 → DRO)
+- bin↔multi winner agreement: **6/6** (disagreements=0; multi max-min can flip vs binary White/non-White)
 
 Protocol: train DP on binary race (White vs non-White); eval max-min DP on 5 race groups.
 REAL ResNet18 features. device=cuda flair2.
-**PARTIAL** — not for paper claims until 30/30.
+Grid complete (30/30). Human review before paper integration.

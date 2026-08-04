@@ -1321,5 +1321,152 @@
       }
     },
     "total_time": 139.12596321105957
+  },
+  {
+    "dataset": "utkface",
+    "alpha": 0.4,
+    "seed": 3,
+    "attack": "dp",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "data_provenance": "REAL",
+    "protected_train": "race_binary_White_vs_nonWhite",
+    "protected_eval_multi": "race_5way",
+    "race_names": {
+      "0": "White",
+      "1": "Black",
+      "2": "Asian",
+      "3": "Indian",
+      "4": "Other"
+    },
+    "naive": {
+      "acc": 0.7814807002742038,
+      "dp_binary": 0.22886082530021667,
+      "dp_multigroup": 0.27936485409736633,
+      "if_cosine": 0.10176314413547516,
+      "group_pos_rates": {
+        "White": 0.31880196928977966,
+        "Black": 0.5303333401679993,
+        "Asian": 0.598166823387146,
+        "Indian": 0.5139144062995911,
+        "Other": 0.5732539892196655
+      }
+    },
+    "dro": {
+      "acc": 0.7789495886943683,
+      "dp_binary": 0.22272837162017822,
+      "dp_multigroup": 0.2722931504249573,
+      "if_cosine": 0.08272263407707214,
+      "group_pos_rates": {
+        "White": 0.32034069299697876,
+        "Black": 0.5273639559745789,
+        "Asian": 0.592633843421936,
+        "Indian": 0.5098217725753784,
+        "Other": 0.5650095343589783
+      }
+    },
+    "total_time": 138.74358439445496
+  },
+  {
+    "dataset": "utkface",
+    "alpha": 0.4,
+    "seed": 4,
+    "attack": "dp",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "data_provenance": "REAL",
+    "protected_train": "race_binary_White_vs_nonWhite",
+    "protected_eval_multi": "race_5way",
+    "race_names": {
+      "0": "White",
+      "1": "Black",
+      "2": "Asian",
+      "3": "Indian",
+      "4": "Other"
+    },
+    "naive": {
+      "acc": 0.7861210715039021,
+      "dp_binary": 0.20817852020263672,
+      "dp_multigroup": 0.2586809992790222,
+      "if_cosine": 0.0969064012169838,
+      "group_pos_rates": {
+        "White": 0.3297591805458069,
+        "Black": 0.5044647455215454,
+        "Asian": 0.5884401798248291,
+        "Indian": 0.5138934254646301,
+        "Other": 0.5818209648132324
+      }
+    },
+    "dro": {
+      "acc": 0.7871757013288336,
+      "dp_binary": 0.20564252138137817,
+      "dp_multigroup": 0.2543105483055115,
+      "if_cosine": 0.0795838013291359,
+      "group_pos_rates": {
+        "White": 0.3287211060523987,
+        "Black": 0.5028461217880249,
+        "Asian": 0.5830316543579102,
+        "Indian": 0.5111116766929626,
+        "Other": 0.5749660730361938
+      }
+    },
+    "total_time": 139.13411712646484
+  },
+  {
+    "dataset": "utkface",
+    "alpha": 0.4,
+    "seed": 5,
+    "attack": "dp",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "data_provenance": "REAL",
+    "protected_train": "race_binary_White_vs_nonWhite",
+    "protected_eval_multi": "race_5way",
+    "race_names": {
+      "0": "White",
+      "1": "Black",
+      "2": "Asian",
+      "3": "Indian",
+      "4": "Other"
+    },
+    "naive": {
+      "acc": 0.7808479223792448,
+      "dp_binary": 0.22169944643974304,
+      "dp_multigroup": 0.27516719698905945,
+      "if_cosine": 0.09468303620815277,
+      "group_pos_rates": {
+        "White": 0.3227477967739105,
+        "Black": 0.520239531993866,
+        "Asian": 0.59791499376297,
+        "Indian": 0.5076372623443604,
+        "Other": 0.5886183381080627
+      }
+    },
+    "dro": {
+      "acc": 0.7859101455389158,
+      "dp_binary": 0.20744934678077698,
+      "dp_multigroup": 0.25587329268455505,
+      "if_cosine": 0.0691043809056282,
+      "group_pos_rates": {
+        "White": 0.3260543644428253,
+        "Black": 0.5085747838020325,
+        "Asian": 0.5819276571273804,
+        "Indian": 0.5010225772857666,
+        "Other": 0.580418050289154
+      }
+    },
+    "total_time": 171.21370244026184
   }
 ]

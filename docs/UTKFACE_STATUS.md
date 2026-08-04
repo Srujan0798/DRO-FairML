@@ -1,6 +1,6 @@
 # UTKFace Status
 
-**Updated:** 2026-08-05 ~05:04 IST (Grok lane)  
+**Updated:** 2026-08-05 ~05:20 IST (Grok lane)  
 
 ## Mac MPS canonical (LOCKED — paper pilot)
 **Grid: COMPLETE 90/90 REAL.** Summary: `results/utkface_summary.md`.
@@ -19,12 +19,22 @@
 ## flair2 CUDA (LIVE — Grok lane)
 | Job | File | Target | Status |
 |-----|------|--------|--------|
-| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **25/90** — dp α=0.0–0.3 complete; α=0.4 seed 0 done, s1+ running |
-| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **24/30** — α=0.0–0.3 complete; α=0.4 s0 running |
-| **U3** pixel PGD | `results/utkface_pixel_pgd.json` | 24 (planned) | **JPEGs ready** (symlink 23708); launch after U1/U2 free GPU |
+| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **35/90** — dp **30/30**; if α=0.0 in progress |
+| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **COMPLETE 30/30** — summary ready |
+| **U3** pixel PGD | `results/utkface_pixel_pgd.json` | 24 | **RUNNING** GPU1 (PID 3504795); seed0 α=0.1 |
 
-- Repro: **25** matched, max\|ΔDP clean\| **0.0072** (outlier dp α=0.1 s1); **0 GAP** thr=0.02. Summary: `results/utkface_reproducibility_summary.md`
-- Multi-group: α=0.3 multi **5/1/6** DRO/tie/n; bin↔multi agreement 4/6. Summary: `results/utkface_multigroup_summary.md`
-- U1 log empty (known); JSON SoT — **do not restart**
-- U3: linked `/data/srujan.sai/UTKFace` → kshitish tree; do not launch until U1/U2 done
+### U2 headline (complete — not yet paper-integrated)
+| α | multi wins (D/tie/n) | mean Δmulti (N−D) | bin wins |
+|---|---------------------:|------------------:|---------:|
+| 0.0 | 6/0/6 | +0.0073 | 3/0/6 |
+| 0.1 | 4/0/6 | +0.0037 | 0/0/6 |
+| 0.2 | 5/0/6 | +0.0038 | 2/0/6 |
+| 0.3 | 5/1/6 | +0.0049 | 4/0/6 |
+| 0.4 | 6/0/6 | +0.0136 | 6/0/6 |
+
+Multi max-min DRO advantage holds; binary White/non-White is weaker (especially α=0.1).  
+At high α, gap driven by **White** (min ~0.32) vs **Asian/Other** (max ~0.58).
+
+- Repro: **35** matched, **0 GAP** thr=0.02. Summary: `results/utkface_reproducibility_summary.md`
+- Multi-group: `results/utkface_multigroup_summary.md` (**30/30**)
 - Live table: `docs/WAVE1_LIVE_PROGRESS.md`
