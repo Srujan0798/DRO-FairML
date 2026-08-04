@@ -1,0 +1,30 @@
+#!/bin/bash
+cd /Users/srujansai/Desktop/DRO-FairML
+export PYTHONUNBUFFERED=1
+LOG=logs/utkface_canonical_run.log
+OUT=results/utkface_canonical.json
+PIDFILE=logs/utkface_canonical.pid
+TARGET=90
+while true; do
+  N=$(python3 -c "import json;print(len(json.load(open('$OUT'))))" 2>/dev/null || echo 0)
+  echo "$(date) rows=$N" >> logs/utkface_watchdog.log
+  if [ "$N" -ge "$TARGET" ]; then
+    echo "$(date) DONE $N" >> logs/utkface_watchdog.log
+    exit 0
+  fi
+  if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+    sleep 60
+    continue
+  fi
+  echo "$(date) restarting runner (rows=$N)" >> logs/utkface_watchdog.log
+  python3 -u experiments/run_utkface_server.py \
+    --attacks dp if combined \
+    --alphas 0.0 0.1 0.2 0.3 0.4 \
+    --n_seeds 6 \
+    --tau 1.0 --k_inner 10 --epochs 60 --pgd_steps 20 \
+    --device mps \
+    --output "$OUT" \
+    >> "$LOG" 2>&1 < /dev/null &
+  echo $! > "$PIDFILE"
+  sleep 90
+done

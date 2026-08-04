@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""
+Agent H helper — list every prose / table location that still claims IF is
+pending, cluster-blocked, or shows degenerate 0.0000 IF cells.
+
+Scopes (per FINAL_COMPLETION_PLAN Agent H):
+  paper/, report/, STATUS.md, docs/KULDEEP_CORRECTION.md
+Also flags README.md hits that say "IF pending" (common stale claim).
+
+Does NOT edit files — inventory only, so a human/agent can patch after the
+real IF numbers land.
+
+Usage:
+  python3 scripts/agent_h_reconcile_prose.py
+  python3 scripts/agent_h_reconcile_prose.py --json   # machine-readable
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+# Directories / files to scan
+SCAN_TARGETS = [
+    ROOT / "paper",
+    ROOT / "report",
+    ROOT / "STATUS.md",
+    ROOT / "docs" / "KULDEEP_CORRECTION.md",
+    ROOT / "README.md",  # often restates IF pending
+]
+
+# Patterns that indicate stale IF narrative / tables
+# (line-level; case-insensitive where noted)
+PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+    ("IF pending", re.compile(r"IF[-\s]?pending|pending\s+(?:a\s+)?(?:cluster\s+)?(?:re-?)?run|pending\s+IF", re.I)),
+    ("cluster-blocked", re.compile(r"cluster[- ]blocked|cluster\s+re-?run|waiting on a cluster|cluster compute", re.I)),
+    ("0.0000 IF cell", re.compile(r"0\.0000\s*\\?\\?pm\s*0\.0000|0\.0000\s*\$\\pm\$\s*0\.0000|0\.0000\s*\\pm\s*0\.0000|0\.0000\s*±\s*0\.0000")),
+    ("IF cells 0.0000 prose", re.compile(r"IF cells currently read 0\.0000|IF\s*=\s*0\.0000|if_clean\s*=\s*0\.0000|IF=0\.0000", re.I)),
+    ("360 rows / IF third missing", re.compile(r"360\s+rows|IF-attack third|IF-attack rows are (?:not yet|pending)|not yet generated.*IF|IF.*not yet been run", re.I)),
+    ("degenerate IF metric (stale claim)", re.compile(r"IF metric was degenerate|earlier IF metrics were degenerate|degenerate,?\s*~?\s*(?:≈|\\approx)?\s*10\^?\{?-?10\}?|1e-10", re.I)),
+    ("IF results withdrawn/pending", re.compile(r"IF-attack results are (?:pending|withdrawn)|no IF claim|no valid IF results|IF attack is pending", re.I)),
+]
+
+# Auto-generated table fragments that get rewritten by generate_report_tables.py
+# — still list them so the operator knows they refresh via the pipeline.
+AUTO_REFRESH = {
+    "report/sections/auto_generated_main_results.tex",
+    "paper/auto_generated/key_findings.tex",
+}
+
+SKIP_DIR_NAMES = {".git", "_archive", "stale_archived", "__pycache__", "venv", ".venv"}
+TEXT_SUFFIXES = {".md", ".tex", ".txt", ".rst"}
+
+
+def iter_files() -> list[Path]:
+    files: list[Path] = []
+    for t in SCAN_TARGETS:
+        if not t.exists():
+            continue
+        if t.is_file():
+            files.append(t)
+            continue
+        for dirpath, dirnames, filenames in os.walk(t):
+            dirnames[:] = [d for d in dirnames if d not in SKIP_DIR_NAMES]
+            for fn in filenames:
+                p = Path(dirpath) / fn
+                if p.suffix.lower() in TEXT_SUFFIXES:
+                    files.append(p)
+    return sorted(set(files))
+
+
+def scan_file(path: Path) -> list[dict]:
+    hits: list[dict] = []
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError as e:
+        return [{"file": str(path), "line": 0, "tag": "read_error", "snippet": str(e)}]
+    rel = str(path.relative_to(ROOT))
+    for i, line in enumerate(text.splitlines(), start=1):
+        for tag, pat in PATTERNS:
+            if pat.search(line):
+                hits.append({
+                    "file": rel,
+                    "line": i,
+                    "tag": tag,
+                    "auto_refresh": rel in AUTO_REFRESH,
+                    "snippet": line.strip()[:200],
+                })
+                break  # one tag per line is enough
+    return hits
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--json", action="store_true", help="Emit JSON")
+    ap.add_argument(
+        "-o", "--out",
+        default=None,
+        help="Optional write path for the inventory (default: stdout only)",
+    )
+    args = ap.parse_args()
+
+    all_hits: list[dict] = []
+    for f in iter_files():
+        all_hits.extend(scan_file(f))
+
+    # Group by file for human output
+    by_file: dict[str, list[dict]] = {}
+    for h in all_hits:
+        by_file.setdefault(h["file"], []).append(h)
+
+    if args.json:
+        payload = {
+            "n_hits": len(all_hits),
+            "n_files": len(by_file),
+            "hits": all_hits,
+            "files": sorted(by_file.keys()),
+        }
+        out = json.dumps(payload, indent=2)
+    else:
+        lines = [
+            "Agent H — prose reconciliation inventory",
+            f"Root: {ROOT}",
+            f"Hits: {len(all_hits)} lines across {len(by_file)} files",
+            "",
+            "Legend: [AUTO] = regenerated by generate_report_tables / pipeline;",
+            "        all other lines need a judgment edit after IF numbers land.",
+            "",
+        ]
+        for fpath in sorted(by_file.keys()):
+            hits = by_file[fpath]
+            auto = any(h.get("auto_refresh") for h in hits)
+            mark = " [AUTO]" if auto else ""
+            lines.append(f"## {fpath}{mark}  ({len(hits)} hits)")
+            for h in hits:
+                lines.append(f"  L{h['line']:4d}  [{h['tag']}]  {h['snippet']}")
+            lines.append("")
+        lines.append("---")
+        lines.append("Priority prose targets (from FINAL_COMPLETION_PLAN Agent H):")
+        for p in [
+            "STATUS.md",
+            "docs/KULDEEP_CORRECTION.md",
+            "paper/sections/conclusion.tex",
+            "paper/sections/results.tex",
+            "report/report.tex",
+        ]:
+            n = len(by_file.get(p, []))
+            lines.append(f"  {'OK ' if n == 0 else 'TODO'}  {p}  ({n} hits)")
+        out = "\n".join(lines) + "\n"
+
+    sys.stdout.write(out)
+    if args.out:
+        Path(args.out).write_text(out, encoding="utf-8")
+        print(f"\nWrote {args.out}", file=sys.stderr)
+    return 0 if all_hits else 0  # inventory always succeeds; empty = all clear
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

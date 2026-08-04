@@ -1,0 +1,22 @@
+To: supin.gopi@iitgn.ac.in        (confirm the exact address)
+Cc: Prof. Manisha Padala
+Subject: flair2 GPU driver not loading (kernel 6.8.0-124) — srujan.sai
+
+Hi Supin,
+
+I can log in to flair2 (srujan.sai) fine, but the GPUs are not usable — nvidia-smi
+reports "couldn't communicate with the NVIDIA driver."
+
+The cause looks like a kernel update: the box is now booted into kernel
+6.8.0-124-generic, but the NVIDIA driver module only exists for the older
+6.8.0-106 kernel (/usr/lib/modules/6.8.0-106-generic/.../nvidia.ko). So the
+nvidia module can't load on the current kernel.
+
+Could you please either:
+  - reboot flair2 back into kernel 6.8.0-106-generic, or
+  - rebuild/reinstall the NVIDIA driver (DKMS) for 6.8.0-124-generic
+
+so nvidia-smi works again? This needs root, which I don't have.
+
+Thanks,
+Srujan (23110081)

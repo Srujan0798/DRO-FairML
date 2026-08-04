@@ -1,0 +1,27 @@
+STATUS.md:27:for r in d))"`). The **IF-attack third (180 rows) was never generated** (the IF metric was
+STATUS.md:28:degenerate, ~1e-10) and is cluster-blocked — see §7.
+STATUS.md:42:  rows are NOT regenerated; IF cells currently read 0.0000 (degenerate pre-fix metric). **No IF
+STATUS.md:65:| IF-attack third (180 rows) | ❌ cluster-blocked (G1) |
+STATUS.md:81:make validate                 # Wilcoxon: DP wins 6/9 at p<0.05; LSAC not significant; IF=0.0000
+report/report.tex:225:0.0 & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\
+report/report.tex:331:methods); the IF-attack third is pending a cluster re-run.
+report/report.tex:369:IF-attack third of the grid is pending a cluster re-run; earlier IF
+report/report.tex:569:  \texttt{results/canonical\_tau1.json}).  The IF-attack third of the
+report/report.tex:783:\item IF-attack third of the canonical grid (cluster re-run after the IF-metric fix).
+report/sections/auto_generated_main_results.tex:6:Adult & 0.0 & 0.813 $\pm$ 0.001 & 0.815 $\pm$ 0.002 & 0.1491 $\pm$ 0.0023 & \textbf{0.1426 $\pm$ 0.0020} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:7:Adult & 0.1 & 0.816 $\pm$ 0.002 & 0.818 $\pm$ 0.001 & 0.2026 $\pm$ 0.0045 & \textbf{0.1999 $\pm$ 0.0044} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:8:Adult & 0.2 & 0.756 $\pm$ 0.004 & 0.759 $\pm$ 0.004 & 0.2452 $\pm$ 0.0037 & \textbf{0.2334 $\pm$ 0.0041} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:9:Adult & 0.3 & 0.667 $\pm$ 0.003 & 0.676 $\pm$ 0.003 & 0.2848 $\pm$ 0.0034 & \textbf{0.2614 $\pm$ 0.0038} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:10:Adult & 0.4 & 0.551 $\pm$ 0.003 & 0.561 $\pm$ 0.003 & 0.3140 $\pm$ 0.0044 & \textbf{0.2855 $\pm$ 0.0040} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:11:Credit & 0.0 & 0.805 $\pm$ 0.002 & 0.807 $\pm$ 0.002 & 0.0127 $\pm$ 0.0016 & \textbf{0.0119 $\pm$ 0.0015} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:12:Credit & 0.1 & 0.810 $\pm$ 0.001 & 0.810 $\pm$ 0.001 & 0.0151 $\pm$ 0.0028 & \textbf{0.0134 $\pm$ 0.0024} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:13:Credit & 0.2 & 0.782 $\pm$ 0.003 & 0.782 $\pm$ 0.003 & 0.0198 $\pm$ 0.0030 & \textbf{0.0178 $\pm$ 0.0026} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:14:Credit & 0.3 & 0.753 $\pm$ 0.005 & 0.753 $\pm$ 0.006 & 0.0253 $\pm$ 0.0024 & \textbf{0.0228 $\pm$ 0.0020} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:15:Credit & 0.4 & 0.751 $\pm$ 0.004 & 0.752 $\pm$ 0.004 & 0.0191 $\pm$ 0.0034 & \textbf{0.0170 $\pm$ 0.0029} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:16:Lsac & 0.0 & 0.901 $\pm$ 0.000 & 0.902 $\pm$ 0.000 & 0.1447 $\pm$ 0.0069 & \textbf{0.1829 $\pm$ 0.0060} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:17:Lsac & 0.1 & 0.903 $\pm$ 0.001 & 0.905 $\pm$ 0.001 & 0.2201 $\pm$ 0.0105 & \textbf{0.2539 $\pm$ 0.0091} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:18:Lsac & 0.2 & 0.902 $\pm$ 0.001 & 0.903 $\pm$ 0.001 & 0.1827 $\pm$ 0.0106 & \textbf{0.2230 $\pm$ 0.0094} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:19:Lsac & 0.3 & 0.902 $\pm$ 0.001 & 0.903 $\pm$ 0.001 & 0.1827 $\pm$ 0.0106 & \textbf{0.2220 $\pm$ 0.0093} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+report/sections/auto_generated_main_results.tex:20:Lsac & 0.4 & 0.902 $\pm$ 0.001 & 0.903 $\pm$ 0.001 & 0.1827 $\pm$ 0.0106 & \textbf{0.2211 $\pm$ 0.0092} & 0.0000 $\pm$ 0.0000 & \textbf{0.0000 $\pm$ 0.0000} \\
+paper/sections/results.tex:120:be characterised once the IF-attack third of the grid is regenerated.
+paper/sections/results.tex:127:complete (360 rows); the IF-attack third is pending a cluster re-run.
