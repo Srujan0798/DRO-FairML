@@ -29,6 +29,9 @@ def build_configs():
 
 
 if __name__ == "__main__":
+    # Default sequential (workers=1): process pools die on some macOS hosts.
+    # Override: python3 experiments/run_a3_lambda.py 4  OR  ABLATION_WORKERS=4
+    w = int(sys.argv[1]) if len(sys.argv) > 1 else 1
     run("results/lambda_grid.json", build_configs(),
         provenance_extras={"ablation": "a3_lambda_grid", "n_seeds_planned": 6},
-        workers=4, label="A3-Lambda")
+        workers=w, label="A3-Lambda")

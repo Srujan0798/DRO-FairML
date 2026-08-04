@@ -123,12 +123,22 @@ def run(results_file, configs, provenance_extras=None, workers=4, label="ablatio
 
     done = 0
     t0 = time.time()
-    failed = []
+    n_todo = len(todo)
 
-    # Prefer spawn on macOS; fall back to sequential if the pool breaks.
-    ctx = mp.get_context("spawn")
-    use_pool = workers and workers > 1
+    # Process pools on some macOS/Python combos die with 0 results (BrokenProcessPool /
+    # leaked semaphores). Prefer sequential unless ABLATION_WORKERS>1 is proven stable.
+    # Override: ABLATION_WORKERS env or workers arg; if pool yields nothing, sequential.
+    env_w = os.environ.get("ABLATION_WORKERS")
+    if env_w is not None:
+        try:
+            workers = int(env_w)
+        except ValueError:
+            pass
+
+    use_pool = bool(workers and workers > 1)
     if use_pool:
+        print(f"[{label}] trying ProcessPoolExecutor(workers={workers}, spawn)…", flush=True)
+        ctx = mp.get_context("spawn")
         try:
             with ProcessPoolExecutor(max_workers=workers, mp_context=ctx) as ex:
                 futs = {ex.submit(_worker, c): c for c in todo}
@@ -139,29 +149,31 @@ def run(results_file, configs, provenance_extras=None, workers=4, label="ablatio
                         done += 1
                         _append_result(
                             rows, res, provenance_extras, results_file,
-                            label, c, done, len(todo), t0,
+                            label, c, done, n_todo, t0,
                         )
                     except Exception as e:
                         print(f"[{label}] FAILED {c}: {e}", flush=True)
                         traceback.print_exc()
-                        failed.append(c)
         except BrokenExecutor as e:
-            print(f"[{label}] Process pool broken ({e}); falling back to sequential.", flush=True)
-            # Recompute remaining after any successful pool writes
-            todo = missing_configs(rows, configs)
+            print(f"[{label}] Process pool broken ({e}).", flush=True)
+
+        if done == 0 and n_todo > 0:
+            print(
+                f"[{label}] pool produced 0/{n_todo} rows — falling back to sequential.",
+                flush=True,
+            )
             use_pool = False
 
-    if not use_pool or failed:
-        remaining = failed if failed and use_pool else missing_configs(rows, configs)
-        if remaining:
-            print(f"[{label}] sequential pass for {len(remaining)} configs…", flush=True)
+    remaining = missing_configs(rows, configs)
+    if remaining and (not use_pool or done < n_todo):
+        print(f"[{label}] sequential pass for {len(remaining)} configs…", flush=True)
         for c in remaining:
             try:
                 res = _worker(c)
                 done += 1
                 _append_result(
                     rows, res, provenance_extras, results_file,
-                    label, c, done, len(todo), t0,
+                    label, c, done, n_todo, t0,
                 )
             except Exception as e:
                 print(f"[{label}] SEQUENTIAL FAILED {c}: {e}", flush=True)

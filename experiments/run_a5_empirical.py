@@ -28,6 +28,7 @@ def build_configs():
 
 
 if __name__ == "__main__":
+    w = int(sys.argv[1]) if len(sys.argv) > 1 else 1
     run("results/empirical_radii.json", build_configs(),
         provenance_extras={"ablation": "a5_empirical", "n_seeds_planned": 6},
-        workers=4, label="A5-EmpR")
+        workers=w, label="A5-EmpR")
