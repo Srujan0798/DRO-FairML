@@ -19,12 +19,12 @@
 ## flair2 CUDA (LIVE — Grok lane)
 | Job | File | Target | Status |
 |-----|------|--------|--------|
-| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **17/90** — dp α=0.2 seed=4 done; jobs alive |
-| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **16/30** — α=0.2 seed=4 running |
+| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **17/90** — dp α=0.2 seed=4 done; seed=5 running |
+| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **17/30** — α=0.2 seed=4 done; seed=5 running |
 | **U3** pixel PGD | `results/utkface_pixel_pgd.json` | 24 (planned) | prepared, not started |
 
 - Repro partial: **17** matched cells, max\|ΔDP_dro\|≈0.007 (**0 GAP**). Summary: `results/utkface_reproducibility_summary.md`
-- Multi-group partial: `results/utkface_multigroup_summary.md` (α=0.2 multi **4/4** so far)
+- Multi-group partial: `results/utkface_multigroup_summary.md` (α=0.2 multi **4/5** so far)
 - U3: images via `scripts/flair2_link_utkface_images.sh`; runner `experiments/run_utkface_pixel_pgd.py`
 - Live table: `docs/WAVE1_LIVE_PROGRESS.md`
 
