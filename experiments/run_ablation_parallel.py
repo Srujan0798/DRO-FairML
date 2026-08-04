@@ -134,8 +134,15 @@ def run(results_file, configs, provenance_extras=None, workers=4, label="ablatio
             workers = int(env_w)
         except ValueError:
             pass
+    try:
+        workers = int(workers)
+    except (TypeError, ValueError):
+        workers = 1
+    # 0 or negative → sequential (same as 1)
+    if workers < 1:
+        workers = 1
 
-    use_pool = bool(workers and workers > 1)
+    use_pool = workers > 1
     if use_pool:
         print(f"[{label}] trying ProcessPoolExecutor(workers={workers}, spawn)…", flush=True)
         ctx = mp.get_context("spawn")

@@ -12,7 +12,7 @@ scripts = [
 ]
 for s in scripts:
     print(f"\n==== LAUNCH {s} sequential {time.strftime('%H:%M:%S')} ====", flush=True)
-    # workers=0 or 1 → sequential in driver
-    rc = subprocess.call([sys.executable, s, "0"])
+    # workers=1 → sequential in driver (stable on macOS). Never pass 0.
+    rc = subprocess.call([sys.executable, s, "1"])
     print(f"==== EXIT {s} rc={rc} {time.strftime('%H:%M:%S')} ====", flush=True)
 print("ALL WAVE1 DONE", flush=True)

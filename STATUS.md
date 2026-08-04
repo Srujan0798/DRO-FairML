@@ -1,6 +1,6 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (Wave-1 ablation drivers landed; refuse write to locked 540/UTKFace; claim docs still current). Supersedes all prior STATUS / handoff docs.
+_Last updated: 2026-08-04 (Wave-1 A4 random-vs-adv running sequential; N4 IF@0.3 artifact linked; RVA summarizer). Supersedes all prior STATUS / handoff docs.
 **CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3._
 
 ## 1. What this project is
@@ -76,7 +76,8 @@ via `experiments/run_a*.py` + `run_ablation_parallel.py` (hard-refuses
 | UTKFace REAL 90/90 | ✅ complete; summary `results/utkface_summary.md` (**mixed clean-test**) |
 | Paper / report | ✅ Aug 10 narrative + **wired figures/tables** (540-backed); honest UTKFace pilot |
 | flair2 | ⏸ parked (optional GPU later) |
-| Wave-1 ablations (advisor gaps) | 🔄 **RUNNING sequential** A3→A4→A5→N5→A1→A2 (`logs/wave1_ablations.log`; separate JSONs only) |
+| Wave-1 ablations (advisor gaps) | 🔄 **A4 random-vs-adv running** → `results/random_vs_adversarial.json` (separate; never touch 540). Summarize: `python3 experiments/summarize_rva.py` |
+| IF@α=0.3 formalization (N4) | ✅ `results/if_wilcoxon_n4_summary.md` (analysis on locked 540) |
 
 
 ## 7. Aug 10 submission checklist

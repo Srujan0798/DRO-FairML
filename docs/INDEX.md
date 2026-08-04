@@ -20,9 +20,11 @@
 ## Data truth
 - `results/canonical_tau1.json` — **540 rows**
 - `results/utkface_canonical.json` — **90/90 REAL**
-- `results/if_wilcoxon_summary.txt` — real IF Wilcoxon
+- `results/if_wilcoxon_summary.txt` — real IF Wilcoxon (DP + IF under IF attack)
+- `results/if_wilcoxon_n4_summary.md` — Kuldeep α=0.3 IF-metric claim formalized (analysis-only)
 - `results/utkface_summary.md` — honest clean-test table
 - `results/utkface_canonical_summary.json` — machine-readable cell means (REAL 90)
+- `results/random_vs_adversarial.json` — Wave-1 A4 (in progress; separate from 540)
 - `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf` — from 540
 - `paper/main.pdf`, `report/report.pdf` — Aug 10 package (**paper now includes figures + auto tables**)
 - `docs/MASTER_PROTOCOL_AUG10.md` — 7-day plan / remaining experiment gaps (optional Wave 1)
