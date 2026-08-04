@@ -22,7 +22,7 @@
 | experiments `*.py` | 16 | + README.md |
 | scripts (active) | 4 | finalize, deploy, extract, flair2 snippet |
 | figures `*.pdf` | ~59 | 5 report-live — `figures/README.md` |
-| UTKFace REAL rows | **29 / 90** | attack=`dp` only; α=0.4 nearly full; **no paper claim** |
+| UTKFace REAL rows | **34 / 90** | attacks={'dp': 30, 'if': 4}; **no paper claim** |
 
 ## Next ticks
 1. When `dp` hits 30/30, still no claim until if/combined
