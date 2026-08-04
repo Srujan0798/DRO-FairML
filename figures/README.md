@@ -1,14 +1,24 @@
-# Figures
+# figures/
 
-## Live (report / paper)
-- `figD*.pdf` — deliverable suite from canonical 540
-- `fig_final_*.pdf`, `fig_tau1_*`, `fig_win_*`, `fig_acc_*` — headline τ=1
+## Report-live (must stay at `figures/` root)
+Referenced by `report/report.tex`:
+- `fig1_main_results.pdf`
+- `fig2_dp_reduction_heatmap.pdf`
+- `fig4_significance_matrix.pdf`
+- `fig5_accuracy_fairness_tradeoff.pdf`
+- `fig7_summary_win_rates.pdf`
 
-## Historical (archived locally, not for claims)
-- `historical/` — τ=100, meeting one-offs, old fig1–7 / figC ablations
+Also used by `make results`: `main_results.pdf`, `test_time_eval.pdf`.
 
-Regenerate from committed results:
+## Deliverables / meeting (canonical-derived)
+- `figD1`–`figD4`, `figD10` — regenerate via `make deliverables` (needs canonical)
+- `figD5`–`figD9` need live `results/individual/` or lambda grid (not in committed set); existing PDFs kept when present
+
+## Historical (not for primary claims)
+- `historical/` — τ=100, meeting one-offs, figC ablations, old dashboards
+- Prefer archive over delete. Do not cite as canonical science.
+
 ```bash
-make results
-make deliverables
+make results        # tables + main plots from canonical_tau1.json
+make deliverables   # figD pack (some tasks fail-loud without optional inputs)
 ```
