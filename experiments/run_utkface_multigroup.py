@@ -188,8 +188,13 @@ def main():
             r = run_one(a, s, args.device, args.tau, args.k_inner, args.epochs, args.pgd_steps)
             r["total_time"] = time.time() - t0
             rows.append(r)
-            with open(args.output, "w") as f:
+            # Atomic replace so Mac puller never rsyncs a truncated JSON mid-write.
+            tmp = args.output + ".tmp"
+            with open(tmp, "w") as f:
                 json.dump(rows, f, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp, args.output)
             print(
                 f"  done {r['total_time']:.0f}s "
                 f"naive_dp_multi={r['naive']['dp_multigroup']:.4f} "

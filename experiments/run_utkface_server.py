@@ -118,8 +118,13 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
                 print(f"[{dataset}/{attack}] Loaded {len(all_results)} existing results (resume)", flush=True)
 
             def save():
-                with open(out_path, 'w') as f:
+                # Atomic replace so puller rsync never sees a half-written JSON.
+                tmp = out_path + ".tmp"
+                with open(tmp, 'w') as f:
                     json.dump(all_results, f, indent=2)
+                    f.flush()
+                    os.fsync(f.fileno())
+                os.replace(tmp, out_path)
 
             for alpha in args.alphas:
                 for seed in range(args.n_seeds):

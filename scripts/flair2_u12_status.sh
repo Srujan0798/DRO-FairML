@@ -29,11 +29,19 @@ def show(path, target):
     c = Counter((x.get("attack"), x.get("alpha")) for x in d)
     for k, v in sorted(c.items(), key=lambda kv: (str(kv[0][0]), kv[0][1] or 0)):
         print(f"  {k}: {v}")
-    ts = [x["total_time"] for x in d if float(x.get("alpha") or 0) >= 0.2 and x.get("total_time")]
+    # Prefer recent higher-α timings when available (better ETA for remaining grid).
+    ts = [x["total_time"] for x in d if float(x.get("alpha") or 0) >= 0.3 and x.get("total_time")]
+    src = "α≥0.3"
+    if len(ts) < 2:
+        ts = [x["total_time"] for x in d if float(x.get("alpha") or 0) >= 0.2 and x.get("total_time")]
+        src = "α≥0.2"
     rem = target - len(d)
     if ts and rem > 0:
         mean_t = sum(ts) / len(ts)
-        print(f"  ETA ~{rem * mean_t / 3600:.1f} h ({rem} left × {mean_t/60:.0f} min, from α≥0.2 cells)")
+        print(f"  ETA ~{rem * mean_t / 3600:.1f} h ({rem} left × {mean_t/60:.0f} min, from {src} cells n={len(ts)})")
+        # If a cell is in flight, estimate when next row lands.
+        if age < mean_t:
+            print(f"  next row ETA ~{(mean_t - age)/60:.0f} min (if mid-cell)")
 
 show("utkface_flair2.json", 90)
 show("utkface_multigroup.json", 30)

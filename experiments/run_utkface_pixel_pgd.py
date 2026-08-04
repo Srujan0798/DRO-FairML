@@ -341,7 +341,10 @@ def main():
             }
             runs.append(row)
             done.add(key)
-            out_path.write_text(json.dumps(runs, indent=2))
+            # Atomic replace (same pattern as U1/U2 runners).
+            tmp = out_path.with_suffix(out_path.suffix + ".tmp")
+            tmp.write_text(json.dumps(runs, indent=2))
+            tmp.replace(out_path)
             print(
                 f"  naive dp={naive.get('dp_violation', float('nan')):.4f} "
                 f"dro dp={dro.get('dp_violation', float('nan')):.4f} "
