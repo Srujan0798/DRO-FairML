@@ -1,24 +1,23 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~04:20 IST_
+_Last tick: 2026-08-05 ~04:31 IST_
 
 ## Counts (do not pkill)
 
 | Job | Target | Count | Last | PID | alive |
 |-----|--------|------:|------|-----|-------|
-| **U1** | 90 | **21** | dp α=0.3 seeds 0–2; **s=3 running** | 3482009 | yes (~4.3h) |
-| **U2** | 30 | **21** | α=0.3 seeds 0–2; log **RUN a=0.3 s=3** | 3482442 | yes (~4.2h) |
+| **U1** | 90 | **22** | dp α=0.3 seeds 0–3; **s=4 running** | 3482009 | yes (~4.5h) |
+| **U2** | 30 | **21** | α=0.3 seeds 0–2; **s=3 running** (~13+ min) | 3482442 | yes (~4.4h) |
 
-Puller OK. ETA ~18.8 h (U1) / ~2.5 h (U2). U3 JPEGs ready.
+Puller OK. ETA ~18.5 h (U1) / ~2.4 h (U2). U3 JPEGs ready.
 
 ## Signals
-- Repro: **21** matched, **0 GAP**; α=0.3 s0–2 max\|ΔDP clean\| **0.0006**
-- U2 α=0.3 n=3: multi **3/3**, binary **3/3**
-- max\|ΔDP corrupted\| overall **0.008** (still ≪0.02 thr)
+- Repro: **22** matched, **0 GAP**; α=0.3 s0–3 max\|ΔDP clean\| **0.0006**
+- U2 α=0.3 n=3: multi **3/3** (s3 in flight)
 
 ## This tick
-- Atomic writes also on `run_utkface.py` (base runner)
-- Partials + summaries refreshed
+- Multigroup summary: **per-seed multi readout** at highest α present
+- U1 advanced to 22 first; U2 slightly behind (~1 cell)
 
 ## Open
 - U1=90 / U2=30; U3 after free GPU

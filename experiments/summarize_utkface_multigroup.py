@@ -61,6 +61,24 @@ def main():
             f"{ {k: round(v, 3) for k, v in means.items()} }"
         )
 
+    # Per-seed multi wins for the highest incomplete/complete α (honest partial readout)
+    for a in [0.4, 0.3, 0.2, 0.1, 0.0]:
+        cell = sorted(
+            [r for r in rows if abs(r["alpha"] - a) < 1e-9],
+            key=lambda r: int(r["seed"]),
+        )
+        if not cell:
+            continue
+        lines += ["", f"### Per-seed multi @ α={a} (n={len(cell)})", ""]
+        for r in cell:
+            n, d = r["naive"]["dp_multigroup"], r["dro"]["dp_multigroup"]
+            win = "DRO" if d < n else ("tie" if d == n else "Naive")
+            lines.append(
+                f"- s{int(r['seed'])}: multi N={n:.4f} D={d:.4f} → **{win}** "
+                f"(bin N={r['naive']['dp_binary']:.4f} D={r['dro']['dp_binary']:.4f})"
+            )
+        break  # only the highest α present
+
     lines += [
         "",
         "Protocol: train DP on binary race (White vs non-White); eval max-min DP on 5 race groups.",

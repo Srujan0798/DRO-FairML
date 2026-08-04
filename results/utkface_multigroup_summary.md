@@ -16,6 +16,12 @@ rows: **21/30**
 - α=0.2 n=6: max **Other** 0.510 / min **White** 0.288 — {'White': 0.288, 'Black': 0.418, 'Asian': 0.484, 'Indian': 0.423, 'Other': 0.51}
 - α=0.3 n=3: max **Other** 0.539 / min **White** 0.300 — {'White': 0.3, 'Black': 0.46, 'Asian': 0.518, 'Indian': 0.445, 'Other': 0.539}
 
+### Per-seed multi @ α=0.3 (n=3)
+
+- s0: multi N=0.2366 D=0.2338 → **DRO** (bin N=0.1804 D=0.1788)
+- s1: multi N=0.2468 D=0.2336 → **DRO** (bin N=0.1943 D=0.1825)
+- s2: multi N=0.2573 D=0.2493 → **DRO** (bin N=0.1822 D=0.1780)
+
 Protocol: train DP on binary race (White vs non-White); eval max-min DP on 5 race groups.
 REAL ResNet18 features. device=cuda flair2.
 **PARTIAL** — not for paper claims until 30/30.
