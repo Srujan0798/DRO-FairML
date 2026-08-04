@@ -18,14 +18,17 @@ Same corrupted data (\texttt{coordinated=True}); only the radius calibration dif
 $\alpha$ & $n$ & DP (uniform) & DP (empirical) & $\Delta$DP & wins (emp) & $p$ & sig \\
 \midrule
 0.0 & 6 & 0.1426 & 0.1426 & +0.0000 & 0/6 & 1.0000 &  \\
-0.1 & 4 & 0.1807 & 0.1807 & -0.0000 & 2/4 & 0.5625 &  \\
+0.1 & 6 & 0.1784 & 0.1784 & -0.0000 & 2/6 & 0.7812 &  \\
+0.2 & 6 & 0.0143 & 0.0143 & -0.0000 & 2/6 & 0.8906 &  \\
+0.3 & 6 & 0.0600 & 0.0600 & -0.0000 & 2/6 & 0.7812 &  \\
+0.4 & 6 & 0.1287 & 0.1287 & -0.0000 & 3/6 & 0.6562 &  \\
 \bottomrule
 \end{tabular}
 \end{center}
 $^{*}$ marks $p<0.05$ (one-sided Wilcoxon, H1: DP$_{\mathrm{uniform}} > $ DP$_{\mathrm{empirical}}$).
 
 \paragraph{Verdict}
-No: empirical+coordinated does NOT lower DP in any cell (0/2); attack-aware radius calibration does not help under this coordinated attack.
+No: empirical+coordinated does NOT lower DP in any cell (0/5); attack-aware radius calibration does not help under this coordinated attack.
 
 \paragraph{Implementation}
 This logic is implemented in \texttt{src/training/dro\_fair.py} within the \texttt{\_empirical\_pi\_clean()} method. The locked canonical grid uses \texttt{radii\_mode=uniform}; the empirical path is available for known attack structure (this appendix).
