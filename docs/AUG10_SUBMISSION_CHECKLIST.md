@@ -18,12 +18,21 @@
 5. α≥0.3: below constant predictor on Adult/Credit only
 6. UTKFace: real pilot; **mixed clean-test**; not Adult copy-paste
 
-## Build
+## Build (final gate — DONE 2026-08-04)
 ```bash
 make test && make validate && make paper && make report
+# 62 passed | validate PASS | paper/main.pdf + report/report.pdf rebuilt
 ```
+
+## Share package
+- `paper/main.pdf`
+- `report/report.pdf`
+- `docs/MEETING_HANDOUT_2026-08-04.md` (already shared)
+- Optional: `results/utkface_summary.md`
 
 ## Do not
 - Retrain 540
 - Claim synthetic UTKFace
 - Claim clean UTKFace low-α sweep without looking at utkface_summary.md
+- Claim “6/6 every α” on Adult/DP (α=0.1 is **5/6**)
+- Claim clean three-attack mirror (IF is **mixed**)

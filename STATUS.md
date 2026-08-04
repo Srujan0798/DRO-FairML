@@ -79,7 +79,7 @@ written reasons; kNN retracted. None are part of the canonical claim.
 1. ✅ Tabular 540 frozen; do not retrain.
 2. ✅ UTKFace 90/90 REAL in repo; paper states **mixed** clean-test (not Adult copy).
 3. ✅ Paper/report rebuilt with τ=1 / 5/6 / IF mixed / LSAC degenerate / UTKFace pilot.
-4. Final gate before send: `make test && make validate && make paper && make report`.
+4. ✅ Final gate: `make test` (62 pass) && `make validate` (PASS) && `make paper` && `make report`.
 5. Optional later: flair2 pixel-level experiments if greenlit.
 
 

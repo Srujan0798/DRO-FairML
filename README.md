@@ -13,7 +13,7 @@ Two training methods, compared under the same attack:
 
 **Attack:** `FairnessTargetedPGD` — adversarial fairness-targeted projected gradient descent on the training labels / attributes (modes: **DP**, **IF**, **Combined**). Random corruption is *not* the evaluation method.
 
-**Datasets:** Adult, Credit, LSAC (tabular). UTKFace is experimental / not a paper claim yet.
+**Datasets:** Adult, Credit, LSAC (tabular). UTKFace is a **real image-feature pilot** (90/90 REAL ResNet18 features; mixed clean-test; not an Adult copy-paste claim).
 
 **Metrics:** demographic parity (DP), individual fairness (IF), accuracy.
 
@@ -50,6 +50,7 @@ Source of truth: `results/canonical_tau1.json` + Wilcoxon in `results/canonical_
 | **LSAC / DP** | **Degenerate** — DRO collapses toward majority predictor; not a method win. See [`docs/LSAC_DEGENERACY.md`](docs/LSAC_DEGENERACY.md). |
 | **IF attack** | **MIXED** — cosine IF is non-degenerate (max \|if_clean\| ≈ 0.24). Adult/Credit support IF-side wins at low α, but DP-under-IF is not a clean three-attack mirror (e.g. Adult α≥0.3 DP loss under IF; LSAC/IF does not support the low-α DP story). **Do not claim a clean IF sweep.** |
 | **α ≥ 0.3** | Both methods can fall below the constant-predictor accuracy baseline on Adult/Credit → no strong method claim in that regime. |
+| **UTKFace** | **REAL 90/90** (`results/utkface_canonical.json`); clean-test DP **mixed** (significant DRO wins mainly at high α). See `results/utkface_summary.md`. |
 
 Earlier “DRO is fragile” plots used stepped **τ=100** (temperature artifact). Canonical claims use **τ=1**.
 

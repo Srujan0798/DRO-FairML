@@ -782,9 +782,10 @@ The canonical full grid is complete (540 rows); Adult and Credit
 at $\alpha\le0.2$ are the mature findings.  LSAC/Combined is a genuine win
 ($p{=}0.0156$); LSAC/DP is a degenerate negative result.  The IF-attack
 rows are complete (180/180; Adult/Credit $\alpha\le0.2$ support DRO on DP;
-LSAC/IF is a DP loss --- not a three-attack sweep).  UTKFace has real
-local features; a multi-seed grid is running and not claimed here (prior
-synthetic smoke tests withdrawn). Q5 empirical radii math in appendix (see also \texttt{docs/KULDEEP\_CORRECTION.md}).
+LSAC/IF is a DP loss --- not a three-attack sweep).  UTKFace REAL grid is
+complete (90/90; clean-test DP mixed --- significant DRO wins mainly at
+high $\alpha$; not an Adult copy). Prior synthetic smoke tests withdrawn.
+Q5 empirical radii math in appendix (see also \texttt{docs/KULDEEP\_CORRECTION.md}).
 
 \paragraph{Practical takeaway.}
 When deploying DRO-FAIR, fix the prediction temperature and re-validate
@@ -795,8 +796,8 @@ source of the ``DRO is fragile'' finding.
 \paragraph{Future directions.}
 \begin{itemize}
 \item IF-attack third of the canonical grid --- DONE (180/180 after metric fix; honest mixed read).
+\item UTKFace REAL feature pilot --- DONE (90/90; mixed clean-test). Optional later: flair2 pixel-space if greenlit.
 \item Empirical radii calibration under known attack structure (Q5; uniform-vs-empirical comparison pending canonical\_tau1\_empirical.json).
-\item UTKFace on GPU (blocked on flair2 access).
 \item Dataset-adaptive $\lambda_{\max}$.
 \end{itemize}
 
@@ -805,7 +806,7 @@ source of the ``DRO is fragile'' finding.
 \vspace{0.5em}
 {\small
 Code: \texttt{github.com/Srujan0798/DRO-FairML}\quad|\quad
-Canonical $\tau{=}1$ grid complete (540 rows; \texttt{results/canonical\_tau1.json}), 32 unit tests, 8 theory verifications.
+Canonical $\tau{=}1$ grid complete (540 rows; \texttt{results/canonical\_tau1.json}), UTKFace REAL 90/90, 62 unit tests, theory verifications.
 }
 
 % ─────────────────────────────────────────────────────────────────────────────
