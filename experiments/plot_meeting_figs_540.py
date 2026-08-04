@@ -46,7 +46,7 @@ def main() -> None:
         }
     )
 
-    # ── Adult DP headline ────────────────────────────────────────────
+    # Adult DP headline
     g = collections.defaultdict(dict)
     for r in d:
         if r["dataset"] == "adult" and r["attack"] == "dp":
@@ -79,14 +79,22 @@ def main() -> None:
     ax.set_title(r"Adult / DP attack — $\tau=1$, $n=6$ (from 540-row canonical)")
     ax.legend(loc="upper left", frameon=False)
     for a, w, ym in zip(ALPHAS, wins, nv_m):
-        ax.annotate(f"{w}/6", (a, ym), textcoords="offset points", xytext=(0, 10), ha="center", fontsize=7, color="#555")
+        ax.annotate(
+            f"{w}/6",
+            (a, ym),
+            textcoords="offset points",
+            xytext=(0, 10),
+            ha="center",
+            fontsize=7,
+            color="#555",
+        )
     ax.set_xticks(ALPHAS)
     fig.savefig(FIG / "fig_tau1_headline.pdf")
     fig.savefig(FIG / "fig_tau1_headline.png", dpi=300)
     plt.close(fig)
     print("fig_tau1_headline wins", wins)
 
-    # ── Wilcoxon win matrix (DP attack) ──────────────────────────────
+    # Wilcoxon win matrix (DP attack)
     g2 = collections.defaultdict(dict)
     for r in d:
         if r["attack"] == "dp":
@@ -146,25 +154,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-EOF
-chmod +x experiments/plot_meeting_figs_540.py
-
-# update meeting brief figure note if it lists paths
-# commit
-git add STATUS.md docs/KULDEEP_CORRECTION.md docs/VERIFICATION_REPORT.md \
-  figures/fig_tau1_headline.pdf figures/fig_tau1_headline.png \
-  figures/fig_final_wilcoxon_table.pdf figures/fig_final_wilcoxon_table.png \
-  figures/figD10_final_wilcoxon_table.pdf figures/figD10_final_wilcoxon_table.png \
-  experiments/plot_meeting_figs_540.py
-git status -sb | head -25
-git commit -m "$(cat <<'EOF'
-fix: correct verified doc mismatches; regenerate stale headline+wilcoxon figs
-
-Agent V (pre-meeting): STATUS/KULDEEP state Adult/DP α=0.1 is 5/6 (not 6/6 every
-α), LSAC is not "below" constant predictor, high-α Naive acc labels fixed.
-Regenerate fig_tau1_headline and fig_final_wilcoxon_table from 540-row
-canonical (Adult wins [6,5,6,6,6]). VERIFICATION_REPORT M1–M7 → MATCH.
-EOF
-)"
-git log -1 --oneline
-ls -la figures/fig_tau1_headline.pdf figures/fig_final_wilcoxon_table.pdf
