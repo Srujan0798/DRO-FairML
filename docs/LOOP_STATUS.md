@@ -1,7 +1,7 @@
 # Loop status
 
 **Cadence:** every **5 minutes** · job `019fcbd740be`  
-**Updated:** 2026-08-04 09:10 UTC
+**Updated:** 2026-08-04 09:15 UTC
 
 ## Locked science
 - canonical **540/540** committed — never rewrite science rows
@@ -10,27 +10,27 @@
 - IF Wilcoxon: `results/if_wilcoxon_summary.txt`
 
 ## This wave
-- `main.py`: hard-refuse `--run-experiments` / full-pipeline train unless `FORCE_LEGACY=1`
-- `docs/VERIFICATION_REPORT.md`: current banner + historical §0 (no more IF 64/PENDING as live)
-- Archive: `paper/sections/_IF_PLACEHOLDER_NOTES.md`, `docs/chat/gchat_raw_export.md` → `docs/_archive/`
-- `figures/README.md`: paper-live vs meeting/historical PDFs (no deletes)
-- UTKFace REAL progress committed with docs only
+- **STATUS.md** UTKFace: local MPS REAL partial grid (not “probe only / flair2 blocked”)
+- **UTKFACE_STATUS:** **26/90** REAL (`dp` α≤0.3 complete; α=0.4 filling)
+- **logs hygiene:** 144 old batch/chunk logs → `logs/archive_root/bulk_pre_540/` (kept recent utkface/IF/H)
+- Paper/report: only legitimate pending (UTKFace full grid; Q5 empirical JSON)
 
 ## Counts
 | Area | Count | Notes |
 |------|------:|-------|
 | Root files (non-dir) | 7 | LICENSE Makefile README STATUS main.py requirements setup |
-| docs live `*.md` | 21 | INDEX complete; archive holds agent noise |
-| experiments `*.py` (active) | 16 | Makefile path + runners |
-| scripts (active) | 4 | agent_h_finalize, deploy_utkface, extract features, flair2 snippet |
-| figures `*.pdf` | ~59 | 5 report-live; rest meeting/appendix — see `figures/README.md` |
-| UTKFace REAL rows | **25 / 90** | attack=`dp` only; α=0.3 filling; **no paper claim** |
+| docs live `*.md` | 21 | INDEX lists live set |
+| experiments `*.py` (active) | 16 | Makefile + runners |
+| scripts (active) | 4 | finalize, deploy, extract, flair2 snippet |
+| figures `*.pdf` | ~59 | 5 report-live; see `figures/README.md` |
+| logs top-level | ~14 | + `archive_root/` bulk |
+| UTKFace REAL rows | **26 / 90** | attack=`dp` only; **no paper claim** |
 
 ## Next ticks
-1. Optional: archive `run_experiments.py` behind Makefile-only path (still needed for FORCE_LEGACY)
-2. Optional: move bulk `logs/*.log` into `logs/archive_root/` (keep recent)
-3. UTKFace row count only until multi-attack cells exist
-4. Keep pytest + validate green after moves
+1. Optional: keep or thin `meeting_summary.py` (CLI utility, not Makefile)
+2. UTKFace: when `dp` 30/30, still no paper claim until if/combined exist
+3. pytest + validate if code moves
+4. Do not push science rewrites of `canonical_tau1.json`
 
 ## Reproduce (no retrain)
 ```bash

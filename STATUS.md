@@ -52,10 +52,12 @@ Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dr
 written reasons; kNN retracted. None are part of the canonical claim.
 
 ## 5. UTKFace (image modality)
-**Real features on disk; full multi-seed attack grid not a paper claim yet.** Timing probe:
-`results/utkface_timing_probe.json` (`data_provenance=REAL`). Agent **M** is **blocked on
-flair2 SSH** for the intended server run; local MPS probe only. Scope-in full grid or formal
-drop for Aug 10. See `docs/UTKFACE_STATUS.md`.
+**Real features on disk; local MPS REAL grid in progress — not a paper claim yet.**  
+`data/raw/utkface_features.npz` (provenance REAL). Runner writes
+`results/utkface_canonical.json` (all rows `data_provenance=REAL`). Progress is
+**partial** (attack=`dp` only so far; see `docs/UTKFACE_STATUS.md` for live count).  
+flair2 SSH remains optional for a faster full grid. **No paper claim** until a
+reviewed multi-seed multi-attack subset exists.
 
 ## 6. Deliverables status
 | Item | State |
@@ -65,14 +67,14 @@ drop for Aug 10. See `docs/UTKFACE_STATUS.md`.
 | Agent H finalize | ✅ `results/if_wilcoxon_summary.txt`; tables; `paper/main.pdf` + `report/report.pdf` |
 | Meeting brief (4pm) | ✅ FINAL `docs/MEETING_2026-08-04.md` (honest 5/6 + IF MIXED) |
 | Kuldeep correction note | ✅ `docs/KULDEEP_CORRECTION.md` (draft — human reviews & sends) |
-| UTKFace full grid | 🔄 **M blocked on flair2 SSH**; local real features + 1-config MPS probe only |
+| UTKFace full grid | 🔄 **local MPS REAL partial** (`utkface_canonical.json`, dp-only so far); **no paper claim** |
 | Note | H log: `compute_canonical_wilcoxon.py` once hit `ModuleNotFoundError: experiments`; IF summary + auto tables OK. L: `PYTHONPATH=.` if full wilcoxon artifact needed. |
 
 ## 7. What remains (Aug 10)
 1. **J more:** continue repo professionalize (archive dead paths, polish entrypoints).
 2. **K:** paper/report prose to 540-row tables + honest IF narrative (**MIXED**: Adult/Credit α≤0.2 yes; Adult α≥0.3 DP-under-IF loss; LSAC IF no; Adult/DP α=0.1 = 5/6).
 3. **L re-audit:** ship gate on full 540 + H artifacts (`docs/VERIFICATION_REPORT.md`).
-4. **M:** UTKFace blocked on **flair2 SSH** — full multi-seed grid or formal Aug 10 scope-out.
+4. **M:** UTKFace — finish local REAL multi-attack grid or formal Aug 10 scope-out (row count only until then).
 5. Optional: fix PYTHONPATH for `experiments/compute_canonical_wilcoxon.py` in finalize script.
 
 ## 8. How to run / verify
