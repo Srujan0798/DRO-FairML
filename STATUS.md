@@ -28,7 +28,8 @@ and **non-degenerate** under attack=if (max |if_clean| ≈ **0.239**). Verify an
 `python3 -c "import json,collections; d=json.load(open('results/canonical_tau1.json')); print(len(d), dict(collections.Counter(r['attack'] for r in d)))"`.
 
 ## 3. Verified results (n=6, read from canonical_tau1.json)
-- **Adult / DP:** DRO wins every α at p ≤ 0.031 (**α=0.1 is 5/6**, seed 2 loses; **others 6/6**).
+- **Adult / DP:** DRO better at every α with p ≤ 0.031 — **not** “6/6 every α”:
+  **α=0.1 is 5/6** (seed 2 loses, p=0.0312); **α∈{0.0,0.2,0.3,0.4} are 6/6** (p=0.0156).
 - **Adult / Combined:** 6/6 wins at every α, p = 0.016.
 - **Credit / DP + Combined:** DRO wins at essentially every cell, p < 0.05
   (Combined α=0.1 is 5/6; others 6/6 on the complete DP+Combined grid).
@@ -37,7 +38,9 @@ and **non-degenerate** under attack=if (max |if_clean| ≈ **0.239**). Verify an
   *higher* (worse) than Naive; accuracy is pinned to the majority-class baseline (~0.90) and
   Naive DP is frozen at 0.1827 for α ≥ 0.2. See `docs/LSAC_DEGENERACY.md`.
 - **Defensible regime: α ≤ 0.2** on Adult and Credit. At α ≥ 0.3 both methods fall *below* the
-  constant-predictor baseline on **Adult (0.752) and Credit (0.779)** → no method claim there.
+  constant-predictor baseline on **Adult (~0.752) and Credit (~0.779)** only → no method claim
+  there. **LSAC does not go below** its majority baseline (~0.902); it is **pinned at** it
+  (degeneracy), which is a different failure mode — do **not** say “every dataset below.”
 - **IF-attack third (COMPLETE — first real numbers):** max |if_clean| ≈ **0.239**.
   Full tables: `results/if_wilcoxon_summary.txt` + `docs/MEETING_2026-08-04.md`.
   **Verdict: MIXED** (not a clean three-attack mirror of DP+Combined).

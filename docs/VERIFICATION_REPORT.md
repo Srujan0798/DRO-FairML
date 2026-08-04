@@ -371,3 +371,25 @@ Wins **5/6**, p=0.0312; loser **seed 2** (Naive 0.192526 vs DRO 0.192608). **MAT
 **M8 residual:** largely closed — `make validate` uses `load_canonical_tau1()` (540 rows).  
 
 **Loop note (2026-08-04 ~09:10 UTC):** UTKFace REAL rows advanced (~23/90, attack=`dp` only). Still no paper claim.
+
+---
+
+## Agent V re-audit (2026-08-04, pre-meeting) — M1–M7 flipped to MATCH
+
+**Method:** recompute Adult/DP from `results/canonical_tau1.json` (540 rows); re-read STATUS.md, KULDEEP_CORRECTION.md, paper/sections/results.tex; regenerate stale figures.
+
+| ID | Claim | Live file state | Status |
+|----|-------|-----------------|--------|
+| M1 | Adult/DP 6/6 every α | STATUS + KULDEEP: **α=0.1 is 5/6**, others 6/6 | **MATCH** |
+| M2 | Adult Naive α=0.3/0.4 acc | KULDEEP: **0.6669 / 0.5512** (Naive); DRO labeled separately | **MATCH** |
+| M3 | Credit Naive high-α acc | KULDEEP: **0.7527 / 0.7513** | **MATCH** |
+| M4 | “every dataset below constant predictor” | STATUS + results.tex: **Adult+Credit only**; LSAC pinned | **MATCH** |
+| M5 | paper τ=1 table n=6 | results.tex + auto tables | **MATCH** (n=6) |
+| M6 | “all three attacks” overclaim | scoped; IF **mixed** | **MATCH** |
+| M7 | IF never generated / 0.0000 | STATUS: IF 180 complete, max≈0.239 | **MATCH** |
+
+**Figures regenerated today (mtime 2026-08-04) from 540-row canonical:**
+- `figures/fig_tau1_headline.pdf` — Adult DP wins annotated **[6,5,6,6,6]**
+- `figures/fig_final_wilcoxon_table.pdf` — DP-attack win matrix (Adult row shows 5 at α=0.1; LSAC 0s)
+
+**Ship-critical prose M1–M7: CLOSED.** Meeting brief was already clean; secondary docs + figures aligned.

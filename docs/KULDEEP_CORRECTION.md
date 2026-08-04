@@ -1,7 +1,9 @@
 # Correction note for Kuldeep — DRO-FairML
 
 **Date:** 2026-07-20 · **Status:** for the human to review and send. Not sent.
-**Source of every number:** `results/canonical_tau1.json` (DP+Combined = 360 complete rows, τ=1.0, k_inner=10, 3 datasets × 5 α × 6 seeds × 2 methods × {DP, Combined}; IF-attack third landing separately — see §1).
+**Source of every number:** `results/canonical_tau1.json` (**540 complete rows**, τ=1.0, k_inner=10,
+3 datasets × 5 α × 6 seeds × 2 methods × {DP, IF, Combined}). IF-attack third is complete —
+story is **mixed** (see `results/if_wilcoxon_summary.txt` and `docs/MEETING_2026-08-04.md`).
 
 You asked on Jun 30 to verify all claims before they went out. That request was well-founded. Three things we reported to you were wrong. Here they are, plainly.
 
@@ -13,7 +15,7 @@ On Jun 30 (5:47pm and 5:59pm) we sent `adult_if_*.pdf` as "individual fairness" 
 
 Those numbers came from the **DP column**, not IF. At that time the IF metric was degenerate — identically ~0 in every row due to a threshold-calibration bug. Under **DP and Combined attacks**, the IF *metric column* is still ~machine zero (max |IF| across those 360 rows is **4.66e-10**). So the project had **no valid IF results** on Jun 30, and the "IF" plots were DP plots under an IF label.
 
-**Current position (2026-08-04):** the IF metric is fixed (cosine-based). A **local parallel IF-attack sweep is in progress** (`experiments/run_if_parallel.py`); partial IF-attack rows are **non-degenerate** (max |if_clean| ≈ 0.098). **No full-grid IF claim is made** until the IF third is complete (180/180) and tables are regenerated. Old Jun-30 IF figures stay withdrawn. This note deliberately quotes **zero IF scientific numbers** as ship claims.
+**Current position (2026-08-04):** the IF metric is fixed (cosine-based). The **full IF-attack third is complete** (180/180 rows; max |if_clean| ≈ **0.239**). The IF story is **mixed**, not a clean three-attack sweep: Adult/Credit support DRO on DP under IF attack at α≤0.2; Adult α=0.3 under IF loses on DP (1/6); LSAC/IF fails on DP for α≤0.3. Old Jun-30 IF figures stay withdrawn. See `results/if_wilcoxon_summary.txt`.
 
 ## 2. LSAC was reported "pending" but is in fact complete — and it is a loss (and degenerate)
 
@@ -52,10 +54,11 @@ On **LSAC** the accuracy does **not** fall *below* 0.9016 under the DP attack �
 
 ## What IS solid (verified, n=6) — lead with this
 
-- **Adult / DP:** DRO wins every α at p ≤ 0.031 (**α=0.1 is 5/6**, seed 2 loses; **others 6/6**). At the defensible bound (α ≤ 0.2): Naive 0.1491 / DRO 0.1426 (p=0.016) at α=0.0; Naive 0.2026 / DRO 0.1999 (p=0.031) at α=0.1; Naive 0.2452 / DRO 0.2334 (p=0.016) at α=0.2.
+- **Adult / DP:** DRO better at every α with p ≤ 0.031 — **α=0.1 is 5/6** (seed 2 loses, p=0.0312); **others 6/6** (p=0.0156). **Not** “all six α are 6/6.” At the defensible bound (α ≤ 0.2): Naive 0.1491 / DRO 0.1426 (p=0.016) at α=0.0; Naive 0.2026 / DRO 0.1999 (p=0.031) at α=0.1; Naive 0.2452 / DRO 0.2334 (p=0.016) at α=0.2.
 - **Adult / Combined:** 6/6 wins at every α, p=0.016.
-- **Credit:** under the DP and Combined attacks (complete in the committed grid), DRO beats Naive at **every** cell, all p < 0.05 (Combined α=0.1 is 5/6). The IF-attack third is **landing but incomplete** — see §1 — so **"all three attacks" is not a ship claim**; DP and Combined are verified.
+- **Credit:** under DP and Combined, DRO beats Naive at every cell with p < 0.05 (Combined α=0.1 is 5/6).
+- **IF-attack third (complete, mixed):** do **not** claim a clean third-attack sweep; report Adult/Credit α≤0.2 support and LSAC / high-α caveats honestly (`results/if_wilcoxon_summary.txt`).
 
 ## One caveat to flag
 
-Every number above is traceable to `results/canonical_tau1.json`. **No full IF-attack story ships** until the local sweep finishes 180 IF rows and tables are regenerated — we are not quoting IF metric results as completed findings until then.
+Every number above is traceable to `results/canonical_tau1.json`. Present the IF story as **mixed**, never as “wins on all three attacks on all datasets.”
