@@ -116,9 +116,10 @@ equal-or-better.  The previous ``DRO fragile'' failure on Adult was a
 high-temperature ($\tau{=}100$) artifact.  LSAC/DP is a degenerate
 negative result (constant-predictor collapse, DRO loses at $0/6$ seeds);
 LSAC/Combined is a genuine win ($p{=}0.0156$).  IF-attack results are
-complete and mixed (180 rows; Adult/Credit $\alpha\le0.2$ support DRO on DP
-under IF attack; LSAC/IF does not --- see
-\texttt{results/if\_wilcoxon\_summary.txt}).  Pre-fix IF metrics were
+complete and mixed on DP (180 rows): IF metric wins Adult/Credit at
+$\alpha\in\{0.1$--$0.4\}$ incl.\ $\alpha{=}0.3$ ($6/6$, $p{=}0.0156$);
+DP-under-IF remains mixed (Adult $\alpha{=}0.3$ DP loss; LSAC/IF DP loss)
+--- see \texttt{results/if\_wilcoxon\_summary.txt}.  Pre-fix IF metrics were
 degenerate ($\approx10^{-10}$).  On real UTKFace ResNet18 features
 (complete 90-config REAL grid) clean-test DP is also mixed (significant DRO
 wins mainly at high $\alpha$; not an Adult/Credit $\alpha\le0.2$ copy).
@@ -538,9 +539,11 @@ the IF-metric fix; see \texttt{results/if\_wilcoxon\_summary.txt}).
 Earlier pre-fix numeric IF claims remain withdrawn.  Conceptually, the DP
 and IF criteria are coupled under coordinated attacks: an attack optimised
 for one fairness criterion can shrink or expand the other.  Empirically the
-read is mixed --- Adult/Credit $\alpha\le0.2$ still support DRO on DP under
-IF attack; LSAC/IF is a DP loss and Adult IF $\alpha\ge0.3$ does not
-support a DP win (see also \texttt{paper/sections/results.tex}).
+read is mixed on DP under IF, but the IF metric itself is a clean Adult/Credit
+win at $\alpha\in\{0.1$--$0.4\}$ including $\alpha{=}0.3$ ($6/6$,
+$p{=}0.0156$); Adult $\alpha{=}0.3$ still loses on DP under IF (coupling).
+LSAC/IF is a DP loss at $\alpha\le0.3$ (see \texttt{paper/sections/results.tex}
+and \texttt{results/if\_wilcoxon\_summary.txt}).
 
 \subsection{Empirical Radii (Q5)}
 
@@ -585,7 +588,7 @@ confirm the radii remain sufficient on all three tabular datasets.
   $p{<}0.05$ at $\alpha\le0.2$ on Adult and Credit (verified in
   \texttt{results/canonical\_tau1.json}).  The IF-attack third of the
   grid is complete (180 rows; earlier IF metrics were degenerate pre-fix;
-  Adult/Credit $\alpha\le0.2$ support DRO on DP under IF attack; LSAC/IF does not).
+  IF metric: Adult/Credit win incl.\ $\alpha{=}0.3$; DP-under-IF mixed; LSAC/IF DP loss).
 \item \textbf{UTKFace complete REAL grid (90/90; mixed clean-test).}
   Real features ($N{=}23{,}705$) and full dp/if/combined $\times$ $5\alpha$ $\times$ $6$ seeds
   in \texttt{results/utkface\_canonical.json}.  Clean-test DP is mixed
