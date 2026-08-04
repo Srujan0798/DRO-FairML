@@ -11,6 +11,23 @@ ROOT = Path(__file__).resolve().parents[1]
 INP = ROOT / "results" / "utkface_multigroup.json"
 OUT = ROOT / "results" / "utkface_multigroup_summary.md"
 
+# |N−D| below this is a numerical tie (not a real win either way).
+TIE_EPS = 1e-5
+
+
+def _winner(n: float, d: float) -> str:
+    if abs(n - d) < TIE_EPS:
+        return "tie"
+    return "DRO" if d < n else "Naive"
+
+
+def _win_counts(ns, ds):
+    """Return (dro_wins, ties, n) for table cells."""
+    labels = [_winner(n, d) for n, d in zip(ns, ds)]
+    dro = sum(1 for w in labels if w == "DRO")
+    ties = sum(1 for w in labels if w == "tie")
+    return dro, ties, len(labels)
+
 
 def main():
     if not INP.exists():
@@ -24,8 +41,10 @@ def main():
         "",
         f"rows: **{len(rows)}/30**",
         "",
-        "| α | n | DP_bin N | DP_bin D | wins_bin | DP_multi N | DP_multi D | wins_multi | mean Δmulti (N−D) |",
-        "|---:|--:|---------:|---------:|---------:|-----------:|-----------:|-----------:|------------------:|",
+        "wins = DRO strict lower DP; ties if |N−D| < 1e-5 (not counted as wins).",
+        "",
+        "| α | n | DP_bin N | DP_bin D | wins_bin (D/tie/n) | DP_multi N | DP_multi D | wins_multi (D/tie/n) | mean Δmulti (N−D) |",
+        "|---:|--:|---------:|---------:|------------------:|-----------:|-----------:|---------------------:|------------------:|",
     ]
     for a in [0.0, 0.1, 0.2, 0.3, 0.4]:
         cell = [r for r in rows if abs(r["alpha"] - a) < 1e-9]
@@ -35,11 +54,13 @@ def main():
         db = [r["dro"]["dp_binary"] for r in cell]
         nm = [r["naive"]["dp_multigroup"] for r in cell]
         dm = [r["dro"]["dp_multigroup"] for r in cell]
+        wb, tb, nb_n = _win_counts(nb, db)
+        wm, tm, nm_n = _win_counts(nm, dm)
         lines.append(
             f"| {a} | {len(cell)} | {mean(nb):.4f} | {mean(db):.4f} | "
-            f"{sum(n > d for n, d in zip(nb, db))}/{len(cell)} | "
+            f"{wb}/{tb}/{nb_n} | "
             f"{mean(nm):.4f} | {mean(dm):.4f} | "
-            f"{sum(n > d for n, d in zip(nm, dm))}/{len(cell)} | "
+            f"{wm}/{tm}/{nm_n} | "
             f"{mean(n - d for n, d in zip(nm, dm)):+.4f} |"
         )
 
@@ -72,10 +93,12 @@ def main():
         lines += ["", f"### Per-seed multi @ α={a} (n={len(cell)})", ""]
         for r in cell:
             n, d = r["naive"]["dp_multigroup"], r["dro"]["dp_multigroup"]
-            win = "DRO" if d < n else ("tie" if d == n else "Naive")
+            win = _winner(n, d)
+            bn, bd = r["naive"]["dp_binary"], r["dro"]["dp_binary"]
+            bwin = _winner(bn, bd)
             lines.append(
                 f"- s{int(r['seed'])}: multi N={n:.4f} D={d:.4f} → **{win}** "
-                f"(bin N={r['naive']['dp_binary']:.4f} D={r['dro']['dp_binary']:.4f})"
+                f"(bin N={bn:.4f} D={bd:.4f} → {bwin})"
             )
         break  # only the highest α present
 

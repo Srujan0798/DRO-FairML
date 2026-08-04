@@ -1,6 +1,6 @@
 # UTKFace Status
 
-**Updated:** 2026-08-05 ~04:31 IST (Grok lane)  
+**Updated:** 2026-08-05 ~04:40 IST (Grok lane)  
 
 ## Mac MPS canonical (LOCKED — paper pilot)
 **Grid: COMPLETE 90/90 REAL.** Summary: `results/utkface_summary.md`.
@@ -20,10 +20,10 @@
 | Job | File | Target | Status |
 |-----|------|--------|--------|
 | **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **22/90** — dp α=0.3 seeds 0–3; s=4 running |
-| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **21/30** — α=0.3 seeds 0–2; s=3 running |
+| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **22/30** — α=0.3 seeds 0–3; s=4 running |
 | **U3** pixel PGD | `results/utkface_pixel_pgd.json` | 24 (planned) | **JPEGs ready** (symlink 23708); launch after U1/U2 free GPU |
 
 - Repro: **22** matched, max\|ΔDP_dro\|≈0.008 (**0 GAP**). α=0.3 s0–3 |Δ|≤0.0006. Summary: `results/utkface_reproducibility_summary.md`
-- Multi-group partial: `results/utkface_multigroup_summary.md` (α=0.3 multi **3/3** so far; per-seed section added)
+- Multi-group partial: `results/utkface_multigroup_summary.md` (α=0.3 multi **3/1/4** DRO/tie/n; s3 multi tie)
 - U3: **linked** `/data/srujan.sai/UTKFace` → kshitish tree (23708 jpg); runner `experiments/run_utkface_pixel_pgd.py`; do not launch until U1/U2 done
 - Live table: `docs/WAVE1_LIVE_PROGRESS.md`
