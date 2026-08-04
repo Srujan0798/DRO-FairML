@@ -623,14 +623,24 @@ sensitivity at the correct $\alpha$ alone. \textbf{(ii) Shrinkage-based
 radii for imbalanced groups}: item~1's binary-attribute limitation and
 the LSAC/DP degeneracy share a root cause (radii calibration on small
 protected groups); a Laplace-style shrinkage of $\hat\pi_{j,\mathrm{clean}}$
-toward balance (\texttt{pi\_shrinkage\_k} in \texttt{DroFairTrainer}) is
-under test as an alternative to the per-group clamp that did not fix
-LSAC --- reported honestly whichever way it lands. \textbf{(iii)
-Augmented-Lagrangian dual stabilization}: replacing the tuned
-$\lambda_{\max}$ hard clamp with a quadratic penalty on $\lambda$ removes
-an empirically-chosen constant in favor of a standard mechanism. Full
-discussion: \texttt{paper/sections/discussion.tex} (Future Work
-subsection).
+toward balance (\texttt{pi\_shrinkage\_k} in \texttt{DroFairTrainer}) was
+tested as an alternative to the per-group clamp. \textbf{Result: also did
+not fix LSAC} (30/30 configs, two shrinkage strengths, indistinguishable
+from the unshrunk baseline) --- two independent mechanisms failing
+cleanly is stronger evidence the degeneracy is structural, not an
+estimation artifact.
+\textbf{(iii) Aggressiveness knobs, tested and negative}: raising
+$\lambda_{\max}$ from $1.5$ to $2.0$ (the paper's own original value) was
+a complete no-op (6/6 configs byte-identical --- the dual variable never
+reaches the cap at $\alpha\le0.2$), and doubling $\beta$ to $10$ made DP
+consistently \emph{worse} (6/6 configs, $+0.0025$ to $+0.0085$ absolute).
+Neither blunt lever widens DRO's margin over Naive; full data in
+\texttt{results/fairness\_aggressiveness\_summary.md}. This motivates
+\textbf{(iv) augmented-Lagrangian dual stabilization} instead of a bigger
+constant: replacing the tuned $\lambda_{\max}$ hard clamp with a quadratic
+penalty on $\lambda$ is a standard mechanism, informed by (iii)'s negative
+result rather than merely proposed alongside it. Full discussion:
+\texttt{paper/sections/discussion.tex} (Future Work subsection).
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Theoretical Verification}

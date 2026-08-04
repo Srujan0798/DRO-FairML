@@ -133,23 +133,40 @@ $\rho_{\mathrm{DP},j}=\alpha/((1-\alpha)\pi_j+\alpha)$ blowing up as
 $\pi_j\to0$ on a small protected group. A per-group cap
 (\texttt{radii\_clamp}) was tested and did not recover LSAC (no arm
 un-degenerated it; see \texttt{docs/LSAC\_DEGENERACY.md}). We are
-separately testing an additive (Laplace-style) shrinkage of
+tested an additive (Laplace-style) shrinkage of
 $\hat\pi_{j,\mathrm{clean}}$ toward $0.5$
 (\texttt{pi\_shrinkage\_k} in \texttt{DroFairTrainer}) as an alternative
 mechanism: rather than capping the output radius post hoc, it smooths
 the input proportion, which reshapes the resulting radius continuously
-and $\alpha$-dependently instead of imposing one fixed ceiling. We note
-honestly that LSAC's validation split is large ($n{=}2804$) and its
-minority proportion ($\approx6.4\%$) is measured, not noisily estimated,
-so shrinkage's usual statistical justification (denoising a small
-sample) does not straightforwardly apply here; we test it as a
-regularizer in its own right, and report the result --- fixed or not
---- rather than tuning until it works.
+and $\alpha$-dependently instead of imposing one fixed ceiling. We noted
+honestly, before running it, that LSAC's validation split is large
+($n{=}2804$) and its minority proportion ($\approx6.4\%$) is measured,
+not noisily estimated, so shrinkage's usual statistical justification
+(denoising a small sample) does not straightforwardly apply here.
+\textbf{Result: it did not fix LSAC either} (30/30 configs at two
+shrinkage strengths, statistically indistinguishable from the unshrunk
+baseline; \texttt{results/lsac\_pi\_shrinkage\_summary.md}). Two
+independent, principled mechanisms failing cleanly is stronger evidence
+that the degeneracy is structural --- the imbalance itself, not an
+estimation artifact --- than either attempt alone.
 
 \textbf{Principled dual-variable stabilization.} The dual step uses a
 hard clamp $\lambda\le\lambda_{\max}{=}1.5$ (tuned empirically; the
 paper's usual setting is $2.0$) to prevent $\lambda$-runaway under high
-temperature. A softer alternative --- a quadratic penalty on $\lambda$
-in the Lagrangian, i.e.\ an augmented-Lagrangian formulation --- would
-replace this tuned constant with a standard, well-understood
-stabilization mechanism and is a natural target for follow-up work.
+temperature. We tested whether simply raising this cap, or sharpening
+the tilted-risk concentration $\beta$, could make DRO's fairness margin
+over Naive larger rather than just present (Adult, DP attack,
+$\alpha\in\{0.1,0.2\}$, $n{=}3$): \textbf{raising $\lambda_{\max}$ to
+$2.0$ was a complete no-op} (6/6 configs byte-identical to the
+$\lambda_{\max}{=}1.5$ canonical run --- the dual variable never
+reaches the cap at this $\alpha$ range, so it is not the bottleneck),
+and \textbf{doubling $\beta$ to $10$ made DP consistently worse, not
+better} (6/6 configs, $+0.0025$ to $+0.0085$ absolute DP violation,
+accuracy essentially unchanged; \texttt{results/fairness\_aggressiveness\_summary.md}).
+Neither blunt lever widens the margin, which argues \emph{for} a
+smarter mechanism rather than a bigger constant: a softer alternative
+--- a quadratic penalty on $\lambda$ in the Lagrangian, i.e.\ an
+augmented-Lagrangian formulation --- replaces the tuned clamp with a
+standard, well-understood stabilization mechanism and remains a natural
+target for follow-up work, informed rather than merely motivated by
+the negative result above.
