@@ -1804,5 +1804,91 @@
     "epochs": 60,
     "coordinated": false,
     "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.2,
+    "seed": 0,
+    "attack": "if",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.8521408985446108,
+        "dp_violation": 0.013913899660110474,
+        "if_violation": 0.06519916653633118
+      },
+      "corrupted": {
+        "accuracy": 0.8506644167897068,
+        "dp_violation": 0.007032841444015503,
+        "if_violation": 0.06286381930112839
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.8508753427546931,
+        "dp_violation": 0.008751332759857178,
+        "if_violation": 0.047330863773822784
+      },
+      "corrupted": {
+        "accuracy": 0.8483442311748576,
+        "dp_violation": 0.004340678453445435,
+        "if_violation": 0.04583052173256874
+      }
+    },
+    "total_time": 105.23646712303162,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "if",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.8517190466146383,
+        "dp_violation": 0.02251860499382019,
+        "if_violation": 0.07031206041574478
+      },
+      "corrupted": {
+        "accuracy": 0.8411727483653237,
+        "dp_violation": 0.013823598623275757,
+        "if_violation": 0.0699235051870346
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.8559375659143641,
+        "dp_violation": 0.02741396427154541,
+        "if_violation": 0.057014092803001404
+      },
+      "corrupted": {
+        "accuracy": 0.8447584897700907,
+        "dp_violation": 0.016861915588378906,
+        "if_violation": 0.055460374802351
+      }
+    },
+    "total_time": 101.88383889198303,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
   }
 ]

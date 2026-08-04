@@ -110,17 +110,17 @@ make monitor
 | [`src/`](src/) | Core library: DRO-FAIR / Naive-FAIR trainers, `FairnessTargetedPGD`, metrics, radii. |
 | [`experiments/`](experiments/) | Canonical runner, ablations, plots, validation, deliverable generators. |
 | [`results/`](results/) | Committed experiment JSON (incl. `canonical_tau1.json`), Wilcoxon tables. |
-| [`figures/`](figures/) | Paper / meeting figures (PDF + PNG). |
+| [`figures/`](figures/) | Paper / meeting figures (PDF). |
 | [`paper/`](paper/) | ICML-style paper (`main.tex` → `main.pdf`). |
 | [`report/`](report/) | Longer report (`report.tex` → `report.pdf`). |
-| [`docs/`](docs/) | Design notes, meeting brief, verification; history in `docs/_archive/`. |
+| [`docs/`](docs/) | Meeting brief, verification, design notes (`docs/reference/` for planning). |
 | [`tests/`](tests/) | Unit / e2e tests. |
 | [`data/`](data/) | Download script + raw tabular inputs. |
 | [`configs/`](configs/) | Default YAML. |
 | [`scripts/`](scripts/) | Orchestration / server helpers (not needed for default repro). |
-| [`logs/`](logs/) | Run logs (mostly gitignored / archival). |
+| [`logs/`](logs/) | Runtime logs only (`logs/README.md`; gitignored). |
 
-One-screen map: [`docs/REPO_LAYOUT.md`](docs/REPO_LAYOUT.md).
+One-screen map: [`docs/reference/REPO_LAYOUT.md`](docs/reference/REPO_LAYOUT.md).
 
 ### Key entry points
 

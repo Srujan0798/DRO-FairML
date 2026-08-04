@@ -1,17 +1,18 @@
-# figures/
+# Figures (LIVE)
 
-## Report-live (must stay at `figures/` root — never delete)
-- `fig1_main_results.pdf`
-- `fig2_dp_reduction_heatmap.pdf`
-- `fig4_significance_matrix.pdf`
-- `fig5_accuracy_fairness_tradeoff.pdf`
-- `fig7_summary_win_rates.pdf`
-- `main_results.pdf`, `test_time_eval.pdf` (`make results`)
+## Regenerated from 540-row canonical (2026-08-04) — prefer these for meeting
+- `fig_tau1_headline.pdf` — Adult DP, wins [6,5,6,6,6]
+- `fig_final_wilcoxon_table.pdf` / `figD10_final_wilcoxon_table.pdf` — DP win matrix
+- `figD1`–`figD4` — constant-predictor / tradeoff (deliverables regen)
+- `fig1`, `fig2`, `fig4`, `fig5`, `fig7`, `main_results`, `test_time_eval` — report includes (regen 2026-08-04)
 
-## Deliverables
-- `figD*.pdf`, `fig_final_*.pdf`, `fig_tau1_*` — canonical-derived when present
+## Older stamps (optional / incomplete data)
+- `fig_final_constant_predictor_*`, `fig_final_lambda_*`, `fig_final_tradeoff_*` — mtime **Jul 2** (pre-540); prefer `figD*` where overlapping
+- `figD5`–`figD7` convergence — **Jul 20**; need `results/individual/` histories (not present) — do not claim as 540-fresh
+- `fig_acc_win_curves_tau1.pdf` — **Jul 2**
+- `fig_high_alpha_*` — optional high-α panels
 
-## Historical
-- `historical/` — meeting/τ=100/figC one-offs. Archive over delete.
-
-**Do not hard-delete this directory tree.** Prefer archive.
+Regenerate meeting pair:
+```bash
+python3 experiments/plot_meeting_figs_540.py
+```

@@ -76,10 +76,10 @@ theory:
 	python3 experiments/verify_theory.py
 
 review:
-	@echo "Self-review:    docs/_archive/REVIEW_CHECKLIST.md"
-	@echo "Verification:   docs/_archive/VERIFICATION_PROTOCOL.md"
-	@echo "Release check:  docs/_archive/RELEASE_CHECKLIST.md"
 	@echo "Live audit:     docs/VERIFICATION_REPORT.md"
+	@echo "Meeting brief:  docs/MEETING_2026-08-04.md"
+	@echo "Status:         STATUS.md"
+	@echo "Doc index:      docs/INDEX.md"
 
 paper:
 	tectonic -X compile paper/main.tex

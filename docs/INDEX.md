@@ -1,34 +1,21 @@
-# Docs
+# Docs index (LIVE)
 
-## Meeting / claims (start here)
-- [MEETING_2026-08-04.md](MEETING_2026-08-04.md)
-- [../STATUS.md](../STATUS.md)
-- [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md)
-- [KULDEEP_CORRECTION.md](KULDEEP_CORRECTION.md)
-- [LSAC_DEGENERACY.md](LSAC_DEGENERACY.md)
-- [KEY_FORMULAS.md](KEY_FORMULAS.md)
-- [UTKFACE_STATUS.md](UTKFACE_STATUS.md)
+## Present from these (current / meeting)
+| Doc | Role |
+|-----|------|
+| [../STATUS.md](../STATUS.md) | Single source of truth — 540 complete, IF MIXED, Adult/DP α=0.1 = 5/6 |
+| [MEETING_2026-08-04.md](MEETING_2026-08-04.md) | 4pm brief — every table from canonical |
+| [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md) | Claim audit (see Agent V section at end for live MATCH) |
+| [KULDEEP_CORRECTION.md](KULDEEP_CORRECTION.md) | Honest corrections for advisor |
+| [LSAC_DEGENERACY.md](LSAC_DEGENERACY.md) | LSAC/DP collapse |
+| [KEY_FORMULAS.md](KEY_FORMULAS.md) | Math |
+| [UTKFACE_STATUS.md](UTKFACE_STATUS.md) | Image experiment progress only (no paper claim) |
+| [LIVE_FILE_AUDIT.md](LIVE_FILE_AUDIT.md) | Brutal per-file audit of the working tree |
 
-## Reference (optional planning/design)
-See `docs/reference/`.
+## Data truth
+- `results/canonical_tau1.json` — **540 rows**
+- `results/if_wilcoxon_summary.txt` — real IF Wilcoxon
+- `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf` — regenerated 2026-08-04 from 540
 
-| [ARCHIVE_POLICY.md](ARCHIVE_POLICY.md) | Archive over delete |
-| [LOOP_STATUS.md](LOOP_STATUS.md) | 5-min loop board |
-
-## All live docs (auto)
-- [ARCHIVE_POLICY.md](ARCHIVE_POLICY.md)
-- [CLEAN_TREE.md](CLEAN_TREE.md)
-- [FAIRNESS_PGD_DESIGN.md](FAIRNESS_PGD_DESIGN.md)
-- [FINAL_COMPLETION_PLAN.md](FINAL_COMPLETION_PLAN.md)
-- [KEY_FORMULAS.md](KEY_FORMULAS.md)
-- [KULDEEP_CORRECTION.md](KULDEEP_CORRECTION.md)
-- [LOOP_STATUS.md](LOOP_STATUS.md)
-- [LSAC_DEGENERACY.md](LSAC_DEGENERACY.md)
-- [MEETING_2026-08-04.md](MEETING_2026-08-04.md)
-- [PAPER_FINALIZATION_CHECKLIST.md](PAPER_FINALIZATION_CHECKLIST.md)
-- [REPO_AUDIT.md](REPO_AUDIT.md)
-- [REPO_CONSOLIDATION_PLAN.md](REPO_CONSOLIDATION_PLAN.md)
-- [SERVER_RUNBOOK.md](SERVER_RUNBOOK.md)
-- [UTKFACE_PIPELINE.md](UTKFACE_PIPELINE.md)
-- [UTKFACE_STATUS.md](UTKFACE_STATUS.md)
-- [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md)
+## Optional / historical planning (not claims)
+See [`reference/`](reference/). Do not cite as live status if they conflict with STATUS.md.
