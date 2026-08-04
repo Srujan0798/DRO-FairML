@@ -1,25 +1,25 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~02:10 IST_
+_Last tick: 2026-08-05 ~02:19 IST_
 
 ## Counts (do not pkill)
 
-| Job | Target | Count | Status |
-|-----|--------|------:|--------|
-| **U1** `utkface_flair2.json` | 90 | **13** | alive PID 3482009 GPU0; last **dp α=0.2 seed=0**; mid seed=1 |
-| **U2** `utkface_multigroup.json` | 30 | **13** | alive PID 3482442 GPU1; last **α=0.2 seed=0**; mid seed=1 |
+| Job | Target | Count | Last | Alive |
+|-----|--------|------:|------|-------|
+| **U1** | 90 | **14** | dp α=0.2 seed=1 (t≈538s) | PID 3482009 GPU0 |
+| **U2** | 30 | **14** | α=0.2 seed=1; mid seed=2 | PID 3482442 GPU1 |
 
-Puller `scripts/u12_puller.sh` OK. ETA ~21 h (U1) / ~4.7 h (U2).
+Puller OK. ETA ~20h (U1) / ~4.2h (U2). Seed time variance ~540–1100s normal.
 
 ## Signals
-- **U1 repro:** 13 matched cells, max|ΔDP_dro|=0.0072, **0 GAP** (incl. first α=0.2 seed).
-- **U2:** α≤0.1 complete; α=0.2 seed0 multi DP ~0.22 (jump from ~0.13) — stronger attack, not a stall.
-  - α=0.0 multi wins 6/6; α=0.1 multi 4/6, binary 0/6.
+- U1 repro: **14** matched, max|ΔDP|=0.0072, **0 GAP**
+- U2 α=0.2 n=2: multi wins 2/2; multi DP ~0.22 (vs ~0.13 at α≤0.1)
 
-## U3 prep
-- JPEG source dry-run: `scripts/flair2_link_utkface_images.sh` (CONFIRM=1 to symlink)
-- Selected: `/data/kshitish.madbhavi/UTKFace` (23708 jpg, world-readable)
-- Do **not** start U3 until a GPU free after U1/U2; shared-user data — symlink only after OK
+## U3 prep (not started)
+- `experiments/run_utkface_pixel_pgd.py` restored (τ=1, race-binary, resume-safe)
+- Image link: `CONFIRM=1 bash scripts/flair2_link_utkface_images.sh` when GPU free
+- Do not launch until U1 or U2 frees a GPU
 
 ## Open
-- U1=90 / U2=30; then U3 optional; Finding 3 paper integration
+- U1=90 / U2=30 → finalize summaries
+- U3 after GPU free
