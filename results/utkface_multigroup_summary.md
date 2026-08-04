@@ -1,11 +1,19 @@
 # UTKFace multi-group (5-race) summary — PARTIAL
 
-rows: **14/30**
+rows: **15/30**
 
-| α | n | wins_bin | wins_multi | DP_multi N | DP_multi D | mean Δmulti |
-|---:|--:|---------:|-----------:|-----------:|-----------:|------------:|
-| 0.0 | 6 | 3/6 | 6/6 | 0.1282 | 0.1209 | +0.0073 |
-| 0.1 | 6 | 0/6 | 4/6 | 0.1319 | 0.1283 | +0.0037 |
-| 0.2 | 2 | 2/2 | 2/2 | 0.2245 | 0.2186 | +0.0059 |
+| α | n | DP_bin N | DP_bin D | wins_bin | DP_multi N | DP_multi D | wins_multi | mean Δmulti (N−D) |
+|---:|--:|---------:|---------:|---------:|-----------:|-----------:|-----------:|------------------:|
+| 0.0 | 6 | 0.0211 | 0.0204 | 3/6 | 0.1282 | 0.1209 | 6/6 | +0.0073 |
+| 0.1 | 6 | 0.0480 | 0.0519 | 0/6 | 0.1319 | 0.1283 | 4/6 | +0.0037 |
+| 0.2 | 3 | 0.1592 | 0.1586 | 2/3 | 0.2288 | 0.2239 | 3/3 | +0.0049 |
 
-**PARTIAL**. cuda flair2. U3 runner restored (not started).
+### DRO group positive rates (mean over seeds)
+
+- α=0.0 n=6: max **Other** 0.565 / min **Black** 0.448 — {'White': 0.466, 'Black': 0.448, 'Asian': 0.538, 'Indian': 0.453, 'Other': 0.565}
+- α=0.1 n=6: max **Other** 0.544 / min **White** 0.416 — {'White': 0.416, 'Black': 0.433, 'Asian': 0.514, 'Indian': 0.437, 'Other': 0.544}
+- α=0.2 n=3: max **Other** 0.512 / min **White** 0.288 — {'White': 0.288, 'Black': 0.421, 'Asian': 0.479, 'Indian': 0.419, 'Other': 0.512}
+
+Protocol: train DP on binary race (White vs non-White); eval max-min DP on 5 race groups.
+REAL ResNet18 features. device=cuda flair2.
+**PARTIAL** — not for paper claims until 30/30.

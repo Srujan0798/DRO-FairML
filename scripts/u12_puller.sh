@@ -37,62 +37,7 @@ finalize_u1() {
 
 finalize_u2() {
   rsync_one utkface_multigroup.json
-  python3 - <<'PY'
-import json
-from statistics import mean
-from pathlib import Path
-from collections import defaultdict
-
-rows = json.load(open("results/utkface_multigroup.json"))
-lines = [
-    "# UTKFace multi-group (5-race) summary",
-    "",
-    f"rows: {len(rows)}/30",
-    "",
-    "| α | n | DP_bin N | DP_bin D | wins_bin | DP_multi N | DP_multi D | wins_multi |",
-    "|---:|--:|---------:|---------:|---------:|-----------:|-----------:|-----------:|",
-]
-for a in [0.0, 0.1, 0.2, 0.3, 0.4]:
-    cell = [r for r in rows if abs(r["alpha"] - a) < 1e-9]
-    if not cell:
-        continue
-    nb = [r["naive"]["dp_binary"] for r in cell]
-    db = [r["dro"]["dp_binary"] for r in cell]
-    nm = [r["naive"]["dp_multigroup"] for r in cell]
-    dm = [r["dro"]["dp_multigroup"] for r in cell]
-    lines.append(
-        f"| {a} | {len(cell)} | {mean(nb):.4f} | {mean(db):.4f} | "
-        f"{sum(n > d for n, d in zip(nb, db))}/{len(cell)} | "
-        f"{mean(nm):.4f} | {mean(dm):.4f} | "
-        f"{sum(n > d for n, d in zip(nm, dm))}/{len(cell)} |"
-    )
-
-# Which race extremum drives max-min DP (DRO)?
-lines += ["", "### DRO group positive rates (mean over seeds, by α)", ""]
-for a in [0.0, 0.1, 0.2, 0.3, 0.4]:
-    cell = [r for r in rows if abs(r["alpha"] - a) < 1e-9]
-    if not cell:
-        continue
-    rates = defaultdict(list)
-    for r in cell:
-        for g, v in r["dro"]["group_pos_rates"].items():
-            rates[g].append(v)
-    means = {g: mean(v) for g, v in rates.items()}
-    gmax = max(means, key=means.get)
-    gmin = min(means, key=means.get)
-    lines.append(
-        f"- α={a}: max={gmax} ({means[gmax]:.3f}) min={gmin} ({means[gmin]:.3f}) "
-        f"— gap≈{means[gmax]-means[gmin]:.3f}; rates={{{', '.join(f'{k}:{means[k]:.3f}' for k in sorted(means))}}}"
-    )
-
-lines += [
-    "",
-    "Protocol: train DP on binary race (White vs non-White); eval max-min DP on 5 race groups.",
-    "REAL ResNet18 features. device=cuda flair2. Not a paper claim until human review.",
-]
-Path("results/utkface_multigroup_summary.md").write_text("\n".join(lines) + "\n")
-print("wrote results/utkface_multigroup_summary.md")
-PY
+  python3 experiments/summarize_utkface_multigroup.py
   echo "$(date) U2 FINALIZED 30/30 + multigroup summary" | tee -a "$LOG"
 }
 

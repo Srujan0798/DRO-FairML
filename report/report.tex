@@ -120,7 +120,9 @@ complete and mixed on DP (180 rows): IF metric wins Adult/Credit at
 $\alpha\in\{0.1$--$0.4\}$ incl.\ $\alpha{=}0.3$ ($6/6$, $p{=}0.0156$);
 DP-under-IF remains mixed (Adult $\alpha{=}0.3$ DP loss; LSAC/IF DP loss)
 --- see \texttt{results/if\_wilcoxon\_summary.txt}.  Pre-fix IF metrics were
-degenerate ($\approx10^{-10}$).  On real UTKFace ResNet18 features
+degenerate ($\approx10^{-10}$) under the original Euclidean feature-space
+threshold; all IF numbers here use cosine (angular) IF and are not the
+original Euclidean IF.  On real UTKFace ResNet18 features
 (complete 90-config REAL grid) clean-test DP is also mixed (significant DRO
 wins mainly at high $\alpha$; not an Adult/Credit $\alpha\le0.2$ copy).
 All theoretical formulas are numerically verified.
