@@ -29,19 +29,42 @@ _LOCKED_SCIENCE = {
 }
 
 
+# Config tuple schema (in order): dataset, alpha, seed, method, attack, k_inner,
+# pgd_steps, tau, lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type,
+# attack_k, [radii_scale, radii_clamp]. The last two are OPTIONAL for backward
+# compatibility with Wave 1 drivers that use 14-tuples; when absent they default to
+# (1.0, None) so the canonical closed-form radii are unchanged. Agent L2 (LSAC
+# degeneracy fix) supplies the 16-tuple to thread the per-group radius clamp
+# through to DroFairTrainer._compute_radii without disturbing other agents.
+_KEY_FIELDS = ['dataset', 'alpha', 'seed', 'method', 'attack', 'k_inner', 'pgd_steps',
+               'tau', 'lambda_init', 'lr_lambda', 'radii_mode', 'coordinated',
+               'corruptor_type', 'attack_k', 'radii_scale', 'radii_clamp']
+
+
 def _worker(cfg):
-    """Module-level worker (must be importable by spawn). No globals — fully self-contained."""
+    """Module-level worker (must be importable by spawn). No globals — fully self-contained.
+
+    Accepts either a 14-tuple (Wave 1 drivers; radii_scale=1.0, radii_clamp=None)
+    or a 16-tuple (Agent L2 passes the per-group radius clamp). Backward-compatible.
+    """
     import torch
     torch.set_num_threads(1)
     from experiments.run_fairness_pgd import run_single_experiment
-    (ds, a, s, m, attack, k_inner, pgd_steps, tau,
-     lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type, attack_k) = cfg
+    if len(cfg) == 14:
+        (ds, a, s, m, attack, k_inner, pgd_steps, tau,
+         lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type, attack_k) = cfg
+        radii_scale, radii_clamp = 1.0, None
+    else:
+        (ds, a, s, m, attack, k_inner, pgd_steps, tau,
+         lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type, attack_k,
+         radii_scale, radii_clamp) = cfg
     return run_single_experiment(
         ds, a, s, attack, m, device="cpu", verbose=False,
         epochs=60, k_inner=k_inner, pgd_steps=pgd_steps,
         tau=tau, lambda_init=lambda_init, radii_mode=radii_mode,
         coordinated=coordinated, n_seeds_planned=6,
         corruptor_type=corruptor_type, lr_lambda=lr_lambda, attack_k=attack_k,
+        radii_scale=radii_scale, radii_clamp=radii_clamp,
     )
 
 
@@ -50,7 +73,8 @@ def _key(r):
             r.get('attack'), r.get('k_inner'), r.get('tau'),
             r.get('lambda_init'), r.get('lr_lambda'), r.get('radii_mode'),
             r.get('coordinated'), r.get('corruptor_type', 'adversarial'),
-            r.get('attack_k', 5))
+            r.get('attack_k', 5),
+            r.get('radii_scale', 1.0), r.get('radii_clamp', None))
 
 
 def missing_configs(rows, configs):
@@ -58,9 +82,10 @@ def missing_configs(rows, configs):
     out = []
     seen = set()
     for c in configs:
-        k = _key(dict(zip(
-            ['dataset','alpha','seed','method','attack','k_inner','pgd_steps','tau',
-             'lambda_init','lr_lambda','radii_mode','coordinated','corruptor_type','attack_k'], c)))
+        # Normalize to a 16-element dict by padding missing trailing fields with
+        # their defaults so 14-tuple configs key identically to legacy rows.
+        pad = list(c) + [1.0, None][len(c):]
+        k = _key(dict(zip(_KEY_FIELDS, pad)))
         if k in have or k in seen:
             continue
         seen.add(k)
@@ -89,6 +114,58 @@ def _assert_safe_results_path(results_file):
         raise RuntimeError(f"REFUSING locked basename: {base}")
 
 
+# Machine-wide lock so at most ONE ablation job runs at a time. History: on
+# 2026-08-04, 11 ablation jobs were launched concurrently by different agent
+# sessions with no shared coordination — each spun up its own worker pool,
+# oversubscribing the 14-core machine ~4x (load avg 280+, near-zero real
+# throughput for 3+ hours). Fixed once by killing everything and running
+# scripts/orchestrate_wave1.sh sequentially — then a SECOND uncoordinated
+# agent session relaunched all remaining jobs concurrently again 2 minutes
+# later, recreating the exact same problem. This lock makes that impossible:
+# any run() call blocks (with a clear message) if another job already holds
+# the lock, regardless of which script or which agent session calls it.
+_LOCK_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                 "logs", "ablation.lock")
+)
+
+
+class _AblationLock:
+    """Advisory file lock (flock) shared by every run() call, from any process."""
+
+    def __init__(self, path=_LOCK_PATH):
+        self.path = path
+        self._fh = None
+
+    def __enter__(self):
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        self._fh = open(self.path, "a+")
+        import fcntl
+        try:
+            fcntl.flock(self._fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print(
+                f"[ablation-lock] another ablation job is already running "
+                f"(lock held on {self.path}). Waiting for it to finish rather "
+                f"than oversubscribing the machine — see history above.",
+                flush=True,
+            )
+            import fcntl as _fcntl
+            _fcntl.flock(self._fh.fileno(), _fcntl.LOCK_EX)  # blocks until free
+        self._fh.seek(0)
+        self._fh.truncate()
+        self._fh.write(f"pid={os.getpid()} started={time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+        self._fh.flush()
+        return self
+
+    def __exit__(self, *exc):
+        import fcntl
+        try:
+            fcntl.flock(self._fh.fileno(), fcntl.LOCK_UN)
+        finally:
+            self._fh.close()
+
+
 def _append_result(rows, res, provenance_extras, results_file, label, c, done, todo_n, t0):
     if provenance_extras:
         for k, v in provenance_extras.items():
@@ -104,7 +181,17 @@ def _append_result(rows, res, provenance_extras, results_file, label, c, done, t
 
 
 def run(results_file, configs, provenance_extras=None, workers=4, label="ablation"):
-    """Run missing configs into results_file. Resume-safe. Default workers=4 (stable on macOS)."""
+    """Run missing configs into results_file. Resume-safe. Default workers=4 (stable on macOS).
+
+    Acquires the machine-wide ablation lock first, so at most one ablation job
+    (from any script, any agent session) ever runs at a time. See _AblationLock
+    docstring/comment above for why this exists.
+    """
+    with _AblationLock():
+        return _run_locked(results_file, configs, provenance_extras, workers, label)
+
+
+def _run_locked(results_file, configs, provenance_extras=None, workers=4, label="ablation"):
     _assert_safe_results_path(results_file)
     rows = []
     if os.path.exists(results_file):
