@@ -1,0 +1,21 @@
+[
+ {
+  "dataset": "adult",
+  "alpha": 0.2,
+  "seed": 0,
+  "attack": "if",
+  "method": "naive",
+  "acc_clean": 0.7879491431730238,
+  "dp_clean": 0.05761727690696716,
+  "if_clean": 0.033325325697660446,
+  "total_time": 50.95806002616882,
+  "k_inner": 10,
+  "tau": 1.0,
+  "radii_mode": "uniform",
+  "lambda_init": 0.0,
+  "coordinated": false,
+  "pgd_steps": 20,
+  "n_seeds_planned": 2,
+  "epochs": 60
+ }
+]

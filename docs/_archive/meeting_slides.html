@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DRO-FAIR: Week 2 Progress</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #1a1a2e; color: #eee; }
+.slide {
+  display: none;
+  width: 100vw; height: 100vh;
+  padding: 60px 80px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+.slide.active { display: flex; flex-direction: column; justify-content: center; }
+h1 { font-size: 3em; color: #00d4ff; margin-bottom: 0.3em; }
+h2 { font-size: 2.2em; color: #ff6b6b; margin-bottom: 0.5em; border-bottom: 3px solid #ff6b6b; padding-bottom: 10px; }
+h3 { font-size: 1.5em; color: #ffd93d; margin: 1em 0 0.5em; }
+p, li { font-size: 1.4em; line-height: 1.6; margin: 0.5em 0; }
+ul { margin-left: 2em; }
+li { margin: 0.4em 0; }
+.highlight { color: #00d4ff; font-weight: bold; }
+.red { color: #ff6b6b; }
+.green { color: #6bcb77; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 1.1em; }
+th { background: #ff6b6b; color: white; padding: 12px; text-align: left; }
+td { padding: 10px 12px; border-bottom: 1px solid #444; }
+tr:nth-child(even) { background: #2a2a4a; }
+.nav {
+  position: fixed; bottom: 20px; right: 30px;
+  font-size: 1.2em; color: #888;
+}
+.nav button {
+  background: #ff6b6b; color: white; border: none;
+  padding: 8px 16px; border-radius: 4px; cursor: pointer;
+  font-size: 1em;
+}
+code { background: #2a2a4a; padding: 2px 8px; border-radius: 3px; color: #00d4ff; }
+.section-title { font-size: 1.1em; color: #888; margin-bottom: 0.5em; }
+</style>
+</head>
+<body>
+
+<!-- Slide 1 -->
+<div class="slide active">
+  <p class="section-title">DRO-FAIR — Week 2 Progress</p>
+  <h1>Adversarial Fairness Attacks</h1>
+  <p>+ UTKFace Pipeline</p>
+  <br><br>
+  <p>May 27, 2026</p>
+  <br><br>
+  <p style="color:#888">← → to navigate | ESC for overview</p>
+</div>
+
+<!-- Slide 2 -->
+<div class="slide">
+  <h2>Motivation: Why Adversarial Attacks?</h2>
+  <table>
+    <tr><th>Paper v1.0 (frozen)</th><th>Week 2 Extension</th></tr>
+    <tr><td>Random noise corruption</td><td class="highlight">Gradient-based adversarial attacks</td></tr>
+    <tr><td>Lower bound on defense difficulty</td><td>2–5× harder than random noise</td></tr>
+    <tr><td>3 tabular datasets</td><td>3 tabular + UTKFace (200K images)</td></tr>
+  </table>
+  <br>
+  <h3>Research Question</h3>
+  <p>Does DRO-FAIR still enforce fairness when the attacker <span class="red">specifically targets</span> fairness metrics (DP or IF)?</p>
+</div>
+
+<!-- Slide 3 -->
+<div class="slide">
+  <h2>Fairness-Targeted PGD Attack</h2>
+  <h3>DP-gradient</h3>
+  <p>Compute $d(\text{DP})/d(y_i)$: $+1$ if flipping increases group rate gap, $-1$ otherwise.</p>
+
+  <h3>IF-gradient (k-NN)</h3>
+  <p>For each sample, count agreeing neighbors in same protected group:</p>
+  <p style="font-family:monospace">grad[i] = (#agree − #disagree) / k</p>
+
+  <h3>Combined</h3>
+  <p>Equal-weighted sum: $0.5 \cdot \nabla_{\text{DP}} + 0.5 \cdot \nabla_{\text{IF}}$</p>
+  <br>
+  <p><span class="highlight">Code:</span> <code>src/corruption/adversarial.py::FairnessTargetedPGD</code></p>
+</div>
+
+<!-- Slide 4 -->
+<div class="slide">
+  <h2>Key Results — 270 Experiments</h2>
+  <table>
+    <tr><th>Dataset</th><th>Attack</th><th>DRO vs Naive DP</th><th>p-value</th></tr>
+    <tr><td>Credit</td><td>IF α=0.2</td><td class="green">+64.5% reduction</td><td class="green">0.031 ***</td></tr>
+    <tr><td>Credit</td><td>IF α=0.3</td><td class="green">+97.5% reduction</td><td class="green">0.031 ***</td></tr>
+    <tr><td>LSAC</td><td>IF α=0.3</td><td class="green">+96.2% reduction</td><td class="green">0.031 ***</td></tr>
+    <tr><td>Adult</td><td>Combined α=0.2</td><td class="green">+40.0% reduction</td><td>0.156</td></tr>
+    <tr><td>Adult</td><td>DP α=0.2</td><td class="red">−22.7% (worse)</td><td>0.938</td></tr>
+  </table>
+  <br>
+  <h3>Key Finding</h3>
+  <p><span class="highlight">IF-attack is the strongest attack.</span> DRO is most robust against it because corruption-calibrated weights downweight corrupted samples.</p>
+</div>
+
+<!-- Slide 5 -->
+<div class="slide">
+  <h2>What Breaks DRO?</h2>
+  <h3>DP-attack on Adult</h3>
+  <p>Attacker flips minority samples to manipulate group rates. DRO's group-specific uncertainty sets cannot distinguish corrupted minority samples.</p>
+  <p class="red">Result: DRO shows higher DP than Naive (−22.7%, not significant)</p>
+
+  <h3>Combined Attack</h3>
+  <p>More favorable for DRO because:</p>
+  <ul>
+    <li>Attack budget splits across DP and IF objectives</li>
+    <li>DRO's per-sample weights can downweight corrupted samples</li>
+  </ul>
+</div>
+
+<!-- Slide 6 -->
+<div class="slide">
+  <h2>UTKFace Pipeline</h2>
+  <h3>Pipeline (200K face images)</h3>
+  <p><code>UTKFace images → ResNet18 → 512-dim features → MLP → DRO-FAIR</code></p>
+
+  <h3>Status</h3>
+  <table>
+    <tr><th>Component</th><th>Status</th></tr>
+    <tr><td>CNNClassifier (ResNet18)</td><td class="green">✅ Committed</td></tr>
+    <tr><td>ImagePGD attack</td><td class="green">✅ Committed</td></tr>
+    <tr><td>run_utkface.py</td><td class="green">✅ Committed (synthetic works)</td></tr>
+    <tr><td>GPU server access</td><td class="red">⏳ Blocked (hostname unresolved)</td></tr>
+  </table>
+</div>
+
+<!-- Slide 7 -->
+<div class="slide">
+  <h2>Tuesday Meeting: Key Messages</h2>
+  <ol style="font-size:1.3em">
+    <li style="margin:0.8em 0"><span class="highlight">"No paper changes."</span> Frozen at v1.0. Separate direction.</li>
+    <li style="margin:0.8em 0"><span class="highlight">"IF-attack is the strongest."</span> DRO reduces DP by 64–97% on Credit/LSAC (p&lt;0.05).</li>
+    <li style="margin:0.8em 0"><span class="highlight">"DP-attack is hardest to defend."</span> On Adult, DRO shows higher DP than Naive.</li>
+    <li style="margin:0.8em 0"><span class="highlight">"UTKFace: waiting on GPU."</span> Pipeline works. Full results next week.</li>
+  </ol>
+  <br><br>
+  <p style="color:#888">Tuesday May 27 · 4 PM</p>
+</div>
+
+<script>
+let idx = 0;
+const slides = document.querySelectorAll('.slide');
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    slides[idx].classList.remove('active');
+    idx = (idx + 1) % slides.length;
+    slides[idx].classList.add('active');
+  } else if (e.key === 'ArrowLeft') {
+    slides[idx].classList.remove('active');
+    idx = (idx - 1 + slides.length) % slides.length;
+    slides[idx].classList.add('active');
+  } else if (e.key === 'Escape') {
+    slides.forEach(s => s.classList.remove('active'));
+    slides[idx].classList.add('active');
+  }
+});
+</script>
+</body>
+</html>

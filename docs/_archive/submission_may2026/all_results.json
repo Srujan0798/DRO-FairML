@@ -1,0 +1,4802 @@
+[
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 0,
+    "naive": {
+      "time": 47.01654815673828,
+      "clean": {
+        "accuracy": 0.8221116639027087,
+        "dp_violation": 0.1610664427280426,
+        "if_violation": 0.02511885019347706
+      },
+      "corrupted": {
+        "accuracy": 0.8221116639027087,
+        "dp_violation": 0.1610664427280426,
+        "if_violation": 0.02511885019347706
+      }
+    },
+    "dro": {
+      "time": 1288.0722897052765,
+      "clean": {
+        "accuracy": 0.8248756218905473,
+        "dp_violation": 0.1790267378091812,
+        "if_violation": 0.02507462686567164
+      },
+      "corrupted": {
+        "accuracy": 0.8248756218905473,
+        "dp_violation": 0.1790267378091812,
+        "if_violation": 0.02507462686567164
+      }
+    },
+    "total_time": 1354.859179019928
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 1,
+    "naive": {
+      "time": 19.69549584388733,
+      "clean": {
+        "accuracy": 0.8273079049198452,
+        "dp_violation": 0.19268465042114258,
+        "if_violation": 0.022045328911000552
+      },
+      "corrupted": {
+        "accuracy": 0.8273079049198452,
+        "dp_violation": 0.19268465042114258,
+        "if_violation": 0.022045328911000552
+      }
+    },
+    "dro": {
+      "time": 715.3654658794403,
+      "clean": {
+        "accuracy": 0.821779988944168,
+        "dp_violation": 0.17681875824928284,
+        "if_violation": 0.026224433388612495
+      },
+      "corrupted": {
+        "accuracy": 0.821779988944168,
+        "dp_violation": 0.17681875824928284,
+        "if_violation": 0.026224433388612495
+      }
+    },
+    "total_time": 743.2372901439667
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 2,
+    "naive": {
+      "time": 32.09358596801758,
+      "clean": {
+        "accuracy": 0.8235489220563847,
+        "dp_violation": 0.17643532156944275,
+        "if_violation": 0.027175234936428965
+      },
+      "corrupted": {
+        "accuracy": 0.8235489220563847,
+        "dp_violation": 0.17643532156944275,
+        "if_violation": 0.027175234936428965
+      }
+    },
+    "dro": {
+      "time": 1103.1016399860382,
+      "clean": {
+        "accuracy": 0.824433388612493,
+        "dp_violation": 0.1608029007911682,
+        "if_violation": 0.02613598673300166
+      },
+      "corrupted": {
+        "accuracy": 0.824433388612493,
+        "dp_violation": 0.1608029007911682,
+        "if_violation": 0.02613598673300166
+      }
+    },
+    "total_time": 1148.0180220603943
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 3,
+    "naive": {
+      "time": 22.91000986099243,
+      "clean": {
+        "accuracy": 0.8200110558319513,
+        "dp_violation": 0.17105555534362793,
+        "if_violation": 0.024875621890547265
+      },
+      "corrupted": {
+        "accuracy": 0.8200110558319513,
+        "dp_violation": 0.17105555534362793,
+        "if_violation": 0.024875621890547265
+      }
+    },
+    "dro": {
+      "time": 1087.3510568141937,
+      "clean": {
+        "accuracy": 0.816694306246545,
+        "dp_violation": 0.15899404883384705,
+        "if_violation": 0.023836373687119956
+      },
+      "corrupted": {
+        "accuracy": 0.816694306246545,
+        "dp_violation": 0.15899404883384705,
+        "if_violation": 0.023836373687119956
+      }
+    },
+    "total_time": 1118.5806090831757
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 4,
+    "naive": {
+      "time": 22.685161113739014,
+      "clean": {
+        "accuracy": 0.8153676064123825,
+        "dp_violation": 0.1767764687538147,
+        "if_violation": 0.025848535102266444
+      },
+      "corrupted": {
+        "accuracy": 0.8153676064123825,
+        "dp_violation": 0.1767764687538147,
+        "if_violation": 0.025848535102266444
+      }
+    },
+    "dro": {
+      "time": 1032.9928019046783,
+      "clean": {
+        "accuracy": 0.8241017136539525,
+        "dp_violation": 0.1673407405614853,
+        "if_violation": 0.025052515201768932
+      },
+      "corrupted": {
+        "accuracy": 0.8241017136539525,
+        "dp_violation": 0.1673407405614853,
+        "if_violation": 0.025052515201768932
+      }
+    },
+    "total_time": 1063.895924091339
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 5,
+    "naive": {
+      "time": 22.959344148635864,
+      "clean": {
+        "accuracy": 0.8220011055831952,
+        "dp_violation": 0.18961510062217712,
+        "if_violation": 0.02295190713101161
+      },
+      "corrupted": {
+        "accuracy": 0.8220011055831952,
+        "dp_violation": 0.18961510062217712,
+        "if_violation": 0.02295190713101161
+      }
+    },
+    "dro": {
+      "time": 1077.3584911823273,
+      "clean": {
+        "accuracy": 0.8227750138197899,
+        "dp_violation": 0.17521759867668152,
+        "if_violation": 0.026003316749585406
+      },
+      "corrupted": {
+        "accuracy": 0.8227750138197899,
+        "dp_violation": 0.17521759867668152,
+        "if_violation": 0.026003316749585406
+      }
+    },
+    "total_time": 1109.3503301143646
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 6,
+    "naive": {
+      "time": 22.903913021087646,
+      "clean": {
+        "accuracy": 0.8197899391929243,
+        "dp_violation": 0.17482760548591614,
+        "if_violation": 0.021315644002211167
+      },
+      "corrupted": {
+        "accuracy": 0.8197899391929243,
+        "dp_violation": 0.17482760548591614,
+        "if_violation": 0.021315644002211167
+      }
+    },
+    "dro": {
+      "time": 1075.753177165985,
+      "clean": {
+        "accuracy": 0.8182421227197346,
+        "dp_violation": 0.19088558852672577,
+        "if_violation": 0.023150912106135988
+      },
+      "corrupted": {
+        "accuracy": 0.8182421227197346,
+        "dp_violation": 0.19088558852672577,
+        "if_violation": 0.023150912106135988
+      }
+    },
+    "total_time": 1107.228580236435
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 7,
+    "naive": {
+      "time": 24.22700309753418,
+      "clean": {
+        "accuracy": 0.8226644555002764,
+        "dp_violation": 0.17600524425506592,
+        "if_violation": 0.026688778330569374
+      },
+      "corrupted": {
+        "accuracy": 0.8226644555002764,
+        "dp_violation": 0.17600524425506592,
+        "if_violation": 0.026688778330569374
+      }
+    },
+    "dro": {
+      "time": 1117.871752023697,
+      "clean": {
+        "accuracy": 0.8216694306246545,
+        "dp_violation": 0.17083477973937988,
+        "if_violation": 0.024411276948590382
+      },
+      "corrupted": {
+        "accuracy": 0.8216694306246545,
+        "dp_violation": 0.17083477973937988,
+        "if_violation": 0.024411276948590382
+      }
+    },
+    "total_time": 1150.771744966507
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 8,
+    "naive": {
+      "time": 25.732534885406494,
+      "clean": {
+        "accuracy": 0.8312880044223327,
+        "dp_violation": 0.17736917734146118,
+        "if_violation": 0.022531785516860144
+      },
+      "corrupted": {
+        "accuracy": 0.8312880044223327,
+        "dp_violation": 0.17736917734146118,
+        "if_violation": 0.022531785516860144
+      }
+    },
+    "dro": {
+      "time": 1110.018074274063,
+      "clean": {
+        "accuracy": 0.8297401879491432,
+        "dp_violation": 0.1669940948486328,
+        "if_violation": 0.0267551133222775
+      },
+      "corrupted": {
+        "accuracy": 0.8297401879491432,
+        "dp_violation": 0.1669940948486328,
+        "if_violation": 0.0267551133222775
+      }
+    },
+    "total_time": 1145.1815240383148
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.0,
+    "seed": 9,
+    "naive": {
+      "time": 23.63901686668396,
+      "clean": {
+        "accuracy": 0.8183526810392482,
+        "dp_violation": 0.16348133981227875,
+        "if_violation": 0.022841348811498064
+      },
+      "corrupted": {
+        "accuracy": 0.8183526810392482,
+        "dp_violation": 0.16348133981227875,
+        "if_violation": 0.022841348811498064
+      }
+    },
+    "dro": {
+      "time": 747.9596610069275,
+      "clean": {
+        "accuracy": 0.8227750138197899,
+        "dp_violation": 0.17069093883037567,
+        "if_violation": 0.023394140409065782
+      },
+      "corrupted": {
+        "accuracy": 0.8227750138197899,
+        "dp_violation": 0.17069093883037567,
+        "if_violation": 0.023394140409065782
+      }
+    },
+    "total_time": 780.4668700695038
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 0,
+    "naive": {
+      "time": 24.720933198928833,
+      "clean": {
+        "accuracy": 0.8232172470978442,
+        "dp_violation": 0.14393946528434753,
+        "if_violation": 0.02673300165837479
+      },
+      "corrupted": {
+        "accuracy": 0.81934770591487,
+        "dp_violation": 0.11838416755199432,
+        "if_violation": 0.027993366500829186
+      }
+    },
+    "dro": {
+      "time": 373.8122932910919,
+      "clean": {
+        "accuracy": 0.8283029297954672,
+        "dp_violation": 0.13979491591453552,
+        "if_violation": 0.022133775566611388
+      },
+      "corrupted": {
+        "accuracy": 0.825428413488115,
+        "dp_violation": 0.11619801819324493,
+        "if_violation": 0.02312880044223328
+      }
+    },
+    "total_time": 407.8349242210388
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 1,
+    "naive": {
+      "time": 19.119390964508057,
+      "clean": {
+        "accuracy": 0.833167495854063,
+        "dp_violation": 0.19206984341144562,
+        "if_violation": 0.021514648977335543
+      },
+      "corrupted": {
+        "accuracy": 0.82808181315644,
+        "dp_violation": 0.16348612308502197,
+        "if_violation": 0.024035378662244335
+      }
+    },
+    "dro": {
+      "time": 366.78834104537964,
+      "clean": {
+        "accuracy": 0.8279712548369265,
+        "dp_violation": 0.19520670175552368,
+        "if_violation": 0.02892205638474295
+      },
+      "corrupted": {
+        "accuracy": 0.8234383637368712,
+        "dp_violation": 0.1660797894001007,
+        "if_violation": 0.030668877833056937
+      }
+    },
+    "total_time": 393.6309208869934
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 2,
+    "naive": {
+      "time": 24.37656283378601,
+      "clean": {
+        "accuracy": 0.8309563294637922,
+        "dp_violation": 0.1597239375114441,
+        "if_violation": 0.029364289662797124
+      },
+      "corrupted": {
+        "accuracy": 0.8267551133222775,
+        "dp_violation": 0.1235022321343422,
+        "if_violation": 0.030713101160862354
+      }
+    },
+    "dro": {
+      "time": 371.1196358203888,
+      "clean": {
+        "accuracy": 0.8308457711442786,
+        "dp_violation": 0.15985339879989624,
+        "if_violation": 0.024698728579325594
+      },
+      "corrupted": {
+        "accuracy": 0.8274184632393587,
+        "dp_violation": 0.12555226683616638,
+        "if_violation": 0.02540630182421227
+      }
+    },
+    "total_time": 405.0292468070984
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 3,
+    "naive": {
+      "time": 28.19896101951599,
+      "clean": {
+        "accuracy": 0.8237700386954119,
+        "dp_violation": 0.1503790318965912,
+        "if_violation": 0.024742951907131012
+      },
+      "corrupted": {
+        "accuracy": 0.8195688225538972,
+        "dp_violation": 0.1163877546787262,
+        "if_violation": 0.02593698175787728
+      }
+    },
+    "dro": {
+      "time": 484.6463391780853,
+      "clean": {
+        "accuracy": 0.8161415146489773,
+        "dp_violation": 0.17291171848773956,
+        "if_violation": 0.026887783305693753
+      },
+      "corrupted": {
+        "accuracy": 0.8120508568269762,
+        "dp_violation": 0.13753369450569153,
+        "if_violation": 0.02794914317302377
+      }
+    },
+    "total_time": 523.1358771324158
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 4,
+    "naive": {
+      "time": 26.196018934249878,
+      "clean": {
+        "accuracy": 0.8173576561636263,
+        "dp_violation": 0.15335151553153992,
+        "if_violation": 0.026909894969596462
+      },
+      "corrupted": {
+        "accuracy": 0.8129353233830846,
+        "dp_violation": 0.12572768330574036,
+        "if_violation": 0.027904919845218354
+      }
+    },
+    "dro": {
+      "time": 319.14028096199036,
+      "clean": {
+        "accuracy": 0.8278606965174129,
+        "dp_violation": 0.20201894640922546,
+        "if_violation": 0.02927584300718629
+      },
+      "corrupted": {
+        "accuracy": 0.8228855721393035,
+        "dp_violation": 0.16385683417320251,
+        "if_violation": 0.03155334438916529
+      }
+    },
+    "total_time": 355.03359174728394
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 5,
+    "naive": {
+      "time": 26.408095121383667,
+      "clean": {
+        "accuracy": 0.8231066887783306,
+        "dp_violation": 0.1704242080450058,
+        "if_violation": 0.025030403537866223
+      },
+      "corrupted": {
+        "accuracy": 0.8197899391929243,
+        "dp_violation": 0.13829395174980164,
+        "if_violation": 0.026202321724709786
+      }
+    },
+    "dro": {
+      "time": 369.2205991744995,
+      "clean": {
+        "accuracy": 0.8228855721393035,
+        "dp_violation": 0.2003573179244995,
+        "if_violation": 0.026489773355444998
+      },
+      "corrupted": {
+        "accuracy": 0.8199004975124378,
+        "dp_violation": 0.16196754574775696,
+        "if_violation": 0.02728579325594251
+      }
+    },
+    "total_time": 405.6173839569092
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 6,
+    "naive": {
+      "time": 26.943513870239258,
+      "clean": {
+        "accuracy": 0.8247650635710337,
+        "dp_violation": 0.1568293422460556,
+        "if_violation": 0.023349917081260364
+      },
+      "corrupted": {
+        "accuracy": 0.8211166390270868,
+        "dp_violation": 0.12259069085121155,
+        "if_violation": 0.023902708678828082
+      }
+    },
+    "dro": {
+      "time": 410.0013790130615,
+      "clean": {
+        "accuracy": 0.8212271973466003,
+        "dp_violation": 0.19333910942077637,
+        "if_violation": 0.024499723604201218
+      },
+      "corrupted": {
+        "accuracy": 0.8175787728026535,
+        "dp_violation": 0.15501950681209564,
+        "if_violation": 0.02480928689883914
+      }
+    },
+    "total_time": 447.0653781890869
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 7,
+    "naive": {
+      "time": 24.8465359210968,
+      "clean": {
+        "accuracy": 0.8301824212271973,
+        "dp_violation": 0.14557990431785583,
+        "if_violation": 0.026799336650082918
+      },
+      "corrupted": {
+        "accuracy": 0.8264234383637369,
+        "dp_violation": 0.1230446845293045,
+        "if_violation": 0.027330016583747927
+      }
+    },
+    "dro": {
+      "time": 384.0690941810608,
+      "clean": {
+        "accuracy": 0.8285240464344942,
+        "dp_violation": 0.1998644322156906,
+        "if_violation": 0.026909894969596462
+      },
+      "corrupted": {
+        "accuracy": 0.8252072968490879,
+        "dp_violation": 0.16617193818092346,
+        "if_violation": 0.027396351575456054
+      }
+    },
+    "total_time": 420.23924803733826
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 8,
+    "naive": {
+      "time": 42.395724058151245,
+      "clean": {
+        "accuracy": 0.8365948037589829,
+        "dp_violation": 0.16663557291030884,
+        "if_violation": 0.02423438363736871
+      },
+      "corrupted": {
+        "accuracy": 0.8322830292979547,
+        "dp_violation": 0.13985657691955566,
+        "if_violation": 0.025737976782752903
+      }
+    },
+    "dro": {
+      "time": 416.5128319263458,
+      "clean": {
+        "accuracy": 0.8329463792150359,
+        "dp_violation": 0.14333981275558472,
+        "if_violation": 0.024543946932006632
+      },
+      "corrupted": {
+        "accuracy": 0.8288557213930349,
+        "dp_violation": 0.11955283582210541,
+        "if_violation": 0.02558319513543394
+      }
+    },
+    "total_time": 473.4768660068512
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.1,
+    "seed": 9,
+    "naive": {
+      "time": 26.54052186012268,
+      "clean": {
+        "accuracy": 0.8206744057490326,
+        "dp_violation": 0.15027964115142822,
+        "if_violation": 0.02478717523493643
+      },
+      "corrupted": {
+        "accuracy": 0.8170259812050856,
+        "dp_violation": 0.12121618539094925,
+        "if_violation": 0.02646766169154229
+      }
+    },
+    "dro": {
+      "time": 314.8971939086914,
+      "clean": {
+        "accuracy": 0.8255389718076285,
+        "dp_violation": 0.152164027094841,
+        "if_violation": 0.02208955223880597
+      },
+      "corrupted": {
+        "accuracy": 0.8225538971807629,
+        "dp_violation": 0.12339647859334946,
+        "if_violation": 0.023372028745163073
+      }
+    },
+    "total_time": 351.1698269844055
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 0,
+    "naive": {
+      "time": 26.362854719161987,
+      "clean": {
+        "accuracy": 0.8262023217247098,
+        "dp_violation": 0.12425428628921509,
+        "if_violation": 0.030005527915975678
+      },
+      "corrupted": {
+        "accuracy": 0.8112769485903815,
+        "dp_violation": 0.07313264906406403,
+        "if_violation": 0.033499170812603646
+      }
+    },
+    "dro": {
+      "time": 271.47459411621094,
+      "clean": {
+        "accuracy": 0.8092868988391376,
+        "dp_violation": 0.3009471595287323,
+        "if_violation": 0.032902155887230514
+      },
+      "corrupted": {
+        "accuracy": 0.7962410171365395,
+        "dp_violation": 0.17569147050380707,
+        "if_violation": 0.03699281370923162
+      }
+    },
+    "total_time": 307.9254059791565
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "naive": {
+      "time": 28.676378965377808,
+      "clean": {
+        "accuracy": 0.8289662797125483,
+        "dp_violation": 0.15669214725494385,
+        "if_violation": 0.028656716417910448
+      },
+      "corrupted": {
+        "accuracy": 0.8097291321171918,
+        "dp_violation": 0.0976298600435257,
+        "if_violation": 0.03774461028192371
+      }
+    },
+    "dro": {
+      "time": 337.0446300506592,
+      "clean": {
+        "accuracy": 0.8165837479270315,
+        "dp_violation": 0.21971654891967773,
+        "if_violation": 0.03688225538971807
+      },
+      "corrupted": {
+        "accuracy": 0.8006633499170812,
+        "dp_violation": 0.13190379738807678,
+        "if_violation": 0.04079601990049751
+      }
+    },
+    "total_time": 376.6940243244171
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 2,
+    "naive": {
+      "time": 24.838016986846924,
+      "clean": {
+        "accuracy": 0.8316196793808734,
+        "dp_violation": 0.1426851451396942,
+        "if_violation": 0.03230514096185738
+      },
+      "corrupted": {
+        "accuracy": 0.8172470978441128,
+        "dp_violation": 0.07615461945533752,
+        "if_violation": 0.037634051962410174
+      }
+    },
+    "dro": {
+      "time": 272.75969314575195,
+      "clean": {
+        "accuracy": 0.8321724709784412,
+        "dp_violation": 0.1490391194820404,
+        "if_violation": 0.026379215035931453
+      },
+      "corrupted": {
+        "accuracy": 0.8225538971807629,
+        "dp_violation": 0.08420942723751068,
+        "if_violation": 0.029386401326699833
+      }
+    },
+    "total_time": 306.98912477493286
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 3,
+    "naive": {
+      "time": 22.17799401283264,
+      "clean": {
+        "accuracy": 0.8220011055831952,
+        "dp_violation": 0.1257946938276291,
+        "if_violation": 0.030359314538419016
+      },
+      "corrupted": {
+        "accuracy": 0.8084024322830293,
+        "dp_violation": 0.08047683537006378,
+        "if_violation": 0.0354228855721393
+      }
+    },
+    "dro": {
+      "time": 419.350252866745,
+      "clean": {
+        "accuracy": 0.7522388059701492,
+        "dp_violation": 0.0007982639945112169,
+        "if_violation": 0.0005970149253731343
+      },
+      "corrupted": {
+        "accuracy": 0.7522388059701492,
+        "dp_violation": 5.157082341611385e-06,
+        "if_violation": 0.00013266998341625208
+      }
+    },
+    "total_time": 449.9411692619324
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 4,
+    "naive": {
+      "time": 21.50795292854309,
+      "clean": {
+        "accuracy": 0.8181315644002212,
+        "dp_violation": 0.12296980619430542,
+        "if_violation": 0.030381426202321725
+      },
+      "corrupted": {
+        "accuracy": 0.8055279159756772,
+        "dp_violation": 0.0776473879814148,
+        "if_violation": 0.03283582089552239
+      }
+    },
+    "dro": {
+      "time": 212.60170602798462,
+      "clean": {
+        "accuracy": 0.8096185737976783,
+        "dp_violation": 0.2743573784828186,
+        "if_violation": 0.03586511885019348
+      },
+      "corrupted": {
+        "accuracy": 0.7899391929242675,
+        "dp_violation": 0.17264020442962646,
+        "if_violation": 0.04435599778883361
+      }
+    },
+    "total_time": 241.8258171081543
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 5,
+    "naive": {
+      "time": 21.474153995513916,
+      "clean": {
+        "accuracy": 0.8206744057490326,
+        "dp_violation": 0.14968495070934296,
+        "if_violation": 0.03212824765063571
+      },
+      "corrupted": {
+        "accuracy": 0.8082918739635158,
+        "dp_violation": 0.0978228747844696,
+        "if_violation": 0.035577667219458264
+      }
+    },
+    "dro": {
+      "time": 266.88332295417786,
+      "clean": {
+        "accuracy": 0.8032061912658928,
+        "dp_violation": 0.2815585434436798,
+        "if_violation": 0.034715312327252626
+      },
+      "corrupted": {
+        "accuracy": 0.7868435599778884,
+        "dp_violation": 0.17071163654327393,
+        "if_violation": 0.04044223327805417
+      }
+    },
+    "total_time": 296.41596603393555
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 6,
+    "naive": {
+      "time": 22.0627658367157,
+      "clean": {
+        "accuracy": 0.8247650635710337,
+        "dp_violation": 0.13499020040035248,
+        "if_violation": 0.02779436152570481
+      },
+      "corrupted": {
+        "accuracy": 0.8105030403537866,
+        "dp_violation": 0.08583839237689972,
+        "if_violation": 0.03170812603648424
+      }
+    },
+    "dro": {
+      "time": 406.2906799316406,
+      "clean": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 2.3745778889860958e-06,
+        "if_violation": 0.0002211166390270868
+      },
+      "corrupted": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 5.622996468446217e-07,
+        "if_violation": 0.00026533996683250415
+      }
+    },
+    "total_time": 436.4556679725647
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 7,
+    "naive": {
+      "time": 21.471400260925293,
+      "clean": {
+        "accuracy": 0.8285240464344942,
+        "dp_violation": 0.14079755544662476,
+        "if_violation": 0.029231619679380875
+      },
+      "corrupted": {
+        "accuracy": 0.8160309563294638,
+        "dp_violation": 0.0790463536977768,
+        "if_violation": 0.03427307904919845
+      }
+    },
+    "dro": {
+      "time": 252.77847909927368,
+      "clean": {
+        "accuracy": 0.8117191818684356,
+        "dp_violation": 0.3042127788066864,
+        "if_violation": 0.03188501934770591
+      },
+      "corrupted": {
+        "accuracy": 0.7977888336097292,
+        "dp_violation": 0.17037804424762726,
+        "if_violation": 0.03798783858485351
+      }
+    },
+    "total_time": 282.4995141029358
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 8,
+    "naive": {
+      "time": 21.969293117523193,
+      "clean": {
+        "accuracy": 0.831730237700387,
+        "dp_violation": 0.11484050750732422,
+        "if_violation": 0.03173023770038695
+      },
+      "corrupted": {
+        "accuracy": 0.8169154228855722,
+        "dp_violation": 0.06532733142375946,
+        "if_violation": 0.0354228855721393
+      }
+    },
+    "dro": {
+      "time": 465.4439506530762,
+      "clean": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 3.3397225251974305e-06,
+        "if_violation": 0.0002211166390270868
+      },
+      "corrupted": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 2.5692256713227835e-06,
+        "if_violation": 0.0002211166390270868
+      }
+    },
+    "total_time": 496.0207941532135
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 9,
+    "naive": {
+      "time": 24.710144996643066,
+      "clean": {
+        "accuracy": 0.8172470978441128,
+        "dp_violation": 0.14308634400367737,
+        "if_violation": 0.030757324488667772
+      },
+      "corrupted": {
+        "accuracy": 0.8035378662244334,
+        "dp_violation": 0.10413917899131775,
+        "if_violation": 0.035997788833609726
+      }
+    },
+    "dro": {
+      "time": 248.72967910766602,
+      "clean": {
+        "accuracy": 0.8258706467661692,
+        "dp_violation": 0.13813138008117676,
+        "if_violation": 0.022841348811498064
+      },
+      "corrupted": {
+        "accuracy": 0.8150359314538419,
+        "dp_violation": 0.09657517820596695,
+        "if_violation": 0.02609176340519624
+      }
+    },
+    "total_time": 283.8291702270508
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 0,
+    "naive": {
+      "time": 38.54112696647644,
+      "clean": {
+        "accuracy": 0.7767827529021559,
+        "dp_violation": 0.0056282877922058105,
+        "if_violation": 0.03385295743504699
+      },
+      "corrupted": {
+        "accuracy": 0.7380873410724157,
+        "dp_violation": 0.018450558185577393,
+        "if_violation": 0.049087893864013264
+      }
+    },
+    "dro": {
+      "time": 171.29909682273865,
+      "clean": {
+        "accuracy": 0.8227750138197899,
+        "dp_violation": 0.09282833337783813,
+        "if_violation": 0.02312880044223328
+      },
+      "corrupted": {
+        "accuracy": 0.8069651741293532,
+        "dp_violation": 0.04795727878808975,
+        "if_violation": 0.02697622996130459
+      }
+    },
+    "total_time": 222.21498894691467
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 1,
+    "naive": {
+      "time": 16.511550903320312,
+      "clean": {
+        "accuracy": 0.7735765616362631,
+        "dp_violation": 0.006915479898452759,
+        "if_violation": 0.035179657269209505
+      },
+      "corrupted": {
+        "accuracy": 0.7315644002211167,
+        "dp_violation": 0.013105839490890503,
+        "if_violation": 0.047960199004975126
+      }
+    },
+    "dro": {
+      "time": 104.8839910030365,
+      "clean": {
+        "accuracy": 0.25516860143725817,
+        "dp_violation": 0.008288204669952393,
+        "if_violation": 0.003228302929795467
+      },
+      "corrupted": {
+        "accuracy": 0.25483692647871753,
+        "dp_violation": 0.004289507865905762,
+        "if_violation": 0.0034273079049198453
+      }
+    },
+    "total_time": 127.59036207199097
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 2,
+    "naive": {
+      "time": 17.10947608947754,
+      "clean": {
+        "accuracy": 0.7879491431730238,
+        "dp_violation": 0.025951236486434937,
+        "if_violation": 0.03683803206191266
+      },
+      "corrupted": {
+        "accuracy": 0.7517965726920951,
+        "dp_violation": 0.019155561923980713,
+        "if_violation": 0.0496849087893864
+      }
+    },
+    "dro": {
+      "time": 154.3877410888672,
+      "clean": {
+        "accuracy": 0.8195688225538972,
+        "dp_violation": 0.10311859846115112,
+        "if_violation": 0.02830292979546711
+      },
+      "corrupted": {
+        "accuracy": 0.7933665008291874,
+        "dp_violation": 0.03376281261444092,
+        "if_violation": 0.039734660033167495
+      }
+    },
+    "total_time": 178.18058514595032
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 3,
+    "naive": {
+      "time": 19.04149079322815,
+      "clean": {
+        "accuracy": 0.7691542288557214,
+        "dp_violation": 0.006164044141769409,
+        "if_violation": 0.034339414040906575
+      },
+      "corrupted": {
+        "accuracy": 0.73510226644555,
+        "dp_violation": 0.028568387031555176,
+        "if_violation": 0.04384742951907131
+      }
+    },
+    "dro": {
+      "time": 57.21471405029297,
+      "clean": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.0002547119802329689,
+        "if_violation": 0.0001990049751243781
+      },
+      "corrupted": {
+        "accuracy": 0.7521282476506357,
+        "dp_violation": 0.00031974955345503986,
+        "if_violation": 0.00013266998341625208
+      }
+    },
+    "total_time": 83.34290599822998
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 4,
+    "naive": {
+      "time": 18.34549117088318,
+      "clean": {
+        "accuracy": 0.7695964621337755,
+        "dp_violation": 0.022472143173217773,
+        "if_violation": 0.03522388059701492
+      },
+      "corrupted": {
+        "accuracy": 0.7341072415699281,
+        "dp_violation": 0.020206958055496216,
+        "if_violation": 0.041967938087341075
+      }
+    },
+    "dro": {
+      "time": 127.4454619884491,
+      "clean": {
+        "accuracy": 0.4023217247097844,
+        "dp_violation": 0.018617331981658936,
+        "if_violation": 0.03747927031509121
+      },
+      "corrupted": {
+        "accuracy": 0.36904367053620785,
+        "dp_violation": 0.014603137969970703,
+        "if_violation": 0.04537313432835821
+      }
+    },
+    "total_time": 152.68824672698975
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 5,
+    "naive": {
+      "time": 18.569863080978394,
+      "clean": {
+        "accuracy": 0.7713653952459922,
+        "dp_violation": 0.006235331296920776,
+        "if_violation": 0.03615257048092869
+      },
+      "corrupted": {
+        "accuracy": 0.7366500829187397,
+        "dp_violation": 0.028226852416992188,
+        "if_violation": 0.04526257600884467
+      }
+    },
+    "dro": {
+      "time": 112.90610003471375,
+      "clean": {
+        "accuracy": 0.25085682697622996,
+        "dp_violation": 0.0034387707710266113,
+        "if_violation": 0.0015920398009950248
+      },
+      "corrupted": {
+        "accuracy": 0.25030403537866225,
+        "dp_violation": 0.0016751885414123535,
+        "if_violation": 0.0015478164731896075
+      }
+    },
+    "total_time": 137.90277004241943
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 6,
+    "naive": {
+      "time": 14.45447564125061,
+      "clean": {
+        "accuracy": 0.7726920950801548,
+        "dp_violation": 0.003949880599975586,
+        "if_violation": 0.0354228855721393
+      },
+      "corrupted": {
+        "accuracy": 0.7313432835820896,
+        "dp_violation": 0.03117355704307556,
+        "if_violation": 0.051498065229408516
+      }
+    },
+    "dro": {
+      "time": 93.36875414848328,
+      "clean": {
+        "accuracy": 0.3307904919845218,
+        "dp_violation": 0.05620235204696655,
+        "if_violation": 0.028678828081813157
+      },
+      "corrupted": {
+        "accuracy": 0.3200663349917081,
+        "dp_violation": 0.018541336059570312,
+        "if_violation": 0.027529021558872307
+      }
+    },
+    "total_time": 113.37432289123535
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 7,
+    "naive": {
+      "time": 14.502823829650879,
+      "clean": {
+        "accuracy": 0.7924820342730791,
+        "dp_violation": 0.029439330101013184,
+        "if_violation": 0.0377003869541183
+      },
+      "corrupted": {
+        "accuracy": 0.7514648977335544,
+        "dp_violation": 0.02364957332611084,
+        "if_violation": 0.05335544499723604
+      }
+    },
+    "dro": {
+      "time": 151.05661010742188,
+      "clean": {
+        "accuracy": 0.24798231066887783,
+        "dp_violation": 0.00024521350860595703,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.24798231066887783,
+        "dp_violation": 0.00011074542999267578,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 171.15117025375366
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 8,
+    "naive": {
+      "time": 15.367746114730835,
+      "clean": {
+        "accuracy": 0.7879491431730238,
+        "dp_violation": 0.003556549549102783,
+        "if_violation": 0.035179657269209505
+      },
+      "corrupted": {
+        "accuracy": 0.7457158651188502,
+        "dp_violation": 0.012374728918075562,
+        "if_violation": 0.04873410724156993
+      }
+    },
+    "dro": {
+      "time": 123.69685411453247,
+      "clean": {
+        "accuracy": 0.2506357103372029,
+        "dp_violation": 0.002409219741821289,
+        "if_violation": 0.0004201216141514649
+      },
+      "corrupted": {
+        "accuracy": 0.2501934770591487,
+        "dp_violation": 0.002582073211669922,
+        "if_violation": 0.0003980099502487562
+      }
+    },
+    "total_time": 144.98007583618164
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.3,
+    "seed": 9,
+    "naive": {
+      "time": 15.350322961807251,
+      "clean": {
+        "accuracy": 0.7693753454947485,
+        "dp_violation": 0.017224788665771484,
+        "if_violation": 0.03531232725262576
+      },
+      "corrupted": {
+        "accuracy": 0.7349917081260365,
+        "dp_violation": 0.008909791707992554,
+        "if_violation": 0.04809286898839138
+      }
+    },
+    "dro": {
+      "time": 257.9641399383545,
+      "clean": {
+        "accuracy": 0.8172470978441128,
+        "dp_violation": 0.10543844103813171,
+        "if_violation": 0.02093974571586512
+      },
+      "corrupted": {
+        "accuracy": 0.8028745163073522,
+        "dp_violation": 0.052267782390117645,
+        "if_violation": 0.026401326699834162
+      }
+    },
+    "total_time": 279.0288791656494
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 0,
+    "naive": {
+      "time": 14.849087953567505,
+      "clean": {
+        "accuracy": 0.6456605859590934,
+        "dp_violation": 0.060562193393707275,
+        "if_violation": 0.000619126589275843
+      },
+      "corrupted": {
+        "accuracy": 0.5661691542288557,
+        "dp_violation": 0.0005521774291992188,
+        "if_violation": 0.0003980099502487562
+      }
+    },
+    "dro": {
+      "time": 619.8689479827881,
+      "clean": {
+        "accuracy": 0.6216694306246545,
+        "dp_violation": 0.040802061557769775,
+        "if_violation": 0.0001105583195135434
+      },
+      "corrupted": {
+        "accuracy": 0.5636263128800443,
+        "dp_violation": 0.001441657543182373,
+        "if_violation": 4.422332780541736e-05
+      }
+    },
+    "total_time": 640.3947839736938
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 1,
+    "naive": {
+      "time": 15.425249099731445,
+      "clean": {
+        "accuracy": 0.6369264787175235,
+        "dp_violation": 0.06128138303756714,
+        "if_violation": 0.00015478164731896074
+      },
+      "corrupted": {
+        "accuracy": 0.5837479270315091,
+        "dp_violation": 0.005837917327880859,
+        "if_violation": 0.00013266998341625208
+      }
+    },
+    "dro": {
+      "time": 653.6004059314728,
+      "clean": {
+        "accuracy": 0.6637921503593145,
+        "dp_violation": 0.03409498929977417,
+        "if_violation": 0.00026533996683250415
+      },
+      "corrupted": {
+        "accuracy": 0.5809839690436706,
+        "dp_violation": 0.004250943660736084,
+        "if_violation": 0.00026533996683250415
+      }
+    },
+    "total_time": 674.739275932312
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 2,
+    "naive": {
+      "time": 15.392552852630615,
+      "clean": {
+        "accuracy": 0.6469872857932559,
+        "dp_violation": 0.05103924870491028,
+        "if_violation": 0.00037589828634604757
+      },
+      "corrupted": {
+        "accuracy": 0.5800995024875621,
+        "dp_violation": 0.004282593727111816,
+        "if_violation": 0.00017689331122166944
+      }
+    },
+    "dro": {
+      "time": 632.012048959732,
+      "clean": {
+        "accuracy": 0.6472084024322831,
+        "dp_violation": 0.03219899535179138,
+        "if_violation": 6.633499170812604e-05
+      },
+      "corrupted": {
+        "accuracy": 0.5826423438363737,
+        "dp_violation": 0.001959860324859619,
+        "if_violation": 6.633499170812604e-05
+      }
+    },
+    "total_time": 653.4408490657806
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 3,
+    "naive": {
+      "time": 15.258900880813599,
+      "clean": {
+        "accuracy": 0.6336097291321172,
+        "dp_violation": 0.04807400703430176,
+        "if_violation": 0.0005085682697622996
+      },
+      "corrupted": {
+        "accuracy": 0.5716970702045329,
+        "dp_violation": 0.006220757961273193,
+        "if_violation": 0.00024322830292979546
+      }
+    },
+    "dro": {
+      "time": 589.7346951961517,
+      "clean": {
+        "accuracy": 0.6426755113322278,
+        "dp_violation": 0.02697095274925232,
+        "if_violation": 0.0005306799336650083
+      },
+      "corrupted": {
+        "accuracy": 0.5673852957435047,
+        "dp_violation": 0.0022173523902893066,
+        "if_violation": 0.00024322830292979546
+      }
+    },
+    "total_time": 610.7259981632233
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 4,
+    "naive": {
+      "time": 15.297199249267578,
+      "clean": {
+        "accuracy": 0.648424543946932,
+        "dp_violation": 0.05298689007759094,
+        "if_violation": 0.00035378662244333887
+      },
+      "corrupted": {
+        "accuracy": 0.5839690436705363,
+        "dp_violation": 0.005470633506774902,
+        "if_violation": 8.844665561083472e-05
+      }
+    },
+    "dro": {
+      "time": 655.9825720787048,
+      "clean": {
+        "accuracy": 0.6426755113322278,
+        "dp_violation": 0.029695779085159302,
+        "if_violation": 0.00015478164731896074
+      },
+      "corrupted": {
+        "accuracy": 0.5813156440022111,
+        "dp_violation": 0.0007358193397521973,
+        "if_violation": 8.844665561083472e-05
+      }
+    },
+    "total_time": 677.0712640285492
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 5,
+    "naive": {
+      "time": 15.537970066070557,
+      "clean": {
+        "accuracy": 0.6553897180762852,
+        "dp_violation": 0.05269530415534973,
+        "if_violation": 0.0005306799336650083
+      },
+      "corrupted": {
+        "accuracy": 0.5762299613045881,
+        "dp_violation": 0.005039632320404053,
+        "if_violation": 0.0003316749585406302
+      }
+    },
+    "dro": {
+      "time": 628.8914687633514,
+      "clean": {
+        "accuracy": 0.6529574350469873,
+        "dp_violation": 0.02901133894920349,
+        "if_violation": 0.0005085682697622996
+      },
+      "corrupted": {
+        "accuracy": 0.5686014372581537,
+        "dp_violation": 0.003969371318817139,
+        "if_violation": 0.00026533996683250415
+      }
+    },
+    "total_time": 649.9197387695312
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 6,
+    "naive": {
+      "time": 12.207162857055664,
+      "clean": {
+        "accuracy": 0.6375898286346048,
+        "dp_violation": 0.05561894178390503,
+        "if_violation": 0.0002211166390270868
+      },
+      "corrupted": {
+        "accuracy": 0.5625207296849087,
+        "dp_violation": 0.007345378398895264,
+        "if_violation": 0.0001105583195135434
+      }
+    },
+    "dro": {
+      "time": 523.2102270126343,
+      "clean": {
+        "accuracy": 0.6249861802100608,
+        "dp_violation": 0.03705567121505737,
+        "if_violation": 0.00024322830292979546
+      },
+      "corrupted": {
+        "accuracy": 0.5598673300165837,
+        "dp_violation": 0.005733489990234375,
+        "if_violation": 0.00028745163073521285
+      }
+    },
+    "total_time": 539.9520099163055
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 7,
+    "naive": {
+      "time": 11.88581395149231,
+      "clean": {
+        "accuracy": 0.6437810945273632,
+        "dp_violation": 0.05075922608375549,
+        "if_violation": 0.0003980099502487562
+      },
+      "corrupted": {
+        "accuracy": 0.5767827529021559,
+        "dp_violation": 0.0021108388900756836,
+        "if_violation": 0.00013266998341625208
+      }
+    },
+    "dro": {
+      "time": 541.1645309925079,
+      "clean": {
+        "accuracy": 0.6299613045881702,
+        "dp_violation": 0.036114513874053955,
+        "if_violation": 0.00013266998341625208
+      },
+      "corrupted": {
+        "accuracy": 0.5586511885019347,
+        "dp_violation": 0.002326071262359619,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 557.7965340614319
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 8,
+    "naive": {
+      "time": 13.418850183486938,
+      "clean": {
+        "accuracy": 0.6486456605859591,
+        "dp_violation": 0.05657738447189331,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5963515754560531,
+        "dp_violation": 0.0014063715934753418,
+        "if_violation": 6.633499170812604e-05
+      }
+    },
+    "dro": {
+      "time": 601.8085858821869,
+      "clean": {
+        "accuracy": 0.6507462686567164,
+        "dp_violation": 0.036599963903427124,
+        "if_violation": 0.0003980099502487562
+      },
+      "corrupted": {
+        "accuracy": 0.5890547263681593,
+        "dp_violation": 0.002217113971710205,
+        "if_violation": 8.844665561083472e-05
+      }
+    },
+    "total_time": 620.5577201843262
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.4,
+    "seed": 9,
+    "naive": {
+      "time": 14.182085990905762,
+      "clean": {
+        "accuracy": 0.6390270867882808,
+        "dp_violation": 0.05665552616119385,
+        "if_violation": 0.0001105583195135434
+      },
+      "corrupted": {
+        "accuracy": 0.5818684355997789,
+        "dp_violation": 0.0028573274612426758,
+        "if_violation": 4.422332780541736e-05
+      }
+    },
+    "dro": {
+      "time": 1126.0544211864471,
+      "clean": {
+        "accuracy": 0.6163626312880044,
+        "dp_violation": 0.039904624223709106,
+        "if_violation": 4.422332780541736e-05
+      },
+      "corrupted": {
+        "accuracy": 0.5681592039800994,
+        "dp_violation": 0.0026677846908569336,
+        "if_violation": 4.422332780541736e-05
+      }
+    },
+    "total_time": 1150.0847680568695
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 0,
+    "naive": {
+      "time": 7.686250925064087,
+      "clean": {
+        "accuracy": 0.8118333333333333,
+        "dp_violation": 0.02068648487329483,
+        "if_violation": 0.0011333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.8118333333333333,
+        "dp_violation": 0.02068648487329483,
+        "if_violation": 0.0011333333333333334
+      }
+    },
+    "dro": {
+      "time": 714.553729057312,
+      "clean": {
+        "accuracy": 0.8146666666666667,
+        "dp_violation": 0.0198882594704628,
+        "if_violation": 0.0017
+      },
+      "corrupted": {
+        "accuracy": 0.8146666666666667,
+        "dp_violation": 0.0198882594704628,
+        "if_violation": 0.0017
+      }
+    },
+    "total_time": 730.7496948242188
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 1,
+    "naive": {
+      "time": 6.012460708618164,
+      "clean": {
+        "accuracy": 0.8166666666666667,
+        "dp_violation": 0.026354722678661346,
+        "if_violation": 0.0016333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.8166666666666667,
+        "dp_violation": 0.026354722678661346,
+        "if_violation": 0.0016333333333333334
+      }
+    },
+    "dro": {
+      "time": 811.8538818359375,
+      "clean": {
+        "accuracy": 0.8106666666666666,
+        "dp_violation": 0.029756635427474976,
+        "if_violation": 0.0025
+      },
+      "corrupted": {
+        "accuracy": 0.8106666666666666,
+        "dp_violation": 0.029756635427474976,
+        "if_violation": 0.0025
+      }
+    },
+    "total_time": 822.9391300678253
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 2,
+    "naive": {
+      "time": 5.682408809661865,
+      "clean": {
+        "accuracy": 0.8125,
+        "dp_violation": 0.01984144002199173,
+        "if_violation": 0.0008
+      },
+      "corrupted": {
+        "accuracy": 0.8125,
+        "dp_violation": 0.01984144002199173,
+        "if_violation": 0.0008
+      }
+    },
+    "dro": {
+      "time": 769.9368941783905,
+      "clean": {
+        "accuracy": 0.8131666666666667,
+        "dp_violation": 0.026430942118167877,
+        "if_violation": 0.0009
+      },
+      "corrupted": {
+        "accuracy": 0.8131666666666667,
+        "dp_violation": 0.026430942118167877,
+        "if_violation": 0.0009
+      }
+    },
+    "total_time": 780.4607429504395
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 3,
+    "naive": {
+      "time": 5.814690113067627,
+      "clean": {
+        "accuracy": 0.8008333333333333,
+        "dp_violation": 0.017987467348575592,
+        "if_violation": 0.0018
+      },
+      "corrupted": {
+        "accuracy": 0.8008333333333333,
+        "dp_violation": 0.017987467348575592,
+        "if_violation": 0.0018
+      }
+    },
+    "dro": {
+      "time": 715.0805430412292,
+      "clean": {
+        "accuracy": 0.8028333333333333,
+        "dp_violation": 0.020789340138435364,
+        "if_violation": 0.0026
+      },
+      "corrupted": {
+        "accuracy": 0.8028333333333333,
+        "dp_violation": 0.020789340138435364,
+        "if_violation": 0.0026
+      }
+    },
+    "total_time": 725.5035488605499
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 4,
+    "naive": {
+      "time": 5.740751028060913,
+      "clean": {
+        "accuracy": 0.809,
+        "dp_violation": 0.013998009264469147,
+        "if_violation": 0.0010333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.809,
+        "dp_violation": 0.013998009264469147,
+        "if_violation": 0.0010333333333333334
+      }
+    },
+    "dro": {
+      "time": 733.7137930393219,
+      "clean": {
+        "accuracy": 0.8095,
+        "dp_violation": 0.01403246819972992,
+        "if_violation": 0.0013666666666666666
+      },
+      "corrupted": {
+        "accuracy": 0.8095,
+        "dp_violation": 0.01403246819972992,
+        "if_violation": 0.0013666666666666666
+      }
+    },
+    "total_time": 743.9459760189056
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 5,
+    "naive": {
+      "time": 5.993140935897827,
+      "clean": {
+        "accuracy": 0.8078333333333333,
+        "dp_violation": 0.03044978529214859,
+        "if_violation": 0.0015
+      },
+      "corrupted": {
+        "accuracy": 0.8078333333333333,
+        "dp_violation": 0.03044978529214859,
+        "if_violation": 0.0015
+      }
+    },
+    "dro": {
+      "time": 759.7861170768738,
+      "clean": {
+        "accuracy": 0.808,
+        "dp_violation": 0.029968298971652985,
+        "if_violation": 0.0013
+      },
+      "corrupted": {
+        "accuracy": 0.808,
+        "dp_violation": 0.029968298971652985,
+        "if_violation": 0.0013
+      }
+    },
+    "total_time": 770.3806767463684
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 6,
+    "naive": {
+      "time": 5.83555006980896,
+      "clean": {
+        "accuracy": 0.8086666666666666,
+        "dp_violation": 0.01594877988100052,
+        "if_violation": 0.0014333333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.8086666666666666,
+        "dp_violation": 0.01594877988100052,
+        "if_violation": 0.0014333333333333333
+      }
+    },
+    "dro": {
+      "time": 755.7826390266418,
+      "clean": {
+        "accuracy": 0.8113333333333334,
+        "dp_violation": 0.021499954164028168,
+        "if_violation": 0.0017
+      },
+      "corrupted": {
+        "accuracy": 0.8113333333333334,
+        "dp_violation": 0.021499954164028168,
+        "if_violation": 0.0017
+      }
+    },
+    "total_time": 766.128378868103
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 7,
+    "naive": {
+      "time": 5.830506086349487,
+      "clean": {
+        "accuracy": 0.814,
+        "dp_violation": 0.030537523329257965,
+        "if_violation": 0.0009333333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.814,
+        "dp_violation": 0.030537523329257965,
+        "if_violation": 0.0009333333333333333
+      }
+    },
+    "dro": {
+      "time": 755.5874147415161,
+      "clean": {
+        "accuracy": 0.8198333333333333,
+        "dp_violation": 0.027350567281246185,
+        "if_violation": 0.0024333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.8198333333333333,
+        "dp_violation": 0.027350567281246185,
+        "if_violation": 0.0024333333333333334
+      }
+    },
+    "total_time": 766.2542150020599
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 8,
+    "naive": {
+      "time": 6.12113094329834,
+      "clean": {
+        "accuracy": 0.8051666666666667,
+        "dp_violation": 0.02503342181444168,
+        "if_violation": 0.0013666666666666666
+      },
+      "corrupted": {
+        "accuracy": 0.8051666666666667,
+        "dp_violation": 0.02503342181444168,
+        "if_violation": 0.0013666666666666666
+      }
+    },
+    "dro": {
+      "time": 557.5915670394897,
+      "clean": {
+        "accuracy": 0.805,
+        "dp_violation": 0.025776930153369904,
+        "if_violation": 0.0011
+      },
+      "corrupted": {
+        "accuracy": 0.805,
+        "dp_violation": 0.025776930153369904,
+        "if_violation": 0.0011
+      }
+    },
+    "total_time": 568.6497690677643
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.0,
+    "seed": 9,
+    "naive": {
+      "time": 6.194269895553589,
+      "clean": {
+        "accuracy": 0.8083333333333333,
+        "dp_violation": 0.01666022092103958,
+        "if_violation": 0.0011333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.8083333333333333,
+        "dp_violation": 0.01666022092103958,
+        "if_violation": 0.0011333333333333334
+      }
+    },
+    "dro": {
+      "time": 755.6048500537872,
+      "clean": {
+        "accuracy": 0.8065,
+        "dp_violation": 0.02647273987531662,
+        "if_violation": 0.0013333333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.8065,
+        "dp_violation": 0.02647273987531662,
+        "if_violation": 0.0013333333333333333
+      }
+    },
+    "total_time": 766.951131105423
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 0,
+    "naive": {
+      "time": 6.325073719024658,
+      "clean": {
+        "accuracy": 0.8123333333333334,
+        "dp_violation": 0.02337592840194702,
+        "if_violation": 0.0025
+      },
+      "corrupted": {
+        "accuracy": 0.8115,
+        "dp_violation": 0.027089186012744904,
+        "if_violation": 0.0024
+      }
+    },
+    "dro": {
+      "time": 227.3825967311859,
+      "clean": {
+        "accuracy": 0.8158333333333333,
+        "dp_violation": 0.017342619597911835,
+        "if_violation": 0.002533333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.8146666666666667,
+        "dp_violation": 0.01891493797302246,
+        "if_violation": 0.0024333333333333334
+      }
+    },
+    "total_time": 238.87818121910095
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 1,
+    "naive": {
+      "time": 6.433507204055786,
+      "clean": {
+        "accuracy": 0.8153333333333334,
+        "dp_violation": 0.02661263197660446,
+        "if_violation": 0.0010666666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.8126666666666666,
+        "dp_violation": 0.021200932562351227,
+        "if_violation": 0.0013333333333333333
+      }
+    },
+    "dro": {
+      "time": 369.66645407676697,
+      "clean": {
+        "accuracy": 0.812,
+        "dp_violation": 0.02849162369966507,
+        "if_violation": 0.0009
+      },
+      "corrupted": {
+        "accuracy": 0.8108333333333333,
+        "dp_violation": 0.022978872060775757,
+        "if_violation": 0.0008333333333333334
+      }
+    },
+    "total_time": 381.5589680671692
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 2,
+    "naive": {
+      "time": 6.284036159515381,
+      "clean": {
+        "accuracy": 0.812,
+        "dp_violation": 0.03358623385429382,
+        "if_violation": 0.0018
+      },
+      "corrupted": {
+        "accuracy": 0.8103333333333333,
+        "dp_violation": 0.025896713137626648,
+        "if_violation": 0.0015
+      }
+    },
+    "dro": {
+      "time": 183.968505859375,
+      "clean": {
+        "accuracy": 0.8136666666666666,
+        "dp_violation": 0.025373950600624084,
+        "if_violation": 0.0014
+      },
+      "corrupted": {
+        "accuracy": 0.8115,
+        "dp_violation": 0.02097802609205246,
+        "if_violation": 0.0012
+      }
+    },
+    "total_time": 195.20708775520325
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 3,
+    "naive": {
+      "time": 6.357712984085083,
+      "clean": {
+        "accuracy": 0.8018333333333333,
+        "dp_violation": 0.024333618581295013,
+        "if_violation": 0.0013
+      },
+      "corrupted": {
+        "accuracy": 0.8006666666666666,
+        "dp_violation": 0.011109337210655212,
+        "if_violation": 0.0010333333333333334
+      }
+    },
+    "dro": {
+      "time": 197.76172184944153,
+      "clean": {
+        "accuracy": 0.8035,
+        "dp_violation": 0.014921814203262329,
+        "if_violation": 0.0016666666666666668
+      },
+      "corrupted": {
+        "accuracy": 0.8018333333333333,
+        "dp_violation": 0.008240923285484314,
+        "if_violation": 0.0016
+      }
+    },
+    "total_time": 209.06595993041992
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 4,
+    "naive": {
+      "time": 6.0982890129089355,
+      "clean": {
+        "accuracy": 0.8108333333333333,
+        "dp_violation": 0.016465477645397186,
+        "if_violation": 0.0009333333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.8083333333333333,
+        "dp_violation": 0.01215372234582901,
+        "if_violation": 0.0008
+      }
+    },
+    "dro": {
+      "time": 207.76832509040833,
+      "clean": {
+        "accuracy": 0.8048333333333333,
+        "dp_violation": 0.01600445806980133,
+        "if_violation": 0.0016333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.8023333333333333,
+        "dp_violation": 0.014929916709661484,
+        "if_violation": 0.002
+      }
+    },
+    "total_time": 219.01549911499023
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 5,
+    "naive": {
+      "time": 6.006108999252319,
+      "clean": {
+        "accuracy": 0.8075,
+        "dp_violation": 0.030457578599452972,
+        "if_violation": 0.0015
+      },
+      "corrupted": {
+        "accuracy": 0.8063333333333333,
+        "dp_violation": 0.026959791779518127,
+        "if_violation": 0.0012333333333333332
+      }
+    },
+    "dro": {
+      "time": 320.27479791641235,
+      "clean": {
+        "accuracy": 0.8071666666666667,
+        "dp_violation": 0.030788131058216095,
+        "if_violation": 0.0015
+      },
+      "corrupted": {
+        "accuracy": 0.8058333333333333,
+        "dp_violation": 0.027021825313568115,
+        "if_violation": 0.0014
+      }
+    },
+    "total_time": 331.0201871395111
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 6,
+    "naive": {
+      "time": 4.9517738819122314,
+      "clean": {
+        "accuracy": 0.811,
+        "dp_violation": 0.02116696536540985,
+        "if_violation": 0.0019
+      },
+      "corrupted": {
+        "accuracy": 0.8095,
+        "dp_violation": 0.017833471298217773,
+        "if_violation": 0.0019333333333333333
+      }
+    },
+    "dro": {
+      "time": 164.80834484100342,
+      "clean": {
+        "accuracy": 0.813,
+        "dp_violation": 0.01655452698469162,
+        "if_violation": 0.002033333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.8111666666666667,
+        "dp_violation": 0.013558708131313324,
+        "if_violation": 0.0019666666666666665
+      }
+    },
+    "total_time": 173.84305477142334
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 7,
+    "naive": {
+      "time": 5.192844867706299,
+      "clean": {
+        "accuracy": 0.8158333333333333,
+        "dp_violation": 0.03124997764825821,
+        "if_violation": 0.0016666666666666668
+      },
+      "corrupted": {
+        "accuracy": 0.8151666666666667,
+        "dp_violation": 0.02214086800813675,
+        "if_violation": 0.0016666666666666668
+      }
+    },
+    "dro": {
+      "time": 142.29782891273499,
+      "clean": {
+        "accuracy": 0.8146666666666667,
+        "dp_violation": 0.026189349591732025,
+        "if_violation": 0.003
+      },
+      "corrupted": {
+        "accuracy": 0.813,
+        "dp_violation": 0.02004026621580124,
+        "if_violation": 0.0028333333333333335
+      }
+    },
+    "total_time": 151.71280097961426
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 8,
+    "naive": {
+      "time": 5.5842249393463135,
+      "clean": {
+        "accuracy": 0.8073333333333333,
+        "dp_violation": 0.027679741382598877,
+        "if_violation": 0.0013666666666666666
+      },
+      "corrupted": {
+        "accuracy": 0.8063333333333333,
+        "dp_violation": 0.021776817739009857,
+        "if_violation": 0.0017333333333333333
+      }
+    },
+    "dro": {
+      "time": 269.1635949611664,
+      "clean": {
+        "accuracy": 0.806,
+        "dp_violation": 0.02252519130706787,
+        "if_violation": 0.0016666666666666668
+      },
+      "corrupted": {
+        "accuracy": 0.8043333333333333,
+        "dp_violation": 0.019880227744579315,
+        "if_violation": 0.0019333333333333333
+      }
+    },
+    "total_time": 279.3660740852356
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.1,
+    "seed": 9,
+    "naive": {
+      "time": 6.511286973953247,
+      "clean": {
+        "accuracy": 0.81,
+        "dp_violation": 0.02383190393447876,
+        "if_violation": 0.0013666666666666666
+      },
+      "corrupted": {
+        "accuracy": 0.8081666666666667,
+        "dp_violation": 0.02255816012620926,
+        "if_violation": 0.0016666666666666668
+      }
+    },
+    "dro": {
+      "time": 332.581258058548,
+      "clean": {
+        "accuracy": 0.8076666666666666,
+        "dp_violation": 0.026589520275592804,
+        "if_violation": 0.0015333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.8061666666666667,
+        "dp_violation": 0.0248698890209198,
+        "if_violation": 0.0012
+      }
+    },
+    "total_time": 344.1058130264282
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 0,
+    "naive": {
+      "time": 7.212278127670288,
+      "clean": {
+        "accuracy": 0.8125,
+        "dp_violation": 0.021778494119644165,
+        "if_violation": 0.003
+      },
+      "corrupted": {
+        "accuracy": 0.8061666666666667,
+        "dp_violation": 0.021830953657627106,
+        "if_violation": 0.0036333333333333335
+      }
+    },
+    "dro": {
+      "time": 240.3664059638977,
+      "clean": {
+        "accuracy": 0.7873333333333333,
+        "dp_violation": 0.01704161800444126,
+        "if_violation": 0.0008
+      },
+      "corrupted": {
+        "accuracy": 0.782,
+        "dp_violation": 0.009086841717362404,
+        "if_violation": 0.0021333333333333334
+      }
+    },
+    "total_time": 253.21161699295044
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 1,
+    "naive": {
+      "time": 6.468717098236084,
+      "clean": {
+        "accuracy": 0.8158333333333333,
+        "dp_violation": 0.030160479247570038,
+        "if_violation": 0.0008
+      },
+      "corrupted": {
+        "accuracy": 0.809,
+        "dp_violation": 0.015269927680492401,
+        "if_violation": 0.0024333333333333334
+      }
+    },
+    "dro": {
+      "time": 453.6583309173584,
+      "clean": {
+        "accuracy": 0.8038333333333333,
+        "dp_violation": 0.0200795978307724,
+        "if_violation": 0.002266666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.7998333333333333,
+        "dp_violation": 0.01815297082066536,
+        "if_violation": 0.0026333333333333334
+      }
+    },
+    "total_time": 465.4633300304413
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 2,
+    "naive": {
+      "time": 6.781064987182617,
+      "clean": {
+        "accuracy": 0.8126666666666666,
+        "dp_violation": 0.037032246589660645,
+        "if_violation": 0.0024333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.8063333333333333,
+        "dp_violation": 0.020120635628700256,
+        "if_violation": 0.0030666666666666668
+      }
+    },
+    "dro": {
+      "time": 227.17162489891052,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.003055884735658765,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.779,
+        "dp_violation": 0.001350106904283166,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 239.1176209449768
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 3,
+    "naive": {
+      "time": 6.379730939865112,
+      "clean": {
+        "accuracy": 0.8031666666666667,
+        "dp_violation": 0.03137245029211044,
+        "if_violation": 0.002
+      },
+      "corrupted": {
+        "accuracy": 0.7996666666666666,
+        "dp_violation": 0.012436963617801666,
+        "if_violation": 0.0025666666666666667
+      }
+    },
+    "dro": {
+      "time": 408.3872549533844,
+      "clean": {
+        "accuracy": 0.7811666666666667,
+        "dp_violation": 0.007274387404322624,
+        "if_violation": 0.0007
+      },
+      "corrupted": {
+        "accuracy": 0.781,
+        "dp_violation": 0.003897271119058132,
+        "if_violation": 0.0006333333333333333
+      }
+    },
+    "total_time": 420.14404106140137
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 4,
+    "naive": {
+      "time": 6.294992208480835,
+      "clean": {
+        "accuracy": 0.8106666666666666,
+        "dp_violation": 0.02612365037202835,
+        "if_violation": 0.0027
+      },
+      "corrupted": {
+        "accuracy": 0.8023333333333333,
+        "dp_violation": 0.009924344718456268,
+        "if_violation": 0.004633333333333333
+      }
+    },
+    "dro": {
+      "time": 449.3526599407196,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 1.4870125530225264e-12,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 2.942567413691255e-12,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 461.1012601852417
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 5,
+    "naive": {
+      "time": 6.67768406867981,
+      "clean": {
+        "accuracy": 0.8096666666666666,
+        "dp_violation": 0.04230267554521561,
+        "if_violation": 0.0020666666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.8065,
+        "dp_violation": 0.028022833168506622,
+        "if_violation": 0.0026333333333333334
+      }
+    },
+    "dro": {
+      "time": 436.27880811691284,
+      "clean": {
+        "accuracy": 0.8026666666666666,
+        "dp_violation": 0.024741332978010178,
+        "if_violation": 0.0031
+      },
+      "corrupted": {
+        "accuracy": 0.7985,
+        "dp_violation": 0.01369696855545044,
+        "if_violation": 0.002533333333333333
+      }
+    },
+    "total_time": 449.09818506240845
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 6,
+    "naive": {
+      "time": 6.158447980880737,
+      "clean": {
+        "accuracy": 0.814,
+        "dp_violation": 0.022351212799549103,
+        "if_violation": 0.0021
+      },
+      "corrupted": {
+        "accuracy": 0.8081666666666667,
+        "dp_violation": 0.01664915680885315,
+        "if_violation": 0.003033333333333333
+      }
+    },
+    "dro": {
+      "time": 236.22629189491272,
+      "clean": {
+        "accuracy": 0.7816666666666666,
+        "dp_violation": 0.01137816533446312,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7796666666666666,
+        "dp_violation": 0.0030003003776073456,
+        "if_violation": 0.0004
+      }
+    },
+    "total_time": 247.3717701435089
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 7,
+    "naive": {
+      "time": 6.790626049041748,
+      "clean": {
+        "accuracy": 0.8178333333333333,
+        "dp_violation": 0.03171711415052414,
+        "if_violation": 0.0017
+      },
+      "corrupted": {
+        "accuracy": 0.813,
+        "dp_violation": 0.009615160524845123,
+        "if_violation": 0.0023666666666666667
+      }
+    },
+    "dro": {
+      "time": 217.68620586395264,
+      "clean": {
+        "accuracy": 0.8031666666666667,
+        "dp_violation": 0.0268823504447937,
+        "if_violation": 0.0028666666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.7933333333333333,
+        "dp_violation": 0.014327742159366608,
+        "if_violation": 0.0044666666666666665
+      }
+    },
+    "total_time": 229.96895813941956
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 8,
+    "naive": {
+      "time": 6.371830940246582,
+      "clean": {
+        "accuracy": 0.8113333333333334,
+        "dp_violation": 0.03070744127035141,
+        "if_violation": 0.0025
+      },
+      "corrupted": {
+        "accuracy": 0.8053333333333333,
+        "dp_violation": 0.021842114627361298,
+        "if_violation": 0.002766666666666667
+      }
+    },
+    "dro": {
+      "time": 362.4682002067566,
+      "clean": {
+        "accuracy": 0.8036666666666666,
+        "dp_violation": 0.021139070391654968,
+        "if_violation": 0.0033
+      },
+      "corrupted": {
+        "accuracy": 0.7961666666666667,
+        "dp_violation": 0.01212998479604721,
+        "if_violation": 0.0045
+      }
+    },
+    "total_time": 374.10809111595154
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.2,
+    "seed": 9,
+    "naive": {
+      "time": 6.653355121612549,
+      "clean": {
+        "accuracy": 0.8081666666666667,
+        "dp_violation": 0.0308392196893692,
+        "if_violation": 0.0018666666666666666
+      },
+      "corrupted": {
+        "accuracy": 0.8013333333333333,
+        "dp_violation": 0.01845429837703705,
+        "if_violation": 0.0033333333333333335
+      }
+    },
+    "dro": {
+      "time": 324.33821535110474,
+      "clean": {
+        "accuracy": 0.8041666666666667,
+        "dp_violation": 0.0205601304769516,
+        "if_violation": 0.0020666666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.7985,
+        "dp_violation": 0.007178373634815216,
+        "if_violation": 0.002266666666666667
+      }
+    },
+    "total_time": 336.6598958969116
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 0,
+    "naive": {
+      "time": 6.562211751937866,
+      "clean": {
+        "accuracy": 0.7913333333333333,
+        "dp_violation": 0.04284493625164032,
+        "if_violation": 0.015333333333333332
+      },
+      "corrupted": {
+        "accuracy": 0.739,
+        "dp_violation": 0.01743920147418976,
+        "if_violation": 0.03186666666666667
+      }
+    },
+    "dro": {
+      "time": 454.46124291419983,
+      "clean": {
+        "accuracy": 0.7851666666666667,
+        "dp_violation": 0.00476059690117836,
+        "if_violation": 0.0018333333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.773,
+        "dp_violation": 0.0036711953580379486,
+        "if_violation": 0.006733333333333333
+      }
+    },
+    "total_time": 466.3970730304718
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 1,
+    "naive": {
+      "time": 5.828327894210815,
+      "clean": {
+        "accuracy": 0.8051666666666667,
+        "dp_violation": 0.04526164382696152,
+        "if_violation": 0.0054
+      },
+      "corrupted": {
+        "accuracy": 0.7586666666666667,
+        "dp_violation": 0.013519302010536194,
+        "if_violation": 0.023066666666666666
+      }
+    },
+    "dro": {
+      "time": 707.0049850940704,
+      "clean": {
+        "accuracy": 0.7795,
+        "dp_violation": 5.37666492164135e-05,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7795,
+        "dp_violation": 0.00031193473841995,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 717.0841500759125
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 2,
+    "naive": {
+      "time": 5.809278249740601,
+      "clean": {
+        "accuracy": 0.7998333333333333,
+        "dp_violation": 0.04816807061433792,
+        "if_violation": 0.004833333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.762,
+        "dp_violation": 0.014443561434745789,
+        "if_violation": 0.019133333333333332
+      }
+    },
+    "dro": {
+      "time": 403.81076312065125,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 5.7368721172679216e-05,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7786666666666666,
+        "dp_violation": 9.941562893800437e-05,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 413.8114812374115
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 3,
+    "naive": {
+      "time": 5.816395998001099,
+      "clean": {
+        "accuracy": 0.7921666666666667,
+        "dp_violation": 0.053738608956336975,
+        "if_violation": 0.008
+      },
+      "corrupted": {
+        "accuracy": 0.7585,
+        "dp_violation": 0.007834851741790771,
+        "if_violation": 0.017733333333333334
+      }
+    },
+    "dro": {
+      "time": 243.28871178627014,
+      "clean": {
+        "accuracy": 0.8045,
+        "dp_violation": 0.03098256140947342,
+        "if_violation": 0.0010333333333333334
+      },
+      "corrupted": {
+        "accuracy": 0.7821666666666667,
+        "dp_violation": 0.014070488512516022,
+        "if_violation": 0.008966666666666666
+      }
+    },
+    "total_time": 253.37944507598877
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 4,
+    "naive": {
+      "time": 5.774258136749268,
+      "clean": {
+        "accuracy": 0.7941666666666667,
+        "dp_violation": 0.034898191690444946,
+        "if_violation": 0.011233333333333333
+      },
+      "corrupted": {
+        "accuracy": 0.7148333333333333,
+        "dp_violation": 0.002980262041091919,
+        "if_violation": 0.04133333333333333
+      }
+    },
+    "dro": {
+      "time": 519.0753657817841,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 2.007408329518512e-05,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7758333333333334,
+        "dp_violation": 0.0023050426971167326,
+        "if_violation": 0.0014666666666666667
+      }
+    },
+    "total_time": 529.2805781364441
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 5,
+    "naive": {
+      "time": 5.6841981410980225,
+      "clean": {
+        "accuracy": 0.8071666666666667,
+        "dp_violation": 0.04614394158124924,
+        "if_violation": 0.0023666666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.7886666666666666,
+        "dp_violation": 0.013182669878005981,
+        "if_violation": 0.008633333333333333
+      }
+    },
+    "dro": {
+      "time": 472.4232120513916,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 1.4172790088196052e-06,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 6.638001650571823e-06,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 482.7099702358246
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 6,
+    "naive": {
+      "time": 9.958243131637573,
+      "clean": {
+        "accuracy": 0.806,
+        "dp_violation": 0.03608144074678421,
+        "if_violation": 0.007266666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.7621666666666667,
+        "dp_violation": 0.02259783446788788,
+        "if_violation": 0.021933333333333332
+      }
+    },
+    "dro": {
+      "time": 405.2884359359741,
+      "clean": {
+        "accuracy": 0.7786666666666666,
+        "dp_violation": 0.0002755401947069913,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7785,
+        "dp_violation": 0.0002085715823341161,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 423.62958097457886
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 7,
+    "naive": {
+      "time": 5.068680047988892,
+      "clean": {
+        "accuracy": 0.8165,
+        "dp_violation": 0.04081399738788605,
+        "if_violation": 0.004366666666666666
+      },
+      "corrupted": {
+        "accuracy": 0.7845,
+        "dp_violation": 0.0002961456775665283,
+        "if_violation": 0.0152
+      }
+    },
+    "dro": {
+      "time": 486.9495441913605,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 0.00016735613462515175,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7786666666666666,
+        "dp_violation": 0.0005557668628171086,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 495.3262732028961
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 8,
+    "naive": {
+      "time": 4.100862979888916,
+      "clean": {
+        "accuracy": 0.7981666666666667,
+        "dp_violation": 0.046698376536369324,
+        "if_violation": 0.007966666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.7306666666666667,
+        "dp_violation": 0.041816845536231995,
+        "if_violation": 0.03306666666666667
+      }
+    },
+    "dro": {
+      "time": 439.72416591644287,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 1.653747183638643e-08,
+        "if_violation": 3.3333333333333335e-05
+      },
+      "corrupted": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 2.8611411835299805e-06,
+        "if_violation": 3.3333333333333335e-05
+      }
+    },
+    "total_time": 446.99739503860474
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.3,
+    "seed": 9,
+    "naive": {
+      "time": 4.414102077484131,
+      "clean": {
+        "accuracy": 0.7966666666666666,
+        "dp_violation": 0.04866626858711243,
+        "if_violation": 0.006466666666666667
+      },
+      "corrupted": {
+        "accuracy": 0.7473333333333333,
+        "dp_violation": 0.020479395985603333,
+        "if_violation": 0.025366666666666666
+      }
+    },
+    "dro": {
+      "time": 314.5455570220947,
+      "clean": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 3.857835650933339e-08,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7788333333333334,
+        "dp_violation": 4.043815238219395e-07,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 322.3102328777313
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 0,
+    "naive": {
+      "time": 4.38674783706665,
+      "clean": {
+        "accuracy": 0.729,
+        "dp_violation": 0.02752053737640381,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5763333333333334,
+        "dp_violation": 0.020356029272079468,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 388.9304528236389,
+      "clean": {
+        "accuracy": 0.736,
+        "dp_violation": 0.0167788565158844,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5918333333333333,
+        "dp_violation": 0.01268652081489563,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 396.6546239852905
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 1,
+    "naive": {
+      "time": 4.212157249450684,
+      "clean": {
+        "accuracy": 0.733,
+        "dp_violation": 0.03081125020980835,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5721666666666667,
+        "dp_violation": 0.02077344059944153,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 288.42922496795654,
+      "clean": {
+        "accuracy": 0.76,
+        "dp_violation": 0.017739832401275635,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6425,
+        "dp_violation": 0.010878980159759521,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 295.8242962360382
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 2,
+    "naive": {
+      "time": 4.164143085479736,
+      "clean": {
+        "accuracy": 0.7416666666666667,
+        "dp_violation": 0.028714656829833984,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6035,
+        "dp_violation": 0.02333417534828186,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 366.7553331851959,
+      "clean": {
+        "accuracy": 0.7521666666666667,
+        "dp_violation": 0.020765632390975952,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6185,
+        "dp_violation": 0.01741206645965576,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 374.07190799713135
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 3,
+    "naive": {
+      "time": 4.211385726928711,
+      "clean": {
+        "accuracy": 0.7233333333333334,
+        "dp_violation": 0.03073030710220337,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5841666666666666,
+        "dp_violation": 0.016458749771118164,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 405.3507630825043,
+      "clean": {
+        "accuracy": 0.7286666666666667,
+        "dp_violation": 0.014918237924575806,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5748333333333333,
+        "dp_violation": 0.01161089539527893,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 412.8740322589874
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 4,
+    "naive": {
+      "time": 4.130586862564087,
+      "clean": {
+        "accuracy": 0.7375,
+        "dp_violation": 0.03047633171081543,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5586666666666666,
+        "dp_violation": 0.019858598709106445,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 407.3118019104004,
+      "clean": {
+        "accuracy": 0.7413333333333333,
+        "dp_violation": 0.018518656492233276,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5755,
+        "dp_violation": 0.013978034257888794,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 414.6223418712616
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 5,
+    "naive": {
+      "time": 4.136297225952148,
+      "clean": {
+        "accuracy": 0.7458333333333333,
+        "dp_violation": 0.02205955982208252,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.632,
+        "dp_violation": 0.01891729235649109,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 309.01383233070374,
+      "clean": {
+        "accuracy": 0.7491666666666666,
+        "dp_violation": 0.013860434293746948,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.651,
+        "dp_violation": 0.011728644371032715,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 316.3249180316925
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 6,
+    "naive": {
+      "time": 4.256385087966919,
+      "clean": {
+        "accuracy": 0.7478333333333333,
+        "dp_violation": 0.0229032039642334,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5955,
+        "dp_violation": 0.029747217893600464,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 415.76591396331787,
+      "clean": {
+        "accuracy": 0.7641666666666667,
+        "dp_violation": 0.012053251266479492,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6196666666666667,
+        "dp_violation": 0.020280510187149048,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 423.2868950366974
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 7,
+    "naive": {
+      "time": 4.205141067504883,
+      "clean": {
+        "accuracy": 0.7518333333333334,
+        "dp_violation": 0.026651084423065186,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6016666666666667,
+        "dp_violation": 0.014276653528213501,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 362.1726830005646,
+      "clean": {
+        "accuracy": 0.7681666666666667,
+        "dp_violation": 0.019468724727630615,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.591,
+        "dp_violation": 0.019441276788711548,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 369.5455570220947
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 8,
+    "naive": {
+      "time": 4.285943984985352,
+      "clean": {
+        "accuracy": 0.7368333333333333,
+        "dp_violation": 0.023474276065826416,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5831666666666667,
+        "dp_violation": 0.024635612964630127,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 382.84543204307556,
+      "clean": {
+        "accuracy": 0.7296666666666667,
+        "dp_violation": 0.016314148902893066,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6143333333333333,
+        "dp_violation": 0.011979609727859497,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 390.41934990882874
+  },
+  {
+    "dataset": "credit",
+    "alpha": 0.4,
+    "seed": 9,
+    "naive": {
+      "time": 4.148279190063477,
+      "clean": {
+        "accuracy": 0.7296666666666667,
+        "dp_violation": 0.024359703063964844,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.5643333333333334,
+        "dp_violation": 0.020198017358779907,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 328.89886593818665,
+      "clean": {
+        "accuracy": 0.744,
+        "dp_violation": 0.01106533408164978,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6091666666666666,
+        "dp_violation": 0.009565174579620361,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 336.2519669532776
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 0,
+    "naive": {
+      "time": 5.294150114059448,
+      "clean": {
+        "accuracy": 0.905589729874298,
+        "dp_violation": 0.02823120355606079,
+        "if_violation": 0.00032094142818935543
+      },
+      "corrupted": {
+        "accuracy": 0.905589729874298,
+        "dp_violation": 0.02823120355606079,
+        "if_violation": 0.00032094142818935543
+      }
+    },
+    "dro": {
+      "time": 500.942932844162,
+      "clean": {
+        "accuracy": 0.9071944370152447,
+        "dp_violation": 0.024926722049713135,
+        "if_violation": 0.00042792190425247395
+      },
+      "corrupted": {
+        "accuracy": 0.9071944370152447,
+        "dp_violation": 0.024926722049713135,
+        "if_violation": 0.00042792190425247395
+      }
+    },
+    "total_time": 510.5940959453583
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 1,
+    "naive": {
+      "time": 3.1601357460021973,
+      "clean": {
+        "accuracy": 0.9005081572612998,
+        "dp_violation": 0.030872881412506104,
+        "if_violation": 0.0006418828563787109
+      },
+      "corrupted": {
+        "accuracy": 0.9005081572612998,
+        "dp_violation": 0.030872881412506104,
+        "if_violation": 0.0006418828563787109
+      }
+    },
+    "dro": {
+      "time": 563.9380128383636,
+      "clean": {
+        "accuracy": 0.9034501203530356,
+        "dp_violation": 0.028717339038848877,
+        "if_violation": 0.0007488633324418294
+      },
+      "corrupted": {
+        "accuracy": 0.9034501203530356,
+        "dp_violation": 0.028717339038848877,
+        "if_violation": 0.0007488633324418294
+      }
+    },
+    "total_time": 568.8805787563324
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 2,
+    "naive": {
+      "time": 4.076095104217529,
+      "clean": {
+        "accuracy": 0.9045199251136667,
+        "dp_violation": 0.012897849082946777,
+        "if_violation": 0.00021396095212623697
+      },
+      "corrupted": {
+        "accuracy": 0.9045199251136667,
+        "dp_violation": 0.012897849082946777,
+        "if_violation": 0.00021396095212623697
+      }
+    },
+    "dro": {
+      "time": 509.05735874176025,
+      "clean": {
+        "accuracy": 0.9074618882054025,
+        "dp_violation": 0.01817774772644043,
+        "if_violation": 0.00021396095212623697
+      },
+      "corrupted": {
+        "accuracy": 0.9074618882054025,
+        "dp_violation": 0.01817774772644043,
+        "if_violation": 0.00021396095212623697
+      }
+    },
+    "total_time": 515.1559302806854
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 3,
+    "naive": {
+      "time": 3.6455979347229004,
+      "clean": {
+        "accuracy": 0.9063920834447713,
+        "dp_violation": 0.028450310230255127,
+        "if_violation": 0.0011767852366943033
+      },
+      "corrupted": {
+        "accuracy": 0.9063920834447713,
+        "dp_violation": 0.028450310230255127,
+        "if_violation": 0.0011767852366943033
+      }
+    },
+    "dro": {
+      "time": 539.4190590381622,
+      "clean": {
+        "accuracy": 0.9069269858250869,
+        "dp_violation": 0.030331730842590332,
+        "if_violation": 0.0006418828563787109
+      },
+      "corrupted": {
+        "accuracy": 0.9069269858250869,
+        "dp_violation": 0.030331730842590332,
+        "if_violation": 0.0006418828563787109
+      }
+    },
+    "total_time": 544.8225557804108
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 4,
+    "naive": {
+      "time": 3.731397867202759,
+      "clean": {
+        "accuracy": 0.9074618882054025,
+        "dp_violation": 0.025517165660858154,
+        "if_violation": 0.0008558438085049479
+      },
+      "corrupted": {
+        "accuracy": 0.9074618882054025,
+        "dp_violation": 0.025517165660858154,
+        "if_violation": 0.0008558438085049479
+      }
+    },
+    "dro": {
+      "time": 496.32553601264954,
+      "clean": {
+        "accuracy": 0.905589729874298,
+        "dp_violation": 0.027509629726409912,
+        "if_violation": 0.00042792190425247395
+      },
+      "corrupted": {
+        "accuracy": 0.905589729874298,
+        "dp_violation": 0.027509629726409912,
+        "if_violation": 0.00042792190425247395
+      }
+    },
+    "total_time": 502.05699467658997
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 5,
+    "naive": {
+      "time": 3.525073766708374,
+      "clean": {
+        "accuracy": 0.9087991441561915,
+        "dp_violation": 0.01374959945678711,
+        "if_violation": 0.00032094142818935543
+      },
+      "corrupted": {
+        "accuracy": 0.9087991441561915,
+        "dp_violation": 0.01374959945678711,
+        "if_violation": 0.00032094142818935543
+      }
+    },
+    "dro": {
+      "time": 490.6166672706604,
+      "clean": {
+        "accuracy": 0.9125434608184007,
+        "dp_violation": 0.014234602451324463,
+        "if_violation": 0.0017116876170098958
+      },
+      "corrupted": {
+        "accuracy": 0.9125434608184007,
+        "dp_violation": 0.014234602451324463,
+        "if_violation": 0.0017116876170098958
+      }
+    },
+    "total_time": 495.9536030292511
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 6,
+    "naive": {
+      "time": 3.7071609497070312,
+      "clean": {
+        "accuracy": 0.912008558438085,
+        "dp_violation": 0.02243560552597046,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.912008558438085,
+        "dp_violation": 0.02243560552597046,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 380.6694140434265,
+      "clean": {
+        "accuracy": 0.9136132655790318,
+        "dp_violation": 0.022159814834594727,
+        "if_violation": 0.0005349023803155924
+      },
+      "corrupted": {
+        "accuracy": 0.9136132655790318,
+        "dp_violation": 0.022159814834594727,
+        "if_violation": 0.0005349023803155924
+      }
+    },
+    "total_time": 386.1980218887329
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 7,
+    "naive": {
+      "time": 3.6593821048736572,
+      "clean": {
+        "accuracy": 0.9069269858250869,
+        "dp_violation": 0.021562695503234863,
+        "if_violation": 0.00010698047606311849
+      },
+      "corrupted": {
+        "accuracy": 0.9069269858250869,
+        "dp_violation": 0.021562695503234863,
+        "if_violation": 0.00010698047606311849
+      }
+    },
+    "dro": {
+      "time": 524.8283789157867,
+      "clean": {
+        "accuracy": 0.9087991441561915,
+        "dp_violation": 0.019373774528503418,
+        "if_violation": 0.001337255950788981
+      },
+      "corrupted": {
+        "accuracy": 0.9087991441561915,
+        "dp_violation": 0.019373774528503418,
+        "if_violation": 0.001337255950788981
+      }
+    },
+    "total_time": 530.3317179679871
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 8,
+    "naive": {
+      "time": 4.456773996353149,
+      "clean": {
+        "accuracy": 0.9104038512971383,
+        "dp_violation": 0.018858790397644043,
+        "if_violation": 0.0014977266648836588
+      },
+      "corrupted": {
+        "accuracy": 0.9104038512971383,
+        "dp_violation": 0.018858790397644043,
+        "if_violation": 0.0014977266648836588
+      }
+    },
+    "dro": {
+      "time": 502.91637682914734,
+      "clean": {
+        "accuracy": 0.9085316929660336,
+        "dp_violation": 0.015361189842224121,
+        "if_violation": 0.001337255950788981
+      },
+      "corrupted": {
+        "accuracy": 0.9085316929660336,
+        "dp_violation": 0.015361189842224121,
+        "if_violation": 0.001337255950788981
+      }
+    },
+    "total_time": 509.49676489830017
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.0,
+    "seed": 9,
+    "naive": {
+      "time": 3.6841211318969727,
+      "clean": {
+        "accuracy": 0.9071944370152447,
+        "dp_violation": 0.02014380693435669,
+        "if_violation": 0.00021396095212623697
+      },
+      "corrupted": {
+        "accuracy": 0.9071944370152447,
+        "dp_violation": 0.02014380693435669,
+        "if_violation": 0.00021396095212623697
+      }
+    },
+    "dro": {
+      "time": 523.831668138504,
+      "clean": {
+        "accuracy": 0.9061246322546135,
+        "dp_violation": 0.027949154376983643,
+        "if_violation": 0.0007488633324418294
+      },
+      "corrupted": {
+        "accuracy": 0.9061246322546135,
+        "dp_violation": 0.027949154376983643,
+        "if_violation": 0.0007488633324418294
+      }
+    },
+    "total_time": 529.3314371109009
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 0,
+    "naive": {
+      "time": 3.7024216651916504,
+      "clean": {
+        "accuracy": 0.9066595346349291,
+        "dp_violation": 0.025067150592803955,
+        "if_violation": 0.00042792190425247395
+      },
+      "corrupted": {
+        "accuracy": 0.9061246322546135,
+        "dp_violation": 0.01929539442062378,
+        "if_violation": 0.00032094142818935543
+      }
+    },
+    "dro": {
+      "time": 167.01767706871033,
+      "clean": {
+        "accuracy": 0.9087991441561915,
+        "dp_violation": 0.018098771572113037,
+        "if_violation": 0.00042792190425247395
+      },
+      "corrupted": {
+        "accuracy": 0.908264241775876,
+        "dp_violation": 0.013263583183288574,
+        "if_violation": 0.00042792190425247395
+      }
+    },
+    "total_time": 172.63415217399597
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 1,
+    "naive": {
+      "time": 3.788562774658203,
+      "clean": {
+        "accuracy": 0.9034501203530356,
+        "dp_violation": 0.027653157711029053,
+        "if_violation": 0.00032094142818935543
+      },
+      "corrupted": {
+        "accuracy": 0.9031826691628778,
+        "dp_violation": 0.019845128059387207,
+        "if_violation": 0.00032094142818935543
+      }
+    },
+    "dro": {
+      "time": 85.92757105827332,
+      "clean": {
+        "accuracy": 0.90291521797272,
+        "dp_violation": 0.005075395107269287,
+        "if_violation": 0.00010698047606311849
+      },
+      "corrupted": {
+        "accuracy": 0.9023803155924044,
+        "dp_violation": 0.003844738006591797,
+        "if_violation": 0.00010698047606311849
+      }
+    },
+    "total_time": 91.5627269744873
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 2,
+    "naive": {
+      "time": 3.999424695968628,
+      "clean": {
+        "accuracy": 0.9037175715431933,
+        "dp_violation": 0.016008436679840088,
+        "if_violation": 0.00010698047606311849
+      },
+      "corrupted": {
+        "accuracy": 0.9034501203530356,
+        "dp_violation": 0.013366878032684326,
+        "if_violation": 0.00010698047606311849
+      }
+    },
+    "dro": {
+      "time": 167.82931923866272,
+      "clean": {
+        "accuracy": 0.9063920834447713,
+        "dp_violation": 0.009547412395477295,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9061246322546135,
+        "dp_violation": 0.007923781871795654,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 173.76298117637634
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 3,
+    "naive": {
+      "time": 3.7866861820220947,
+      "clean": {
+        "accuracy": 0.9074618882054025,
+        "dp_violation": 0.027412354946136475,
+        "if_violation": 0.0010698047606311847
+      },
+      "corrupted": {
+        "accuracy": 0.9063920834447713,
+        "dp_violation": 0.019787311553955078,
+        "if_violation": 0.0008558438085049479
+      }
+    },
+    "dro": {
+      "time": 191.33783507347107,
+      "clean": {
+        "accuracy": 0.9093340465365071,
+        "dp_violation": 0.02319258451461792,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9079967905857181,
+        "dp_violation": 0.018203437328338623,
+        "if_violation": 0.00021396095212623697
+      }
+    },
+    "total_time": 196.99682712554932
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 4,
+    "naive": {
+      "time": 4.015768051147461,
+      "clean": {
+        "accuracy": 0.908264241775876,
+        "dp_violation": 0.027390897274017334,
+        "if_violation": 0.0014977266648836588
+      },
+      "corrupted": {
+        "accuracy": 0.9074618882054025,
+        "dp_violation": 0.02661895751953125,
+        "if_violation": 0.0014977266648836588
+      }
+    },
+    "dro": {
+      "time": 118.43062901496887,
+      "clean": {
+        "accuracy": 0.9042524739235089,
+        "dp_violation": 0.027004599571228027,
+        "if_violation": 0.00032094142818935543
+      },
+      "corrupted": {
+        "accuracy": 0.9031826691628778,
+        "dp_violation": 0.02831059694290161,
+        "if_violation": 0.00042792190425247395
+      }
+    },
+    "total_time": 124.49133324623108
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 5,
+    "naive": {
+      "time": 3.756131172180176,
+      "clean": {
+        "accuracy": 0.9096014977266649,
+        "dp_violation": 0.015139997005462646,
+        "if_violation": 0.0006418828563787109
+      },
+      "corrupted": {
+        "accuracy": 0.9090665953463493,
+        "dp_violation": 0.011363744735717773,
+        "if_violation": 0.0003744316662209147
+      }
+    },
+    "dro": {
+      "time": 122.13666677474976,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 127.75501298904419
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 6,
+    "naive": {
+      "time": 3.9229202270507812,
+      "clean": {
+        "accuracy": 0.9087991441561915,
+        "dp_violation": 0.02029597759246826,
+        "if_violation": 0.00032094142818935543
+      },
+      "corrupted": {
+        "accuracy": 0.9087991441561915,
+        "dp_violation": 0.01502770185470581,
+        "if_violation": 0.00021396095212623697
+      }
+    },
+    "dro": {
+      "time": 110.09372520446777,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 116.07904291152954
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 7,
+    "naive": {
+      "time": 4.046966791152954,
+      "clean": {
+        "accuracy": 0.9077293393955603,
+        "dp_violation": 0.01717311143875122,
+        "if_violation": 0.00010698047606311849
+      },
+      "corrupted": {
+        "accuracy": 0.9071944370152447,
+        "dp_violation": 0.019090652465820312,
+        "if_violation": 0.00010698047606311849
+      }
+    },
+    "dro": {
+      "time": 163.40497088432312,
+      "clean": {
+        "accuracy": 0.9071944370152447,
+        "dp_violation": 0.01418536901473999,
+        "if_violation": 0.0006418828563787109
+      },
+      "corrupted": {
+        "accuracy": 0.9063920834447713,
+        "dp_violation": 0.018292248249053955,
+        "if_violation": 0.0009628242845680663
+      }
+    },
+    "total_time": 169.4963321685791
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 8,
+    "naive": {
+      "time": 4.155731201171875,
+      "clean": {
+        "accuracy": 0.9109387536774539,
+        "dp_violation": 0.017878234386444092,
+        "if_violation": 0.0011767852366943033
+      },
+      "corrupted": {
+        "accuracy": 0.9104038512971383,
+        "dp_violation": 0.01303023099899292,
+        "if_violation": 0.0010698047606311847
+      }
+    },
+    "dro": {
+      "time": 108.37793779373169,
+      "clean": {
+        "accuracy": 0.9090665953463493,
+        "dp_violation": 0.0122603178024292,
+        "if_violation": 0.00032094142818935543
+      },
+      "corrupted": {
+        "accuracy": 0.9079967905857181,
+        "dp_violation": 0.011008024215698242,
+        "if_violation": 0.00032094142818935543
+      }
+    },
+    "total_time": 114.5058000087738
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.1,
+    "seed": 9,
+    "naive": {
+      "time": 4.05430793762207,
+      "clean": {
+        "accuracy": 0.9079967905857181,
+        "dp_violation": 0.020407438278198242,
+        "if_violation": 0.00010698047606311849
+      },
+      "corrupted": {
+        "accuracy": 0.9066595346349291,
+        "dp_violation": 0.017735004425048828,
+        "if_violation": 0.00010698047606311849
+      }
+    },
+    "dro": {
+      "time": 83.25488495826721,
+      "clean": {
+        "accuracy": 0.9034501203530356,
+        "dp_violation": 0.0016635656356811523,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9034501203530356,
+        "dp_violation": 4.57763671875e-05,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 89.18209314346313
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 0,
+    "naive": {
+      "time": 4.027827024459839,
+      "clean": {
+        "accuracy": 0.9047873763038246,
+        "dp_violation": 0.03747880458831787,
+        "if_violation": 0.00021396095212623697
+      },
+      "corrupted": {
+        "accuracy": 0.9031826691628778,
+        "dp_violation": 0.030140578746795654,
+        "if_violation": 0.0010163145225996256
+      }
+    },
+    "dro": {
+      "time": 181.94721102714539,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 188.0480978488922
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 1,
+    "naive": {
+      "time": 4.006126165390015,
+      "clean": {
+        "accuracy": 0.9037175715431933,
+        "dp_violation": 0.030836105346679688,
+        "if_violation": 0.00042792190425247395
+      },
+      "corrupted": {
+        "accuracy": 0.9023803155924044,
+        "dp_violation": 0.024348974227905273,
+        "if_violation": 0.0007488633324418294
+      }
+    },
+    "dro": {
+      "time": 202.8275761604309,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 5.960464477539063e-08,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 5.960464477539063e-08,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 208.88448977470398
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 2,
+    "naive": {
+      "time": 4.013587951660156,
+      "clean": {
+        "accuracy": 0.9063920834447713,
+        "dp_violation": 0.02234882116317749,
+        "if_violation": 0.00032094142818935543
+      },
+      "corrupted": {
+        "accuracy": 0.9047873763038246,
+        "dp_violation": 0.010612905025482178,
+        "if_violation": 0.00032094142818935543
+      }
+    },
+    "dro": {
+      "time": 182.898854970932,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 188.82979702949524
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 3,
+    "naive": {
+      "time": 3.627427101135254,
+      "clean": {
+        "accuracy": 0.9021128644022466,
+        "dp_violation": 0.03774261474609375,
+        "if_violation": 0.0019791388071676917
+      },
+      "corrupted": {
+        "accuracy": 0.8994383525006686,
+        "dp_violation": 0.024622976779937744,
+        "if_violation": 0.0023535704733886067
+      }
+    },
+    "dro": {
+      "time": 234.13737320899963,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 239.65357494354248
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 4,
+    "naive": {
+      "time": 5.078298091888428,
+      "clean": {
+        "accuracy": 0.9071944370152447,
+        "dp_violation": 0.03439533710479736,
+        "if_violation": 0.002888472853704199
+      },
+      "corrupted": {
+        "accuracy": 0.9047873763038246,
+        "dp_violation": 0.02548694610595703,
+        "if_violation": 0.0025675314255148435
+      }
+    },
+    "dro": {
+      "time": 137.0992169380188,
+      "clean": {
+        "accuracy": 0.9096014977266649,
+        "dp_violation": 0.021670520305633545,
+        "if_violation": 0.001123294998662744
+      },
+      "corrupted": {
+        "accuracy": 0.9079967905857181,
+        "dp_violation": 0.016140282154083252,
+        "if_violation": 0.001123294998662744
+      }
+    },
+    "total_time": 144.88988995552063
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 5,
+    "naive": {
+      "time": 4.882462024688721,
+      "clean": {
+        "accuracy": 0.9093340465365071,
+        "dp_violation": 0.010683715343475342,
+        "if_violation": 0.003958277614335383
+      },
+      "corrupted": {
+        "accuracy": 0.9069269858250869,
+        "dp_violation": 0.0010495185852050781,
+        "if_violation": 0.0039047873763038247
+      }
+    },
+    "dro": {
+      "time": 137.10345077514648,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 144.01854419708252
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 6,
+    "naive": {
+      "time": 4.3258140087127686,
+      "clean": {
+        "accuracy": 0.9112062048676116,
+        "dp_violation": 0.022824585437774658,
+        "if_violation": 0.0005349023803155924
+      },
+      "corrupted": {
+        "accuracy": 0.9109387536774539,
+        "dp_violation": 0.015599370002746582,
+        "if_violation": 0.0005349023803155924
+      }
+    },
+    "dro": {
+      "time": 88.35180711746216,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 2.384185791015625e-07,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 4.172325134277344e-07,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 94.83987522125244
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 7,
+    "naive": {
+      "time": 4.801815032958984,
+      "clean": {
+        "accuracy": 0.9066595346349291,
+        "dp_violation": 0.020566165447235107,
+        "if_violation": 0.001337255950788981
+      },
+      "corrupted": {
+        "accuracy": 0.9058571810644558,
+        "dp_violation": 0.013280510902404785,
+        "if_violation": 0.0014442364268520995
+      }
+    },
+    "dro": {
+      "time": 201.0368549823761,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 207.95954084396362
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 8,
+    "naive": {
+      "time": 3.856938123703003,
+      "clean": {
+        "accuracy": 0.900240706071142,
+        "dp_violation": 0.034200191497802734,
+        "if_violation": 0.00010698047606311849
+      },
+      "corrupted": {
+        "accuracy": 0.8978336453597219,
+        "dp_violation": 0.029332995414733887,
+        "if_violation": 0.00032094142818935543
+      }
+    },
+    "dro": {
+      "time": 98.92339181900024,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 104.66373133659363
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.2,
+    "seed": 9,
+    "naive": {
+      "time": 4.22081995010376,
+      "clean": {
+        "accuracy": 0.905589729874298,
+        "dp_violation": 0.023396670818328857,
+        "if_violation": 0.0019256485691361326
+      },
+      "corrupted": {
+        "accuracy": 0.9010430596416154,
+        "dp_violation": 0.018784165382385254,
+        "if_violation": 0.0025140411874832844
+      }
+    },
+    "dro": {
+      "time": 77.70733618736267,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 83.94072079658508
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 0,
+    "naive": {
+      "time": 4.029898166656494,
+      "clean": {
+        "accuracy": 0.8967638405990906,
+        "dp_violation": 0.036754071712493896,
+        "if_violation": 0.0039047873763038247
+      },
+      "corrupted": {
+        "accuracy": 0.8847285370419898,
+        "dp_violation": 0.014866948127746582,
+        "if_violation": 0.00850494784701792
+      }
+    },
+    "dro": {
+      "time": 105.8258740901947,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 9.5367431640625e-07,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 111.80710983276367
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 1,
+    "naive": {
+      "time": 3.8689887523651123,
+      "clean": {
+        "accuracy": 0.9010430596416154,
+        "dp_violation": 0.026109814643859863,
+        "if_violation": 0.00492110189890345
+      },
+      "corrupted": {
+        "accuracy": 0.8919497191762503,
+        "dp_violation": 0.013181626796722412,
+        "if_violation": 0.008023535704733886
+      }
+    },
+    "dro": {
+      "time": 268.414439201355,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 8.344650268554688e-07,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 6.556510925292969e-07,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 274.24297881126404
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 2,
+    "naive": {
+      "time": 3.9185750484466553,
+      "clean": {
+        "accuracy": 0.9053222786841402,
+        "dp_violation": 0.019359588623046875,
+        "if_violation": 0.006579299277881786
+      },
+      "corrupted": {
+        "accuracy": 0.8940893286975127,
+        "dp_violation": 0.0016601085662841797,
+        "if_violation": 0.009628242845680663
+      }
+    },
+    "dro": {
+      "time": 249.50110697746277,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 255.56469821929932
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 3,
+    "naive": {
+      "time": 3.9223029613494873,
+      "clean": {
+        "accuracy": 0.8994383525006686,
+        "dp_violation": 0.04481947422027588,
+        "if_violation": 0.00561647499331372
+      },
+      "corrupted": {
+        "accuracy": 0.8855308906124633,
+        "dp_violation": 0.029791533946990967,
+        "if_violation": 0.010912008558438085
+      }
+    },
+    "dro": {
+      "time": 249.1741807460785,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 6.556510925292969e-07,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 1.7881393432617188e-06,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 255.0353181362152
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 4,
+    "naive": {
+      "time": 3.348353862762451,
+      "clean": {
+        "accuracy": 0.9005081572612998,
+        "dp_violation": 0.04335737228393555,
+        "if_violation": 0.005135062851029687
+      },
+      "corrupted": {
+        "accuracy": 0.8849959882321476,
+        "dp_violation": 0.03191077709197998,
+        "if_violation": 0.011821342604974592
+      }
+    },
+    "dro": {
+      "time": 154.97297716140747,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 1.1205673217773438e-05,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 9.417533874511719e-06,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 160.00683283805847
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 5,
+    "naive": {
+      "time": 3.0768020153045654,
+      "clean": {
+        "accuracy": 0.9069269858250869,
+        "dp_violation": 0.011851727962493896,
+        "if_violation": 0.011125969510564321
+      },
+      "corrupted": {
+        "accuracy": 0.8908799144156192,
+        "dp_violation": 0.003448963165283203,
+        "if_violation": 0.0211286440224659
+      }
+    },
+    "dro": {
+      "time": 246.1416838169098,
+      "clean": {
+        "accuracy": 0.901577962021931,
+        "dp_violation": 0.0011769533157348633,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.901577962021931,
+        "dp_violation": 0.0010721683502197266,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 250.83449602127075
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 6,
+    "naive": {
+      "time": 3.8435041904449463,
+      "clean": {
+        "accuracy": 0.9136132655790318,
+        "dp_violation": 0.02425020933151245,
+        "if_violation": 0.0036908264241775875
+      },
+      "corrupted": {
+        "accuracy": 0.9026477667825622,
+        "dp_violation": 0.011035740375518799,
+        "if_violation": 0.007542123562449853
+      }
+    },
+    "dro": {
+      "time": 222.95720505714417,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 228.7847101688385
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 7,
+    "naive": {
+      "time": 3.962406873703003,
+      "clean": {
+        "accuracy": 0.9061246322546135,
+        "dp_violation": 0.025046706199645996,
+        "if_violation": 0.003316394757956673
+      },
+      "corrupted": {
+        "accuracy": 0.898903450120353,
+        "dp_violation": 0.006769001483917236,
+        "if_violation": 0.005135062851029687
+      }
+    },
+    "dro": {
+      "time": 136.63719487190247,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 142.65559029579163
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 8,
+    "naive": {
+      "time": 4.26813817024231,
+      "clean": {
+        "accuracy": 0.8999732548809842,
+        "dp_violation": 0.03792619705200195,
+        "if_violation": 0.005295533565124365
+      },
+      "corrupted": {
+        "accuracy": 0.8863332441829366,
+        "dp_violation": 0.03605616092681885,
+        "if_violation": 0.011072479272532763
+      }
+    },
+    "dro": {
+      "time": 142.7208330631256,
+      "clean": {
+        "accuracy": 0.901577962021931,
+        "dp_violation": 1.5497207641601562e-06,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9013105108317732,
+        "dp_violation": 0.0004622936248779297,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 149.15339303016663
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.3,
+    "seed": 9,
+    "naive": {
+      "time": 4.0658509731292725,
+      "clean": {
+        "accuracy": 0.898903450120353,
+        "dp_violation": 0.03056401014328003,
+        "if_violation": 0.00561647499331372
+      },
+      "corrupted": {
+        "accuracy": 0.8804493179994651,
+        "dp_violation": 0.023428261280059814,
+        "if_violation": 0.013907461888205403
+      }
+    },
+    "dro": {
+      "time": 53.66774821281433,
+      "clean": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.9018454132120888,
+        "dp_violation": 0.0,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 59.904723167419434
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 0,
+    "naive": {
+      "time": 5.334656000137329,
+      "clean": {
+        "accuracy": 0.8510296870821075,
+        "dp_violation": 0.017105281352996826,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7352233217437818,
+        "dp_violation": 0.01307457685470581,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 308.99082612991333,
+      "clean": {
+        "accuracy": 0.8633324418293662,
+        "dp_violation": 0.007414519786834717,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7723990371757155,
+        "dp_violation": 0.00823962688446045,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 316.566575050354
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 1,
+    "naive": {
+      "time": 4.189025163650513,
+      "clean": {
+        "accuracy": 0.8534367477935276,
+        "dp_violation": 0.00500941276550293,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7183738967638406,
+        "dp_violation": 0.00853949785232544,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 368.3873338699341,
+      "clean": {
+        "accuracy": 0.8673442096817331,
+        "dp_violation": 0.0029767751693725586,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6988499598823215,
+        "dp_violation": 0.007956147193908691,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 374.6951439380646
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 2,
+    "naive": {
+      "time": 4.1196959018707275,
+      "clean": {
+        "accuracy": 0.8419363466167424,
+        "dp_violation": 0.00883340835571289,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7403048943567799,
+        "dp_violation": 0.008550286293029785,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 310.07651472091675,
+      "clean": {
+        "accuracy": 0.856913613265579,
+        "dp_violation": 0.0026398897171020508,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.762503343139877,
+        "dp_violation": 0.005809962749481201,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 316.34710693359375
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 3,
+    "naive": {
+      "time": 4.1983561515808105,
+      "clean": {
+        "accuracy": 0.8721583311045734,
+        "dp_violation": 0.019305109977722168,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.737630382455202,
+        "dp_violation": 0.008785367012023926,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 359.0473518371582,
+      "clean": {
+        "accuracy": 0.8967638405990906,
+        "dp_violation": 0.006912410259246826,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.8785771596683605,
+        "dp_violation": 0.002664327621459961,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 365.24789094924927
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 4,
+    "naive": {
+      "time": 4.471437215805054,
+      "clean": {
+        "accuracy": 0.8512971382722653,
+        "dp_violation": 0.011050045490264893,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7368280288847285,
+        "dp_violation": 0.012964129447937012,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 332.6628830432892,
+      "clean": {
+        "accuracy": 0.8729606846750468,
+        "dp_violation": 0.008853554725646973,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.8026210216635464,
+        "dp_violation": 0.006343483924865723,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 339.0504503250122
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 5,
+    "naive": {
+      "time": 3.971508026123047,
+      "clean": {
+        "accuracy": 0.8684140144423643,
+        "dp_violation": 0.006485879421234131,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7116876170098957,
+        "dp_violation": 0.012364745140075684,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 429.7549178600311,
+      "clean": {
+        "accuracy": 0.8769724525274137,
+        "dp_violation": 0.005680382251739502,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7132923241508424,
+        "dp_violation": 0.00962221622467041,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 435.8209779262543
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 6,
+    "naive": {
+      "time": 4.4822258949279785,
+      "clean": {
+        "accuracy": 0.8892752072746724,
+        "dp_violation": 0.013261497020721436,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.8192029954533298,
+        "dp_violation": 0.004517912864685059,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 380.4151129722595,
+      "clean": {
+        "accuracy": 0.8732281358652046,
+        "dp_violation": 0.005675792694091797,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7766782562182402,
+        "dp_violation": 0.002479076385498047,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 387.64675211906433
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 7,
+    "naive": {
+      "time": 4.964233875274658,
+      "clean": {
+        "accuracy": 0.8831238299010431,
+        "dp_violation": 0.013234078884124756,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.8205402514041188,
+        "dp_violation": 0.005154073238372803,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 280.8048961162567,
+      "clean": {
+        "accuracy": 0.8919497191762503,
+        "dp_violation": 0.0059372782707214355,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.8537041989836854,
+        "dp_violation": 0.003564894199371338,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 287.9545969963074
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 8,
+    "naive": {
+      "time": 4.22710108757019,
+      "clean": {
+        "accuracy": 0.8392618347151645,
+        "dp_violation": 0.011300265789031982,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7170366408130516,
+        "dp_violation": 0.00012433528900146484,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 389.4290690422058,
+      "clean": {
+        "accuracy": 0.8644022465899973,
+        "dp_violation": 0.003899812698364258,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7258625300882589,
+        "dp_violation": 0.0005241036415100098,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 395.7042360305786
+  },
+  {
+    "dataset": "lsac",
+    "alpha": 0.4,
+    "seed": 9,
+    "naive": {
+      "time": 4.1053314208984375,
+      "clean": {
+        "accuracy": 0.8692163680128376,
+        "dp_violation": 0.01668524742126465,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.6790585718106446,
+        "dp_violation": 0.01128840446472168,
+        "if_violation": 0.0
+      }
+    },
+    "dro": {
+      "time": 302.3879380226135,
+      "clean": {
+        "accuracy": 0.8831238299010431,
+        "dp_violation": 0.008230984210968018,
+        "if_violation": 0.0
+      },
+      "corrupted": {
+        "accuracy": 0.7943300347686547,
+        "dp_violation": 0.00664287805557251,
+        "if_violation": 0.0
+      }
+    },
+    "total_time": 308.4733159542084
+  }
+]

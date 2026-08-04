@@ -11,3 +11,6 @@
 
 ## Reference (optional planning/design)
 See `docs/reference/`.
+
+| [ARCHIVE_POLICY.md](ARCHIVE_POLICY.md) | Archive over delete |
+| [LOOP_STATUS.md](LOOP_STATUS.md) | 5-min loop board |

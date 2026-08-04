@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering\small
+\caption{Ablation study on Adult (adversarial corruption, 3 seeds).}
+\label{tab:ablation}
+\rowcolors{2}{gray!8}{white}
+\begin{tabular}{L{4cm}cccccc}
+\toprule
+\rowcolor{hdrblue!90}
+\color{white}\textbf{Variant} & \color{white}\(\alpha{=}0.2\) Acc & \color{white}DP & \color{white}IF & \color{white}\(\alpha{=}0.3\) Acc & \color{white}DP & \color{white}IF \\
+\midrule
+Standard ML & 0.822 & 0.1034 & 0.0233 & 0.816 & 0.1135 & 0.0248 \\
+Naive-FAIR & 0.821 & 0.0905 & 0.0164 & 0.786 & 0.0339 & 0.0258 \\
+DRO Joint (DP+IF) & 0.788 & 0.0484 & 0.0067 & 0.606 & 0.0109 & 0.0028 \\
+DRO DP-only & 0.803 & 0.0726 & 0.0108 & 0.647 & 0.0599 & 0.0119 \\
+DRO IF-only & 0.821 & 0.0956 & 0.0174 & 0.787 & 0.0295 & 0.0280 \\
+\bottomrule
+\end{tabular}
+\end{table}
