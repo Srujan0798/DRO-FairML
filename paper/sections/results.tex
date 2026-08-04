@@ -141,12 +141,17 @@ complete (540 rows).  Under IF attack the DP test is significant on
 Adult $\alpha\le0.2$ and most Credit cells; LSAC/IF and Adult IF
 $\alpha\ge0.3$ do not support a DP win (see summary file).
 
-\subsection{Image data (UTKFace) --- real features local; full grid pending}
+\subsection{Image data (UTKFace) --- real features; grid not claimed}
 \label{sec:results-utkface}
 
-UTKFace is the third task of the project.  Real ResNet-style features are
-now extracted locally (\texttt{data/raw/utkface\_features.npz}); a multi-seed
-Fairness-Targeted PGD grid is running post-canonical-clear and is
-\textbf{not} claimed in this draft.  Prior synthetic-only smoke outputs
-remain non-results; the older ``DRO inverts on image features'' claim stays
-\emph{withdrawn}.  flair2 GPU access is still optional once SSH is available.
+UTKFace uses real ResNet18 features ($N{=}23{,}705$, gender prediction,
+race White/non-White as protected attribute;
+\texttt{data/raw/utkface\_features.npz}).  A multi-seed Fairness-Targeted
+PGD grid ($\tau{=}1$, $k_{\mathrm{inner}}{=}10$, same protocol as tabular)
+is running locally into \texttt{results/utkface\_canonical.json} with
+\texttt{data\_provenance{=}REAL}.  \textbf{No image-modality claim is made
+in this draft} until the 90-config grid is complete and reviewed.
+Prior synthetic-only smoke outputs remain non-results; the older
+``DRO inverts on image features'' claim stays \emph{withdrawn}.
+Server GPU (flair2) is proven infrastructure but \textbf{not required}
+for these numbers.

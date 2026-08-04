@@ -47,9 +47,10 @@ use this approximation according to the attack") and does not claim
 the paper is wrong.
 See report appendix for the clean inversion derivation: $\pi_{\mathrm{clean}}[\mathrm{min}] = \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4\alpha$, etc. (B's math).
 
-\subsection{Image data (UTKFace) --- future work; full grid not claimed}
+\subsection{Image data (UTKFace) --- real features; claim deferred}
 The earlier ``DRO inverts on ResNet18 features'' claim from prior
 versions of this paper is withdrawn (synthetic smoke only).  Real
-features are available locally
-(\texttt{data/raw/utkface\_features.npz}); a multi-seed Fairness-Targeted
-PGD grid is not claimed in this draft.  See \S\ref{sec:results-utkface}.
+features and a partial REAL-tagged grid exist locally
+(\texttt{results/utkface\_canonical.json}); we defer any image-modality
+result until the full protocol grid is complete and reviewed.
+See \S\ref{sec:results-utkface}.
