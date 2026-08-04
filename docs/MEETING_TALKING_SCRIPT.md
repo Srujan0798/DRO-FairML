@@ -27,10 +27,10 @@ LSAC Combined: DRO wins. **LSAC DP: model collapses** — we flag it, not hide i
 2. `figures/fig_final_wilcoxon_table.pdf`
 
 ## If asked about UTKFace
-“Real features are ready; multi-seed grid is still finishing. We will not claim image results until that grid is complete and checked.”
+“Full real-feature grid is done — 90 configs on ResNet18 features from 23k faces. Clean-test DP is mixed: significant DRO wins mainly at high α, not the Adult low-α story. We treat it as a real image-feature pilot, not a tabular copy.”
 
 ## If asked “verify claims”
 “Every number is from the locked 540-row file; we rechecked win counts and Wilcoxon ourselves — including the 5/6 cell.”
 
 ## Close
-“Next: finish UTKFace or scope it; paper polish with this honest story.”
+“Package for Aug 10: paper and report with τ=1 story, honest IF mixed, LSAC degeneracy, and UTKFace as mixed pilot.”

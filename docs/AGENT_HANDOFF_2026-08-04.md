@@ -1,10 +1,13 @@
-# Agent handoff — 2026-08-04 (post 15:14)
+# Agent handoff — 2026-08-04 (post Aug 10 final gate)
 
-## Meeting (16:00)
-**Present only from:** `docs/MEETING_2026-08-04.md`  
-Also share: `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf`.
+**Aligned with:** Grok session + Claude Code session `00b1a526…`  
+**HEAD:** `origin/main` — Aug 10 package complete.
 
-Honest lines: Adult/DP **α=0.1 = 5/6**; IF **mixed**; LSAC/DP **degenerate**.
+## Meeting (done)
+Present from: `docs/MEETING_HANDOUT_2026-08-04.md`  
+Figures: `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf`.
+
+Honest lines: Adult/DP **α=0.1 = 5/6**; IF **mixed**; LSAC/DP **degenerate**; UTKFace **90/90 REAL mixed pilot**.
 
 ---
 
@@ -16,28 +19,35 @@ Honest lines: Adult/DP **α=0.1 = 5/6**; IF **mixed**; LSAC/DP **degenerate**.
 | **Agent V** mismatches + Jul-2 figs | ✅ STATUS / KULDEEP / VERIFICATION / figs fixed & pushed |
 | Repo cleanup | ✅ slim tree; archives purged; `origin/main` updated |
 | flair2 access / L40S / code / features | ✅ proven — **PARKED** (no torch install; don’t restart) |
+| **Local UTKFace REAL** | ✅ **90/90** — `results/utkface_canonical.json` + `utkface_summary.md` |
+| Paper / report Aug 10 narrative | ✅ mixed UTKFace pilot; τ=1 / 5/6 / IF mixed / LSAC |
+| Final gate | ✅ `make test` (62) + `validate` PASS + paper + report |
 
 ---
 
-## IN PROGRESS
-| Item | Notes |
-|------|--------|
-| **Local UTKFace REAL** | **COMPLETE 90/90** — see `results/utkface_summary.md`. Review before paper claim. |
+## Aug 10 (submission package)
+| Share | Path |
+|-------|------|
+| Paper | `paper/main.pdf` |
+| Report | `report/report.pdf` |
+| Handout | `docs/MEETING_HANDOUT_2026-08-04.md` |
+| Optional image summary | `results/utkface_summary.md` |
 
-When 90/90: commit `results/utkface_canonical.json`, honest summary, optional paper blurb — **never synthetic**.
+Checklist: `docs/AUG10_SUBMISSION_CHECKLIST.md`  
+Advisor map: `docs/ADVISOR_CONCERNS_CHECKLIST.md`  
+Live board: `STATUS.md`
 
 ---
 
-## Aug 10 (after UTKFace decision)
-1. Paper/report polish (K)  
-2. Final claim trace (L)  
-3. UTKFace in paper **or** honest scope-out  
-4. flair2 only if GPU-heavy experiment greenlit  
+## Optional later (not blocking Aug 10)
+- flair2 pixel-level / end-to-end only if greenlit
+- Empirical-radii full table (Q5 appendix exists; canonical stays uniform)
 
 ---
 
 ## Don’t
-- Don’t retrain or rewrite `canonical_tau1.json`  
-- Don’t wait on / restart flair2 torch download  
-- Don’t report synthetic UTKFace as real  
-- Don’t run multiple UTKFace writers (race on JSON)  
+- Don’t retrain or rewrite `canonical_tau1.json`
+- Don’t wait on / restart flair2 torch download
+- Don’t report synthetic UTKFace as real
+- Don’t claim “6/6 every α” or clean three-attack mirror
+- Don’t claim UTKFace is Adult-style low-α DP sweep (it’s **mixed**)

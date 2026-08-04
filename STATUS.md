@@ -1,7 +1,7 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (Aug 10 package). 2026-08-04 (Agent I meeting brief). Supersedes all prior STATUS / handoff docs.
-**CLEAR:** canonical grid **540/540** (IF 180); Agent H finalize complete; first real IF numbers below._
+_Last updated: 2026-08-04 (Aug 10 final + Claude/Grok session alignment). Supersedes all prior STATUS / handoff docs.
+**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; final gate green; advisor checklist current._
 
 ## 1. What this project is
 Implement **DRO-FAIR** (min-max Lagrangian with corruption-calibrated TV uncertainty

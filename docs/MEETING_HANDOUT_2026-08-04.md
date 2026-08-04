@@ -105,7 +105,7 @@ At **α ≥ 0.3**, both DRO and Naive fall **below** the constant predictor on *
 - **Attack:** Fairness-Targeted PGD — DP only, IF only, or Combined.  
 - **Methods:** Naive-FAIR vs DRO-FAIR (TV uncertainty set).  
 - **Datasets (tabular):** Adult, Credit, LSAC.  
-- **UTKFace:** real image features extracted; multi-seed grid still running. **No image claim in this update.**
+- **UTKFace:** REAL ResNet18-feature pilot **complete (90/90)**. Clean-test DP is **mixed** (significant DRO wins mainly at high α) — **not** an Adult/Credit copy. Details: `results/utkface_summary.md`.
 
 ---
 
@@ -116,10 +116,11 @@ At **α ≥ 0.3**, both DRO and Naive fall **below** the constant predictor on *
 
 ---
 
-## 7. Next steps
+## 7. Status toward Aug 10
 
-1. Complete the UTKFace multi-seed multi-attack runs on **real** image features (or list as future work if incomplete).  
-2. Final paper/report write-up with the **mixed IF** story and honest LSAC/DP section.
+1. ✅ Tabular 540 frozen; IF mixed; LSAC/DP honest.  
+2. ✅ UTKFace REAL 90/90 in paper/report as mixed pilot.  
+3. ✅ Paper + report PDFs rebuilt (`paper/main.pdf`, `report/report.pdf`).
 
 ---
 

@@ -495,13 +495,13 @@ degenerate, $\approx10^{-10}$, in earlier runs) and use this $k{=}5$ default.
 
 \subsection{Hyperparameter Grid (Q1)}
 
-The $\lambda_{\mathrm{init}}{\times}\mathrm{lr}_{\lambda}$ grid search
-(Kuldeep's~Q1) is running on Adult at tau=1 (72 configurations).
-Preliminary results from the first completed cell
+The $\lambda_{\mathrm{init}}{\times}\mathrm{lr}_{\lambda}$ grid
+(Kuldeep's~Q1) was explored on Adult at $\tau{=}1$.  Early cells
 ($\lambda_{\mathrm{init}}{=}0.0$, $\mathrm{lr}{=}0.001$, $\alpha{=}0.2$)
-show DRO DP $= 0.237$ --- identical to the default setting, suggesting
-the default $\lambda$ initialisation is already near-optimal.
-The full grid heatmap will be added when the run completes.
+match the default DRO DP ($\approx0.237$), suggesting the locked
+initialisation is already near-optimal.  The main claim remains the
+fixed-$\tau{=}1$ protocol on the 540-row canonical grid (not a full
+$\lambda$ sweep).
 
 \subsection{High-$\alpha$ Defensibility ($\alpha\ge0.3$)}
 
