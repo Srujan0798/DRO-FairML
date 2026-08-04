@@ -1,20 +1,19 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~02:50 IST_
+_Last tick: 2026-08-05 ~03:00 IST_
 
 ## Counts (do not pkill)
 
-| Job | Target | Count | Status |
-|-----|--------|------:|--------|
-| **U1** | 90 | **15** | alive; mid dp α=0.2 seed=3 (~16 min into cell) |
-| **U2** | 30 | **15** | alive; mid α=0.2 seed=3 |
+| Job | Target | Count | Last |
+|-----|--------|------:|------|
+| **U1** | 90 | **16** | dp α=0.2 seeds 0–3 done; mid seed=4 |
+| **U2** | 30 | **16** | α=0.2 seeds 0–3 done; mid seed=4 |
 
-CPU ticks advancing; not hung. Puller OK. ETA ~20h / ~4h.
+Puller OK. ETA ~20h (U1) / ~3.8h (U2).
 
-## U3 readiness (not launched)
-- Pixel loader smoke on shared path: **OK** (32 images)
-- `scripts/launch_u3_pixel_pgd.sh` on flair2 — waits for free GPU
-- Finding 3 paper+report disclosure marked done in HANDOFF_GROK
+## Signals
+- Repro: 16 matched, max|ΔDP|0.007, **0 GAP** (α=0.2 seeds tight: |ΔDP|≤0.0013)
+- U2 α=0.2 n=4: multi wins **4/4**, mean multi ~0.22
 
 ## Open
-- U1=90 / U2=30; then optional U3 launch
+- Finish U1/U2; U3 after free GPU

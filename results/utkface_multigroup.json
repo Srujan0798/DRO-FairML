@@ -733,5 +733,54 @@
       }
     },
     "total_time": 1097.3817355632782
+  },
+  {
+    "dataset": "utkface",
+    "alpha": 0.2,
+    "seed": 3,
+    "attack": "dp",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "data_provenance": "REAL",
+    "protected_train": "race_binary_White_vs_nonWhite",
+    "protected_eval_multi": "race_5way",
+    "race_names": {
+      "0": "White",
+      "1": "Black",
+      "2": "Asian",
+      "3": "Indian",
+      "4": "Other"
+    },
+    "naive": {
+      "acc": 0.7884412571187513,
+      "dp_binary": 0.16550779342651367,
+      "dp_multigroup": 0.2224150002002716,
+      "if_cosine": 0.06603675335645676,
+      "group_pos_rates": {
+        "White": 0.28647783398628235,
+        "Black": 0.4259846806526184,
+        "Asian": 0.49413836002349854,
+        "Indian": 0.42158517241477966,
+        "Other": 0.508892834186554
+      }
+    },
+    "dro": {
+      "acc": 0.7903395908036279,
+      "dp_binary": 0.16659557819366455,
+      "dp_multigroup": 0.2155463695526123,
+      "if_cosine": 0.053270123898983,
+      "group_pos_rates": {
+        "White": 0.28626084327697754,
+        "Black": 0.42783331871032715,
+        "Asian": 0.49697065353393555,
+        "Indian": 0.42321279644966125,
+        "Other": 0.5018072128295898
+      }
+    },
+    "total_time": 1004.1970164775848
   }
 ]
