@@ -8,7 +8,7 @@
 #
 # Then runs the deterministic regeneration pipeline:
 #   wilcoxon → report tables → make results → deliverables → paper → report
-#   + writes results/if_wilcoxon_summary.txt (same logic as monitor_if_then_regen.sh)
+#   + writes results/if_wilcoxon_summary.txt
 #
 # Does NOT commit or push (judgment / prose pass is separate).
 # Logs every step to results/FINALIZATION_LOG.txt
@@ -194,7 +194,7 @@ FAIL=0
 # Mirror last few log lines to console for visibility
 tail -n 20 "$LOG" || true
 
-# IF Wilcoxon summary — same logic as scripts/monitor_if_then_regen.sh
+# IF Wilcoxon summary
 log "STEP START: if_wilcoxon_summary"
 if $PY - >>"$LOG" 2>&1 <<'PY'
 import json, collections
