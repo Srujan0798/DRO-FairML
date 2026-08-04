@@ -7,7 +7,7 @@ random}; attack='dp'; α ∈ {0.1, 0.2}; 3 datasets × 6 seeds × 2 methods ×
 
 Per (dataset, α): ΔDP = naive_dp - dro_dp for BOTH corruptor types;
 multiplier = ΔDP(adv) / ΔDP(random). The historical claim (paper
-\S\ref{sec:results-tabular}) is that adversarial corruption raises DP
+S\ref{sec:results-tabular}) is that adversarial corruption raises DP
 "12-40×" more than random corruption. This script tests that claim on the
 new n=6 data. If the multiplier is < 12 or > 40 it is flagged explicitly.
 

@@ -1,31 +1,31 @@
 \subsection{Q5: Empirical Radii Under Coordinated Attacks}
 \label{app:empirical-radii}
 
-This appendix clarifies the calculation of uncertainty radii $\pi_{clean}$ used in our DRO-FairML objective under different assumption modes.
+This appendix clarifies the calculation of uncertainty radii $\pi_{\mathrm{clean}}$ used in our DRO-FairML objective under different assumption modes, and reports the empirical comparison requested by Kuldeep (Q5).
 
-\paragraph{Uniform vs. Empirical Mode}
-In the \textit{uniform mode}, we assume no prior knowledge of the attack structure beyond the total corruption budget $\alpha$. The cleaned group proportions are calculated as:
-\begin{equation}
-    \pi_{clean} = \frac{\pi_{obs} - \alpha}{1 - 2\alpha}
-\end{equation}
-This represents a conservative estimate where corruption is assumed to be distributed uniformly across groups.
+\paragraph{Uniform vs.\ Empirical Mode}
+In the \textit{uniform mode}, we assume no prior knowledge of the attack structure beyond the total corruption budget $\alpha$. The cleaned group proportions are calculated as $\pi_{\mathrm{clean}} = (\pi_{\mathrm{obs}} - \alpha)/(1 - 2\alpha)$.
 
 \paragraph{Coordinated Attack Structure}
-In the \textit{empirical mode}, we exploit the observation that real-world adversarial attacks are often coordinated, targeting specific demographic groups. Specifically, we model a scenario where 70\% of the corruption budget is directed at the minority group. The empirical clean proportions are adjusted as follows:
-\begin{align}
-    \pi_{clean}[min] &= \pi_{obs}[min] + 0.4\alpha \\
-    \pi_{clean}[maj] &= \pi_{obs}[maj] - 0.4\alpha
-\end{align}
-Values are clipped to the $[0, 1]$ range and renormalized to ensure $\sum \pi_{clean} = 1$. 
+In the \textit{empirical mode}, we exploit the observation that real-world adversarial attacks are often coordinated, targeting specific demographic groups (70\% of the budget directed at the minority group). The empirical clean proportions are adjusted as $\pi_{\mathrm{clean}}[\mathrm{min}] = \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4\alpha$, $\pi_{\mathrm{clean}}[\mathrm{maj}] = \pi_{\mathrm{obs}}[\mathrm{maj}] - 0.4\alpha$, clipped to $[0,1]$ and renormalised.
 
-\paragraph{Information Constraints}
-It is critical to note that there is \textbf{no oracle leak} in this implementation. The model does not have access to per-sample corruption masks. Instead, it only utilizes the global budget $\alpha$ and the \textit{known structure} of the dataset's demographic distribution to refine its robustness radii. This allows the model to be more robust against group-targeted attacks without requiring ground-truth labels for which samples were actually corrupted.
+\paragraph{Comparison (Adult, DP attack, $n{=}6$ seeds, DRO only)}
+Same corrupted data (\texttt{coordinated=True}); only the radius calibration differs. Source: \texttt{results/empirical\_radii.json}.
+
+\begin{center}
+\begin{tabular}{cccccccc}
+\toprule
+$\alpha$ & $n$ & DP (uniform) & DP (empirical) & $\Delta$DP & wins (emp) & $p$ & sig \\
+\midrule
+0.0 & 6 & 0.1426 & 0.1426 & +0.0000 & 0/6 & 1.0000 &  \\
+0.1 & 4 & 0.1807 & 0.1807 & -0.0000 & 2/4 & 0.5625 &  \\
+\bottomrule
+\end{tabular}
+\end{center}
+$^{*}$ marks $p<0.05$ (one-sided Wilcoxon, H1: DP$_{\mathrm{uniform}} > $ DP$_{\mathrm{empirical}}$).
+
+\paragraph{Verdict}
+No: empirical+coordinated does NOT lower DP in any cell (0/2); attack-aware radius calibration does not help under this coordinated attack.
 
 \paragraph{Implementation}
-This logic is implemented in \texttt{src/training/dro\_fair.py} within the
-\texttt{\_empirical\_pi\_clean()} method. The implementation is verified to be
-valid for corruption budgets $\alpha \le 0.4$ across the evaluated tabular
-datasets (Adult and Law School). The locked canonical grid uses
-\texttt{radii\_mode=uniform}; the empirical path is available for known attack
-structure (this appendix). UTKFace's main pilot (\S\ref{sec:results-utkface})
-also uses the same uniform-radii protocol as tabular.
+This logic is implemented in \texttt{src/training/dro\_fair.py} within the \texttt{\_empirical\_pi\_clean()} method. The locked canonical grid uses \texttt{radii\_mode=uniform}; the empirical path is available for known attack structure (this appendix).

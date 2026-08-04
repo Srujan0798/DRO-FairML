@@ -45,8 +45,14 @@ def _assert_not_stale(path):
         )
 
 
-def load_canonical_tau1():
-    """Load the canonical tau=1 grid. Fails loudly if absent or polluted."""
+def load_canonical_tau1(include_extension=False):
+    """Load the canonical tau=1 grid. Fails loudly if absent or polluted.
+
+    By default returns the **locked n=6 science** (seeds 0–5 only).  The on-disk
+    file may grow if Agent S appends seeds 6–9 (N10 extension); those rows are
+    excluded unless ``include_extension=True``.  This function never writes the
+    file.
+    """
     _assert_not_stale(CANONICAL_PATH)
     if not os.path.exists(CANONICAL_PATH):
         raise FileNotFoundError(
@@ -64,6 +70,16 @@ def load_canonical_tau1():
             f"canonical_tau1.json contains non-k_inner=10 rows (k_inner={bad}). "
             f"It must hold only the canonical grid, not kNN-ablation rows."
         )
+    if not include_extension:
+        locked = [r for r in rows if int(r.get("seed", -1)) <= 5]
+        if len(locked) < 540:
+            raise RuntimeError(
+                f"Locked science incomplete: expected ≥540 rows with seeds 0–5, "
+                f"got {len(locked)} (file has {len(rows)} total)."
+            )
+        # Prefer exactly 540 unique locked rows when present; if more exist with
+        # seed≤5 (should not), keep all seed≤5 for safety.
+        return locked
     return rows
 
 

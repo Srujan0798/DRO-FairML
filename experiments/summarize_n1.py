@@ -42,6 +42,9 @@ from scipy.stats import wilcoxon
 warnings.filterwarnings("ignore", category=RuntimeWarning, module="numpy")
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+import sys
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 RESULTS_DIR = os.path.join(ROOT, "results")
 
 ARM_A_PATH = os.path.join(RESULTS_DIR, "attack_strength.json")

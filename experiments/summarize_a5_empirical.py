@@ -252,11 +252,13 @@ def _refresh_appendix(comparisons, verdict):
     a_lines.append(r"In the \textit{empirical mode}, we exploit the observation that "
                    r"real-world adversarial attacks are often coordinated, targeting specific "
                    r"demographic groups (70\% of the budget directed at the minority group). "
-                   r"The empirical clean proportions are adjusted as $\pi_{\mathrm{clean}}[\min] "
-                   r"= \pi_{\mathrm{obs}}[\min] + 0.4\alpha$, $\pi_{\mathrm{clean}}[\maj] = "
-                   r"\pi_{\mathrm{obs}}[\maj] - 0.4\alpha$, clipped to $[0,1]$ and renormalised.")
+                   r"The empirical clean proportions are adjusted as "
+                   r"$\pi_{\mathrm{clean}}[\mathrm{min}] "
+                   r"= \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4\alpha$, "
+                   r"$\pi_{\mathrm{clean}}[\mathrm{maj}] = "
+                   r"\pi_{\mathrm{obs}}[\mathrm{maj}] - 0.4\alpha$, clipped to $[0,1]$ and renormalised.")
     a_lines.append("")
-    a_lines.append(r"\paragraph{Comparison (Adult, DP attack, $n{=}6$ seeds, DRO only)}")
+    a_lines.append(r"\paragraph{Comparison (Adult, DP attack, DRO only; partial OK)}")
     a_lines.append(r"Same corrupted data (\texttt{coordinated=True}); only the radius "
                    r"calibration differs. Source: \texttt{results/empirical\_radii.json}.")
     a_lines.append("")

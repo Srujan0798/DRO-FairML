@@ -50,6 +50,9 @@ from collections import defaultdict
 import numpy as np
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+import sys
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 RESULTS_DIR = os.path.join(ROOT, "results")
 
 ABLATION_PATH = os.path.join(RESULTS_DIR, "lsac_radii_fix.json")

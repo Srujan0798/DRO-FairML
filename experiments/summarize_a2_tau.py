@@ -33,6 +33,9 @@ import pandas as pd
 from scipy.stats import wilcoxon
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+import sys
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 RESULTS_DIR = os.path.join(ROOT, "results")
 
 ABLATION_PATH = os.path.join(RESULTS_DIR, "tau_ablation.json")
