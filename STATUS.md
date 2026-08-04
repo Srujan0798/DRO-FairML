@@ -55,30 +55,32 @@ Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dr
 written reasons; kNN retracted. None are part of the canonical claim.
 
 ## 5. UTKFace (image modality)
-**Real features on disk; local MPS REAL grid in progress — not a paper claim yet.**  
-`data/raw/utkface_features.npz` (provenance REAL). Runner writes
-`results/utkface_canonical.json` (all rows `data_provenance=REAL`). Progress is
-**partial** (attack=`dp` only so far; see `docs/UTKFACE_STATUS.md` for live count).  
-flair2 SSH remains optional for a faster full grid. **No paper claim** until a
-reviewed multi-seed multi-attack subset exists.
+**REAL local MPS grid in progress — not a paper claim yet.**  
+- Features: `data/raw/utkface_features.npz` (23,705 samples, provenance REAL).  
+- Output: `results/utkface_canonical.json` (all rows `data_provenance=REAL`).  
+- Progress: **DP done (30/30)**; **IF in progress**; **Combined pending** → target **90** rows. Live count: `docs/UTKFACE_STATUS.md`.  
+- **flair2: PROVEN & STAGED, PARKED** — access, 2× L40S, code + features on server; torch install stopped (slow wifi). **Do not wait on flair2.** Mac is the real UTKFace path.  
+- Synthetic fallback stays off. **No paper claim** until multi-attack subset is reviewed.
 
 ## 6. Deliverables status
 | Item | State |
 |------|-------|
-| Canonical full grid (540 rows) | ✅ complete (unique 540; τ=1 / k_inner=10 / epochs=60 uniform; max\|if\|≈0.239) |
-| IF-attack third (180 rows) | ✅ complete — **first real IF numbers; MIXED** vs DP story (see §3) |
-| Agent H finalize | ✅ `results/if_wilcoxon_summary.txt`; tables; `paper/main.pdf` + `report/report.pdf` |
-| Meeting brief (4pm) | ✅ FINAL `docs/MEETING_2026-08-04.md` (honest 5/6 + IF MIXED) |
-| Kuldeep correction note | ✅ `docs/KULDEEP_CORRECTION.md` (draft — human reviews & sends) |
-| UTKFace full grid | 🔄 **local MPS REAL partial** (`utkface_canonical.json`, dp-only so far); **no paper claim** |
-| Note | H log: `compute_canonical_wilcoxon.py` once hit `ModuleNotFoundError: experiments`; IF summary + auto tables OK. L: `PYTHONPATH=.` if full wilcoxon artifact needed. |
+| Canonical full grid (540 rows) | ✅ complete (unique 540; τ=1 / k_inner=10 / epochs=60; max\|if\|≈0.239) |
+| IF-attack third (180 rows) | ✅ complete — **MIXED** (see §3 + `if_wilcoxon_summary.txt`) |
+| Agent H finalize | ✅ tables/PDFs; meeting figs regenerated 2026-08-04 |
+| Agent V claim fixes | ✅ Adult/DP **5/6** at α=0.1; LSAC not “below baseline”; KULDEEP acc fixed; stale Jul-2 figs removed |
+| Meeting brief (4pm) | ✅ `docs/MEETING_2026-08-04.md` |
+| Verification | ✅ **LIVE 540-only** `docs/VERIFICATION_REPORT.md` (M1–M7 MATCH) |
+| Kuldeep correction | ✅ `docs/KULDEEP_CORRECTION.md` (human reviews & sends) |
+| UTKFace 90-row REAL grid | 🔄 local MPS (~50+/90); **no paper claim** |
+| flair2 | ⏸ parked (proven infrastructure only) |
 
 ## 7. What remains (Aug 10)
-1. **J more:** continue repo professionalize (archive dead paths, polish entrypoints).
-2. **K:** paper/report prose to 540-row tables + honest IF narrative (**MIXED**: Adult/Credit α≤0.2 yes; Adult α≥0.3 DP-under-IF loss; LSAC IF no; Adult/DP α=0.1 = 5/6).
-3. **L re-audit:** ship gate on full 540 + H artifacts (`docs/VERIFICATION_REPORT.md`).
-4. **M:** UTKFace — finish local REAL multi-attack grid or formal Aug 10 scope-out (row count only until then).
-5. Optional: fix PYTHONPATH for `experiments/compute_canonical_wilcoxon.py` in finalize script.
+1. **M:** Finish local UTKFace to 90/90 REAL (or formal scope-out) → summarize honestly → optional paper subsection.  
+2. **K polish:** paper/report final pass vs 540 + mixed IF (mostly done).  
+3. **L ship gate:** every claim still traces to `canonical_tau1.json` after any prose edit.  
+4. **J (optional):** more consolidation only if needed — tree already slimmed.  
+5. **flair2:** revisit only if GPU-heavy work (e.g. pixel PGD) is explicitly greenlit.
 
 ## 8. How to run / verify
 ```bash

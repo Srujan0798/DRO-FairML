@@ -12,6 +12,8 @@
 | [UTKFACE_STATUS.md](UTKFACE_STATUS.md) | Image experiment progress only (no paper claim) |
 | [LIVE_FILE_AUDIT.md](LIVE_FILE_AUDIT.md) | Brutal per-file audit of the working tree |
 
+- [AGENT_HANDOFF_2026-08-04.md](AGENT_HANDOFF_2026-08-04.md) — what is done / open
+
 ## Data truth
 - `results/canonical_tau1.json` — **540 rows**
 - `results/if_wilcoxon_summary.txt` — real IF Wilcoxon
