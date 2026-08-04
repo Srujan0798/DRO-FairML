@@ -90,6 +90,8 @@ results/*.STALE_*
 
 # Runtime logs / pids (keep README)
 logs/*.log
+logs/*.out
+logs/*.lock
 logs/*.pid
 logs/*_paused.txt
 !logs/README.md

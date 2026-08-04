@@ -1,23 +1,22 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~03:50 IST_
+_Last tick: 2026-08-05 ~04:00 IST_
 
 ## Counts (do not pkill)
 
 | Job | Target | Count | Last | PID | alive |
 |-----|--------|------:|------|-----|-------|
-| **U1** | 90 | **19** | dp **α=0.3 seed=0** done; s=1 running | 3482009 | yes (~3.8h) |
-| **U2** | 30 | **19** | α=0.3 seed=0 done; log **RUN a=0.3 s=1** | 3482442 | yes (~3.7h) |
+| **U1** | 90 | **20** | dp α=0.3 seeds 0–1 done; s=2 running | 3482009 | yes (~3.9h) |
+| **U2** | 30 | **20** | α=0.3 seeds 0–1 done; log **RUN a=0.3 s=2** | 3482442 | yes (~3.9h) |
 
-Puller OK (count-up summarize). ETA ~19.4 h (U1) / ~3.0 h (U2). U3 JPEGs ready (23708).
+Puller OK. ETA ~18.9 h (U1) / ~2.7 h (U2). U3 JPEGs ready (23708).
 
 ## Signals
-- Repro: **19** matched, max\|ΔDP\|0.0072, **0 GAP**
-- α=0.3 s0 seed-matched: clean ΔDP **−0.0005**, corr **−0.0024** (OK)
-- U2 α=0.3 s0: multi win, binary win
+- Repro: **20** matched, **0 GAP**; α=0.3 s0–1 seed-matched |ΔDP clean| ≤ 0.0006
+- U2 α=0.3 s1: multi win (N=0.247 / D=0.234)
 
-## Fix this tick
-- `summarize_utkface_repro.py`: partial cells used **all 6 Mac seeds** vs incomplete GPU → false large Δ (e.g. corr +0.024). Now **seed-matched** Mac only.
+## Hygiene this tick
+- Untrack `logs/wave1_nohup.out` (~82 MB) + other `logs/*.out`; gitignore `logs/*.out`
 
 ## Open
 - U1=90 / U2=30; U3 after free GPU

@@ -1,3 +1,0 @@
-[A3-Lambda] results/lambda_grid.json: have 0 rows; 72 missing; workers=4
-/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:396: UserWarning: resource_tracker: There appear to be 5 leaked semaphore objects to clean up at shutdown: {'/mp-baxhtjro', '/mp-6mpgbyjh', '/mp-p16_1iw2', '/mp-z1t42us7', '/mp-gq1y_r3s'}
-  warnings.warn(
