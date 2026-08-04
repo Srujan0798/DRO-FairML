@@ -28,7 +28,7 @@ from src.evaluation.metrics import compute_metrics_torch
 from src.temperature import get_temperature
 
 
-def _add_utkface_provenance(result, k_inner, tau, lambda_max, attack, pgd_steps, n_seeds_planned, epochs, coordinated=False, radii_mode='uniform'):
+def _add_utkface_provenance(result, k_inner, tau, lambda_max, attack, pgd_steps, n_seeds_planned, epochs, coordinated=False, radii_mode='uniform', device=None):
     """Record canonical provenance for every UTKFace row (matches tabular _add_provenance contract).
     Keys: k_inner, tau, lambda_max, attack, pgd_steps, n_seeds_planned, epochs + extras.
     """
@@ -43,6 +43,8 @@ def _add_utkface_provenance(result, k_inner, tau, lambda_max, attack, pgd_steps,
         'coordinated': bool(coordinated),
         'radii_mode': str(radii_mode),
     })
+    if device is not None:
+        result['device'] = str(device)
     return result
 
 
@@ -210,7 +212,7 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
     results = _add_utkface_provenance(
         results, k_inner=k_inner, tau=tau, lambda_max=lambda_max,
         attack=attack, pgd_steps=pgd_steps, n_seeds_planned=n_seeds_planned, epochs=epochs,
-        coordinated=coordinated
+        coordinated=coordinated, device=device,
     )
 
     return results

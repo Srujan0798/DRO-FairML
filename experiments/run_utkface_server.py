@@ -86,9 +86,10 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    print(f"UTKFACE SERVER RUNNER (canonical mode)")
-    print(f"  tau={args.tau} (fixed)  k_inner={args.k_inner}  epochs={args.epochs}  pgd_steps={args.pgd_steps}")
-    print(f"  attacks={args.attacks}  alphas={args.alphas}  n_seeds={args.n_seeds}  device={device}")
+    # flush=True: nohup redirects are fully buffered without PYTHONUNBUFFERED
+    print(f"UTKFACE SERVER RUNNER (canonical mode)", flush=True)
+    print(f"  tau={args.tau} (fixed)  k_inner={args.k_inner}  epochs={args.epochs}  pgd_steps={args.pgd_steps}", flush=True)
+    print(f"  attacks={args.attacks}  alphas={args.alphas}  n_seeds={args.n_seeds}  device={device}", flush=True)
 
     total = len(args.datasets) * len(args.alphas) * args.n_seeds * len(args.attacks)
     completed = 0
@@ -114,7 +115,7 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
                     (r.get('dataset'), r.get('alpha'), r.get('seed'), r.get('attack'))
                     for r in all_results
                 }
-                print(f"[{dataset}/{attack}] Loaded {len(all_results)} existing results (resume)")
+                print(f"[{dataset}/{attack}] Loaded {len(all_results)} existing results (resume)", flush=True)
 
             def save():
                 with open(out_path, 'w') as f:
@@ -128,7 +129,7 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
                         continue
 
                     label = f"[{dataset}/{attack}] α={alpha} seed={seed}"
-                    print(f"\n{label}")
+                    print(f"\n{label}", flush=True)
                     try:
                         t0 = time.time()
                         result = run_single_utkface_experiment(
@@ -147,25 +148,25 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
                               f"Naive clean: acc={result['naive']['clean']['accuracy']:.3f} "
                               f"dp={result['naive']['clean']['dp_violation']:.3f} | "
                               f"DRO clean: acc={result['dro']['clean']['accuracy']:.3f} "
-                              f"dp={result['dro']['clean']['dp_violation']:.3f}")
+                              f"dp={result['dro']['clean']['dp_violation']:.3f}", flush=True)
                     except Exception as e:
                         failed += 1
-                        print(f"  FAILED: {e}")
+                        print(f"  FAILED: {e}", flush=True)
                         import traceback
                         traceback.print_exc()
 
-            print(f"[{dataset}/{attack}] Saved {len(all_results)} results to {out_path}")
+            print(f"[{dataset}/{attack}] Saved {len(all_results)} results to {out_path}", flush=True)
 
-    print(f"\n{'='*60}")
-    print(f"SERVER RUN COMPLETE")
-    print(f"Total: {total} | Completed: {completed} | Failed: {failed}")
-    print(f"{'='*60}")
+    print(f"\n{'='*60}", flush=True)
+    print(f"SERVER RUN COMPLETE", flush=True)
+    print(f"Total: {total} | Completed: {completed} | Failed: {failed}", flush=True)
+    print(f"{'='*60}", flush=True)
 
     # Final provenance sanity on last written result (if any)
     if all_results:
         last = all_results[-1]
-        prov_keys = ['k_inner', 'tau', 'pgd_steps', 'epochs', 'n_seeds_planned']
-        print("Last row provenance sample:", {k: last.get(k) for k in prov_keys})
+        prov_keys = ['k_inner', 'tau', 'pgd_steps', 'epochs', 'n_seeds_planned', 'device']
+        print("Last row provenance sample:", {k: last.get(k) for k in prov_keys}, flush=True)
 
 
 if __name__ == '__main__':
