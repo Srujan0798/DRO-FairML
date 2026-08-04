@@ -105,7 +105,15 @@ Fairness~(IF) under data corruption, following the exact Algorithm~1 from
 the ICML submission.  Our key contribution replaces the paper's random noise
 with \textbf{multi-modal adversarial corruption} --- PGD-based feature attacks,
 coordinated label flips, and minority-targeted attribute flips ---
-providing a 2--5$\times$ harder evaluation at the same corruption level $\alpha$.
+\emph{targeted} at the fairness metric's exact gradient rather than
+distributed uniformly at random.  An early pre-canonical estimate put
+this at ``2--5$\times$ harder''; the completed seed-paired comparison
+(144 configs, \S\ref{sec:results-tabular}) does not support a fixed
+multiplier --- the effect is dataset- and $\alpha$-dependent, ranging
+from comparable to (Adult, Credit) to reversed (LSAC, where the
+targeted attack interacts with that dataset's known DP degeneracy) ---
+so we report the structural difference in attack design rather than an
+empirical strength ratio.
 On the complete canonical grid (540 rows; fixed $\tau{=}1$,
 $k_{\mathrm{inner}}{=}10$, $n{=}6$ seeds), DRO-FAIR achieves significantly
 lower DP than Naive-FAIR on \textbf{Adult} and \textbf{Credit} at
@@ -161,7 +169,13 @@ Feature perturbation & Gaussian noise $\mathcal{N}(0,\varepsilon^2)$ &
   PGD: $x' = x + \varepsilon\cdot\mathrm{sign}(\nabla_x\mathcal{L})$,\; $\|\delta\|_\infty \le 0.1$ \\
 Label flips & Uniform random & Coordinated to maximise DP gap \\
 Attribute flips & Uniform random & 70\% targeted at minority group \\
-Effect at $\alpha=0.2$ & DP increase $\approx+0.01$ & DP increase $\approx+0.03$--$0.05$\;(3--5$\times$) \\
+Effect at $\alpha=0.2$ (seed-paired, $n{=}6$) &
+  DP increase varies by dataset &
+  \textbf{Not a fixed multiplier} --- comparable to random on Adult
+  ($1.1\times$) and Credit ($1.1\times$); \emph{reversed} on LSAC
+  ($-3.2\times$, tied to that dataset's DP degeneracy). Early
+  pre-canonical ``3--5$\times$'' estimate withdrawn; see
+  \texttt{results/random\_vs\_adversarial\_summary.md}. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -483,15 +497,23 @@ $\tau$ & Naive DP & DRO DP & Verdict \\
 \end{tabular}
 \end{center}
 
-\subsection{Adversarial vs.\ Random Corruption}
+\subsection{Adversarial vs.\ Random Corruption --- corrected}
 
-A historical pilot (pre-canonical protocol) found fairness-targeted PGD
-raises Adult/Credit DP far more than matched-$\alpha$ random label noise
-(Kuldeep Q1 sanity: adversarial $\gg$ random).  We keep that qualitative
-check but do \emph{not} treat older multiplicative ``$12$--$40\times$''
-factors as locked under the 540-row $\tau{=}1$ protocol until a seed-paired
-re-run is committed.  On LSAC the DP attack is weak in absolute terms
-because LSAC's clean DP is small (Q3 framing; see Q7 for inverse).
+A historical pre-canonical pilot reported fairness-targeted PGD raising
+Adult/Credit DP $12$--$40\times$ more than matched-$\alpha$ random label
+noise (Kuldeep Q1 sanity check). The seed-paired re-run under the locked
+$\tau{=}1$, $k_{\mathrm{inner}}{=}10$, $n{=}6$ protocol is now complete
+(144 configs, Adult/Credit/LSAC $\times$ $\alpha\in\{0.1,0.2\}$;
+\texttt{results/random\_vs\_adversarial\_summary.md}) and does
+\textbf{not} support the $12$--$40\times$ figure: the observed
+multiplier ranges from $-3.7\times$ to $1.6\times$ across all 6 tested
+cells (median $0.7\times$) --- adversarial corruption is comparable to
+or weaker than random corruption on DP here, not dramatically stronger.
+The negative multipliers are on LSAC, where the adversarial attack
+lowers DP relative to clean while random corruption raises it slightly,
+consistent with LSAC/DP's broader degeneracy (Q3 framing) rather than
+attack ineffectiveness. \textbf{The ``adversarial $\gg$ random'' claim
+is withdrawn}; it does not survive the seed-paired re-run.
 
 \subsection{IF k-NN Ablation (scope)}
 

@@ -198,15 +198,24 @@ excluded as degenerate.}
 \label{fig:win-rates}
 \end{figure}
 
-\paragraph{Adversarial vs.\ random corruption (scope note).}
-A historical pilot (pre-canonical protocol; not re-run under the locked
-540-row settings) found that fairness-targeted PGD raised Adult DP far
-more than matched-$\alpha$ random label noise.  We retain that qualitative
-sanity check (adversarial $\gg$ random) but do \emph{not} treat the older
-``$12$--$40\times$'' factor as a locked canonical number until a
-seed-paired re-run under $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, $n{=}6$
-is committed.  On LSAC the DP-targeted attack remains weak in absolute
-terms because clean DP is small (see \S\ref{sec:lsac-framing}).
+\paragraph{Adversarial vs.\ random corruption --- corrected.}
+A historical pre-canonical pilot reported fairness-targeted PGD raising
+Adult DP $12$--$40\times$ more than matched-$\alpha$ random label noise.
+We do \emph{not} retain that figure: a seed-paired re-run under the
+locked $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, $n{=}6$ protocol
+(Adult/Credit/LSAC, $\alpha\in\{0.1,0.2\}$, 144 configs;
+\texttt{results/random\_vs\_adversarial\_summary.md}) finds the true
+multiplier is \textbf{not} in the $12$--$40\times$ range in any of 6
+tested cells: observed multipliers range from $-3.7\times$ to
+$1.6\times$ (median $0.7\times$), i.e.\ adversarial corruption is
+\emph{comparable to or weaker than} random corruption on DP under this
+protocol, not $12$--$40\times$ stronger. On LSAC the multiplier is
+negative because the adversarial attack \emph{lowers} DP relative to
+clean while random corruption raises it slightly --- consistent with
+LSAC/DP's broader degeneracy (\S\ref{sec:lsac-framing}), not a sign the
+attack is ineffective on Adult/Credit. The qualitative claim
+``adversarial $\gg$ random'' from the historical pilot does not survive
+the seed-paired re-run and is withdrawn.
 
 \paragraph{k-NN graph for the IF attack (scope note).}
 Canonical IF-attack rows use the default $k{=}5$ neighbourhood graph in
