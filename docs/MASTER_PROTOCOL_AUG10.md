@@ -31,11 +31,12 @@ that made those drops necessary (no GPU, slow laptop) **no longer exists as an e
 | 11 | Kuldeep, Jun 9 (Q4) | LSAC α=0 anomaly — "expected or another bug?" | Diagnosed (LSAC/DP degenerate; radii-on-imbalance). **No principled fix tested.** α=0 DRO≠Naive objective question has a stated position but no experiment | ⚠️ **PARTIAL — diagnosis only** |
 | 12 | Kuldeep, Jun 9 (Q9) | "6 seeds now, or is 3 acceptable…?" (n for publishable) | n=6 everywhere. Min attainable p = 0.0156. n=10 was never evaluated; hardware now makes it ~2 h | ⚠️ **UPGRADE AVAILABLE** |
 | 13 | Kuldeep, Jun 30 | "verify all the claims" | Verification pipeline exists; claims traced | ✅ DONE (maintain) |
-| 14 | — (implied by "submission under professor") | A paper PDF that actually shows results | **paper/main.tex has 0 `\includegraphics`, 0 wired tables; auto_generated/*.tex orphaned; both appendix files (q1_lambda, q5_empirical) NOT `\input`.** The paper is prose-only | ❌ **CRITICAL GAP** |
+| 14 | — (implied by "submission under professor") | A paper PDF that actually shows results | **WIRED 2026-08-04:** figures (`fig_tau1_headline`, wilcoxon matrix, fig1/2/4/5/7), auto_generated tables (seed-paired Wilcoxon fix), Q1/Q5 appendices `\input` | ✅ **DONE (paper assembly)** |
 
-**Score: 5 delivered, 6 hard gaps, 2 partial, 1 upgrade.** The 6 hard gaps are all now
-cheap: every missing ablation is ≤ 2 h wall-clock on the Mac at measured 21 s/config.
-There is no remaining excuse.
+**Score (updated):** core paper assembly + claim-audit fixed; remaining hard gaps are
+**new experiments** (kNN k=5/15, clean τ ablation, full λ grid, random-vs-adv re-run under
+canonical, empirical-radii table, flair2 UTKFace). Do **not** retrain the locked 540
+without explicit greenlight.
 
 ---
 

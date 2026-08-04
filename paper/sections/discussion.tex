@@ -20,11 +20,14 @@ distribute weight smoothly and $\lambda$ stays bounded, so the
 re-weighting helps rather than hurts.
 
 \subsection{Adversarial vs.\ Random Corruption}
-The empirical comparison (adversarial-vs-random runs)
-confirms that adversarial PGD raises DP $12$--$40\times$ more than
-random label noise at matched $\alpha$ on Adult, and $2$--$22\times$
-on Credit.  This rules out the ``attack is too weak''
-counter-explanation for the Adult low-$\alpha$ cells.
+A historical pilot (pre-canonical protocol) found adversarial
+fairness-targeted PGD raises Adult/Credit DP far more than matched-$\alpha$
+random label noise.  We keep that qualitative sanity check (adversarial
+$\gg$ random) but do \emph{not} treat older multiplicative factors as locked
+canonical numbers until a seed-paired re-run under the $\tau{=}1$,
+$k_{\mathrm{inner}}{=}10$, $n{=}6$ protocol is committed.  This still
+rules out a pure ``attack is too weak'' reading of the Adult low-$\alpha$
+cells under PGD.
 
 \subsection{Mechanism (old ``feedback loop'')}
 The earlier ``adversarial feedback loop'' account of Adult

@@ -49,43 +49,51 @@ def build_summary(rows):
 
 
 def build_wilcoxon(rows):
-    """One-sided Wilcoxon (DRO better = naive DP - dro DP > 0) per (dataset,alpha,attack)."""
+    """One-sided Wilcoxon (DRO better = naive DP - dro DP > 0) per (dataset,alpha,attack).
+
+    Critical: pair by *seed* before subtracting. JSON row order is not guaranteed
+    method-interleaved; unpaired lists yield wrong p-values (e.g. Adult/IF α=0.2
+    mis-reported 0.344 instead of 0.0156).
+    """
     recs = []
-    groups = defaultdict(lambda: {'naive': [], 'dro': []})
+    groups = defaultdict(lambda: {'naive': {}, 'dro': {}})
     for r in rows:
-        groups[(r['dataset'], r['alpha'], r['attack'])][r['method']].append(r)
+        groups[(r['dataset'], r['alpha'], r['attack'])][r['method']][r['seed']] = r
     for (ds, alpha, atk), md in groups.items():
-        nv = np.array([x['dp_clean'] for x in md['naive']])
-        dv = np.array([x['dp_clean'] for x in md['dro']])
+        seeds = sorted(set(md['naive']) & set(md['dro']))
+        nv = np.array([md['naive'][s]['dp_clean'] for s in seeds])
+        dv = np.array([md['dro'][s]['dp_clean'] for s in seeds])
         diff = nv - dv
         p = 1.0
         if len(diff) >= 2 and np.std(diff) > 0:
             _, p = wilcoxon(diff, alternative='greater')
-        if_nv = np.array([x['if_clean'] for x in md['naive']])
-        if_dv = np.array([x['if_clean'] for x in md['dro']])
+        if_nv = np.array([md['naive'][s]['if_clean'] for s in seeds])
+        if_dv = np.array([md['dro'][s]['if_clean'] for s in seeds])
         if_diff = if_nv - if_dv
         if_p = 1.0
         if len(if_diff) >= 2 and np.std(if_diff) > 0:
             _, if_p = wilcoxon(if_diff, alternative='greater')
         recs.append({
             'dataset': ds, 'alpha': alpha, 'attack': atk,
-            'dp_naive_mean': nv.mean() if len(nv) else float('nan'),
-            'dp_diff_mean': diff.mean() if len(diff) else float('nan'),
-            'dp_pvalue': p,
-            'if_naive_mean': if_nv.mean() if len(if_nv) else float('nan'),
-            'if_diff_mean': if_diff.mean() if len(if_diff) else float('nan'),
-            'if_pvalue': if_p,
+            'n_pairs': len(seeds),
+            'dp_naive_mean': float(nv.mean()) if len(nv) else float('nan'),
+            'dp_diff_mean': float(diff.mean()) if len(diff) else float('nan'),
+            'dp_pvalue': float(p),
+            'if_naive_mean': float(if_nv.mean()) if len(if_nv) else float('nan'),
+            'if_diff_mean': float(if_diff.mean()) if len(if_diff) else float('nan'),
+            'if_pvalue': float(if_p),
         })
     return pd.DataFrame(recs)
 
 
 def generate_main_results_tex(summary_df, outpath):
-    """Report-style main results table with Acc/DP/IF per dataset and alpha.
-    
-    Uses tau=1 data from tau1_summary.csv (precomputed mean±se).
+    """Report-style main results table with Acc/DP/IF per dataset and alpha (DP attack).
+
+    Driven from results/canonical_tau1.json means (not a stale CSV).
+    Bold only the better method (higher acc / lower fairness violation).
     """
     datasets = ['adult', 'credit', 'lsac']
-    lines = ["% AUTO-GENERATED from tau1_summary.csv (tau=1 canonical): do not edit manually",
+    lines = ["% AUTO-GENERATED from results/canonical_tau1.json (tau=1): do not edit manually",
              "\\begin{tabular}{llcccccc}", "\\toprule"]
     lines.append("Dataset & $\\alpha$ & Acc (Naive) & Acc (DRO) & DP (Naive) & DP (DRO) & IF (Naive) & IF (DRO) \\\\")
     lines.append("\\midrule")
@@ -97,12 +105,27 @@ def generate_main_results_tex(summary_df, outpath):
             dro = sub[sub['method'] == 'dro']
             if len(naive) == 0 or len(dro) == 0:
                 continue
-            acc_n = f"{naive['acc_mean'].values[0]:.3f} $\\pm$ {naive['acc_se'].values[0]:.3f}"
-            acc_d = f"{dro['acc_mean'].values[0]:.3f} $\\pm$ {dro['acc_se'].values[0]:.3f}"
-            dp_n = f"{naive['dp_mean'].values[0]:.4f} $\\pm$ {naive['dp_se'].values[0]:.4f}"
-            dp_d = f"\\textbf{{{dro['dp_mean'].values[0]:.4f} $\\pm$ {dro['dp_se'].values[0]:.4f}}}"
-            if_n = f"{naive['if_mean'].values[0]:.4f} $\\pm$ {naive['if_se'].values[0]:.4f}"
-            if_d = f"\\textbf{{{dro['if_mean'].values[0]:.4f} $\\pm$ {dro['if_se'].values[0]:.4f}}}"
+            an, ad = naive['acc_mean'].values[0], dro['acc_mean'].values[0]
+            dn, dd = naive['dp_mean'].values[0], dro['dp_mean'].values[0]
+            inn, idd = naive['if_mean'].values[0], dro['if_mean'].values[0]
+            acc_n = f"{an:.3f} $\\pm$ {naive['acc_se'].values[0]:.3f}"
+            acc_d = f"{ad:.3f} $\\pm$ {dro['acc_se'].values[0]:.3f}"
+            if ad > an:
+                acc_d = f"\\textbf{{{acc_d}}}"
+            elif an > ad:
+                acc_n = f"\\textbf{{{acc_n}}}"
+            dp_n = f"{dn:.4f} $\\pm$ {naive['dp_se'].values[0]:.4f}"
+            dp_d = f"{dd:.4f} $\\pm$ {dro['dp_se'].values[0]:.4f}"
+            if dd < dn:
+                dp_d = f"\\textbf{{{dp_d}}}"
+            elif dn < dd:
+                dp_n = f"\\textbf{{{dp_n}}}"
+            if_n = f"{inn:.4f} $\\pm$ {naive['if_se'].values[0]:.4f}"
+            if_d = f"{idd:.4f} $\\pm$ {dro['if_se'].values[0]:.4f}"
+            if idd < inn:
+                if_d = f"\\textbf{{{if_d}}}"
+            elif inn < idd:
+                if_n = f"\\textbf{{{if_n}}}"
             lines.append(f"{ds.capitalize()} & {alpha:.1f} & {acc_n} & {acc_d} & {dp_n} & {dp_d} & {if_n} & {if_d} \\\\")
 
     lines.append("\\bottomrule")
@@ -217,11 +240,17 @@ def generate_paper_tabular_results_tex(summary_df, outpath):
                 d_d = dro['dp_mean'].values[0]
                 i_n = naive['if_mean'].values[0]
                 i_d = dro['if_mean'].values[0]
+
+                def _fmt(val, bold):
+                    s = f"${val:.3f}$"
+                    return f"\\textbf{{{s}}}" if bold else s
+
+                # Bold the better method: higher acc, lower DP/IF
                 lines.append(
                     f"{ds.capitalize()} & {atk.upper()} & {alpha:.1f} & "
-                    f"${a_n:.3f}$ & \\textbf{{${a_d:.3f}$}} & "
-                    f"${d_n:.3f}$ & \\textbf{{${d_d:.3f}$}} & "
-                    f"${i_n:.3f}$ & \\textbf{{${i_d:.3f}$}} \\\\"
+                    f"{_fmt(a_n, a_n >= a_d)} & {_fmt(a_d, a_d > a_n)} & "
+                    f"{_fmt(d_n, d_n <= d_d)} & {_fmt(d_d, d_d < d_n)} & "
+                    f"{_fmt(i_n, i_n <= i_d)} & {_fmt(i_d, i_d < i_n)} \\\\"
                 )
 
     lines.append("\\bottomrule")

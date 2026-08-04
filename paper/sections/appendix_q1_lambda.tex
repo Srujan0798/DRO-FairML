@@ -1,39 +1,35 @@
-\subsection{Q1: Lambda Hyperparameter Ablation}
+\subsection{Q1: Lambda Hyperparameter Ablation (pilot / incomplete)}
 \label{app:lambda-ablation}
 
-In this section, we provide details on the sensitivity of our DRO-FairML framework to the dual variable $\lambda$ initialization and its learning rate $\eta_\lambda$. 
+This appendix records the \emph{status} of Kuldeep's Q1 request
+($\lambda_{\mathrm{init}}\times\eta_{\lambda}$ grid), not a second
+canonical science table.  The locked claim in the main text is the
+fixed-$\tau{=}1$ 540-row grid with defaults
+$\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5\times10^{-3}$.
 
-\paragraph{Experimental Setup}
-We conducted an extensive grid search over the following parameters:
+\paragraph{What was attempted}
+A partial Adult/DP grid over
+$\lambda_{\mathrm{init}}\in\{0.0,0.01,0.1\}$ and
+$\eta_{\lambda}\in\{0.001,0.005\}$ was run historically and later
+interrupted / dropped before a complete, provenance-clean file was
+committed.  Early cells that finished near the defaults already matched
+canonical DRO DP at $\alpha{=}0.2$ ($\approx0.237$), consistent with the
+defaults being a stable operating point rather than a fragile sweet spot.
+
+\paragraph{What is locked (do not overclaim)}
 \begin{itemize}
-    \item $\lambda_{init} \in \{0.0, 0.01, 0.1\}$
-    \item $\eta_\lambda \in \{0.001, 0.005\}$
-    \item Random Seeds: 3 distinct initializations
-    \item Corruption Levels: $\alpha \in \{0.1, 0.2, 0.3, 0.4\}$
+\item Main results use $\lambda_{\mathrm{init}}{=}0.0$,
+  $\eta_{\lambda}{=}5\times10^{-3}$, $\lambda_{\max}{=}1.5$.
+\item At $\alpha\ge0.3$ on Adult, accuracy falls below the constant-predictor
+  baseline ($\approx0.752$) under the locked protocol regardless of the
+  limited $\lambda$ pilots we inspected --- high-$\alpha$ is not rescued by
+  dual-step tuning alone.
+\item A full published $\lambda$ grid would require a fresh, complete run
+  with seed-paired provenance; that is optional Wave-1 work, not part of
+  the frozen 540-row claim.
 \end{itemize}
-This resulted in a total of $3 \times 2 \times 3 \times 4 = 72$ unique configurations. All experiments were performed on the Adult dataset with $\tau=1$ and an inner iteration count of $K_{inner}=10$.
-
-\paragraph{Results}
-Table~\ref{tab:lambda-ablation} summarizes the best performance achieved for each corruption level $\alpha$.
-
-\begin{table}[h]
-\centering
-\caption{Best Accuracy and Demographic Parity (DP) across $\lambda$ grid search on Adult dataset.}
-\label{tab:lambda-ablation}
-\begin{tabular}{ccccc}
-\toprule
-$\alpha$ & Best Accuracy & Best DP & Configs $\ge 0.752$ Acc & Acc Range \\
-\midrule
-0.1 & 0.8219 & 0.2007 & 18/18 & [0.817, 0.822] \\
-0.2 & 0.7707 & 0.2225 & 18/18 & [0.752, 0.771] \\
-0.3 & 0.6971 & 0.2523 & 0/18  & [0.672, 0.697] \\
-0.4 & 0.5644 & 0.2787 & 0/18  & [0.539, 0.564] \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Key Findings}
-Our results indicate that tuning the $\lambda$ parameters is beneficial for maintaining Demographic Parity at moderate corruption levels ($\alpha \le 0.2$). However, for higher corruption levels ($\alpha \ge 0.3$), the model's accuracy falls below the $0.752$ constant-predictor ceiling (the accuracy of predicting the majority class), regardless of the $\lambda$ configuration. This suggests that the DRO constraint becomes too restrictive when the corruption budget exceeds 30\%.
 
 \paragraph{Recommendation}
-Based on this ablation, we recommend the default settings of $\lambda_{init}=0.0$ and $\eta_\lambda=5\times 10^{-3}$ for general use, as they consistently provided stable convergence across different seeds.
+Use the locked defaults above for the main protocol.  Treat any
+historical $\lambda$-grid numbers outside
+\texttt{results/canonical\_tau1.json} as non-canonical.

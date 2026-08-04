@@ -1,7 +1,7 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (claim-audit polish: KEY_FORMULAS → τ=1; high-α Adult/Credit-only caveats in paper/report; UTKFace summary tightened). Supersedes all prior STATUS / handoff docs.
-**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; final gate green; advisor checklist current._
+_Last updated: 2026-08-04 (paper surgery: wire figures+tables; seed-paired Wilcoxon fix; drop unsupported 12–40× / kNN claims). Supersedes all prior STATUS / handoff docs.
+**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper PDF has figures/tables; advisor checklist current._
 
 ## 1. What this project is
 Implement **DRO-FAIR** (min-max Lagrangian with corruption-calibrated TV uncertainty
@@ -71,7 +71,7 @@ written reasons; kNN retracted. None are part of the canonical claim.
 | Meeting handout (share) | ✅ `docs/MEETING_HANDOUT_2026-08-04.md` |
 | Verification LIVE | ✅ `docs/VERIFICATION_REPORT.md` |
 | UTKFace REAL 90/90 | ✅ complete; summary `results/utkface_summary.md` (**mixed clean-test**) |
-| Paper / report | ✅ Aug 10 narrative: tabular claim + honest UTKFace pilot |
+| Paper / report | ✅ Aug 10 narrative + **wired figures/tables** (540-backed); honest UTKFace pilot |
 | flair2 | ⏸ parked (optional GPU later) |
 
 

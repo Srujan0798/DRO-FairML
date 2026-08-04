@@ -1,4 +1,4 @@
-\subsection{Tabular results (Adult, fixed $\tau=1$)}
+\subsection{Tabular results (fixed $\tau=1$)}
 \label{sec:results-tabular}
 
 \textbf{Headline (verified; canonical $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, 6-seed grid).}
@@ -16,19 +16,46 @@ no method claim there.  The full attack grid is complete
 $\times$ 6 seeds $\times$ 2 methods).  The IF-attack third is
 \emph{mixed} (not a three-attack sweep): Adult/Credit $\alpha\le0.2$ still
 support DRO on DP under IF attack; LSAC/IF and Adult IF $\alpha\ge0.3$ do
-not (see \S\ref{sec:results-tabular} Q7 and
+not (see Q7 below and
 \texttt{results/if\_wilcoxon\_summary.txt}).  Earlier IF metrics were
 degenerate ($\approx10^{-10}$) before the cosine fix in
 \texttt{src/evaluation/metrics.py}.  Full per-seed traces are in
 \texttt{results/canonical\_tau1.json}.
 
+\paragraph{$\alpha{=}0$ is not an attack cell.}
+At $\alpha{=}0$ there is no corruption: DRO and Naive optimise
+\emph{different} objectives (tilted risk / dual reweighting vs.\ fixed-Lagrange
+BCE), so equal performance is not expected.  We report $\alpha{=}0$ for
+completeness but exclude it from the attack-robustness headline
+($\alpha\in\{0.1,0.2\}$ on Adult/Credit under DP and Combined).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{../figures/fig_tau1_headline.pdf}
+\caption{Adult, DP attack: clean DP vs.\ corruption budget $\alpha$ under
+fixed $\tau{=}1$ (canonical 540-row grid, $n{=}6$ seeds).  DRO is lower
+than Naive at every $\alpha$; win counts on the plot include the honest
+\textbf{$5/6$} cell at $\alpha{=}0.1$ ($p{=}0.031$).  Defensible
+accuracy regime remains $\alpha\le0.2$.}
+\label{fig:tau1-headline}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{../figures/fig_final_wilcoxon_table.pdf}
+\caption{DP-attack Wilcoxon win summary across datasets and $\alpha$
+(seed-paired, one-sided $H_1$: Naive DP $>$ DRO DP; $n{=}6$).
+Adult and Credit support DRO; LSAC/DP is a \textbf{degenerate loss}
+(constant-predictor collapse).}
+\label{fig:wilcoxon-matrix}
+\end{figure}
+
 \paragraph{Why the previous story is wrong.}
-Earlier results in this project (and the auto-generated tables
-archived in \texttt{results/stale\_pre\_fix/}) used a stepped
+Earlier results in this project used a stepped
 $\tau$-schedule: $\tau{=}100$ for $\alpha\le0.3$, $\tau{=}1$ for
 $\alpha{=}0.4$.  Under that schedule DRO \emph{lost} on Adult DP at
 $\alpha{=}0.1$--$0.3$ (e.g.\ $\alpha{=}0.2$: Naive $0.327147$ vs DRO
-$0.503047$, from the stepped-schedule runs).  Switching to a single fixed $\tau{=}1$ for
+$0.503047$, from the stepped-schedule pilot, $n{=}3$).  Switching to a single fixed $\tau{=}1$ for
 all $\alpha$ (per Kuldeep's Q12) flips the verdict: DRO now wins on
 DP at $\alpha\le0.2$ (no method claim is made at $\alpha\ge0.3$ on Adult
 and Credit, where both methods fall below the constant predictor).  The earlier
@@ -74,23 +101,102 @@ $\tau{=}100$ artifact.  Same hyperparameters, only
 \end{tabular}
 \end{table}
 
-\paragraph{Adversarial $\gg$ random corruption.}
-We confirm Kuldeep's Q1 sanity check: at the same $\alpha$ the
-adversarial PGD attack raises DP vastly more than random label noise
-on Adult and Credit.  Representative numbers
-(6 seeds):
-Adult $\alpha{=}0.2$ adversarial $\Delta\mathrm{DP}\!=\!+0.18$ vs
-random $+0.001$ (adversarial $\approx\!30$--$40\times$ larger when
-random is non-zero); Adult $\alpha{=}0.3$ $+0.38$ vs $+0.02$
-($\approx\!12$--$40\times$).  On LSAC the DP attack is weak in
-absolute terms because LSAC's clean DP is small (see \S\ref{sec:lsac-framing}).
+\paragraph{Full tabular grid (means).}
+Table~\ref{tab:full-grid} reports mean clean Acc/DP/IF for every
+(dataset, attack, $\alpha$) cell of the locked 540-row grid
+(bold $=$ better method: higher Acc / lower DP / lower IF).
+The companion Wilcoxon table (Table~\ref{tab:wilcoxon-full}) uses
+\emph{seed-paired} one-sided tests ($H_1$: Naive $>$ DRO on the named
+metric).
 
-\paragraph{k-NN graph ablation (Adult).}
-The $k$-NN graph construction is available from
-\texttt{results/knn\_ablation\_k\{5,10,15\}.json}; the attack graph is
-insensitive to $k\!\in\!\{5,10,15\}$ (DP values across $k$ are within
-$\pm0.003$ of each other at every $\alpha$), so $k{=}5$ is a safe
-default for the IF attack.
+\begin{table}[t]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Canonical $\tau{=}1$ grid means ($n{=}6$).  Source:
+\texttt{results/canonical\_tau1.json}.  Under DP/Combined attack the IF
+columns are near zero by construction; non-degenerate IF appears under
+the IF attack.}
+\label{tab:full-grid}
+\resizebox{\textwidth}{!}{%
+\input{auto_generated/tabular_results.tex}
+}
+\end{table}
+
+\begin{table}[t]
+\centering\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\caption{Seed-paired Wilcoxon (one-sided): percent reduction and $p$-value
+for DP and IF.  $^{***}$ marks $p{<}0.05$.  Positive $\Delta$\% means DRO
+is better.  Adult/DP $\alpha{=}0.1$ is the honest $5/6$ cell ($p{=}0.031$).
+LSAC/DP shows negative $\Delta$DP (DRO worse) at every $\alpha$.}
+\label{tab:wilcoxon-full}
+\resizebox{\textwidth}{!}{%
+\input{auto_generated/wilcoxon.tex}
+}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/fig1_main_results.pdf}
+\caption{Main results overview from the locked $\tau{=}1$ protocol
+($n{=}6$).  Interpret together with Tables~\ref{tab:full-grid}--\ref{tab:wilcoxon-full};
+the defensible method claim is Adult/Credit, $\alpha\le0.2$, DP+Combined.}
+\label{fig:main-results}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{../figures/fig2_dp_reduction_heatmap.pdf}
+\caption{DP reduction heatmap (Naive $-$ DRO; positive $=$ DRO better)
+under the canonical protocol.  LSAC/DP cells are the known degenerate
+negative (red / negative reduction).}
+\label{fig:dp-heatmap}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{../figures/fig4_significance_matrix.pdf}
+\caption{Significance matrix for seed-paired Wilcoxon on DP
+($p{<}0.05$).  Matches the $5/6$ and $6/6$ counts discussed in the text.}
+\label{fig:sig-matrix}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{../figures/fig5_accuracy_fairness_tradeoff.pdf}
+\caption{Accuracy--fairness tradeoff under the locked grid.  At
+$\alpha\ge0.3$ on Adult/Credit both methods fall below the
+constant-predictor accuracy baselines (Adult $\approx0.752$, Credit
+$\approx0.779$); we make no method claim there.}
+\label{fig:tradeoff}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{../figures/fig7_summary_win_rates.pdf}
+\caption{Summary win rates across the canonical grid.  Not a claim of a
+clean three-attack sweep: IF-attack outcomes remain \emph{mixed}
+(Table~\ref{tab:wilcoxon-full}).}
+\label{fig:win-rates}
+\end{figure}
+
+\paragraph{Adversarial vs.\ random corruption (scope note).}
+A historical pilot (pre-canonical protocol; not re-run under the locked
+540-row settings) found that fairness-targeted PGD raised Adult DP far
+more than matched-$\alpha$ random label noise.  We retain that qualitative
+sanity check (adversarial $\gg$ random) but do \emph{not} treat the older
+``$12$--$40\times$'' factor as a locked canonical number until a
+seed-paired re-run under $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, $n{=}6$
+is committed.  On LSAC the DP-targeted attack remains weak in absolute
+terms because clean DP is small (see \S\ref{sec:lsac-framing}).
+
+\paragraph{k-NN graph for the IF attack (scope note).}
+Canonical IF-attack rows use the default $k{=}5$ neighbourhood graph in
+the attack construction.  A full $k\in\{5,10,15\}$ ablation table is
+\emph{not} part of the locked 540-row science file; we therefore do not
+claim $k$-insensitivity as a verified result here.  Default $k{=}5$ is
+used consistently for all IF-attack cells in
+\texttt{results/canonical\_tau1.json}.
 
 \paragraph{Empirical radii (Q5).}
 The bias-corrected clean-proportion formula
@@ -102,10 +208,13 @@ from the post-attack observed proportions directly.  We retain the
 closed-form as the default and add an empirical mode
 (\texttt{radii\_mode='empirical'} in
 \texttt{src/training/dro\_fair.py::\_compute\_radii}) for the
-known-attack setting.  This does \emph{not} claim the paper is wrong.
-Full derivation in report appendix (Q5 math from B).
+known-attack setting.  The locked 540-row grid uses
+\texttt{radii\_mode=uniform}; the empirical path is derivation-ready
+(Appendix~\ref{app:empirical-radii}) but not a second full experiment
+table.  This does \emph{not} claim the paper is wrong.
 
 \paragraph{LSAC framing (Q3).}
+\label{sec:lsac-framing}
 LSAC's DP is \textbf{degenerate}: the model collapses to the
 constant (majority-class) predictor---accuracy $\approx0.902$, i.e.\
 the $0.9016$ majority rate---at every $\alpha$, and DRO loses to Naive
@@ -122,7 +231,8 @@ degeneracy / IF-attack DP loss).
 \paragraph{Q7: IF $\leftrightarrow$ DP coupling (complete grid).}
 The IF-attack third is complete (180 rows; cosine IF metric
 non-degenerate, $\max|\mathrm{if\_clean}|\!\approx\!0.24$; full
-Wilcoxon in \texttt{results/if\_wilcoxon\_summary.txt}).
+Wilcoxon in \texttt{results/if\_wilcoxon\_summary.txt} and
+Table~\ref{tab:wilcoxon-full}).
 Under the IF \emph{attack}, DRO still lowers \textbf{DP} vs Naive on
 Adult at $\alpha\le0.2$ ($6/6$, $p{=}0.0156$) and on most Credit
 cells (Credit $\alpha{=}0.1$ is $4/6$, n.s.).  On LSAC under IF
@@ -135,7 +245,7 @@ sweep on every dataset.
 \paragraph{Statistical significance.}
 The canonical grid uses $n{=}6$ seeds (0--5).  Wilcoxon signed-rank
 one-sided $p{<}0.05$ holds at $\alpha\le0.2$ on Adult and Credit under
-the DP-targeted and Combined attacks (verified in
+the DP-targeted and Combined attacks (seed-paired; verified in
 \texttt{results/canonical\_tau1.json}).  The full attack grid is
 complete (540 rows).  Under IF attack the DP test is significant on
 Adult $\alpha\le0.2$ and most Credit cells; LSAC/IF and Adult IF
@@ -165,3 +275,4 @@ We therefore treat UTKFace as a \textbf{real image-feature pilot}: protocol
 works end-to-end, but results \textbf{do not copy} the Adult/Credit
 $\alpha\le0.2$ narrative.  Prior synthetic-only smoke and the ``DRO inverts
 on image features'' claim remain \emph{withdrawn}.
+Full cell table: \texttt{results/utkface\_summary.md}.

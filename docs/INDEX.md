@@ -24,7 +24,8 @@
 - `results/utkface_summary.md` — honest clean-test table
 - `results/utkface_canonical_summary.json` — machine-readable cell means (REAL 90)
 - `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf` — from 540
-- `paper/main.pdf`, `report/report.pdf` — Aug 10 package
+- `paper/main.pdf`, `report/report.pdf` — Aug 10 package (**paper now includes figures + auto tables**)
+- `docs/MASTER_PROTOCOL_AUG10.md` — 7-day plan / remaining experiment gaps (optional Wave 1)
 
 ## Optional / historical planning (not claims)
 See [`reference/`](reference/). Do not cite as live status if they conflict with STATUS.md.

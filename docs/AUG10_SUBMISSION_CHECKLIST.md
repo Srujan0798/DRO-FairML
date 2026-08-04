@@ -18,10 +18,11 @@
 5. α≥0.3: below constant predictor on Adult/Credit only
 6. UTKFace: real pilot; **mixed clean-test**; not Adult copy-paste
 
-## Build (final gate — DONE 2026-08-04)
+## Build (final gate — DONE 2026-08-04; paper figures wired same day)
 ```bash
 make test && make validate && make paper && make report
-# 62 passed | validate PASS | paper/main.pdf + report/report.pdf rebuilt
+# 62 passed | validate PASS | paper/main.pdf (~319 KB with figures+tables) + report/report.pdf
+# Regenerate tables after any Wilcoxon/script fix: python3 experiments/generate_report_tables.py
 ```
 
 ## Share package

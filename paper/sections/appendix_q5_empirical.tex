@@ -22,4 +22,10 @@ Values are clipped to the $[0, 1]$ range and renormalized to ensure $\sum \pi_{c
 It is critical to note that there is \textbf{no oracle leak} in this implementation. The model does not have access to per-sample corruption masks. Instead, it only utilizes the global budget $\alpha$ and the \textit{known structure} of the dataset's demographic distribution to refine its robustness radii. This allows the model to be more robust against group-targeted attacks without requiring ground-truth labels for which samples were actually corrupted.
 
 \paragraph{Implementation}
-This logic is implemented in \texttt{src/training/dro_fair.py} within the \texttt{\_empirical\_pi\_clean()} method. The implementation is verified to be valid for corruption budgets $\alpha \le 0.4$ across the evaluated tabular datasets (Adult and Law School). The locked canonical grid uses \texttt{radii\_mode=uniform}; the empirical path is available for known attack structure (this appendix). UTKFace's main pilot (\S\ref{sec:results-utkface}) also uses the same uniform-radii protocol as tabular.
+This logic is implemented in \texttt{src/training/dro\_fair.py} within the
+\texttt{\_empirical\_pi\_clean()} method. The implementation is verified to be
+valid for corruption budgets $\alpha \le 0.4$ across the evaluated tabular
+datasets (Adult and Law School). The locked canonical grid uses
+\texttt{radii\_mode=uniform}; the empirical path is available for known attack
+structure (this appendix). UTKFace's main pilot (\S\ref{sec:results-utkface})
+also uses the same uniform-radii protocol as tabular.

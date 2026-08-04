@@ -11,13 +11,11 @@ $\partial(\text{fairness})/\partial y_i$ on each label.
 the stepped $\tau{=}100$ schedule for $\alpha\le 0.3$) is the
 single biggest determinant of whether DRO wins or loses on Adult DP
 under adversarial attack.
-(3) The k-NN graph ablation and the empirical-radii interpretation per
-Kuldeep's feedback (\S\ref{sec:results-tabular}); full IF-attack grid
-(180 rows; mixed by dataset --- Adult/Credit $\alpha\le0.2$ support DRO
-on DP; LSAC/IF does not).
-(4) The adversarial-vs-random comparison showing adversarial PGD
-raises DP by an order of magnitude more than random label noise at
-matched $\alpha$ on Adult.
+(3) Empirical-radii interpretation (Q5; uniform is locked for the 540-row
+grid) and full IF-attack grid (180 rows; mixed by dataset --- Adult/Credit
+$\alpha\le0.2$ support DRO on DP; LSAC/IF does not).
+(4) Qualitative adversarial-vs-random sanity (PGD $\gg$ random label noise
+on Adult in a historical pilot; not a locked multiplicative factor).
 (5) A complete real-feature UTKFace protocol grid (90 configs) showing
 that image-modality clean-test results are mixed and should not be
 conflated with the Adult/Credit $\alpha\le0.2$ claim.

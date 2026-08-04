@@ -481,22 +481,22 @@ $\tau$ & Naive DP & DRO DP & Verdict \\
 
 \subsection{Adversarial vs.\ Random Corruption}
 
-The empirical comparison confirms Kuldeep's sanity check (Q1): at matched
-$\alpha$ the adversarial PGD attack raises DP vastly more than random
-label noise on Adult and Credit.  Representative numbers (6 seeds):
-Adult $\alpha{=}0.2$ adversarial $\Delta\mathrm{DP}{=}{+}0.18$ vs random
-${+}0.001$ ($\approx 30$--$40\times$ larger); Adult $\alpha{=}0.3$
-${+}0.38$ vs ${+}0.02$ ($\approx 12$--$40\times$).  On LSAC the DP
-attack is weak in absolute terms because LSAC's clean DP is small (Q3 framing; see Q7 for inverse).
+A historical pilot (pre-canonical protocol) found fairness-targeted PGD
+raises Adult/Credit DP far more than matched-$\alpha$ random label noise
+(Kuldeep Q1 sanity: adversarial $\gg$ random).  We keep that qualitative
+check but do \emph{not} treat older multiplicative ``$12$--$40\times$''
+factors as locked under the 540-row $\tau{=}1$ protocol until a seed-paired
+re-run is committed.  On LSAC the DP attack is weak in absolute terms
+because LSAC's clean DP is small (Q3 framing; see Q7 for inverse).
 
-\subsection{IF k-NN Ablation}
+\subsection{IF k-NN Ablation (scope)}
 
-The $k$-NN graph construction is available from
-\texttt{results/knn\_ablation\_k*.json}; the attack graph is insensitive
-to $k{\in}\{5,10,15\}$ (DP values across $k$ are within ${\pm}0.003$ of
-each other at every $\alpha$), so $k{=}5$ is a safe default.  The
-IF-attack evaluation rows are complete (180/180; the IF metric was
-degenerate, $\approx10^{-10}$, in earlier runs) and use this $k{=}5$ default.
+Canonical IF-attack rows use the default $k{=}5$ neighbourhood in the
+attack construction.  A committed $k\in\{5,10,15\}$ ablation JSON is
+\emph{not} currently in the tree, so we do not claim $k$-insensitivity as
+a verified result.  The IF-attack evaluation rows themselves are complete
+(180/180; the IF metric was degenerate, $\approx10^{-10}$, in earlier runs)
+under this fixed $k{=}5$ default.
 
 \subsection{Hyperparameter Grid (Q1)}
 
@@ -745,13 +745,13 @@ is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
   LSAC/DP at $0/6$ seeds.  LSAC/Combined is a genuine clean win
   ($p{=}0.0156$ at $\alpha{=}0.1,0.3,0.4$).  We report this openly rather
   than hiding it.
-\item \textbf{Adversarial $\gg$ random:} Adversarial PGD raises DP $12$--$40\times$
-  more than random label noise at matched $\alpha$ on Adult.
+\item \textbf{Adversarial $\gg$ random (qualitative):} Historical pilot only;
+  multiplicative factors not re-locked under the 540-row protocol.
 \item \textbf{IF attack is complete:} The IF-attack rows of the canonical grid
   are generated (180/180); earlier IF metrics were degenerate ($\approx10^{-10}$).
   Honest read: Adult/Credit $\alpha\le0.2$ support DRO on DP under IF attack;
-  LSAC/IF and Adult IF $\alpha\ge0.3$ do not.  The $k$-NN
-  graph is insensitive to $k{\in}\{5,10,15\}$ (DP within ${\pm}0.003$).
+  LSAC/IF and Adult IF $\alpha\ge0.3$ do not.  Canonical IF rows use fixed
+  $k{=}5$ (full $k$ ablation not in the locked science file).
 \item \textbf{UTKFace (complete REAL 90/90 grid; mixed clean-test story):}
   Real ResNet features ($N{=}23{,}705$) and full protocol
   (\texttt{results/utkface\_canonical.json}, all
@@ -786,9 +786,10 @@ attack Adult/Credit $\alpha\le0.2$ still support DRO on DP while LSAC/IF is
 a DP loss (mixed; earlier pre-fix IF metrics were degenerate,
 $\approx10^{-10}$).
 
-On Adult, adversarial PGD raises DP $12$--$40\times$ more than random
-label noise at matched $\alpha$, ruling out the ``attack too weak''
-counter-explanation for the low-$\alpha$ cells.
+On Adult, a historical pilot found adversarial PGD raises DP far more
+than matched-$\alpha$ random label noise (qualitative; not a locked
+multiplicative factor), which still rules out a pure ``attack too weak''
+counter-explanation for the low-$\alpha$ PGD cells.
 
 The canonical full grid is complete (540 rows); Adult and Credit
 at $\alpha\le0.2$ are the mature findings.  LSAC/Combined is a genuine win
