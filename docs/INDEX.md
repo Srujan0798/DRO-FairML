@@ -14,6 +14,8 @@
 
 - [AGENT_HANDOFF_2026-08-04.md](AGENT_HANDOFF_2026-08-04.md) — what is done / open
 
+- [ADVISOR_CONCERNS_CHECKLIST.md](ADVISOR_CONCERNS_CHECKLIST.md) — every Manisha/Kuldeep ask vs current status
+
 ## Data truth
 - `results/canonical_tau1.json` — **540 rows**
 - `results/if_wilcoxon_summary.txt` — real IF Wilcoxon
