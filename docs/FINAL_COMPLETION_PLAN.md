@@ -20,13 +20,13 @@
 | Hardware | **The old blocker is gone.** IF is no longer cluster-blocked — it completes locally in minutes. |
 
 ### The verified science (unchanged, still true)
-- **Adult / DP:** DRO wins every α, p ≤ 0.031 (n=6). **Adult / Combined:** 6/6 every α, p=0.016.
-- **Credit:** all attacks, ~14/15 cells p<0.05.
-- **LSAC / Combined:** genuine win, p=0.016 at α=0.1/0.3/0.4.
+- **Adult / DP:** DRO wins every α at p ≤ 0.031 (n=6): **α=0.1 is 5/6** (seed 2 loses); **others 6/6**. **Adult / Combined:** 6/6 every α, p=0.016.
+- **Credit:** DP+Combined complete; every cell p<0.05 (Combined α=0.1 is 5/6). IF-attack incomplete — do not claim “all three attacks” yet.
+- **LSAC / Combined:** genuine win, p=0.016 at α=0.1/0.3/0.4 (α=0.2 is 5/6, p=0.031).
 - **LSAC / DP:** honest **negative** — DRO loses 0/6 at every α; the model collapses to the constant predictor (see `docs/LSAC_DEGENERACY.md`).
-- **Defensible regime: α ≤ 0.2.** At α ≥ 0.3 both methods fall below the constant-predictor baseline (Adult 0.752 / Credit 0.779 / LSAC 0.902).
+- **Defensible regime: α ≤ 0.2** on Adult and Credit. At α ≥ 0.3 both methods fall below the constant-predictor baseline on **Adult (0.752) / Credit (0.779)** — **not LSAC**, which is pinned *at* ~0.902 under DP.
 - **Central finding:** the earlier "DRO is fragile" was a τ=100 temperature artifact; fixed τ=1 makes DRO robust.
-- **New, landing today:** the first real IF-attack results across all three datasets.
+- **New, landing today:** first non-degenerate IF-attack rows (partial; no full IF claim until 180/180).
 
 ### What Kuldeep will check
 On Jun 30 he said: *"After drafting the reply, verify all the claims. Sometimes AI makes claims just to make results appear correct."* Every number below must trace to `canonical_tau1.json`. If it can't be traced, it doesn't ship.
@@ -83,10 +83,11 @@ Working dir: /Users/srujansai/Desktop/DRO-FairML. Read docs/FINAL_COMPLETION_PLA
 Agent H has just regenerated everything from the full 540-row grid.
 
 Produce docs/MEETING_2026-08-04.md — a one-screen, honest update for the 4 pm meeting:
-- Headline: fixed τ=1 makes DRO robust on Adult & Credit at α≤0.2 under all three attacks
-  (n=6, p<0.05); the earlier "DRO fragile" was a τ=100 artifact.
-- The FIRST real IF results (from H) — state exactly what they show, per dataset.
-- The honest negatives: LSAC/DP degenerate; α≥0.3 below constant predictor.
+- Headline: fixed τ=1 makes DRO robust on Adult & Credit at α≤0.2 under **DP + Combined**
+  (n=6, p<0.05); say “all three attacks” **only if** IF=180 is complete and verified.
+  Earlier "DRO fragile" was a τ=100 artifact. Adult/DP: p≤0.031 every α (α=0.1 is 5/6).
+- The FIRST real IF results (from H) — state exactly what they show, per dataset; if incomplete, mark PARTIAL.
+- The honest negatives: LSAC/DP degenerate; α≥0.3 below constant predictor on **Adult+Credit only** (LSAC pinned, not below).
 - Status: tabular grid 100% complete (540 rows); what remains for Aug 10.
 - A short "figures to share" list (absolute paths to the specific PDFs to drop in chat):
   the τ=1 headline, win-curves, Wilcoxon table, and the new IF figures.
@@ -147,9 +148,11 @@ Bring the paper and report to submission quality for Aug 10. The narrative is fi
 honest — do not invent results:
 1. Story: (a) FairnessTargetedPGD attack; (b) τ=1 fix — the central finding, with the
    τ=100 artifact shown as the ablation that motivated it; (c) DRO robust on Adult & Credit
-   at α≤0.2 under all three attacks, n=6, Wilcoxon p<0.05; (d) the FIRST real IF results
-   (from Agent H); (e) honest negatives: LSAC/DP degeneracy (own subsection, cite
-   docs/LSAC_DEGENERACY.md) and the α≥0.3 constant-predictor limit; (f) UTKFace per Agent M.
+   at α≤0.2 under **DP + Combined** (claim “all three attacks” only if IF=180 complete),
+   n=6, Wilcoxon p<0.05; Adult/DP α=0.1 is 5/6; (d) the FIRST real IF results
+   (from Agent H; PARTIAL until 180); (e) honest negatives: LSAC/DP degeneracy (own
+   subsection, cite docs/LSAC_DEGENERACY.md) and the α≥0.3 constant-predictor limit on
+   **Adult+Credit only** (LSAC pinned, not below); (f) UTKFace per Agent M.
 2. Every table auto-generated from results/canonical_tau1.json — zero hardcoded numbers.
    Hunt and remove any remaining hardcoded τ=100 / 3-seed values (MASTER_DISPATCH lists the
    exact lines: report/report.tex:441,463; paper/sections/results.tex:23-24,54;

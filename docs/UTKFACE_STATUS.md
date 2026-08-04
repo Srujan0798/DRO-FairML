@@ -9,6 +9,7 @@
 | Images | `data/raw/utkface/` (Kaggle `utkface-new`, ~331MB zip extracted) |
 | Features | `data/raw/utkface_features.npz` — X=(23705, 512), y=gender, a=race_binary (White/nonWhite), meta=REAL_UTKFACE_IMAGES (mtime ~13:44 IST) |
 | Timing probe | `results/utkface_timing_probe.json` |
+| Partial canonical (paused) | `results/utkface_canonical.json` — **REAL**, attack=dp, α=0 only, seeds 0–4 (5 rows); process paused for IF cores (`logs/utkface_paused.txt`) |
 | Synthetic archive | `docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md` (old smoke tests only) |
 
 ## Probe result (not a full experiment)

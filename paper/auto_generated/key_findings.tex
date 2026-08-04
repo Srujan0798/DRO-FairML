@@ -3,8 +3,8 @@
 % Every number below is traceable to results/canonical_tau1.json.
 % See KULDEEP_DISCUSSION.md and docs/MASTER_DISPATCH.md (BLOCKER 1-3) for the
 % full honesty caveats (IF metric degenerate pre-fix; LSAC/DP degenerate run).
-\newcommand{\tabularReductionRange}{lower DP for DRO across the defensible regime (Adult \& Credit, $\alpha\le0.2$, all three attacks; abs.\ DP deltas from canonical\_tau1.json)}
-\newcommand{\tabularSigTests}{Wilcoxon one-sided, $p<0.05$, $n=6$ seeds, on Adult+Credit all three attacks at $\alpha\le0.2$}
-\newcommand{\tabularNExperiments}{Canonical grid complete for DP \& Combined attacks (360 rows, 6 seeds); IF-attack rows pending cluster re-run after the IF-metric fix}
-\newcommand{\tauoneHeadline}{Fixing $\tau{=}1$ (replacing the stepped $\tau{=}100$ schedule) makes DRO-FAIR beat Naive-FAIR on DP at $\alpha\le0.2$ on Adult and Credit under all three attacks ($p{<}0.05$, $n{=}6$).}
+\newcommand{\tabularReductionRange}{lower DP for DRO across the defensible regime (Adult \& Credit, $\alpha\le0.2$, DP \& Combined attacks; abs.\ DP deltas from canonical\_tau1.json)}
+\newcommand{\tabularSigTests}{Wilcoxon one-sided, $p<0.05$, $n=6$ seeds, on Adult+Credit DP \& Combined attacks at $\alpha\le0.2$}
+\newcommand{\tabularNExperiments}{Canonical grid complete for DP \& Combined attacks (360 rows, 6 seeds); IF-attack third incomplete (local sweep after metric fix) --- no full IF claim until 180/180}
+\newcommand{\tauoneHeadline}{Fixing $\tau{=}1$ (replacing the stepped $\tau{=}100$ schedule) makes DRO-FAIR beat Naive-FAIR on DP at $\alpha\le0.2$ on Adult and Credit under the DP-targeted and Combined attacks ($p{<}0.05$, $n{=}6$; Adult/DP $\alpha{=}0.1$ is $5/6$, others $6/6$).}
 \newcommand{\tauoneFramingSwitch}{The earlier ``DRO is fragile'' finding was a high-temperature artifact (stepped $\tau{=}100$ schedule for $\alpha\le0.3$); switching to fixed $\tau{=}1$ inverts that conclusion.}

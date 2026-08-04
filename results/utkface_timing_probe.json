@@ -1,0 +1,45 @@
+[
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.0,
+    "seed": 0,
+    "attack": "dp",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.8586796034591858,
+        "dp_violation": 0.019766539335250854,
+        "if_violation": 0.06869544088840485
+      },
+      "corrupted": {
+        "accuracy": 0.8586796034591858,
+        "dp_violation": 0.019766539335250854,
+        "if_violation": 0.06869544088840485
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.8593123813541447,
+        "dp_violation": 0.020466119050979614,
+        "if_violation": 0.05171005427837372
+      },
+      "corrupted": {
+        "accuracy": 0.8593123813541447,
+        "dp_violation": 0.020466119050979614,
+        "if_violation": 0.05171005427837372
+      }
+    },
+    "total_time": 23.692583084106445,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 1,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  }
+]

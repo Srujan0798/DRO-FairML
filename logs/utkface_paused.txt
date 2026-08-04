@@ -1,0 +1,1 @@
+2026-08-04T08:16:35Z Paused UTKFace pid 14438 for IF cores; resume after 540 with run_utkface_server.py -> results/utkface_canonical.json

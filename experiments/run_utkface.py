@@ -81,25 +81,36 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
 
     start_time = time.time()
 
+    # REAL data only for canonical runs. Synthetic is opt-in via env ALLOW_SYNTHETIC_UTKFACE=1
+    allow_synthetic = os.environ.get('ALLOW_SYNTHETIC_UTKFACE', '0') == '1'
+    dname = 'UTKFace'
+    data_provenance = 'REAL'
     try:
         X_train, y_train, a_train, X_val, y_val, a_val, X_test, y_test, a_test, dname = \
             get_dataset(dataset_name, random_state=seed)
-        # UTKFace: override protected attribute to gender (binary) for fairness consistency
-        # load_utkface returns a=race (5-class) by default, but DRO trainer assumes binary
-        if dataset_name.lower() == 'utkface':
-            # Re-extract gender from the raw data path if possible, else use y as proxy
-            a_train = y_train.astype(np.int64)
-            a_val = y_val.astype(np.int64)
-            a_test = y_test.astype(np.int64)
+        # load_utkface now returns a = race_binary (White vs non-White), y = gender.
+        # Do NOT overwrite a with y (that made fairness degenerate: A≡Y).
+        if 'synthetic' in str(dname).lower():
+            data_provenance = 'SYNTHETIC'
+            if not allow_synthetic:
+                raise RuntimeError(
+                    f"Refusing synthetic UTKFace ({dname}). "
+                    "Extract real features or set ALLOW_SYNTHETIC_UTKFACE=1 for pipeline smoke only."
+                )
+        else:
+            data_provenance = 'REAL'
+            dname = 'UTKFace'
     except RuntimeError as e:
-        if 'UTKFace' in str(e) or 'No UTKFace' in str(e):
-            print(f"  UTKFace not available ({e}), using synthetic data")
+        if allow_synthetic and ('UTKFace' in str(e) or 'No UTKFace' in str(e) or 'feature cache' in str(e)):
+            print(f"  WARNING: UTKFace real data unavailable ({e}); synthetic ONLY because "
+                  f"ALLOW_SYNTHETIC_UTKFACE=1")
             X_train, y_train, a_train = _make_synthetic_utkface(n=800, seed=seed)
-            X_test, y_test, a_test = _make_synthetic_utkface(n=200, seed=seed+999)
+            X_test, y_test, a_test = _make_synthetic_utkface(n=200, seed=seed + 999)
             X_val = X_test.copy()
             y_val = y_test.copy()
             a_val = a_test.copy()
             dname = 'UTKFace (synthetic)'
+            data_provenance = 'SYNTHETIC'
         else:
             raise
 
@@ -130,10 +141,14 @@ def run_single_utkface_experiment(dataset_name, alpha, seed, device='cpu', verbo
 
     results = {
         'dataset': dataset_name,
+        'dataset_display': dname,
         'alpha': alpha,
         'seed': seed,
         'attack': attack,
         'lambda_max': lambda_max,
+        'data_provenance': data_provenance,  # REAL or SYNTHETIC — never omit
+        'label_def': 'gender',              # y = gender (0F/1M)
+        'protected_def': 'race_binary',     # a = White(0) vs non-White(1)
         'naive': {},
         'dro': {}
     }
@@ -243,7 +258,12 @@ def main():
         args.k_inner = 3
         print("SMOKE TEST MODE: 1 seed, alpha=0.2, reduced epochs/k_inner/pgd for fast CPU check")
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if torch.cuda.is_available():
+        device = 'cuda'
+    elif getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available():
+        device = 'mps'
+    else:
+        device = 'cpu'
     eff_tau = args.tau if args.tau is not None else '(stepped)'
     print(f"Using device: {device} | attack={args.attack} | tau={eff_tau} | k_inner={args.k_inner} | lambda_max={args.lambda_max}")
 
@@ -273,13 +293,17 @@ def main():
                         n_seeds_planned=args.n_seeds,
                     )
                     elapsed = time.time() - t0
-                    print(f"  Done in {elapsed:.0f}s | "
+                    all_results.append(result)
+                    print(f"  Done in {elapsed:.0f}s | prov={result.get('data_provenance')} | "
                           f"Naive clean: acc={result['naive']['clean']['accuracy']:.3f} "
                           f"dp={result['naive']['clean']['dp_violation']:.3f} "
                           f"if={result['naive']['clean']['if_violation']:.3f} | "
                           f"DRO clean: acc={result['dro']['clean']['accuracy']:.3f} "
                           f"dp={result['dro']['clean']['dp_violation']:.3f} "
                           f"if={result['dro']['clean']['if_violation']:.3f}")
+                    # Resume-safe: write after every config
+                    with open(results_path, 'w') as f:
+                        json.dump(all_results, f, indent=2)
                 except Exception as e:
                     print(f"  FAILED: {e}")
                     import traceback

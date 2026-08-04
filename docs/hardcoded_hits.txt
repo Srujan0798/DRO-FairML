@@ -1,0 +1,156 @@
+# machine-readable hardcoded number hits
+# format: severity|path|line|pattern|snippet
+# severity: must-fix | ok-baseline | auto-generated
+
+must-fix|paper/main.tex|32|every alpha claim|DRO-FAIR beat Naive-FAIR on DP at every α under the DP-targeted and combined attacks
+must-fix|paper/sections/results.tex|12|pending|IF-attack verification is pending a cluster re-run
+must-fix|paper/sections/results.tex|22|0.327147|alpha=0.2: Naive 0.327147 vs DRO (tau=100 historical; OK if labeled, table mixed)
+must-fix|paper/sections/results.tex|23|0.503047|0.503047 from stepped-schedule runs
+must-fix|paper/sections/results.tex|36|n=6 caption mismatch|Mean ± SE over 6 seeds; τ=1 claimed from canonical_tau1.json
+must-fix|paper/sections/results.tex|48|n=3 win 2/3|0.1 & 1 & 0.2068 & 0.2046 & 2/3
+must-fix|paper/sections/results.tex|52|0.2371 n=3|0.2 & 1 & 0.2480 & 0.2371 & 3/3 (canonical is 0.2452/0.2334)
+must-fix|paper/sections/results.tex|54|tau=100|0.2 & 100 & 0.3271 & 0.5030
+must-fix|paper/sections/results.tex|56|0.2640 n=3|0.3 & 1 & 0.2855 & 0.2640 & 3/3
+must-fix|paper/sections/results.tex|60|0.2834 n=3|0.4 & 1 & 0.3101 & 0.2834 & 3/3
+must-fix|paper/sections/results.tex|79|pending|IF-attack evaluation rows are pending a cluster re-run
+must-fix|paper/sections/results.tex|85|pending|default for the pending IF-attack re-run
+must-fix|paper/sections/results.tex|111|pending|IF results on LSAC are pending
+must-fix|paper/sections/results.tex|114|pending|Q7: IF ↔ DP coupling (pending)
+must-fix|paper/sections/results.tex|116|pending|re-run pending after the IF-metric fix
+must-fix|paper/sections/results.tex|127|pending|IF-attack third is pending a cluster re-run
+must-fix|paper/sections/introduction.tex|16|pending|pending a cluster re-run
+must-fix|paper/sections/conclusion.tex|1|pending|IF-attack results are pending a cluster re-run
+must-fix|paper/sections/appendix_q1_lambda.tex|11|n=3|Random Seeds: 3 distinct initializations
+must-fix|paper/sections/appendix_q1_lambda.tex|25|0.752 hardcoded table|Configs ≥ 0.752 Acc
+must-fix|paper/sections/appendix_q1_lambda.tex|27|hardcoded means|0.1 & 0.8219 & 0.2007 & 18/18
+must-fix|paper/sections/appendix_q1_lambda.tex|28|0.752 range|0.2 & 0.7707 & 0.2225 & 18/18 & [0.752, 0.771]
+must-fix|paper/sections/appendix_q1_lambda.tex|36|0.752 ceiling|falls below the 0.752 constant-predictor ceiling
+must-fix|paper/auto_generated/key_findings.tex|8|pending|IF-attack rows pending cluster re-run after the IF-metric fix
+must-fix|report/report.tex|117|pending|IF-attack results are pending a cluster
+must-fix|report/report.tex|331|pending|IF-attack third is pending a cluster re-run
+must-fix|report/report.tex|369|pending|IF-attack third of the grid is pending
+must-fix|report/report.tex|413|pending|IF comparisons pending re-run
+must-fix|report/report.tex|443|0.327/0.503|Naive 0.327, DRO 0.503 (stepped-schedule)
+must-fix|report/report.tex|464|0.2371 n=3|1 & 0.2480 & 0.2371 & DRO wins (3/3)
+must-fix|report/report.tex|465|0.4634|10 & 0.3382 & 0.4634 & Naive wins
+must-fix|report/report.tex|466|0.5030|100 & 0.3271 & 0.5030 & Naive wins
+must-fix|report/report.tex|497|0.237|show DRO DP = 0.237 (canonical ~0.2334)
+must-fix|report/report.tex|487|pending|IF-attack evaluation rows are pending a cluster re-run
+must-fix|report/report.tex|510|pending|LSAC Framing + Q7 (DP/IF coupling, pending)
+must-fix|report/report.tex|521|pending|cluster re-run pending after the IF-metric fix
+must-fix|report/report.tex|570|pending|grid is pending a cluster re-run
+must-fix|report/report.tex|635|hardcoded runtime|Naive-FAIR 10.6 ± 9.1
+must-fix|report/report.tex|636|hardcoded runtime|DRO-FAIR 397.6 ± 258.5 ; 37.5×
+must-fix|report/report.tex|652|n=6 claim on ablation|Ablation study on Adult (adversarial corruption, 6 seeds)
+must-fix|report/report.tex|660|hardcoded ablation|Standard ML 0.822 0.1034 0.0233
+must-fix|report/report.tex|661|hardcoded ablation|Naive-FAIR 0.821 0.0905 0.0164
+must-fix|report/report.tex|662|hardcoded ablation|DRO Joint 0.788 0.0484 0.0067
+must-fix|report/report.tex|663|hardcoded ablation|DRO DP-only 0.803 0.0726 0.0108
+must-fix|report/report.tex|664|hardcoded ablation|DRO IF-only 0.821 0.0956 0.0174
+must-fix|report/report.tex|730|pending|IF attack is pending
+must-fix|report/report.tex|760|pending|IF-attack rows are pending a cluster
+must-fix|report/sections/auto_generated_main_results.tex|6|0.0000 IF|IF 0.0000 ± 0.0000 bolded as result
+must-fix|report/sections/auto_generated_main_results.tex|7|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|8|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|9|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|10|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|11|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|12|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|13|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|14|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|15|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|16|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|17|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|18|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|19|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|report/sections/auto_generated_main_results.tex|20|0.0000 IF|IF 0.0000 ± 0.0000
+must-fix|paper/auto_generated/tabular_results.tex|6|0.000 IF|$0.000$ IF columns degenerate
+must-fix|docs/FAIRNESS_PGD_RESULTS.md|16|n=3|Protocol: 3 seeds per condition (n=6 in progress)
+must-fix|docs/FAIRNESS_PGD_RESULTS.md|26|0.248/0.237 n=3|DP 0.2 Naive 0.248 DRO 0.237 3/3
+must-fix|docs/FAIRNESS_PGD_RESULTS.md|64|n=3|n=3 seeds cannot achieve p<0.05
+must-fix|docs/FAIRNESS_PGD_RESULTS.md|71|n=6 IN PROGRESS|stale status; canonical n=6 already committed
+must-fix|docs/TAU1_ABLATION_SUMMARY.md|17|0.2371 n=3|0.2 tau=1 0.2480/0.2371 3/3 seeds=3 (feeds paper table)
+must-fix|docs/PROJECT_FLOW.md|9|acc>=0.78 claim|acc ≥ 0.78 stable at α≤0.2 (conflicts with ~0.75 at α=0.2)
+must-fix|experiments/generate_all_deliverables.py|222|0.752 string|horiz 0.752 in title while ACC dynamic
+must-fix|experiments/generate_all_deliverables.py|228|0.752 string|caption near/above 0.752
+must-fix|experiments/generate_all_deliverables.py|340|0.752 string|label Constant predictor (0, 0.752)
+must-fix|experiments/generate_all_deliverables.py|344|0.752 string|title ... (0, 0.752)
+must-fix|experiments/generate_all_deliverables.py|350|0.752 string|Constant predictor acc=0.752
+must-fix|experiments/generate_all_deliverables.py|526|0.752 string|Green dashed = cells with acc ≥ 0.752
+must-fix|experiments/generate_all_deliverables.py|586|0.752 string|Green dashed = cells with acc ≥ 0.752
+must-fix|experiments/generate_report_tables.py|25|540-row docstring|Load the canonical 540-row grid (actually 360 DP+Combined)
+
+ok-baseline|experiments/loaders.py|27|0.7521|_CONSTANT_PREDICTOR_FALLBACK adult 0.7521
+ok-baseline|experiments/loaders.py|28|0.7788|_CONSTANT_PREDICTOR_FALLBACK credit 0.7788
+ok-baseline|experiments/loaders.py|29|0.9016|_CONSTANT_PREDICTOR_FALLBACK lsac 0.9016
+ok-baseline|experiments/loaders.py|68|hardcoded 0.752 comment|Replaces the single hardcoded 0.752
+ok-baseline|experiments/loaders.py|81|0.7521 fallback|return fallback.get(d, 0.7521)
+ok-baseline|paper/sections/results.tex|102|0.902|LSAC constant predictor ≈0.902
+ok-baseline|paper/sections/results.tex|103|0.9016|0.9016 majority rate
+ok-baseline|paper/sections/results.tex|108|0.0156|Wilcoxon p=0.0156 LSAC/Combined
+ok-baseline|paper/sections/results.tex|136|synthetic|_make_synthetic_utkface disclosure
+ok-baseline|paper/sections/results.tex|138|synthetic|synthetic smoke tests
+ok-baseline|paper/sections/experimental_setup.tex|17|synthetic|UTKFace outputs synthetic smoke tests
+ok-baseline|paper/sections/experimental_setup.tex|27|synthetic|prior UTKFace numbers were synthetic smoke tests
+ok-baseline|paper/sections/discussion.tex|7|tau=100|stepped schedule τ=100 historical
+ok-baseline|paper/sections/discussion.tex|52|tau=100|based on tau=100-stepped results withdrawn
+ok-baseline|paper/sections/discussion.tex|53|synthetic|synthetic smoke tests
+ok-baseline|paper/main.tex|32|tau=100|stepped τ=100 schedule artifact narrative
+ok-baseline|paper/main.tex|32|synthetic|only UTKFace outputs are synthetic smoke tests
+ok-baseline|report/report.tex|225|0.0000 radii|theory TV radii α=0.0 row
+ok-baseline|report/report.tex|226|0.1422 radii|theory radii α=0.1
+ok-baseline|report/report.tex|506|0.752|acc≈0.752 Adult constant bar
+ok-baseline|report/report.tex|513|0.902|LSAC ≈0.902
+ok-baseline|report/report.tex|514|0.9016|0.9016 majority rate
+ok-baseline|report/report.tex|519|0.0156|p=0.0156
+ok-baseline|report/report.tex|573|synthetic|numbers were synthetic smoke tests
+ok-baseline|report/report.tex|724|0.902|accuracy ≈0.902
+ok-baseline|report/report.tex|735|synthetic|synthetic smoke
+ok-baseline|docs/KULDEEP_CORRECTION.md|12|0.0195|retraction of mislabelled IF quote (do not re-ship as result)
+ok-baseline|docs/KULDEEP_CORRECTION.md|42|0.7521|Adult baseline 0.7521
+ok-baseline|docs/KULDEEP_CORRECTION.md|43|0.7788|Credit baseline 0.7788
+ok-baseline|docs/KULDEEP_CORRECTION.md|47|0.9016|LSAC pinned ~0.902 / 0.9016
+ok-baseline|docs/KULDEEP_CORRECTION.md|55|0.2452/0.2334|canonical Adult α=0.2 means (truth)
+ok-baseline|docs/LSAC_DEGENERACY.md|11|0.9023|LSAC diagnostic table
+ok-baseline|docs/FINAL_COMPLETION_PLAN.md|27|0.752/0.779/0.902|rounded constant baselines
+ok-baseline|docs/FINAL_COMPLETION_PLAN.md|176|hunt instruction|grep 0.752, 0.0195, tau=100, n=3
+ok-baseline|docs/FINDING_DRO_FAILS_ON_ADULT.md|1|tau=100|historical finding title
+ok-baseline|docs/FINDING_DRO_FAILS_ON_ADULT.md|28|0.248/0.237|tau=1 contrast table (n=3 era, labeled finding doc)
+ok-baseline|docs/MASTER_DISPATCH.md|25|0.0195|audit of bad IF quote
+ok-baseline|docs/MASTER_DISPATCH.md|76|tau=100|tau=100→1 is correct central finding
+ok-baseline|docs/AGENT_PROMPTS.md|146|0.752|instruction to delete hardcoded CONSTANT 0.752
+ok-baseline|docs/AGENT_PROMPTS.md|199|0.0195|instruction about mislabelled IF
+ok-baseline|docs/AGENT_PROMPTS_REMAINING.md|138|0.0000|IF cells 0.0000 degenerate
+ok-baseline|docs/AGENT_PROMPTS_REMAINING.md|146|0.7521|adult/credit/lsac constants
+ok-baseline|docs/AGENT_PROMPTS_REMAINING.md|182|0.0195|quoted mislabelled IF
+ok-baseline|docs/TAU1_ABLATION_SUMMARY.md|1|source|Source: tau_ablation JSON (ok as ablation archive)
+ok-baseline|docs/TAU1_ABLATION_SUMMARY.md|19|0.5030|tau=100 historical contrast
+ok-baseline|experiments/generate_all_deliverables.py|83|CONSTANT_PREDICTOR_ACC|constant_predictor_acc('adult') dynamic
+ok-baseline|experiments/generate_final_figures.py|46|CONSTANT_PREDICTOR_ACC|constant_predictor_acc('adult') dynamic
+ok-baseline|experiments/generate_report_tables.py|188|tau=100 comment|so it cannot drift to tau=100 numbers again
+ok-baseline|experiments/meeting_summary.py|114|tau=100 label|("tau=1", tau1), ("tau=10", tau10), ("tau=100", tau100)
+
+auto-generated|report/sections/auto_generated_main_results.tex|1|header|AUTO-GENERATED from results/canonical_tau1.json
+auto-generated|report/sections/auto_generated_main_results.tex|8|0.2452/0.2334|Adult 0.2 DP means from canonical
+auto-generated|report/sections/auto_generated_main_results.tex|15|0.752|Credit 0.4 Acc DRO 0.752 (measured, not Adult bar)
+auto-generated|report/sections/auto_generated_main_results.tex|16|0.902|Lsac Acc 0.902 measured pin
+auto-generated|report/sections/auto_generated_pgd.tex|1|header|AUTO-GENERATED from results/canonical_tau1.json
+auto-generated|report/sections/auto_generated_pgd.tex|8|0.2452/0.2334|Adult DP 0.2 reduction table
+auto-generated|report/sections/auto_generated_wilcoxon.tex|1|header|AUTO-GENERATED from results/canonical_tau1.json
+auto-generated|paper/auto_generated/tabular_results.tex|1|header|AUTO-GENERATED by generate_report_tables.py
+auto-generated|paper/auto_generated/tabular_results.tex|8|0.245/0.233|Adult DP 0.2 rounded
+auto-generated|paper/auto_generated/tabular_results.tex|20|0.752|Credit Acc DRO 0.752 measured
+auto-generated|paper/auto_generated/tabular_results.tex|26|0.902|Lsac Acc 0.902 measured
+auto-generated|paper/auto_generated/wilcoxon.tex|1|header|AUTO-GENERATED by generate_report_tables.py
+auto-generated|paper/auto_generated/key_findings.tex|1|header|AUTO-GENERATED from results/canonical_tau1.json
+auto-generated|paper/auto_generated/key_findings.tex|7|n=6|Wilcoxon p<0.05 n=6 seeds
+auto-generated|experiments/generate_report_tables.py|30|build_summary|per-group mean/sem from rows
+auto-generated|experiments/generate_report_tables.py|51|build_wilcoxon|Wilcoxon from rows
+auto-generated|experiments/generate_report_tables.py|182|generate_paper_tabular|paper tabular from tau=1
+auto-generated|experiments/generate_results.py|88|mean from data|naive_dp_mean = np.mean(...)
+auto-generated|experiments/generate_latex_extras.py|18|mean from data|naive_mean = data['naive_mean']
+auto-generated|experiments/generate_pdf_report.py|583|mean from data|naive_mean, dro_mean = np.mean(times)
+auto-generated|experiments/generate_final_figures.py|243|mean from data|acc_mean = sub.mean()
+auto-generated|docs/TAU1_ABLATION_SUMMARY.md|3|auto-generated note|auto-generated by run_tau_ablation.py
+
+# end

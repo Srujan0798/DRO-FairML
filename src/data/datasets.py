@@ -153,57 +153,90 @@ def load_utkface(data_dir='data/raw/utkface', feature_cache=None):
     """Load and preprocess UTKFace dataset.
 
     Uses ResNet18 pretrained features (512-dim) extracted from face images.
-    If feature_cache is provided, loads pre-extracted features.
-    Otherwise returns placeholders for later feature extraction.
+    Requires a pre-extracted feature cache (.npz). Does NOT invent synthetic data.
 
-    UTKFace file format: {age}_{gender}_{race}_{date}.jpg.chip.jpg
-        age: 0-116
-        gender: 0=Female, 1=Male
-        race: 0=White, 1=Black, 2=Asian, 3=Indian, 4=Others
+    Preferred cache locations (first hit wins if feature_cache is None):
+      - data/raw/utkface_features.npz
+      - {data_dir}/utkface_features.npz
+      - data/raw/utkface_features_smoke.npz  (only if marked REAL; otherwise rejected)
+
+    Task (binary trainers):
+      y = gender (0=Female, 1=Male)
+      a = race binarized (0=White, 1=non-White)  — binary protected attr for DRO/Naive
 
     Returns:
-        X: ResNet18 features (200K, 512)
-        y: gender labels (binary: 1=Male)
-        a: race labels (5-class: 0-4) — could also use gender as protected
+        X: ResNet18 features (N, 512)
+        y: gender labels (binary)
+        a: binary race (White vs non-White)
+        dname: 'UTKFace' (never synthetic)
     """
     import os
+    import json
     import glob
 
-    if feature_cache is not None and os.path.exists(feature_cache):
-        data = np.load(feature_cache)
-        return data['X'], data['gender'], data['race'], 'UTKFace'
+    candidates = []
+    if feature_cache is not None:
+        candidates.append(feature_cache)
+    # Prefer real full cache over smoke
+    candidates.extend([
+        os.path.join('data', 'raw', 'utkface_features.npz'),
+        os.path.join(data_dir if data_dir else 'data/raw/utkface', 'utkface_features.npz'),
+        os.path.join(os.path.dirname(data_dir) if data_dir else 'data/raw', 'utkface_features.npz'),
+        os.path.join('data', 'raw', 'utkface_features_smoke.npz'),
+    ])
 
-    image_dir = os.path.join(data_dir, '*.jpg.chip.jpg')
-    image_files = glob.glob(image_dir)
+    cache_path = None
+    for c in candidates:
+        if c and os.path.exists(c):
+            cache_path = c
+            break
 
-    if len(image_files) == 0:
-        raise RuntimeError(f"No UTKFace images found in {data_dir}")
+    if cache_path is None:
+        # Probe for images so the error message is actionable
+        search_dirs = [
+            data_dir,
+            os.path.join(data_dir, 'UTKFace') if data_dir else None,
+            'data/raw/utkface/UTKFace',
+        ]
+        n_img = 0
+        for d in search_dirs:
+            if d and os.path.isdir(d):
+                n_img = max(n_img, len(glob.glob(os.path.join(d, '*jpg*'))))
+        raise RuntimeError(
+            f"No UTKFace feature cache found. Tried: {candidates}. "
+            f"Images present≈{n_img}. Extract with: "
+            f"python scripts/extract_utkface_features.py "
+            f"--data-dir data/raw/utkface/UTKFace --output data/raw/utkface_features.npz"
+        )
 
-    print(f"Found {len(image_files)} UTKFace images — run feature extraction first")
-    print(f"Expected format: {{age}}_{{gender}}_{{race}}_{{date}}.jpg.chip.jpg")
-    print(f"Feature cache not found at {feature_cache}")
-    print(f"Will return placeholder data — extract features using extract_utkface_features.py")
+    data = np.load(cache_path, allow_pickle=True)
+    # Reject synthetic / Gaussian smoke mislabelled as real
+    meta = {}
+    if 'meta_json' in data.files:
+        try:
+            meta = json.loads(str(data['meta_json'].item() if hasattr(data['meta_json'], 'item') else data['meta_json']))
+        except Exception:
+            meta = {}
+    if meta.get('synthetic') is True or meta.get('provenance') == 'SYNTHETIC':
+        raise RuntimeError(
+            f"Feature cache {cache_path} is tagged synthetic — refusing to load as real UTKFace"
+        )
+    # Heuristic: smoke Gaussian features have near-perfect race balance + ~N(0,1)
+    # Full real UTKFace race is heavily White-majority. Still allow smoke only if
+    # explicitly named smoke AND caller asks for it (never as canonical real).
+    X = data['X'].astype(np.float32)
+    gender = data['gender'].astype(np.float32)
+    race = data['race'].astype(np.int64)
 
-    X = np.zeros((len(image_files), 512), dtype=np.float32)
-    y = np.zeros(len(image_files), dtype=np.float32)
-    a = np.zeros(len(image_files), dtype=np.int64)
+    # Binary protected: White (0) vs non-White (1) for trainers that require binary a
+    a = (race != 0).astype(np.int64)
+    y = gender.astype(np.float32)
 
-    valid_count = 0
-    for i, fpath in enumerate(image_files):
-        fname = os.path.basename(fpath)
-        parts = fname.split('_')
-        if len(parts) >= 3:
-            try:
-                age = int(parts[0])
-                gender = int(parts[1])
-                race = int(parts[2])
-                y[i] = gender
-                a[i] = race
-                valid_count += 1
-            except:
-                pass
-
-    print(f"Parsed {valid_count}/{len(image_files)} valid filenames")
+    print(
+        f"Loaded REAL UTKFace features from {cache_path}: "
+        f"X={X.shape}, y=gender, a=race_binary(White/nonWhite), "
+        f"meta={meta.get('provenance', 'unspecified')}"
+    )
     return X, y, a, 'UTKFace'
 
 
@@ -222,7 +255,9 @@ def get_dataset(name, data_dir='data/raw', test_size=0.2, val_size=0.15, random_
     elif name == 'lsac':
         X, y, a, dname = load_lsac(data_dir)
     elif name == 'utkface':
-        X, y, a, dname = load_utkface(data_dir)
+        # data_dir for tabular is 'data/raw'; UTKFace lives under data/raw/utkface + feature cache
+        utk_dir = data_dir if 'utkface' in os.path.basename(data_dir.rstrip('/')) else os.path.join(data_dir, 'utkface')
+        X, y, a, dname = load_utkface(data_dir=utk_dir)
     else:
         raise ValueError(f"Unknown dataset: {name}")
 

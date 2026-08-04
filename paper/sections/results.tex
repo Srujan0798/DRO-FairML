@@ -4,14 +4,17 @@
 \textbf{Headline (verified; canonical $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, 6-seed grid).}
 At $\alpha\le0.2$, DRO-FAIR achieves \emph{significantly} lower DP than
 Naive-FAIR on \textbf{Adult and Credit} under the DP-targeted and Combined
-PGD attacks (Wilcoxon one-sided $p{<}0.05$, $n{=}6$ seeds, $0$--$5$),
+PGD attacks (Wilcoxon one-sided $p{<}0.05$, $n{=}6$ seeds, $0$--$5$;
+Adult/DP is $5/6$ at $\alpha{=}0.1$ and $6/6$ otherwise),
 reproducing the original Jun~30 report for Adult DP.  Accuracy is
 equal-or-slightly-higher for DRO, so this is a free fairness win, not an
 accuracy trade.  At $\alpha\ge0.3$ both methods fall below the
-constant-predictor baseline on every dataset, so we make no method claim
-there.  IF-attack verification is pending a cluster re-run (the IF metric
-was degenerate, $\approx10^{-10}$, in earlier runs due to a threshold
-bug in \texttt{src/evaluation/metrics.py}).  Full per-seed traces are in
+constant-predictor baseline on \textbf{Adult and Credit} (LSAC under the
+DP attack stays pinned \emph{at} majority accuracy, not below), so we make
+no method claim there.  The IF-attack third is landing after a metric fix
+(earlier IF was degenerate, $\approx10^{-10}$, due to a threshold bug in
+\texttt{src/evaluation/metrics.py}); \textbf{no full IF claim} until that
+third is complete.  Full per-seed traces are in
 \texttt{results/canonical\_tau1.json}.
 
 \paragraph{Why the previous story is wrong.}
@@ -22,8 +25,8 @@ $\alpha{=}0.4$.  Under that schedule DRO \emph{lost} on Adult DP at
 $\alpha{=}0.1$--$0.3$ (e.g.\ $\alpha{=}0.2$: Naive $0.327147$ vs DRO
 $0.503047$, from the stepped-schedule runs).  Switching to a single fixed $\tau{=}1$ for
 all $\alpha$ (per Kuldeep's Q12) flips the verdict: DRO now wins on
-DP at $\alpha\le0.2$ (no method claim is made at $\alpha\ge0.3$, where
-both methods fall below the constant predictor).  The earlier
+DP at $\alpha\le0.2$ (no method claim is made at $\alpha\ge0.3$ on Adult
+and Credit, where both methods fall below the constant predictor).  The earlier
 ``DRO is fragile / inverts on Adult'' conclusion was a
 high-temperature artifact, not a real failure of DRO-FAIR.
 Table~\ref{tab:tau-comparison} makes the contrast explicit.
@@ -33,7 +36,9 @@ Table~\ref{tab:tau-comparison} makes the contrast explicit.
 \caption{Adult, DP attack: the ``DRO is fragile'' story was a
 $\tau{=}100$ artifact.  Same hyperparameters, only
 \texttt{get\_temperature()} monkey-patched to return a constant.
-Mean $\pm$ SE over 6 seeds. The $\tau{=}1$ values are from \texttt{results/canonical\_tau1.json}; the $\tau{=}10,100$ rows reproduce the earlier stepped-schedule (pre-fix) runs.}
+\textbf{$\tau{=}1$ rows:} means over the full 6-seed canonical grid
+(\texttt{results/canonical\_tau1.json}, seeds $0$--$5$).
+\textbf{$\tau{=}10,100$ rows:} historical stepped-schedule pilot (seeds $0$--$2$, $n{=}3$).}
 \label{tab:tau-comparison}
 \rowcolors{2}{gray!8}{white}
 \begin{tabular}{cc ccc cc}
@@ -45,19 +50,19 @@ Mean $\pm$ SE over 6 seeds. The $\tau{=}1$ values are from \texttt{results/canon
 \color{white}\textbf{DRO wins} &
 \color{white}\textbf{Verdict} \\
 \midrule
-0.1 & 1   & 0.2068 & \cellcolor{wingreen}\textbf{0.2046} & $+$0.001 & 2/3 & DRO\;\checkmark \\
+0.1 & 1   & 0.2026 & \cellcolor{wingreen}\textbf{0.1999} & $+$0.001 & 5/6 & DRO\;\checkmark \\
 0.1 & 10  & 0.1850 & \cellcolor{lossred}0.2231            & $+$0.001 & 0/3 & Tie \\
 0.1 & 100 & 0.1801 & \cellcolor{lossred}0.2033            & $+$0.002 & 0/3 & Tie \\
 \midrule
-0.2 & 1   & 0.2480 & \cellcolor{wingreen}\textbf{0.2371} & $+$0.002 & 3/3 & DRO\;\checkmark \\
+0.2 & 1   & 0.2452 & \cellcolor{wingreen}\textbf{0.2334} & $+$0.003 & 6/6 & DRO\;\checkmark \\
 0.2 & 10  & 0.3382 & \cellcolor{lossred}0.4634            & $-$0.026 & 0/3 & Naive\;\checkmark \\
 0.2 & 100 & 0.3271 & \cellcolor{lossred}0.5030            & $-$0.025 & 0/3 & Naive\;\checkmark \\
 \midrule
-0.3 & 1   & 0.2855 & \cellcolor{wingreen}\textbf{0.2640} & $+$0.009 & 3/3 & DRO\;\checkmark \\
+0.3 & 1   & 0.2848 & \cellcolor{wingreen}\textbf{0.2614} & $+$0.009 & 6/6 & DRO\;\checkmark \\
 0.3 & 10  & 0.5253 & \cellcolor{lossred}0.5532            & $+$0.010 & 0/3 & Naive\;\checkmark \\
 0.3 & 100 & 0.5313 & \cellcolor{lossred}0.5622            & $+$0.012 & 0/3 & Naive\;\checkmark \\
 \midrule
-0.4 & 1   & 0.3101 & \cellcolor{wingreen}\textbf{0.2834} & $+$0.011 & 3/3 & DRO\;\checkmark \\
+0.4 & 1   & 0.3140 & \cellcolor{wingreen}\textbf{0.2855} & $+$0.010 & 6/6 & DRO\;\checkmark \\
 0.4 & 10  & 0.5158 & \cellcolor{lossred}0.5231            & $+$0.012 & 0/3 & Naive\;\checkmark \\
 0.4 & 100 & 0.5129 & \cellcolor{lossred}0.5260            & $+$0.016 & 0/3 & Naive\;\checkmark \\
 \bottomrule
@@ -76,13 +81,13 @@ random is non-zero); Adult $\alpha{=}0.3$ $+0.38$ vs $+0.02$
 absolute terms because LSAC's clean DP is small (see \S\ref{sec:lsac-framing}).
 
 \paragraph{k-NN graph ablation (Adult).}
-The IF-attack evaluation rows are pending a cluster re-run after the
-metric fix (the IF metric was degenerate, $\approx10^{-10}$, in earlier
-runs).  The $k$-NN graph construction is available from
+The IF-attack third is incomplete after the metric fix (earlier IF was
+degenerate, $\approx10^{-10}$); no full IF claim is made here.  The
+$k$-NN graph construction is available from
 \texttt{results/knn\_ablation\_k\{5,10,15\}.json}; the attack graph is
 insensitive to $k\!\in\!\{5,10,15\}$ (DP values across $k$ are within
 $\pm0.003$ of each other at every $\alpha$), so $k{=}5$ is a safe
-default for the pending IF-attack re-run.
+default for the IF-attack completion run.
 
 \paragraph{Empirical radii (Q5).}
 The bias-corrected clean-proportion formula
@@ -108,23 +113,26 @@ attack ineffective.  By contrast, LSAC/Combined is a genuine clean win
 (Wilcoxon $p{=}0.0156$ at $\alpha{=}0.1,0.3,0.4$).  The canonical
 $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, 6-seed grid is complete
 (360 rows; DP+Combined attacks); this paper reports Adult and Credit
-because they are the mature findings.  IF results on LSAC are pending
-the cluster re-run (earlier IF metrics were degenerate).
+because they are the mature findings.  IF results on LSAC remain
+pending completion of the IF-attack third (earlier IF metrics were
+degenerate).
 
 \paragraph{Q7: IF $\leftrightarrow$ DP coupling (pending).}
-The IF-attack rows of the canonical grid are not yet generated (cluster
-re-run pending after the IF-metric fix), so we withdraw the earlier
-numeric IF claims.  Conceptually, the DP and IF criteria are not
-independent under coordinated attacks: an attack optimised for one
-fairness criterion can shrink or expand the other.  This coupling will
-be characterised once the IF-attack third of the grid is regenerated.
+The IF-attack third of the canonical grid is incomplete at write time
+(local re-run after the IF-metric fix; partial rows are non-degenerate),
+so we withdraw full-grid numeric IF claims until that third is complete.
+Conceptually, the DP and IF criteria are not independent under
+coordinated attacks: an attack optimised for one fairness criterion can
+shrink or expand the other.  This coupling will be characterised once the
+IF-attack third of the grid is complete.
 
 \paragraph{Statistical significance.}
 The canonical grid uses $n{=}6$ seeds (0--5).  Wilcoxon signed-rank
 one-sided $p{<}0.05$ holds at $\alpha\le0.2$ on Adult and Credit under
 the DP-targeted and Combined attacks (verified in
 \texttt{results/canonical\_tau1.json}).  The DP+Combined attack grid is
-complete (360 rows); the IF-attack third is pending a cluster re-run.
+complete (360 rows); the IF-attack third is incomplete (local sweep after
+the metric fix) and is not claimed here.
 
 \subsection{Image data (UTKFace) --- future work, no real run to date}
 \label{sec:results-utkface}

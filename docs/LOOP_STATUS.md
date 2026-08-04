@@ -28,7 +28,8 @@
 - Captured **real UTKFace** progress honestly:
   - Kaggle download done; features `data/raw/utkface_features.npz` (23705×512).
   - Probe `results/utkface_timing_probe.json`: provenance **REAL**, MPS, α=0 seed=0 dp only; ~24s.
-  - Wrote `docs/UTKFACE_STATUS.md` (probe only — **no paper claim**).
+  - Partial `results/utkface_canonical.json`: **5 REAL rows** (dp, α=0, seeds 0–4); **paused** for IF cores (`logs/utkface_paused.txt`).
+  - Wrote `docs/UTKFACE_STATUS.md` (partial only — **no paper claim**).
 - Confirmed prior work still standing: M1–M7 prose closed per `docs/VERIFICATION_REPORT.md`; fail-loud loaders; Makefile help; requirements pins; Agent H script present but only **check** mode so far (`results/FINALIZATION_LOG.txt`).
 - **Did not** run `agent_h_finalize.sh` full path (gate closed).
 - **Did not** regenerate figures/PDFs (H owns post-540).

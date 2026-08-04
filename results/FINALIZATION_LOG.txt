@@ -1,0 +1,13 @@
+========================================
+Agent H finalization — 2026-08-04T08:16:36Z
+cwd=/Users/srujansai/Desktop/DRO-FairML  mode=check
+DATA SAFETY: this script never writes results/canonical_tau1.json
+========================================
+[2026-08-04T08:16:36Z] Running verification gate on results/canonical_tau1.json
+total=442  dp=180  combined=180  if=82
+max|if_clean| (attack=if) = 9.780805e-02
+FAIL: total=442 (need 540)
+FAIL: if=82 (need 180)
+OK: max|if_clean|=9.780805e-02 >> 1e-6
+GATE: NOT READY
+[2026-08-04T08:16:37Z] VERIFICATION FAILED — aborting (no regeneration)

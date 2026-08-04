@@ -56,7 +56,8 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
                         help='FairnessTargetedPGD attack modes to run (canonical server grid)')
     parser.add_argument('--n_seeds', type=int, default=6,
                         help='Number of seeds (canonical target: 6 for statistical power)')
-    parser.add_argument('--device', default='cuda')
+    parser.add_argument('--device', default='auto',
+                        help='auto|cuda|mps|cpu (auto picks cuda>mps>cpu)')
     parser.add_argument('--lambda_max', type=float, default=1.5)
     parser.add_argument('--tau', type=float, default=1.0,
                         help='Fixed temperature (canonical=1.0 for all alphas; do not use stepped)')
@@ -66,11 +67,22 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
     parser.add_argument('--pgd_steps', type=int, default=20)
     parser.add_argument('--coordinated', action='store_true', default=False)
     parser.add_argument('--output_dir', default='results')
+    parser.add_argument('--output', type=str, default=None,
+                        help='If set, write ALL attacks into this single JSON (canonical aggregate)')
     args = parser.parse_args()
 
-    device = args.device if torch.cuda.is_available() else 'cpu'
-    if device == 'cpu' and args.device == 'cuda':
-        print("WARNING: CUDA not available, falling back to CPU")
+    if args.device == 'auto':
+        if torch.cuda.is_available():
+            device = 'cuda'
+        elif getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available():
+            device = 'mps'
+        else:
+            device = 'cpu'
+    elif args.device == 'cuda' and not torch.cuda.is_available():
+        print("WARNING: CUDA not available, falling back to auto")
+        device = 'mps' if (getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available()) else 'cpu'
+    else:
+        device = args.device
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -84,10 +96,13 @@ See also: UTKFACE_SERVER_COMMANDS.txt for nohup/tmux/slurm wrappers.
 
     for dataset in args.datasets:
         for attack in args.attacks:
-            out_path = os.path.join(
-                args.output_dir,
-                f'utkface_{attack}_server.json'
-            )
+            if args.output:
+                out_path = args.output
+            else:
+                out_path = os.path.join(
+                    args.output_dir,
+                    f'utkface_{attack}_server.json'
+                )
 
             # Load existing progress
             all_results = []
