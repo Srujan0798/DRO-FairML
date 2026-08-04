@@ -1,6 +1,6 @@
 # UTKFace Status
 
-**Updated:** 2026-08-05 ~03:41 IST (Grok lane)  
+**Updated:** 2026-08-05 ~03:50 IST (Grok lane)  
 
 ## Mac MPS canonical (LOCKED — paper pilot)
 **Grid: COMPLETE 90/90 REAL.** Summary: `results/utkface_summary.md`.
@@ -19,11 +19,11 @@
 ## flair2 CUDA (LIVE — Grok lane)
 | Job | File | Target | Status |
 |-----|------|--------|--------|
-| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **18/90** — dp α=0.0–0.2 done; α=0.3 s=0 running |
-| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **18/30** — α=0.0–0.2 done; α=0.3 s=0 running |
+| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **19/90** — dp α=0.3 seed=0 done; s=1 running |
+| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **19/30** — α=0.3 seed=0 done; s=1 running |
 | **U3** pixel PGD | `results/utkface_pixel_pgd.json` | 24 (planned) | **JPEGs ready** (symlink 23708); launch after U1/U2 free GPU |
 
-- Repro: **18** matched, max\|ΔDP_dro\|≈0.007 (**0 GAP**). First full CUDA α tier: dp α=0.2 max seed-wise |Δ|=**0.0013**. Summary: `results/utkface_reproducibility_summary.md`
-- Multi-group: α=0.2 multi **5/6**, binary **2/6** (mixed). Summary: `results/utkface_multigroup_summary.md`
+- Repro: **19** matched, max\|ΔDP_dro\|≈0.007 (**0 GAP**). α=0.3 s0 seed-matched OK. Summary: `results/utkface_reproducibility_summary.md` (seed-matched means when partial)
+- Multi-group: α=0.2 multi **5/6**; α=0.3 s0 multi+bin win. Summary: `results/utkface_multigroup_summary.md`
 - U3: **linked** `/data/srujan.sai/UTKFace` → kshitish tree (23708 jpg); runner `experiments/run_utkface_pixel_pgd.py`; do not launch until U1/U2 done
 - Live table: `docs/WAVE1_LIVE_PROGRESS.md`

@@ -41,6 +41,12 @@ def _mean(rs, method, which, name):
     return float(np.nanmean(vals)) if vals else float("nan")
 
 
+def _matched_mac(mr, gr):
+    """Keep only Mac rows whose seeds appear on GPU (fair partial-cell means)."""
+    seeds = {int(r["seed"]) for r in gr}
+    return [r for r in mr if int(r["seed"]) in seeds] or mr
+
+
 def main():
     mac = json.loads(MAC.read_text()) if MAC.exists() else []
     gpu = json.loads(GPU.read_text()) if GPU.exists() else []
@@ -52,6 +58,7 @@ def main():
         "",
         "Protocol: τ=1, k_inner=10, epochs=60, pgd_steps=20, n_seeds=6, REAL features.",
         "Same seeds 0–5. Large gaps are bugs to investigate.",
+        "Cell means use **seed-matched** Mac rows only when GPU is partial.",
         "",
         "## Clean test (primary)",
         "",
@@ -63,8 +70,9 @@ def main():
     gap_cells = []
     for atk, a in keys:
         mr, gr = mg.get((atk, a), []), gg.get((atk, a), [])
-        ddp = _mean(gr, "dro", "clean", "dp") - _mean(mr, "dro", "clean", "dp")
-        dacc = _mean(gr, "dro", "clean", "acc") - _mean(mr, "dro", "clean", "acc")
+        mr_m = _matched_mac(mr, gr) if gr else mr
+        ddp = _mean(gr, "dro", "clean", "dp") - _mean(mr_m, "dro", "clean", "dp")
+        dacc = _mean(gr, "dro", "clean", "acc") - _mean(mr_m, "dro", "clean", "acc")
         if abs(ddp) < GAP_THR and abs(dacc) < GAP_THR:
             note = "OK"
         elif len(gr) >= 6 and len(mr) >= 6:
@@ -87,8 +95,9 @@ def main():
         mr, gr = mg.get((atk, a), []), gg.get((atk, a), [])
         if not gr:
             continue
-        ddp = _mean(gr, "dro", "corrupted", "dp") - _mean(mr, "dro", "corrupted", "dp")
-        dacc = _mean(gr, "dro", "corrupted", "acc") - _mean(mr, "dro", "corrupted", "acc")
+        mr_m = _matched_mac(mr, gr)
+        ddp = _mean(gr, "dro", "corrupted", "dp") - _mean(mr_m, "dro", "corrupted", "dp")
+        dacc = _mean(gr, "dro", "corrupted", "acc") - _mean(mr_m, "dro", "corrupted", "acc")
         note = "OK" if abs(ddp) < GAP_THR and abs(dacc) < GAP_THR else (
             "GAP" if len(gr) >= 6 and len(mr) >= 6 else "partial"
         )

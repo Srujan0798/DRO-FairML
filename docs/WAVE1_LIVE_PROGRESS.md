@@ -1,26 +1,23 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~03:41 IST_
+_Last tick: 2026-08-05 ~03:50 IST_
 
 ## Counts (do not pkill)
 
 | Job | Target | Count | Last | PID | alive |
 |-----|--------|------:|------|-----|-------|
-| **U1** | 90 | **18** | dp α=0.2 done; **α=0.3 s=0 in progress** (json_age ~15 min) | 3482009 | yes (~3.6h, ~3200% CPU) |
-| **U2** | 30 | **18** | α=0.2 done; log **RUN a=0.3 s=0** (json_age ~13 min) | 3482442 | yes (~3.6h, ~3150% CPU) |
+| **U1** | 90 | **19** | dp **α=0.3 seed=0** done; s=1 running | 3482009 | yes (~3.8h) |
+| **U2** | 30 | **19** | α=0.3 seed=0 done; log **RUN a=0.3 s=1** | 3482442 | yes (~3.7h) |
 
-Puller OK. ETA ~19.5 h (U1) / ~3.2 h (U2). Typical cell ~16 min — not stalled yet.
+Puller OK (count-up summarize). ETA ~19.4 h (U1) / ~3.0 h (U2). U3 JPEGs ready (23708).
 
-## Milestone (prior)
-- CUDA dp α∈{0.0,0.1,0.2} full 18/18; α=0.2 max seed-wise |ΔDP| **0.0013**, **0 GAP**
-- U2 α=0.2 multi **5/6**
+## Signals
+- Repro: **19** matched, max\|ΔDP\|0.0072, **0 GAP**
+- α=0.3 s0 seed-matched: clean ΔDP **−0.0005**, corr **−0.0024** (OK)
+- U2 α=0.3 s0: multi win, binary win
 
-## U3 prep (this tick)
-- **JPEGs linked** (symlink only, no job start):
-  - `/data/srujan.sai/UTKFace` → `/data/kshitish.madbhavi/UTKFace` (**23708** jpg)
-  - run tree `data/raw/utkface/UTKFace` same target
-- Launch still **blocked** while U1/U2 hold both GPUs (`launch_u3` refuses)
-- Status script now reports `json_age`, stall WARN >25 min, U3 image readiness
+## Fix this tick
+- `summarize_utkface_repro.py`: partial cells used **all 6 Mac seeds** vs incomplete GPU → false large Δ (e.g. corr +0.024). Now **seed-matched** Mac only.
 
 ## Open
-- Finish U1=90 / U2=30; then U3 via `bash scripts/launch_u3_pixel_pgd.sh` on flair2
+- U1=90 / U2=30; U3 after free GPU
