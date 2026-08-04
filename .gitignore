@@ -87,3 +87,17 @@ friend/
 FRIEND/
 packages/
 results/*.STALE_*
+
+# Runtime logs / pids (keep README)
+logs/*.log
+logs/*.pid
+logs/*_paused.txt
+!logs/README.md
+
+# Caches
+.pytest_cache/
+**/__pycache__/
+
+# Large local image dumps (features npz is enough)
+data/raw/utkface/
+data/raw/**/UTKFace/

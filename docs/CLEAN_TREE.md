@@ -96,3 +96,15 @@ stale_archived/              old knn/lambda/if_chunks/if_poc/partials — do not
 ```bash
 make install && make data && make test && make validate && make paper && make report
 ```
+
+## Disk cleanup (2026-08-04)
+
+| Removed | Why |
+|---------|-----|
+| `data/raw/utkface/` (~67k jpg, ~500MB) | Features already in `utkface_features.npz` |
+| `utkface_features_smoke.npz` | Non-REAL smoke; real features present |
+| `logs/archive_root/bulk_pre_540/` | Old IF batch logs |
+| `__pycache__`, `.pytest_cache` | Regenerable |
+| Meeting/τ=100 figs → `figures/historical/` | Clutter; not canonical claims |
+
+Repo ~**207MB** after (was ~764MB). File count ~**760** (was ~68k).
