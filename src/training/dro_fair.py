@@ -32,7 +32,7 @@ class DroFairTrainer:
                  K_inner=10, epochs=60, weight_decay=1e-4,
                  use_dp=True, use_if=True, tau_warmup_epochs=15,
                  lambda_init=0.0, radii_mode='uniform', history_path=None,
-                 radii_scale=1.0, radii_clamp=None):
+                 radii_scale=1.0, radii_clamp=None, pi_shrinkage_k=0.0):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -73,6 +73,17 @@ class DroFairTrainer:
         # data like LSAC (~90/10), where uniform mode produces rho_dp[minority]=1.0
         # (degenerate). This is HYPOTHESIS TESTING, not tuning-until-it-wins.
         self.radii_clamp = float(radii_clamp) if radii_clamp is not None else None
+        # pi_shrinkage_k (LSAC-degeneracy hypothesis, alternative to radii_clamp):
+        # additive (Laplace-style) shrinkage of pi_clean toward 0.5 before computing
+        # rho_dp. pi_shrunk[j] = (pi_clean[j]*n_eff + k*0.5) / (n_eff + k), where n_eff
+        # is the sample count that informed pi_clean. k=0 (default) is a no-op —
+        # canonical behavior unchanged. Unlike radii_clamp (a hard post-hoc cap on
+        # rho_dp itself), this smooths the INPUT proportion, which changes how the
+        # cap is shaped as alpha varies rather than pinning a single fixed ceiling.
+        # HYPOTHESIS TESTING, not tuning-until-it-wins: if the tiny minority group's
+        # true proportion is genuinely small (not just noisily estimated), shrinkage
+        # may fail to fix LSAC just as radii_clamp did — report honestly either way.
+        self.pi_shrinkage_k = float(pi_shrinkage_k)
         self.history_path = history_path
         self.rho_dp = None
         self.rho_if = None
@@ -106,8 +117,10 @@ class DroFairTrainer:
             # Kuldeep asked about. Requires coordinated=True so the 70/30 inversion
             # in _empirical_pi_clean matches the actual attack (see run_canonical_empirical.py).
             pi_clean = self._empirical_pi_clean(pi_obs)
+            n_eff = n
         elif a_val is not None and len(a_val) > 0:
             pi_clean = np.array([np.mean(a_val == j) for j in [0, 1]])
+            n_eff = len(a_val)
         else:
             pi_clean = np.zeros(2)
             for j in [0, 1]:
@@ -120,6 +133,11 @@ class DroFairTrainer:
             pi_sum = np.sum(pi_clean)
             if pi_sum > 0:
                 pi_clean = pi_clean / pi_sum
+            n_eff = n
+
+        if self.pi_shrinkage_k > 0.0:
+            k = self.pi_shrinkage_k
+            pi_clean = (pi_clean * n_eff + k * 0.5) / (n_eff + k)
 
         rho_dp = []
         for j in [0, 1]:

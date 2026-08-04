@@ -47,7 +47,8 @@ def _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, 
 def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=20,
                            tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3,
                            corruptor_type='adversarial', lr_lambda=5e-3, attack_k=5,
-                           radii_scale=1.0, radii_clamp=None, dump_history=False):
+                           radii_scale=1.0, radii_clamp=None, dump_history=False,
+                           pi_shrinkage_k=0.0):
     """Run single (dataset, alpha, seed, attack, method) experiment.
     All callers must pass (or rely on defaults for) full provenance params so every row
     includes k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
@@ -58,6 +59,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
       attack_k: k-NN neighborhood for IF attack (A1 kNN ablation; default 5 = canonical attack k).
       radii_scale (Agent N1): global multiplier on rho_dp/rho_if (default 1.0 = canonical).
       radii_clamp (Agent L2): per-group cap on rho_dp[j] (default None = canonical).
+      pi_shrinkage_k: additive shrinkage of pi_clean toward 0.5 before computing rho_dp
+        (LSAC-degeneracy hypothesis, alternative to radii_clamp; default 0.0 = canonical).
 
     Extended for Agent N2 convergence diagnostics:
       dump_history: if True AND method=='dro', dump trainer.history (per-epoch train_loss,
@@ -137,6 +140,7 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         'attack_k': int(attack_k),
         'radii_scale': float(radii_scale),
         'radii_clamp': (None if radii_clamp is None else float(radii_clamp)),
+        'pi_shrinkage_k': float(pi_shrinkage_k),
         'attack_effectiveness': attack_effectiveness,
         'dp_clean_train': dp_clean_train,
         'dp_corrupted_train': dp_corrupted_train,
@@ -164,7 +168,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
             tau=tau, beta=5.0, k=attack_k, gamma=0.0,
             K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15,
             lambda_init=lambda_init, radii_mode=radii_mode,
-            radii_scale=radii_scale, radii_clamp=radii_clamp
+            radii_scale=radii_scale, radii_clamp=radii_clamp,
+            pi_shrinkage_k=pi_shrinkage_k
         )
         trainer.fit(X_train_att, y_train_att, a_train_att,
                      X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)

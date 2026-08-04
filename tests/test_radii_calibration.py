@@ -188,6 +188,45 @@ def test_radii_clamp():
         f"clamp did not reduce the minority radius: {max(rho_dp_cl)} vs {minority_rho_un}"
 
 
+def test_pi_shrinkage_pulls_toward_balance():
+    """LSAC-degeneracy hypothesis (alternative to radii_clamp): additive shrinkage
+    of pi_clean toward 0.5 should reduce the minority group's degenerate rho_dp,
+    same intent as radii_clamp but via a different mechanism (smooths the INPUT
+    proportion rather than capping the output radius). k=0 must be a no-op.
+    """
+    n = 1000
+    a_clean = np.array([0] * 900 + [1] * 100, dtype=np.int64)  # 90/10 LSAC-like
+    rng = np.random.RandomState(0); rng.shuffle(a_clean)
+    alpha = 0.2
+    nc = int(alpha * n)
+    n_min_corr = min(int(0.7 * nc), int((a_clean == 1).sum()))
+    n_maj_corr = nc - n_min_corr
+    a_corrupt = a_clean.copy()
+    a_corrupt[rng.choice(np.where(a_clean == 1)[0], n_min_corr, replace=False)] = 0
+    a_corrupt[rng.choice(np.where(a_clean == 0)[0], n_maj_corr, replace=False)] = 1
+
+    # k=0 must reproduce the unshrunk (canonical) radii exactly
+    t_base = DroFairTrainer(_make_dummy_model(), alpha=alpha, pi_shrinkage_k=0.0, epochs=1)
+    t_noop = DroFairTrainer(_make_dummy_model(), alpha=alpha, pi_shrinkage_k=0.0, epochs=1)
+    rho_base, _ = t_base._compute_radii(a_corrupt)
+    rho_noop, _ = t_noop._compute_radii(a_corrupt)
+    for j in [0, 1]:
+        assert abs(rho_base[j] - rho_noop[j]) < 1e-12
+
+    minority_rho_un = max(rho_base)
+    assert minority_rho_un > 0.3, \
+        f"setup invariant failed: minority rho_dp should be >0.3, got {minority_rho_un}"
+
+    # Shrinkage toward 0.5 should measurably reduce the degenerate minority radius
+    t_shrunk = DroFairTrainer(_make_dummy_model(), alpha=alpha, pi_shrinkage_k=200.0, epochs=1)
+    rho_shrunk, _ = t_shrunk._compute_radii(a_corrupt)
+    assert max(rho_shrunk) < minority_rho_un, \
+        f"shrinkage did not reduce the minority radius: {max(rho_shrunk)} vs {minority_rho_un}"
+    # Sanity: rho stays a valid, finite radius (bounded [0,1]) under strong shrinkage
+    for j in [0, 1]:
+        assert 0.0 <= rho_shrunk[j] <= 1.0
+
+
 def test_empirical_differs_from_uniform_imbalanced_90_10():
     """Agent A5 verification: on a 90/10 imbalanced split at alpha=0.2,
     empirical rho_dp != uniform rho_dp. Confirms empirical mode is actually
