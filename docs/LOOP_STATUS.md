@@ -24,7 +24,7 @@
 | scripts (active) | 4 | finalize, deploy, extract, flair2 snippet |
 | figures `*.pdf` | ~59 | 5 report-live; see `figures/README.md` |
 | logs top-level | ~14 | + `archive_root/` bulk |
-| UTKFace REAL rows | **26 / 90** | attack=`dp` only; **no paper claim** |
+| UTKFace REAL rows | **27 / 90** | attack=`dp` only; **no paper claim** |
 
 ## Next ticks
 1. Optional: keep or thin `meeting_summary.py` (CLI utility, not Makefile)
