@@ -1,23 +1,20 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~02:40 IST_
+_Last tick: 2026-08-05 ~02:50 IST_
 
 ## Counts (do not pkill)
 
-| Job | Target | Count | Last |
-|-----|--------|------:|------|
-| **U1** | 90 | **15** | dp α=0.2 seed=2 done; mid seed=3 |
-| **U2** | 30 | **15** | α=0.2 seed=2 done; mid seed=3 |
+| Job | Target | Count | Status |
+|-----|--------|------:|--------|
+| **U1** | 90 | **15** | alive; mid dp α=0.2 seed=3 (~16 min into cell) |
+| **U2** | 30 | **15** | alive; mid α=0.2 seed=3 |
 
-Jobs alive GPU0/1. Puller restarted with durable multigroup summarizer.
+CPU ticks advancing; not hung. Puller OK. ETA ~20h / ~4h.
 
-## Signals
-- Repro: 15 matched, max|ΔDP clean|≈0.007, **0 GAP**
-- U2 α=0.2 n=3: multi wins **3/3**, mean multi ~0.22 (vs ~0.13 at α≤0.1)
-
-## Docs
-- Finding 3 cosine≠Euclidean now in **paper + report**
-- `experiments/summarize_utkface_multigroup.py` for U2 finalize
+## U3 readiness (not launched)
+- Pixel loader smoke on shared path: **OK** (32 images)
+- `scripts/launch_u3_pixel_pgd.sh` on flair2 — waits for free GPU
+- Finding 3 paper+report disclosure marked done in HANDOFF_GROK
 
 ## Open
-- U1=90 / U2=30; U3 after free GPU
+- U1=90 / U2=30; then optional U3 launch

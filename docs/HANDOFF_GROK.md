@@ -80,11 +80,11 @@ unexplained empirical correlation is a different, weaker claim than a derived on
 - **Paper:** `paper/sections/results.tex` lines 25–30 already state α=0 is **not** an attack cell and DRO vs Naive optimise **different** objectives (tilted / dual vs fixed-Lagrange BCE); excluded from attack-robustness headline.
 - **Verdict:** No overclaim of “robustness to zero corruption.” No prose fix required. Integration may mirror the same sentence in the report if any residual α=0 “win” language remains.
 
-#### Finding 3 — cosine IF vs original Euclidean (DISCLOSE FOR INTEGRATION)
+#### Finding 3 — cosine IF vs original Euclidean (DISCLOSED 2026-08-05)
 - **Eval default:** `metrics.compute_if_violation` / `compute_metrics_torch` use `metric='cosine'` (docstring lines 70–74, 144–147).
 - **Attack:** IF path uses `metric='cosine'` in `_precompute_if_neighbors` / greedy attack (`adversarial.py` 293–315, 424).
-- **Paper status:** Mentions “cosine IF” / “cosine fix” in results/conclusion but does **not** always spell out: “this is **not** the original paper Euclidean IF; absolute feature-space threshold was abandoned because it was degenerate.”
-- **Verdict:** **Flag for integration pass** — strengthen one explicit sentence wherever IF numbers appear (experimental setup + first IF table). Not a code bug. Numbers in tables measure angular IF, not the original Euclidean formula.
+- **Paper/report:** Explicit sentence added — cosine (angular) IF is **not** the original Euclidean IF (`paper/sections/results.tex`; `report/report.tex`).
+- **Verdict:** Disclosure done for headline IF prose. Numbers in tables measure angular IF, not the original Euclidean formula.
 
 #### Q6 — IF attack k-NN within-group vs global (FIXED)
 | Site | Graph | Metric | Lines |
@@ -113,7 +113,7 @@ This is a **plausible mechanism**, not a theorem that IF↑ always implies DP↓
 DP-under-IF as a **separate** reported outcome (mixed), not as a corollary of IF robustness.
 
 #### Phase 0 residual for integration (not Grok GPU)
-- Paper/report: one explicit “cosine ≠ original Euclidean IF” sentence (Finding 3).
+- Finding 3 cosine≠Euclidean sentence: **done** in paper + report (2026-08-05).
 - Optional: re-run IF third after trainer cosine fix if advisors demand re-lock (canonical 540 was trained under old Euclidean train graph) — **do not silently retrain without greenlight**.
 
 ---
