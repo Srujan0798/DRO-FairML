@@ -24,7 +24,7 @@
 | experiments `*.py` (active) | 16 | Makefile path + runners |
 | scripts (active) | 4 | agent_h_finalize, deploy_utkface, extract features, flair2 snippet |
 | figures `*.pdf` | ~59 | 5 report-live; rest meeting/appendix — see `figures/README.md` |
-| UTKFace REAL rows | **23 / 90** | attack=`dp` only; α=0.3 filling; **no paper claim** |
+| UTKFace REAL rows | **25 / 90** | attack=`dp` only; α=0.3 filling; **no paper claim** |
 
 ## Next ticks
 1. Optional: archive `run_experiments.py` behind Makefile-only path (still needed for FORCE_LEGACY)

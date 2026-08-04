@@ -59,6 +59,11 @@ utkface_canonical.json
 stale_archived/              old knn/lambda/if_chunks/if_poc/partials — do not claim
 ```
 
+## figures/
+- **Report-live (5):** fig1, fig2, fig4, fig5, fig7 — see `figures/README.md`
+- Meeting / figD / figC / heatmaps kept; do not delete PDFs paper may need
+- Prefer archive over delete
+
 ## Archives (not deleted)
 | Path | Contents |
 |------|----------|
