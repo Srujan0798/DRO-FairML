@@ -944,5 +944,134 @@
     "epochs": 60,
     "coordinated": false,
     "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.3,
+    "seed": 4,
+    "attack": "dp",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.7973001476481755,
+        "dp_violation": 0.17065268754959106,
+        "if_violation": 0.08717310428619385
+      },
+      "corrupted": {
+        "accuracy": 0.7198903184982072,
+        "dp_violation": 0.2496432214975357,
+        "if_violation": 0.12387679517269135
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.7920269985235182,
+        "dp_violation": 0.17553052306175232,
+        "if_violation": 0.07025791704654694
+      },
+      "corrupted": {
+        "accuracy": 0.7186247627082893,
+        "dp_violation": 0.24325111508369446,
+        "if_violation": 0.09735200554132462
+      }
+    },
+    "total_time": 112.90367412567139,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.3,
+    "seed": 5,
+    "attack": "dp",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.7970892216831892,
+        "dp_violation": 0.18153777718544006,
+        "if_violation": 0.08964873850345612
+      },
+      "corrupted": {
+        "accuracy": 0.762708289390424,
+        "dp_violation": 0.3548361659049988,
+        "if_violation": 0.09889578819274902
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.7985657034380932,
+        "dp_violation": 0.1758282482624054,
+        "if_violation": 0.0661693662405014
+      },
+      "corrupted": {
+        "accuracy": 0.7681923644800674,
+        "dp_violation": 0.3399490714073181,
+        "if_violation": 0.07428385317325592
+      }
+    },
+    "total_time": 86.96397686004639,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.4,
+    "seed": 0,
+    "attack": "dp",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.7821134781691627,
+        "dp_violation": 0.21961861848831177,
+        "if_violation": 0.10906795412302017
+      },
+      "corrupted": {
+        "accuracy": 0.7397173592069184,
+        "dp_violation": 0.3627769947052002,
+        "if_violation": 0.13632705807685852
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.7854882936089432,
+        "dp_violation": 0.21241754293441772,
+        "if_violation": 0.08506927639245987
+      },
+      "corrupted": {
+        "accuracy": 0.7418266188567813,
+        "dp_violation": 0.3555091619491577,
+        "if_violation": 0.10990331321954727
+      }
+    },
+    "total_time": 89.01078081130981,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
   }
 ]

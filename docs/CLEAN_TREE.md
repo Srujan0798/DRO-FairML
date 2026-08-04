@@ -1,6 +1,6 @@
 # Clean tree map (post-540 professionalization)
 
-**Updated:** 2026-08-04 · Source of truth: `results/canonical_tau1.json` (**540** rows)
+**Updated:** 2026-08-04 09:10 UTC · Source of truth: `results/canonical_tau1.json` (**540** rows)
 
 ## Root (minimal)
 ```

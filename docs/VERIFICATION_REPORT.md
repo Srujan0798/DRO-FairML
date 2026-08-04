@@ -1,23 +1,28 @@
 # Independent Verification Report (Agent L)
 
+> **CURRENT (post-540):** Canonical grid is **540/540 complete** (dp=180, combined=180, if=180).  
+> IF story is **MIXED** — not a clean three-attack sweep. See **§ Post-540 re-audit** at the bottom  
+> and `results/if_wilcoxon_summary.txt` + `docs/MEETING_2026-08-04.md`.  
+> Adult/DP α=0.1 is **5/6**. LSAC/DP is **degenerate**.  
+> Sections **§0–§9** below are a **historical mid-sweep snapshot** (424 rows / IF 64) kept for audit trail — **do not cite as live counts**.
+
 **Verifier:** Agent L (adversarial / independent)  
-**Timestamp (UTC):** 2026-08-04T08:10:15Z  
-**Canonical file:** `/Users/srujansai/Desktop/DRO-FairML/results/canonical_tau1.json`  
-**File mtime (UTC):** 2026-08-04T08:09:19Z  
+**Historical snapshot (UTC):** 2026-08-04T08:10:15Z (mid IF sweep)  
+**Canonical file:** `results/canonical_tau1.json`  
 **Method:** Recompute means, seed win-counts, and one-sided Wilcoxon signed-rank (`scipy.stats.wilcoxon`, `alternative='greater'` on `naive − dro` for DP) from raw rows. Claims assumed false until proven.
 
 ---
 
-## 0. Row counts at verification time
+## 0. Row counts at verification time *(historical — superseded by 540/540)*
 
-| Attack | Rows | Expected (full grid) | Status |
-|--------|------|----------------------|--------|
+| Attack | Rows | Expected (full grid) | Status (at snapshot) |
+|--------|------|----------------------|----------------------|
 | `dp` | **180** | 180 (3×5×6×2) | **COMPLETE** |
 | `combined` | **180** | 180 | **COMPLETE** |
-| `if` | **64** | 180 | **PARTIAL (PENDING)** |
-| **Total** | **424** | **540** | Growing |
+| `if` | **64** | 180 | ~~PARTIAL~~ → **now 180/180 COMPLETE** |
+| **Total** | **424** | **540** | ~~Growing~~ → **540 COMPLETE** |
 
-**IF-attack completeness matrix** (`n_naive` / `n_dro`, target 6/6 each cell):
+**IF-attack completeness matrix at snapshot** (`n_naive` / `n_dro`, target 6/6 each cell) — historical:
 
 | Dataset | α=0.0 | α=0.1 | α=0.2 | α=0.3 | α=0.4 |
 |---------|-------|-------|-------|-------|-------|
@@ -25,7 +30,7 @@
 | credit | 6/6 | 1/0 | 0/0 | 0/0 | 0/0 |
 | lsac | 0/0 | 0/0 | 0/0 | 0/0 | 0/0 |
 
-**IF readiness for ship:** not ready. Adult IF α≤0.2 is complete enough for provisional DP-metric checks; full IF-attack third is **PENDING**. All IF scientific claims remain **PENDING** until 180/180.
+**IF readiness (live):** complete 180/180; ship claims must be **honest mixed** (Adult/Credit α≤0.2 OK on DP under IF; LSAC/IF and Adult IF α≥0.3 not a DP sweep).
 
 ---
 
@@ -360,7 +365,9 @@ Wins **5/6**, p=0.0312; loser **seed 2** (Naive 0.192526 vs DRO 0.192608). **MAT
 | Adult IF-attack α≤0.2 on DP (+ IF metric at 0.1/0.2) | **PASS** |
 | “All three attacks, all datasets” | **FAIL** — LSAC/IF DP loss; Adult IF α≥0.3 DP fails |
 | LSAC/DP | **FAIL** (degenerate; document, do not sell) |
-| UTKFace | **NOT READY** — REAL grid running (~12/90 rows at re-audit); no paper claim |
+| UTKFace | **NOT READY** — REAL-only partial grid (`results/utkface_canonical.json`); **no paper claim** |
 
 **M6 residual:** prose must stay “DP+Combined + selective IF”, not blanket three-attack.  
-**M8 residual:** `make validate` Expected-150 tooling still secondary.
+**M8 residual:** largely closed — `make validate` uses `load_canonical_tau1()` (540 rows).  
+
+**Loop note (2026-08-04 ~09:10 UTC):** UTKFace REAL rows advanced (~23/90, attack=`dp` only). Still no paper claim.
