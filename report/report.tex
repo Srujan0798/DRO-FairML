@@ -119,9 +119,12 @@ LSAC/Combined is a genuine win ($p{=}0.0156$).  IF-attack results are
 complete and mixed (180 rows; Adult/Credit $\alpha\le0.2$ support DRO on DP
 under IF attack; LSAC/IF does not --- see
 \texttt{results/if\_wilcoxon\_summary.txt}).  Pre-fix IF metrics were
-degenerate ($\approx10^{-10}$).  All theoretical formulas are numerically
-verified.
-Code, results, and diagnostics are fully reproducible. (See KULDEEP\_DISCUSSION.md + paper/sections/results.tex for full traceable tables.)
+degenerate ($\approx10^{-10}$).  On real UTKFace ResNet18 features
+(complete 90-config REAL grid) clean-test DP is also mixed (significant DRO
+wins mainly at high $\alpha$; not an Adult/Credit $\alpha\le0.2$ copy).
+All theoretical formulas are numerically verified.
+Code, results, and diagnostics are fully reproducible
+(\texttt{docs/KULDEEP\_CORRECTION.md}, \texttt{paper/sections/results.tex}).
 \end{mdframed}
 
 \tableofcontents
@@ -448,7 +451,9 @@ Adult DP under adversarial attack.  Under the stepped schedule
 DRO \emph{loses} on Adult DP at every $\alpha$ (e.g.\ $\alpha{=}0.2$:
 Naive $0.327$, DRO $0.503$, from the stepped-schedule runs).  Under fixed $\tau{=}1$
 DRO \emph{wins} on DP at $\alpha\le0.2$ (no method claim at
-$\alpha\ge0.3$, where both methods fall below the constant predictor),
+$\alpha\ge0.3$ on Adult and Credit, where both methods fall below the
+constant predictor; LSAC/DP is pinned \emph{at} majority accuracy, a
+different failure mode),
 and the gap widens with $\alpha$ in that regime.
 
 The mechanism: $\tau{=}100$ sharpens the soft predictions $\sigma(\tau f)$
@@ -506,11 +511,16 @@ $\lambda$ sweep).
 \subsection{High-$\alpha$ Defensibility ($\alpha\ge0.3$)}
 
 We also investigated whether DRO-FAIR can beat the constant-label predictor
-at high corruption levels ($\alpha\ge0.3$). The answer is no: both tau and
-lambda tuning fail to recover accuracy above the constant-predictor baseline
-(acc $\approx0.752$) at $\alpha\ge0.3$. This is because the coordinated attack corrupts
+at high corruption levels ($\alpha\ge0.3$). On \textbf{Adult and Credit}, the
+answer is no: both tau and lambda tuning fail to recover accuracy above the
+majority-class baselines (Adult $\approx0.752$, Credit $\approx0.779$) at
+$\alpha\ge0.3$.  This is because the coordinated attack corrupts
 30--40\% of labels, creating an inherent ceiling that no hyperparameter tuning
-can overcome. The defensible regime for DRO-FAIR is therefore $\alpha\le0.2$.
+can overcome.  \textbf{LSAC} does not fall \emph{below} its majority baseline
+($\approx0.902$); under the DP attack it is \emph{pinned at} that baseline
+(degeneracy --- see below), which is a different failure mode.  The
+defensible regime for method claims is therefore $\alpha\le0.2$ on Adult and
+Credit.
 
 \subsection{LSAC Framing (Q3) + Q7 (DP/IF coupling, complete)}
 
@@ -724,9 +734,11 @@ is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
 \item \textbf{At fixed $\tau{=}1$: DRO wins on Adult and Credit DP under the DP-targeted and Combined attacks at $\alpha\le0.2$ (headline).}
   At $\alpha\le0.2$ DRO beats Naive under both attacks (Wilcoxon
   one-sided $p{<}0.05$, $n{=}6$ seeds; verified in
-  \texttt{results/canonical\_tau1.json}).  Accuracy is equal-or-better.
+  \texttt{results/canonical\_tau1.json}; Adult/DP $\alpha{=}0.1$ is $5/6$).
+  Accuracy is equal-or-better.
   At $\alpha\ge0.3$ both methods fall below the constant-predictor
-  baseline, so no method claim is made there.
+  baseline on Adult and Credit only, so no method claim is made there
+  (LSAC/DP is pinned at majority accuracy, not below).
 \item \textbf{LSAC/DP is a degenerate negative result; LSAC/Combined wins:}
   On LSAC the model collapses to the constant (majority-class) predictor at
   every $\alpha$ (accuracy $\approx0.902$), and DRO loses to Naive on

@@ -8,7 +8,7 @@
 | [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md) | **LIVE 540-only** claim audit (see Agent V section at end for live MATCH) |
 | [KULDEEP_CORRECTION.md](KULDEEP_CORRECTION.md) | Honest corrections for advisor |
 | [LSAC_DEGENERACY.md](LSAC_DEGENERACY.md) | LSAC/DP collapse |
-| [KEY_FORMULAS.md](KEY_FORMULAS.md) | Math |
+| [KEY_FORMULAS.md](KEY_FORMULAS.md) | Math + canonical τ=1 protocol (not pre-fix 150-run story) |
 | [UTKFACE_STATUS.md](UTKFACE_STATUS.md) | UTKFace REAL 90/90 complete (mixed clean-test pilot) |
 | [AUG10_SUBMISSION_CHECKLIST.md](AUG10_SUBMISSION_CHECKLIST.md) | Aug 10 share package + claim locks |
 | [LIVE_FILE_AUDIT.md](LIVE_FILE_AUDIT.md) | Brutal per-file audit of the working tree |
@@ -22,6 +22,7 @@
 - `results/utkface_canonical.json` — **90/90 REAL**
 - `results/if_wilcoxon_summary.txt` — real IF Wilcoxon
 - `results/utkface_summary.md` — honest clean-test table
+- `results/utkface_canonical_summary.json` — machine-readable cell means (REAL 90)
 - `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf` — from 540
 - `paper/main.pdf`, `report/report.pdf` — Aug 10 package
 

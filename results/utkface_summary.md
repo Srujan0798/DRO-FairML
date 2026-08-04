@@ -28,7 +28,8 @@
 **COMPLETE 90/90 REAL.**
 
 ### Honest read (do not overclaim)
-- This is an **image-feature** experiment (ResNet18), not a pixel-space attack.
-- Compare to tabular carefully; win pattern may **not** mirror Adult/Credit.
-- Use Wilcoxon p only when n=6 and report losses as well as wins.
-- Safe for paper only after human review of the table above.
+- This is an **image-feature** experiment (ResNet18 embeddings), not a pixel-space attack.
+- Win pattern does **not** mirror Adult/Credit low-α: significant clean DP wins for DRO appear mainly at **α = 0.4** (DP and Combined, 6/6, p=0.0156). Low/mid α cells are mixed or non-significant (many favor Naive on DP).
+- IF attack: clean DP never reaches p&lt;0.05 for DRO; IF values often lower for DRO (coupling, not a DP sweep).
+- Use Wilcoxon only with n=6; report losses as well as wins.
+- Paper/report framing: **real image-feature pilot, mixed clean-test** — not an Adult/Credit α≤0.2 copy.

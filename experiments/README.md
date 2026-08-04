@@ -32,6 +32,8 @@ Active drivers for the **canonical** DRO-FairML pipeline. One-offs live in `_arc
 1. Never rewrite science rows of `results/canonical_tau1.json` casually.
 2. Never load `results/stale_archived/` for claims.
 3. IF story is **mixed**; Adult/DP α=0.1 is **5/6**; LSAC/DP degenerate.
-4. UTKFace: report REAL row counts only; no paper claim until multi-attack cells exist.
+4. UTKFace: **90/90 REAL** locked in `results/utkface_canonical.json` — paper/report state **mixed clean-test pilot** only (not Adult copy). Do not dual-write or invent synthetic rows.
 
+| Script | Role |
+|--------|------|
 | `plot_meeting_figs_540.py` | Meeting headline figs from canonical 540 |
