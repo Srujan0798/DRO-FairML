@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Validation script (Stream A4 from completion plan).
-Checks that DRO-FAIR beats Naive-FAIR on DP in >= 6/9 cells
-using Wilcoxon signed-rank test (the official criterion).
+Validation gate on the canonical tau=1 grid.
 
-CRITICAL FIX: Previous version used mean-based comparison only.
-This version uses Wilcoxon p<0.05 AND mean(DRO) < mean(Naive)
-to match the report's "Wilcoxon p<0.05" claim.
+Checks that DRO-FAIR beats Naive-FAIR on DP under Wilcoxon p<0.05
+for headline (dataset, alpha) cells using the DP attack.
+
+Source of truth: results/canonical_tau1.json via load_canonical_tau1().
+Never reads results/all_results.json nested legacy schema or stale_archived.
 """
-import json
 import sys
 import os
+from collections import defaultdict
+
 import numpy as np
 from scipy.stats import wilcoxon
 
@@ -18,59 +19,72 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 
 def validate():
-    # Try merging first if individual results exist
-    if os.path.exists('results/individual') and os.listdir('results/individual'):
-        try:
-            from experiments.run_robust import merge_all
-            merge_all()
-        except Exception as e:
-            print(f"Note: merge_all failed ({e}), using existing all_results.json")
+    from experiments.loaders import load_canonical_tau1
 
-    if not os.path.exists('results/all_results.json'):
-        print("ERROR: results/all_results.json not found. Run experiments first.")
+    rows = load_canonical_tau1()
+    print(f"Loaded canonical_tau1.json: {len(rows)} flat rows")
+
+    # Prefer DP attack for the gate (paper headline). Fall back to any attack
+    # present only if DP is completely absent (should not happen on full grid).
+    attacks = sorted({r.get('attack') for r in rows})
+    attack = 'dp' if 'dp' in attacks else (attacks[0] if attacks else None)
+    if attack is None:
+        print("ERROR: no attack field in canonical rows")
         return False
+    print(f"Gate attack: {attack} (available: {attacks})")
 
-    results = json.load(open('results/all_results.json'))
-    print(f"Total: {len(results)} experiments")
+    sub_all = [r for r in rows if r.get('attack') == attack]
+    print(f"Rows for attack={attack}: {len(sub_all)}")
 
-    if len(results) < 150:
-        print(f"WARNING: Expected 150, got {len(results)}")
-
-    # ========================================================================
-    # WILCOXON-BASED VALIDATION (matches report caption)
-    # ========================================================================
     wins = {"dp": 0, "if": 0, "total": 0}
-    mean_wins = {"dp": 0, "if": 0}  # For reference only
+    mean_wins = {"dp": 0, "if": 0}
     acc_drops = []
 
-    print("\n" + "="*70)
-    print("WILCOXON VALIDATION (one-sided H1: Naive > DRO, n=10 paired seeds)")
-    print("="*70)
+    print("\n" + "=" * 70)
+    print("WILCOXON VALIDATION (one-sided H1: Naive DP > DRO DP, paired by seed)")
+    print("Source: results/canonical_tau1.json (no all_results / stale fallback)")
+    print("=" * 70)
 
+    # Canonical alphas include 0.0; gate historically used 0.1/0.2/0.3.
+    gate_alphas = [0.1, 0.2, 0.3]
     for ds in ['adult', 'credit', 'lsac']:
-        for a in [0.1, 0.2, 0.3]:
-            sub = [r for r in results if r['dataset'] == ds and abs(r['alpha'] - a) < 1e-6]
-            if not sub:
+        for a in gate_alphas:
+            cell = [
+                r for r in sub_all
+                if r['dataset'] == ds and abs(float(r['alpha']) - a) < 1e-6
+            ]
+            if not cell:
                 print(f"{ds} a={a}: NO DATA")
                 continue
 
-            n_dp = np.array([r['naive']['clean']['dp_violation'] for r in sub])
-            d_dp = np.array([r['dro']['clean']['dp_violation'] for r in sub])
-            n_if = np.array([r['naive']['clean']['if_violation'] for r in sub])
-            d_if = np.array([r['dro']['clean']['if_violation'] for r in sub])
-            n_acc = np.mean([r['naive']['clean']['accuracy'] for r in sub])
-            d_acc = np.mean([r['dro']['clean']['accuracy'] for r in sub])
+            by_seed = defaultdict(dict)
+            for r in cell:
+                by_seed[int(r['seed'])][r['method']] = r
 
-            # Wilcoxon: test if DRO < Naive
+            paired = [
+                (v['naive'], v['dro'])
+                for v in by_seed.values()
+                if 'naive' in v and 'dro' in v
+            ]
+            if len(paired) < 2:
+                print(f"{ds} a={a}: insufficient paired seeds ({len(paired)})")
+                continue
+
+            n_dp = np.array([p[0]['dp_clean'] for p in paired], dtype=float)
+            d_dp = np.array([p[1]['dp_clean'] for p in paired], dtype=float)
+            n_if = np.array([p[0]['if_clean'] for p in paired], dtype=float)
+            d_if = np.array([p[1]['if_clean'] for p in paired], dtype=float)
+            n_acc = float(np.mean([p[0]['acc_clean'] for p in paired]))
+            d_acc = float(np.mean([p[1]['acc_clean'] for p in paired]))
+
             diff_dp = n_dp - d_dp
             diff_if = n_if - d_if
-
             try:
-                _, p_dp = wilcoxon(diff_dp, alternative='greater')
+                _, p_dp = wilcoxon(diff_dp, alternative='greater', zero_method='wilcox')
             except Exception:
                 p_dp = 1.0
             try:
-                _, p_if = wilcoxon(diff_if, alternative='greater')
+                _, p_if = wilcoxon(diff_if, alternative='greater', zero_method='wilcox')
             except Exception:
                 p_if = 1.0
 
@@ -90,41 +104,61 @@ def validate():
             wins["total"] += 1
             acc_drops.append(n_acc - d_acc)
 
-            dp_red = (np.mean(n_dp) - np.mean(d_dp)) / np.mean(n_dp) * 100 if np.mean(n_dp) > 0 else 0
-            if_red = (np.mean(n_if) - np.mean(d_if)) / np.mean(n_if) * 100 if np.mean(n_if) > 0 else 0
+            dp_red = (
+                (np.mean(n_dp) - np.mean(d_dp)) / np.mean(n_dp) * 100
+                if np.mean(n_dp) > 0 else 0
+            )
+            if_red = (
+                (np.mean(n_if) - np.mean(d_if)) / np.mean(n_if) * 100
+                if np.mean(n_if) > 0 else 0
+            )
 
-            dp_status = f"SIG_WIN(p={p_dp:.3f})" if dp_sig else (f"mean_win(p={p_dp:.3f})" if dp_mean_win else f"NOT_SIG(p={p_dp:.3f})")
-            if_status = f"SIG_WIN(p={p_if:.3f})" if if_sig else (f"mean_win(p={p_if:.3f})" if if_mean_win else f"NOT_SIG(p={p_if:.3f})")
+            dp_status = (
+                f"SIG_WIN(p={p_dp:.3f})" if dp_sig
+                else (f"mean_win(p={p_dp:.3f})" if dp_mean_win else f"NOT_SIG(p={p_dp:.3f})")
+            )
+            if_status = (
+                f"SIG_WIN(p={p_if:.3f})" if if_sig
+                else (f"mean_win(p={p_if:.3f})" if if_mean_win else f"NOT_SIG(p={p_if:.3f})")
+            )
 
-            print(f"{ds:6s} a={a}: DP {np.mean(n_dp):.4f}->{np.mean(d_dp):.4f} ({dp_red:+.1f}%) {dp_status:20s} | "
-                  f"IF {np.mean(n_if):.4f}->{np.mean(d_if):.4f} ({if_red:+.1f}%) {if_status:20s} | "
-                  f"Acc {n_acc:.4f}->{d_acc:.4f} ({(n_acc-d_acc)*100:.1f}% drop)")
+            print(
+                f"{ds:6s} a={a}: DP {np.mean(n_dp):.4f}->{np.mean(d_dp):.4f} "
+                f"({dp_red:+.1f}%) {dp_status:20s} | "
+                f"IF {np.mean(n_if):.4f}->{np.mean(d_if):.4f} "
+                f"({if_red:+.1f}%) {if_status:20s} | "
+                f"Acc {n_acc:.4f}->{d_acc:.4f} ({(n_acc - d_acc) * 100:.1f}% drop) "
+                f"n={len(paired)}"
+            )
 
-    # Check Credit alpha=0.4 accuracy
-    sub04 = [r for r in results if r['dataset'] == 'credit' and abs(r['alpha'] - 0.4) < 1e-6]
-    if sub04:
-        d_acc04 = np.mean([r['dro']['clean']['accuracy'] for r in sub04])
-        print(f"\nCredit a=0.4 DRO acc: {d_acc04:.4f} {'OK' if d_acc04 >= 0.60 else 'WARNING: low'}")
+    # Credit α=0.4 accuracy sanity (if present)
+    credit_04 = [
+        r for r in sub_all
+        if r['dataset'] == 'credit' and abs(float(r['alpha']) - 0.4) < 1e-6
+        and r['method'] == 'dro'
+    ]
+    if credit_04:
+        d_acc04 = float(np.mean([r['acc_clean'] for r in credit_04]))
+        print(f"\nCredit a=0.4 DRO acc: {d_acc04:.4f} "
+              f"{'OK' if d_acc04 >= 0.60 else 'WARNING: low'}")
 
-    # Runtime check
-    naive_times = [r['naive']['time'] for r in results if 'time' in r.get('naive', {})]
-    dro_times = [r['dro']['time'] for r in results if 'time' in r.get('dro', {})]
-    if naive_times and dro_times:
-        overhead = np.mean(dro_times) / np.mean(naive_times)
-        print(f"\nRuntime: Naive={np.mean(naive_times):.1f}s, DRO={np.mean(dro_times):.1f}s, "
-              f"Overhead={overhead:.1f}x")
-
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"DP WINS (Wilcoxon p<0.05):  {wins['dp']}/{wins['total']}  (need >= 6/9)")
     print(f"IF WINS (Wilcoxon p<0.05):  {wins['if']}/{wins['total']}  (report claims 5/9)")
     print(f"DP WINS (mean-based only):  {mean_wins['dp']}/{wins['total']}  (for reference)")
     print(f"IF WINS (mean-based only):  {mean_wins['if']}/{wins['total']}  (for reference)")
-    print(f"Avg accuracy drop: {np.mean(acc_drops)*100:.2f}%")
-    print(f"{'='*70}")
+    if acc_drops:
+        print(f"Avg accuracy drop: {np.mean(acc_drops) * 100:.2f}%")
+    print(f"{'=' * 70}")
+
+    if wins['total'] == 0:
+        print("RESULT: FAIL (no gate cells found in canonical_tau1.json)")
+        print(f"{'=' * 70}")
+        return False
 
     passed = wins['dp'] >= 6
     print(f"RESULT: {'PASS' if passed else 'FAIL'}")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     return passed
 
 

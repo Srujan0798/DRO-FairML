@@ -18,8 +18,12 @@ This script creates the exact figures requested in the task:
 import os
 import sys
 import json
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from experiments.loaders import constant_predictor_acc
+from collections import defaultdict
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, ROOT)
+
+from experiments.loaders import constant_predictor_acc, load_canonical_tau1
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -29,8 +33,7 @@ import matplotlib.ticker as ticker
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.stats import wilcoxon
 
-# Add parent directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+RESULTS_DIR = os.path.join(ROOT, 'results')
 
 # Style configuration
 plt.rcParams.update({
@@ -83,49 +86,97 @@ OUT = 'figures'
 CONSTANT_PREDICTOR_ACC = constant_predictor_acc('adult')
 
 
+def _refuse_stale(path):
+    """Raise if a path points at the archived results tree."""
+    norm = os.path.normpath(path).replace('\\', '/')
+    if 'stale_archived' in norm:
+        raise RuntimeError(
+            f"Refusing to read stale archived results: {path}. "
+            "Use results/canonical_tau1.json via load_canonical_tau1()."
+        )
+
+
 def load_results():
-    """Load all results from JSON files (tau-ablation set, now archived)."""
-    results = []
-
-    # Load tau ablation results
-    tau_files = {
-        1: 'results/stale_archived/tau_ablation_tau1.json',
-        5: 'results/stale_archived/tau_ablation_tau5.json',
-        10: 'results/stale_archived/tau_ablation_tau10.json',
-        20: 'results/stale_archived/tau_ablation_tau20.json',
-        100: 'results/stale_archived/tau_ablation_tau100.json',
-    }
-
-    for tau_val, path in tau_files.items():
-        if os.path.exists(path):
-            with open(path) as f:
-                data = json.load(f)
-                for row in data:
-                    row['tau'] = tau_val
-                    results.append(row)
-
-    return results
-
-
-def load_high_alpha_summary():
-    """Load high_alpha_summary.csv (archived)."""
-    return pd.read_csv('results/stale_archived/high_alpha_summary.csv')
+    """Load canonical tau=1 grid only (fail-loud). Never reads stale_archived/."""
+    rows = load_canonical_tau1()
+    out = []
+    for row in rows:
+        r = dict(row)
+        # Canonical is fixed tau=1.0; keep explicit for multi-tau plotting loops.
+        if r.get('tau') is None:
+            r['tau'] = 1.0
+        out.append(r)
+    if not out:
+        raise RuntimeError(
+            "results/canonical_tau1.json loaded but is empty. "
+            "Run experiments/run_canonical.py before generate_all_deliverables."
+        )
+    return out
 
 
 def load_tau1_summary():
-    """Load tau1_summary.csv (archived)."""
-    return pd.read_csv('results/stale_archived/tau1_summary.csv')
+    """Build a per-(dataset, attack, alpha, method) summary from canonical."""
+    rows = load_results()
+    buckets = defaultdict(list)
+    for r in rows:
+        key = (r['dataset'], r['attack'], float(r['alpha']), r['method'], float(r.get('tau', 1.0)))
+        buckets[key].append(r)
+    records = []
+    for (ds, attack, alpha, method, tau), group in buckets.items():
+        acc = [g['acc_clean'] for g in group]
+        dp = [g['dp_clean'] for g in group]
+        ifm = [g['if_clean'] for g in group]
+        records.append({
+            'dataset': ds,
+            'attack': attack,
+            'alpha': alpha,
+            'method': method,
+            'tau': tau,
+            'acc_mean': float(np.mean(acc)),
+            'dp_mean': float(np.mean(dp)),
+            'if_mean': float(np.mean(ifm)),
+            'n': len(group),
+        })
+    return pd.DataFrame(records)
 
 
 def load_lambda_grid():
-    """Load lambda_lr_grid.json (archived)."""
-    with open('results/stale_archived/lambda_lr_grid.json') as f:
-        return json.load(f)
+    """Load live lambda grid JSON only (never stale_archived). Fail loud if missing."""
+    candidates = [
+        os.path.join(RESULTS_DIR, 'lambda_lr_grid.json'),
+        os.path.join(RESULTS_DIR, 'lambda_grid_comprehensive.json'),
+    ]
+    for path in candidates:
+        _refuse_stale(path)
+        if os.path.exists(path):
+            with open(path) as f:
+                data = json.load(f)
+            if not data:
+                raise RuntimeError(f"Lambda grid file is empty: {path}")
+            return data
+    raise FileNotFoundError(
+        "No live lambda grid found. Expected one of:\n  - "
+        + "\n  - ".join(candidates)
+        + "\n(Do not use results/stale_archived/.)"
+    )
 
 
 def load_canonical_wilcoxon():
-    """Load canonical_wilcoxon.csv (archived)."""
-    return pd.read_csv('results/stale_archived/canonical_wilcoxon.csv')
+    """Load live wilcoxon CSV or compute it from canonical_tau1 (fail-loud)."""
+    live = os.path.join(RESULTS_DIR, 'canonical_wilcoxon.csv')
+    _refuse_stale(live)
+    if os.path.exists(live):
+        return pd.read_csv(live)
+    # Compute on the fly from canonical — never fall back to stale_archived CSV.
+    from experiments.compute_canonical_wilcoxon import compute_wilcoxon
+    rows = load_canonical_tau1()
+    df = compute_wilcoxon(rows)
+    if df is None or df.empty:
+        raise RuntimeError(
+            "Could not compute Wilcoxon table from canonical_tau1.json "
+            "(need paired naive/dro seeds)."
+        )
+    return df
 
 
 def _ms(vals):
@@ -175,14 +226,14 @@ def figD1_constant_predictor_accuracy():
     results = load_results()
     ALPHAS = [0.1, 0.2, 0.3, 0.4]
     
-    from collections import defaultdict
     acc_data = defaultdict(list)
     for row in results:
         if row.get('dataset') == 'adult' and row.get('attack') == 'dp' and float(row.get('alpha',0)) in ALPHAS:
-            key = (float(row['alpha']), int(row.get('tau',1)), row['method'])
+            key = (float(row['alpha']), int(float(row.get('tau', 1))), row['method'])
             acc_data[key].append(row['acc_clean'])
     
-    taus_to_plot = [1, 5, 10, 100]
+    # Canonical is tau=1 only; do not load multi-tau from stale_archived.
+    taus_to_plot = sorted({int(float(r.get('tau', 1))) for r in results}) or [1]
     tau_colors = {1: '#1a7a3a', 5: '#2ca02c', 10: '#ff7f0e', 100: '#9467bd'}
     
     plotted_labels = set()
@@ -237,14 +288,13 @@ def figD2_constant_predictor_dp():
     
     results = load_results()
     ALPHAS = [0.1, 0.2, 0.3, 0.4]
-    from collections import defaultdict
     dp_data = defaultdict(list)
     for row in results:
         if row.get('dataset') == 'adult' and row.get('attack') == 'dp' and float(row.get('alpha',0)) in ALPHAS:
-            key = (float(row['alpha']), int(row.get('tau',1)), row['method'])
+            key = (float(row['alpha']), int(float(row.get('tau', 1))), row['method'])
             dp_data[key].append(row['dp_clean'])
     
-    taus_to_plot = [1, 10, 100]
+    taus_to_plot = sorted({int(float(r.get('tau', 1))) for r in results}) or [1]
     tau_colors = {1: '#1a7a3a', 10: '#ff7f0e', 100: '#9467bd'}
     for tau in taus_to_plot:
         for mname, mcolor, mmarker, mls in [('dro', None, 's', '-'), ('naive', '#c44e2b', 'o', '--')]:
@@ -280,14 +330,13 @@ def figD3_constant_predictor_if():
     
     results = load_results()
     ALPHAS = [0.1, 0.2, 0.3, 0.4]
-    from collections import defaultdict
     if_data = defaultdict(list)
     for row in results:
         if row.get('dataset') == 'adult' and row.get('attack') == 'dp' and float(row.get('alpha',0)) in ALPHAS:
-            key = (float(row['alpha']), int(row.get('tau',1)), row['method'])
+            key = (float(row['alpha']), int(float(row.get('tau', 1))), row['method'])
             if_data[key].append(row.get('if_clean', 0.0))
     
-    taus_to_plot = [1, 10, 100]
+    taus_to_plot = sorted({int(float(r.get('tau', 1))) for r in results}) or [1]
     tau_colors = {1: '#1a7a3a', 10: '#ff7f0e', 100: '#9467bd'}
     for tau in taus_to_plot:
         for mname, mcolor, mmarker, mls in [('dro', None, 's', '-'), ('naive', '#c44e2b', 'o', '--')]:
@@ -352,124 +401,82 @@ def figD4_tradeoff_vs_constant_predictor():
 
 
 
-def figD5_convergence_loss():
-    """Plot 5: Val-loss convergence."""
-    print("Generating figD5: Val-loss convergence")
-    
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Load individual result files
-    results_dir = 'results/stale_archived/individual'
+def _load_live_individual_histories():
+    """Load per-run history from live results/individual only (never stale_archived)."""
+    results_dir = os.path.join(RESULTS_DIR, 'individual')
+    if not os.path.isdir(results_dir):
+        raise FileNotFoundError(
+            f"Per-run history directory missing: {results_dir}. "
+            "Canonical flat rows have no epoch histories. "
+            "Do not fall back to results/stale_archived/individual. "
+            "Re-run with history logging or skip figD5–D7."
+        )
     epochs_data = {}
-    
     for filename in os.listdir(results_dir):
-        if filename.endswith('.json') and 'adult' in filename:
-            with open(os.path.join(results_dir, filename)) as f:
-                data = json.load(f)
-                
-                key = (data['dataset'], data['alpha'], data['seed'])
-                if key not in epochs_data:
-                    epochs_data[key] = []
-                
-                # Extract loss from history if available, otherwise use time as proxy
-                if 'history' in data:
-                    epochs_data[key].extend(data['history'])
-                else:
-                    # Use total_time as proxy for convergence
-                    epochs_data[key].append(data['total_time'])
-    
-    # Plot convergence curves
+        if not (filename.endswith('.json') and 'adult' in filename):
+            continue
+        path = os.path.join(results_dir, filename)
+        _refuse_stale(path)
+        with open(path) as f:
+            data = json.load(f)
+        key = (data['dataset'], data['alpha'], data['seed'])
+        epochs_data.setdefault(key, [])
+        if 'history' in data:
+            epochs_data[key].extend(data['history'])
+        elif 'total_time' in data:
+            epochs_data[key].append(data['total_time'])
+    if not epochs_data:
+        raise FileNotFoundError(
+            f"No adult individual run JSONs with history under {results_dir}."
+        )
+    return epochs_data
+
+
+def figD5_convergence_loss():
+    """Plot 5: Val-loss convergence (requires live results/individual)."""
+    print("Generating figD5: Val-loss convergence")
+    epochs_data = _load_live_individual_histories()
+    fig, ax = plt.subplots(figsize=(10, 6))
     for (dataset, alpha, seed), history in epochs_data.items():
         if dataset == 'adult' and alpha in [0.3, 0.4]:
-            ax.plot(history, label=f'\alpha={alpha}, seed={seed}')
-    
-    # Formatting
+            ax.plot(history, label=f'α={alpha}, seed={seed}')
     ax.set_xlabel('Epoch', fontsize=12)
     ax.set_ylabel('Validation Loss', fontsize=12)
-    ax.set_title('Val-loss convergence (\alpha=0.3, 0.4 DRO runs)', fontsize=14)
+    ax.set_title('Val-loss convergence (α=0.3, 0.4 DRO runs)', fontsize=14)
     ax.legend(fontsize=8, ncol=2)
     ax.grid(True, alpha=0.3, linestyle='--')
-    
     _save(fig, 'figD5_convergence_loss')
 
 
 def figD6_convergence_acc():
-    """Plot 6: Val-accuracy convergence."""
+    """Plot 6: Val-accuracy convergence (requires live results/individual)."""
     print("Generating figD6: Val-accuracy convergence")
-    
+    epochs_data = _load_live_individual_histories()
     fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Load individual result files
-    results_dir = 'results/stale_archived/individual'
-    epochs_data = {}
-    
-    for filename in os.listdir(results_dir):
-        if filename.endswith('.json') and 'adult' in filename:
-            with open(os.path.join(results_dir, filename)) as f:
-                data = json.load(f)
-                
-                key = (data['dataset'], data['alpha'], data['seed'])
-                if key not in epochs_data:
-                    epochs_data[key] = []
-                
-                # Extract accuracy from history if available, otherwise use acc_clean
-                if 'history' in data:
-                    epochs_data[key].extend(data['history'])
-                else:
-                    epochs_data[key].append(data['dro']['clean']['accuracy'])
-    
-    # Plot convergence curves
     for (dataset, alpha, seed), history in epochs_data.items():
         if dataset == 'adult' and alpha in [0.3, 0.4]:
-            ax.plot(history, label=f'\alpha={alpha}, seed={seed}')
-    
-    # Formatting
+            ax.plot(history, label=f'α={alpha}, seed={seed}')
     ax.set_xlabel('Epoch', fontsize=12)
     ax.set_ylabel('Validation Accuracy', fontsize=12)
-    ax.set_title('Val-accuracy convergence (\alpha=0.3, 0.4 DRO runs)', fontsize=14)
+    ax.set_title('Val-accuracy convergence (α=0.3, 0.4 DRO runs)', fontsize=14)
     ax.legend(fontsize=8, ncol=2)
     ax.grid(True, alpha=0.3, linestyle='--')
-    
     _save(fig, 'figD6_convergence_acc')
 
 
 def figD7_convergence_dp():
-    """Plot 7: Val-DP convergence."""
+    """Plot 7: Val-DP convergence (requires live results/individual)."""
     print("Generating figD7: Val-DP convergence")
-    
+    epochs_data = _load_live_individual_histories()
     fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Load individual result files
-    results_dir = 'results/stale_archived/individual'
-    epochs_data = {}
-    
-    for filename in os.listdir(results_dir):
-        if filename.endswith('.json') and 'adult' in filename:
-            with open(os.path.join(results_dir, filename)) as f:
-                data = json.load(f)
-                
-                key = (data['dataset'], data['alpha'], data['seed'])
-                if key not in epochs_data:
-                    epochs_data[key] = []
-                
-                # Extract DP from history if available, otherwise use dp_clean
-                if 'history' in data:
-                    epochs_data[key].extend(data['history'])
-                else:
-                    epochs_data[key].append(data['dro']['clean']['dp_violation'])
-    
-    # Plot convergence curves
     for (dataset, alpha, seed), history in epochs_data.items():
         if dataset == 'adult' and alpha in [0.3, 0.4]:
-            ax.plot(history, label=f'\alpha={alpha}, seed={seed}')
-    
-    # Formatting
+            ax.plot(history, label=f'α={alpha}, seed={seed}')
     ax.set_xlabel('Epoch', fontsize=12)
     ax.set_ylabel('Validation DP Violation', fontsize=12)
-    ax.set_title('Val-DP convergence (\alpha=0.3, 0.4 DRO runs)', fontsize=14)
+    ax.set_title('Val-DP convergence (α=0.3, 0.4 DRO runs)', fontsize=14)
     ax.legend(fontsize=8, ncol=2)
     ax.grid(True, alpha=0.3, linestyle='--')
-    
     _save(fig, 'figD7_convergence_dp')
 
 
@@ -645,40 +652,43 @@ def figD10_final_wilcoxon_table():
 
 
 def main():
-    print("AGENT C FINAL: Generate all required figures for Kuldeep meeting")
+    print("AGENT C FINAL: Generate deliverable figures from CANONICAL (no stale_archived)")
     print("=" * 80)
-    
-    # TASK 1: Constant-predictor figures
-    print("\nTASK 1: Constant-predictor figures")
-    print("-" * 80)
-    figD1_constant_predictor_accuracy()
-    figD2_constant_predictor_dp()
-    figD3_constant_predictor_if()
-    
-    # TASK 2: Acc-DP tradeoff vs constant predictor
-    print("\nTASK 2: Acc-DP tradeoff vs constant predictor")
-    print("-" * 80)
-    figD4_tradeoff_vs_constant_predictor()
-    
-    # TASK 3: Val-loss convergence plots
-    print("\nTASK 3: Val-loss convergence plots")
-    print("-" * 80)
-    figD5_convergence_loss()
-    figD6_convergence_acc()
-    figD7_convergence_dp()
-    
-    # TASK 4: Lambda heatmaps
-    print("\nTASK 4: Lambda heatmaps")
-    print("-" * 80)
-    figD8_lambda_heatmap_acc_alpha0_3()
-    figD9_lambda_heatmap_acc_alpha0_4()
-    
-    # TASK 5: Wilcoxon significance
-    print("\nTASK 5: Wilcoxon significance")
-    print("-" * 80)
-    figD10_final_wilcoxon_table()
-    
+    print("Source of truth: results/canonical_tau1.json via load_canonical_tau1()")
+    print("Refusing any path under results/stale_archived/")
+    print("=" * 80)
+
+    errors = []
+
+    def _run(label, fn):
+        print(f"\n{label}")
+        print("-" * 80)
+        try:
+            fn()
+        except Exception as e:
+            msg = f"{label}: {type(e).__name__}: {e}"
+            print(f"  FAIL (loud): {msg}")
+            errors.append(msg)
+
+    _run("TASK 1a: figD1 constant-predictor accuracy", figD1_constant_predictor_accuracy)
+    _run("TASK 1b: figD2 constant-predictor DP", figD2_constant_predictor_dp)
+    _run("TASK 1c: figD3 constant-predictor IF", figD3_constant_predictor_if)
+    _run("TASK 2: figD4 Acc-DP tradeoff", figD4_tradeoff_vs_constant_predictor)
+    _run("TASK 3a: figD5 convergence loss", figD5_convergence_loss)
+    _run("TASK 3b: figD6 convergence acc", figD6_convergence_acc)
+    _run("TASK 3c: figD7 convergence DP", figD7_convergence_dp)
+    _run("TASK 4a: figD8 lambda heatmap α=0.3", figD8_lambda_heatmap_acc_alpha0_3)
+    _run("TASK 4b: figD9 lambda heatmap α=0.4", figD9_lambda_heatmap_acc_alpha0_4)
+    _run("TASK 5: figD10 Wilcoxon table", figD10_final_wilcoxon_table)
+
     print("\n" + "=" * 80)
+    if errors:
+        print(f"COMPLETED WITH {len(errors)} FAILURE(S) (fail-loud; no stale fallback):")
+        for e in errors:
+            print(f"  - {e}")
+        print("Canonical-based figures that succeeded were written under figures/.")
+        print("Fix missing live inputs or use generate_final_figures.py / compute_canonical_wilcoxon.py.")
+        sys.exit(1)
     print("AGENT C MILESTONE: All required figures generated successfully!")
     print("=" * 80)
 

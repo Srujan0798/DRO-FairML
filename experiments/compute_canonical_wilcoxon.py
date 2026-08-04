@@ -16,26 +16,16 @@ For every (dataset, attack, alpha) with paired seeds:
 
 Same for IF metric (secondary).
 
-PRELIMINARY: currently falls back to tau_ablation_tau1.json (n=3 seeds) so min
-p=0.125; no * will appear. After A delivers results/canonical_tau1.json
-(6 seeds, 540 rows, full provenance) this script will automatically use it
-(first check) and n=6 will allow p<0.05 in cells where the effect is consistent.
-
-RE-POINT / auto: this script prefers canonical_tau1.json if present, else
-tau_ablation_tau1.json. On canonical, also consider writing a version of
-fairness_pgd_wilcoxon.csv if needed for legacy figs, but canonical_wilcoxon
-is the authoritative for the paper.
+Source of truth: results/canonical_tau1.json only via
+experiments.loaders.load_canonical_tau1() (fail-loud; no tau_ablation fallback).
 
 All numbers traceable to specific json rows (per (ds,alpha,attack,seed,method)).
 
 Run (analysis only):
     python3 experiments/compute_canonical_wilcoxon.py
-
-Also run by analyze_tau1 or other generators.
 """
 from __future__ import annotations
 
-import json
 import os
 
 import numpy as np
@@ -45,17 +35,14 @@ from scipy.stats import wilcoxon
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 RESULTS_DIR = os.path.join(ROOT, "results")
 
-CANONICAL_PATH = os.path.join(RESULTS_DIR, "canonical_tau1.json")
-TAU1_FALLBACK  = os.path.join(RESULTS_DIR, "tau_ablation_tau1.json")
-
 OUT_CSV = os.path.join(RESULTS_DIR, "canonical_wilcoxon.csv")
-OUT_MD  = os.path.join(RESULTS_DIR, "canonical_wilcoxon.md")
+OUT_MD = os.path.join(RESULTS_DIR, "canonical_wilcoxon.md")
 
 
 def load_preferred() -> tuple[list[dict], str]:
     from experiments.loaders import load_canonical_tau1
     rows = load_canonical_tau1()
-    return rows, f"canonical ({len(rows)} rows, 6 seeds expected)"
+    return rows, f"canonical_tau1.json ({len(rows)} rows, k_inner=10, tau=1)"
 
 
 def compute_wilcoxon(rows: list[dict]) -> pd.DataFrame:
@@ -132,7 +119,7 @@ def write_md(wilc: pd.DataFrame, source: str, n_note: str):
 
 
 def main():
-    print("AGENT C: computing Wilcoxon (n=6 target) for canonical_tau1 / fallback")
+    print("AGENT C: computing Wilcoxon for results/canonical_tau1.json only")
     print("=" * 72)
 
     rows, source = load_preferred()
@@ -156,15 +143,16 @@ def main():
     else:
         print("  no wilc rows; csv not written")
 
-    n_note = ("n=6 (canonical) — p<0.05 achievable for consistent effects. "
-              "Previously n=3 limited min p~0.125." if "canonical" in source.lower()
-              else "PRELIMINARY: n<=3 (tau_ablation fallback); min attainable p=0.125. "
-                   "Regenerate after canonical_tau1.json (6 seeds) lands.")
+    n_note = (
+        "n up to 6 (canonical) — p<0.05 achievable for consistent effects. "
+        "No tau_ablation / K_inner=5 fallback."
+    )
     write_md(wilc, source, n_note)
 
     sig_count = int((wilc["dp_sig"] == "*").sum()) if not wilc.empty else 0
-    print(f"\nAGENT C MILESTONE: canonical_wilcoxon complete (from {source}), {sig_count} significant DP cells (p<0.05). See results/canonical_wilcoxon.csv")
-    print(f"  row counts used: {len(rows)}; will auto-upgrade on canonical presence.")
+    print(f"\nAGENT C MILESTONE: canonical_wilcoxon complete (from {source}), "
+          f"{sig_count} significant DP cells (p<0.05). See results/canonical_wilcoxon.csv")
+    print(f"  row counts used: {len(rows)}")
     print("=" * 72)
 
 

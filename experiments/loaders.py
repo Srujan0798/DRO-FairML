@@ -5,11 +5,14 @@ stale / contaminated results file. The single source of truth for tabular
 results is ``results/canonical_tau1.json``: the canonical tau=1.0, k_inner=10,
 epochs=60, pgd_steps=20, lambda_init=0.0 grid. The DP and Combined attacks are
 complete (360 rows, 6 seeds each); the IF-attack third (180 rows) is pending a
-cluster re-run after the IF-metric fix (Agent A) and is intentionally absent.
+cluster re-run after the IF-metric fix (Agent A) and may still be filling.
 
 The legacy ``results/fairness_pgd_results.json`` is CONTAMINATED: 270
 pre-provenance rows with ``tau=None`` / mixed config. Every attempt to read
 it now raises loudly instead of silently producing wrong artifacts.
+
+Never load from ``results/stale_archived/`` or ``tau_ablation_tau1_KINNER5_BAK``
+for headline numbers.
 """
 
 import json
@@ -20,9 +23,10 @@ RESULTS_DIR = os.path.join(ROOT, "results")
 
 CANONICAL_PATH = os.path.join(RESULTS_DIR, "canonical_tau1.json")
 CONTAMINATED_PATH = os.path.join(RESULTS_DIR, "fairness_pgd_results.json")
+STALE_DIR = os.path.join(RESULTS_DIR, "stale_archived")
 
 # Documented majority-class (constant-predictor) accuracies, used only as a
-# fallback when the raw data cannot be loaded.
+# fallback when the raw data cannot be loaded (not a results-file fallback).
 _CONSTANT_PREDICTOR_FALLBACK = {
     "adult": 0.7521,
     "credit": 0.7788,
@@ -30,15 +34,30 @@ _CONSTANT_PREDICTOR_FALLBACK = {
 }
 
 
+def _assert_not_stale(path):
+    """Refuse any path under results/stale_archived/."""
+    norm = os.path.normpath(os.path.abspath(path))
+    stale = os.path.normpath(os.path.abspath(STALE_DIR))
+    if norm == stale or norm.startswith(stale + os.sep):
+        raise RuntimeError(
+            f"Refusing to load results from stale archive: {path}. "
+            f"Use {CANONICAL_PATH} via load_canonical_tau1()."
+        )
+
+
 def load_canonical_tau1():
     """Load the canonical tau=1 grid. Fails loudly if absent or polluted."""
+    _assert_not_stale(CANONICAL_PATH)
     if not os.path.exists(CANONICAL_PATH):
         raise FileNotFoundError(
             f"Canonical results missing: {CANONICAL_PATH}. "
-            f"Run the canonical grid (tau=1, k_inner=10) before loading results."
+            f"Run the canonical grid (tau=1, k_inner=10) before loading results. "
+            f"Do not fall back to results/stale_archived/ or tau_ablation* files."
         )
     with open(CANONICAL_PATH) as f:
         rows = json.load(f)
+    if not rows:
+        raise RuntimeError(f"Canonical results file is empty: {CANONICAL_PATH}")
     if not all(r.get("k_inner") == 10 for r in rows):
         bad = sorted({r.get("k_inner") for r in rows if r.get("k_inner") != 10})
         raise AssertionError(

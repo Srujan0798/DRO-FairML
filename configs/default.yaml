@@ -8,10 +8,13 @@ training:
   lr_lambda: 0.005
   lr_p: 0.005
   lambda_max: 1.5
-  tau: 100.0
+  # Canonical fixed temperature (src/temperature.get_temperature → 1.0).
+  # Historical May-2026 submission used tau=100; do not reintroduce that default.
+  tau: 1.0
   beta: 5.0
   k: 5
   gamma: 0.0
+  # Canonical grid uses K_inner=10 (results/canonical_tau1.json).
   K_inner: 10
   epochs: 60
   weight_decay: 0.0001

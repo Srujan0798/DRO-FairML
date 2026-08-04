@@ -13,12 +13,27 @@ import matplotlib.pyplot as plt
 
 
 def load_results():
-    """Load all experiment results."""
-    results_path = 'results/all_results.json'
-    if os.path.exists(results_path):
-        with open(results_path, 'r') as f:
-            return json.load(f)
-    return []
+    """Load experiment results as nested rows for legacy table/plot code.
+
+    Prefer converting the flat canonical grid (results/canonical_tau1.json).
+    Never silently return [] — fail loud so Makefile targets cannot claim success
+    on missing data. Never reads results/stale_archived/.
+    """
+    from experiments.loaders import load_canonical_tau1
+    from experiments.canonical_to_all_results import to_nested
+
+    flat = load_canonical_tau1()
+    nested = to_nested(flat, attack='dp')
+    if not nested:
+        raise RuntimeError(
+            "canonical_tau1.json has no convertible DP-attack paired rows. "
+            "Refusing empty results (no silent fallback to all_results.json / stale)."
+        )
+    print(
+        f"Loaded {len(flat)} flat canonical rows → {len(nested)} nested "
+        f"(DP attack) for tables/figures"
+    )
+    return nested
 
 
 def generate_table1(results):
@@ -273,14 +288,10 @@ def plot_test_time_eval(results, output_dir='figures'):
 
 def main():
     print("Generating results from experiments...")
+    print("Source: results/canonical_tau1.json (via load_canonical_tau1; fail-loud)")
 
     results = load_results()
-
-    if not results:
-        print("No results found. Please run experiments first.")
-        return
-
-    print(f"Loaded {len(results)} experiment results")
+    print(f"Using {len(results)} nested experiment rows")
 
     # Check if we have new format (with clean/corrupted evaluation)
     has_test_eval = all('clean' in r.get('naive', {}) for r in results)
