@@ -144,8 +144,10 @@ def run(results_file, configs, provenance_extras=None, workers=4, label="ablatio
 
     use_pool = workers > 1
     if use_pool:
-        print(f"[{label}] trying ProcessPoolExecutor(workers={workers}, spawn)…", flush=True)
-        ctx = mp.get_context("spawn")
+        # Use fork on POSIX (spawn crashes on macOS Python 3.14 for this workload;
+        # fork inherits interpreter state so the worker imports cleanly).
+        ctx = mp.get_context("fork") if sys.platform != "win32" else mp.get_context("spawn")
+        print(f"[{label}] trying ProcessPoolExecutor(workers={workers}, {ctx.get_start_method()})…", flush=True)
         try:
             with ProcessPoolExecutor(max_workers=workers, mp_context=ctx) as ex:
                 futs = {ex.submit(_worker, c): c for c in todo}
