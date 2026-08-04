@@ -50,6 +50,12 @@ is in line with Kuldeep's Q5 ("if the attack is known then we can
 use this approximation according to the attack") and does not claim
 the paper is wrong.
 See report appendix for the clean inversion derivation: $\pi_{\mathrm{clean}}[\mathrm{min}] = \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4\alpha$, etc. (B's math).
+As noted in \S\ref{sec:results-tabular}, the locked grid's
+\texttt{uniform} label in practice used clean validation-set group rates
+rather than evaluating the closed form on corrupted training proportions
+--- not an oracle leak (both methods see the same validation split), but
+a different, tighter estimator than the closed form describes; see the
+correctness note there for the full account.
 
 \subsection{Image data (UTKFace) --- real pilot; not a tabular copy}
 The earlier ``DRO inverts on ResNet18 features'' claim is withdrawn
@@ -97,3 +103,53 @@ LSAC/IF loses on DP for $\alpha\le0.3$.  The IF and DP metrics are
 pair it with the DP-coupling caveat rather than claiming a three-attack
 DP sweep.
 \end{enumerate}
+
+\subsection{Future Work}
+\label{sec:future-work}
+Three natural extensions follow directly from the mechanisms identified
+above, none of which require revisiting the locked $\tau{=}1$ protocol.
+
+\textbf{Robustness to misspecified $\alpha$.} Every radius calibration in
+this work assumes the practitioner knows the true corruption level
+$\alpha$ and computes $\rho$ accordingly. In practice $\alpha$ is rarely
+known exactly. Kuldeep's earliest question about this project (``does
+the attack affect the radius? if the attack is too weak, then DRO would
+perform well?'') is really a question about the sensitivity of DRO's
+advantage to a mismatch between the assumed and true corruption level.
+We separately measure attack strength directly (rather than assuming it
+from $\alpha$) and vary the radius independently of $\alpha$
+(\S\ref{sec:results-tabular}) as a first step; the natural next step is
+a radius calibration that is robust to $\alpha$ \emph{misspecification}
+itself --- e.g.\ estimating $\alpha$ from the data rather than taking it
+as given, or a radius schedule that degrades gracefully when the true
+corruption differs from the assumed one. This changes the claim from
+``DRO works if you tell it the truth about $\alpha$'' to ``DRO works
+even when you are unsure,'' which is the more practically relevant
+guarantee.
+
+\textbf{Shrinkage-regularized radii for imbalanced groups.} The
+LSAC/DP degeneracy (item~1 above) traces to the radius formula
+$\rho_{\mathrm{DP},j}=\alpha/((1-\alpha)\pi_j+\alpha)$ blowing up as
+$\pi_j\to0$ on a small protected group. A per-group cap
+(\texttt{radii\_clamp}) was tested and did not recover LSAC (no arm
+un-degenerated it; see \texttt{docs/LSAC\_DEGENERACY.md}). We are
+separately testing an additive (Laplace-style) shrinkage of
+$\hat\pi_{j,\mathrm{clean}}$ toward $0.5$
+(\texttt{pi\_shrinkage\_k} in \texttt{DroFairTrainer}) as an alternative
+mechanism: rather than capping the output radius post hoc, it smooths
+the input proportion, which reshapes the resulting radius continuously
+and $\alpha$-dependently instead of imposing one fixed ceiling. We note
+honestly that LSAC's validation split is large ($n{=}2804$) and its
+minority proportion ($\approx6.4\%$) is measured, not noisily estimated,
+so shrinkage's usual statistical justification (denoising a small
+sample) does not straightforwardly apply here; we test it as a
+regularizer in its own right, and report the result --- fixed or not
+--- rather than tuning until it works.
+
+\textbf{Principled dual-variable stabilization.} The dual step uses a
+hard clamp $\lambda\le\lambda_{\max}{=}1.5$ (tuned empirically; the
+paper's usual setting is $2.0$) to prevent $\lambda$-runaway under high
+temperature. A softer alternative --- a quadratic penalty on $\lambda$
+in the Lagrangian, i.e.\ an augmented-Lagrangian formulation --- would
+replace this tuned constant with a standard, well-understood
+stabilization mechanism and is a natural target for follow-up work.

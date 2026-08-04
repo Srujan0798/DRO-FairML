@@ -229,6 +229,21 @@ known-attack setting.  The locked 540-row grid uses
 (Appendix~\ref{app:empirical-radii}) but not a second full experiment
 table.  This does \emph{not} claim the paper is wrong.
 
+\emph{Correctness note (post-hoc audit).} In the implementation, the
+\texttt{uniform} label is estimated from clean held-out validation group
+rates whenever a validation split is available, rather than by evaluating
+the closed form above on the post-attack \emph{training} proportions.
+Since a validation split is always available in our canonical runs, the
+closed form is not actually exercised on the locked 540-row grid; the
+reported \texttt{uniform} radii are practical, validation-calibrated
+estimates. Both methods have equal access to the same clean validation
+split, so this is not an oracle leak, but it is a different --- and, in
+practice, tighter --- estimate of $\pi_{\mathrm{clean}}$ than the closed
+form computes from corrupted training data alone. We flag this so the
+\texttt{uniform} vs.\ \texttt{empirical} comparison here is read as
+``validation-calibrated'' vs.\ ``known-attack-structure'' radii, not as a
+test of the closed form in isolation.
+
 \paragraph{LSAC framing (Q3).}
 \label{sec:lsac-framing}
 LSAC's DP is \textbf{degenerate}: the model collapses to the

@@ -558,6 +558,20 @@ add \texttt{radii\_mode='empirical'} for the known-attack setting.
 This does not claim the paper is wrong.
 Full derivation (from B) is in the appendix below.
 
+\textbf{Correctness note (post-hoc audit, 2026-08-05).} In the
+implementation, the \texttt{uniform} label is estimated from clean
+held-out validation group rates whenever a validation split is
+available, rather than by evaluating the closed form above on the
+post-attack \emph{training} proportions. Since a validation split is
+always available in our canonical runs, the closed form is not actually
+exercised on the locked 540-row grid; the reported \texttt{uniform}
+radii are practical, validation-calibrated estimates. Both methods have
+equal access to the same clean validation split, so this is not an
+oracle leak, but it is a different --- and, in practice, tighter ---
+estimate of $\pi_{\mathrm{clean}}$ than the closed form computes from
+corrupted training data alone. Full account:
+\texttt{docs/KEY\_FORMULAS.md}, Phase 0 audit, Finding 1.
+
 \subsection{Robustness: Clean vs.\ Corrupted Test}
 
 The clean-vs-corrupted DP comparison shows that DRO-FAIR maintains
@@ -596,6 +610,27 @@ confirm the radii remain sufficient on all three tabular datasets.
   (strongest significant DRO DP wins at high $\alpha$); do not equate with
   Adult/Credit $\alpha\le0.2$.  Synthetic smoke claims remain withdrawn.
 \end{enumerate}
+
+\subsection{Future Work}
+
+Three follow-ups target the mechanisms above directly rather than
+proposing an unrelated extension. \textbf{(i) Robustness to
+misspecified $\alpha$}: every radius here assumes the true corruption
+level is known; a calibration that degrades gracefully when the assumed
+and true $\alpha$ differ answers Kuldeep's original May-29 question
+(``does the attack affect the radius?'') more completely than measuring
+sensitivity at the correct $\alpha$ alone. \textbf{(ii) Shrinkage-based
+radii for imbalanced groups}: item~1's binary-attribute limitation and
+the LSAC/DP degeneracy share a root cause (radii calibration on small
+protected groups); a Laplace-style shrinkage of $\hat\pi_{j,\mathrm{clean}}$
+toward balance (\texttt{pi\_shrinkage\_k} in \texttt{DroFairTrainer}) is
+under test as an alternative to the per-group clamp that did not fix
+LSAC --- reported honestly whichever way it lands. \textbf{(iii)
+Augmented-Lagrangian dual stabilization}: replacing the tuned
+$\lambda_{\max}$ hard clamp with a quadratic penalty on $\lambda$ removes
+an empirically-chosen constant in favor of a standard mechanism. Full
+discussion: \texttt{paper/sections/discussion.tex} (Future Work
+subsection).
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Theoretical Verification}
