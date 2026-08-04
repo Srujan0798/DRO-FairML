@@ -55,12 +55,12 @@ Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dr
 written reasons; kNN retracted. None are part of the canonical claim.
 
 ## 5. UTKFace (image modality)
-**REAL local MPS grid in progress — not a paper claim yet.**  
-- Features: `data/raw/utkface_features.npz` (23,705 samples, provenance REAL).  
-- Output: `results/utkface_canonical.json` (all rows `data_provenance=REAL`).  
-- Progress: **DP done (30/30)**; **IF in progress**; **Combined pending** → target **90** rows. Live count: `docs/UTKFACE_STATUS.md`.  
-- **flair2: PROVEN & STAGED, PARKED** — access, 2× L40S, code + features on server; torch install stopped (slow wifi). **Do not wait on flair2.** Mac is the real UTKFace path.  
-- Synthetic fallback stays off. **No paper claim** until multi-attack subset is reviewed.
+**REAL local MPS grid COMPLETE — 90/90 rows (`data_provenance=REAL`).**  
+- Features: `data/raw/utkface_features.npz` (23,705 × 512 ResNet18).  
+- Output: `results/utkface_canonical.json` + summary `results/utkface_summary.md`.  
+- Attacks: dp / if / combined = 30 each (5 α × 6 seeds).  
+- **flair2: PROVEN & STAGED, PARKED** — not used for these numbers.  
+- **Paper claim:** only after human review of `utkface_summary.md` (do not auto-claim a tabular-style sweep).
 
 ## 6. Deliverables status
 | Item | State |

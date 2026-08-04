@@ -22,7 +22,7 @@ Honest lines: Adult/DP **α=0.1 = 5/6**; IF **mixed**; LSAC/DP **degenerate**.
 ## IN PROGRESS
 | Item | Notes |
 |------|--------|
-| **Local UTKFace REAL** | One resume runner only. DP done; IF then Combined → **90** rows. See `docs/UTKFACE_STATUS.md`. |
+| **Local UTKFace REAL** | **COMPLETE 90/90** — see `results/utkface_summary.md`. Review before paper claim. |
 
 When 90/90: commit `results/utkface_canonical.json`, honest summary, optional paper blurb — **never synthetic**.
 
