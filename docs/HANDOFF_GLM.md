@@ -97,13 +97,46 @@ you write.
 
 ### Phase 0 done when
 
-- [ ] Finding 1 resolved, decision (a) or (b) documented in `docs/KEY_FORMULAS.md`
-- [ ] Item 4 (×2 factor) hand-verified with a passing unit test
-- [ ] Items 5-6 hand-re-derived and confirmed against Algorithm 1
-- [ ] Invariant table run across the full grid, zero violations (or violations explained)
-- [ ] Findings appended to this file (below this line), don't rewrite the sections above
+- [x] Finding 1 resolved, decision (a) or (b) documented in `docs/KEY_FORMULAS.md`
+- [x] Item 4 (×2 factor) hand-verified with a passing unit test
+- [x] Items 5-6 hand-re-derived and confirmed against Algorithm 1
+- [x] Invariant table run across the full grid, zero violations (or violations explained)
+- [x] Findings appended to this file (below this line), don't rewrite the sections above
 
 **Findings go here:**
+
+### Phase 0 complete — 2026-08-05
+
+**Finding 1 (uniform radii formula never executed): CONFIRMED, decision (b).**
+- The `elif a_val is not None` branch in `_compute_radii` (line 109) fires for every
+  canonical row because `run_single_experiment` always passes `a_val`. The documented
+  closed-form `(π_obs − α)/(1 − 2α)` (line 115) is dead code in the canonical path.
+- **Decision (b):** Keep `a_val` (defensible — clean validation group rates, not an
+  oracle leak), but the paper must NOT claim to test the Appendix F closed form. The
+  `radii_mode: "uniform"` JSON label is retained for backward compatibility but means
+  "validation-estimated" in practice. Documented in `docs/KEY_FORMULAS.md`.
+- **Impact on locked science:** NONE. The radii used were valid; only the label and
+  the paper claim about which formula ran were wrong. No retrain needed.
+
+**Item 4 (TV → L1 ×2 factor): VERIFIED CORRECT.**
+- `dro_fair.py:219` passes `2 * radius` to `project_simplex_l1_ball`. Unit test
+  `test_tv_to_l1_radius_factor_2` confirms the projected point lands on the L1 ball
+  boundary at exactly 2ρ, not ρ or 4ρ. No bug.
+
+**Items 5-6 (tilted risk + dual ascent): VERIFIED CORRECT.**
+- Tilted risk: `β·(logsumexp(ℓ/β) − log(m))` = `β·log(mean(exp(ℓ/β)))` — matches
+  Algorithm 1 step 2.
+- Dual ascent: `λ ← clamp(λ + η·0.95^epoch·g, 0, λ_max)` — matches Algorithm 1 step 3.
+  Decay counter is epoch index (0-indexed), one update per epoch. Correct.
+
+**Invariant checks (560 rows):**
+- `dp_clean ≥ 0`: 0 violations ✓
+- `if_clean ≥ 0`: 0 violations ✓
+- `acc_clean ∈ [0,1]`: 0 violations ✓
+- α=0 gap: Adult/Credit small (0.001-0.007, tilted-risk-vs-BCE). LSAC large (+0.038,
+  known degeneracy). Not new bugs.
+
+**Tests:** 91 passed (was 90; +1 new `test_tv_to_l1_radius_factor_2`).
 
 ---
 

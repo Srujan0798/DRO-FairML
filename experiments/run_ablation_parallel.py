@@ -259,12 +259,14 @@ def _run_locked(results_file, configs, provenance_extras=None, workers=4, label=
 
     use_pool = workers > 1
     if use_pool:
-        # ThreadPoolExecutor: torch releases the GIL during CPU-bound matmuls, so
-        # threads give real parallelism without the macOS fork-pool crashes.
-        from concurrent.futures import ThreadPoolExecutor
-        print(f"[{label}] ThreadPoolExecutor(workers={workers})…", flush=True)
+        # ProcessPool with fork gives real parallelism for torch CPU-bound work
+        # (torch releases the GIL during matmuls, but Python orchestration between
+        # ops still needs the GIL, so ThreadPoolExecutor doesn't parallelize well).
+        # Fork inherits interpreter state so the worker imports cleanly on macOS.
+        ctx = mp.get_context("fork") if sys.platform != "win32" else mp.get_context("spawn")
+        print(f"[{label}] ProcessPoolExecutor(workers={workers}, {ctx.get_start_method()})…", flush=True)
         try:
-            with ThreadPoolExecutor(max_workers=workers) as ex:
+            with ProcessPoolExecutor(max_workers=workers, mp_context=ctx) as ex:
                 futs = {ex.submit(_worker, c): c for c in todo}
                 for fut in as_completed(futs):
                     c = futs[fut]
@@ -279,7 +281,7 @@ def _run_locked(results_file, configs, provenance_extras=None, workers=4, label=
                         print(f"[{label}] FAILED {c}: {e}", flush=True)
                         traceback.print_exc()
         except Exception as e:
-            print(f"[{label}] thread pool error ({e}).", flush=True)
+            print(f"[{label}] pool error ({e}).", flush=True)
 
         if done == 0 and n_todo > 0:
             print(
