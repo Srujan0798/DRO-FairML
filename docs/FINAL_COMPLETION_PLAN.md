@@ -33,6 +33,15 @@ On Jun 30 he said: *"After drafting the reply, verify all the claims. Sometimes 
 
 ---
 
+## 0.1 LIVE UPDATE (2026-08-04, expanded scope)
+
+Three things changed the plan, all in our favour:
+1. **Agent H is auto-chained.** A tracked monitor (`scripts/monitor_if_then_regen.sh`, watching the IF sweep) will, the moment the grid hits 540 rows, run the deterministic regeneration (Wilcoxon, tables, figures, PDFs) and capture the real IF Wilcoxon table to `results/if_wilcoxon_summary.txt`. It then re-invokes the assistant to do the judgment part (interpret the real IF numbers, reconcile prose honestly, write the meeting brief). **No one needs to babysit the sweep** — the meeting artifacts finish before 4 pm on their own.
+2. **GPU access is expected.** This flips **UTKFace from "scope out" to "run for real"** (Agent M, path 2 is now primary). A real image result turns a withdrawn claim into a genuine fourth dataset — a materially stronger submission for Aug 10.
+3. **More agents / more time.** Milestone 2 work is fully parallelizable. Where a single agent is a bottleneck, split it (e.g. J's audit vs J's consolidation; K's figures vs K's prose). Efficiency notes are inline per agent.
+
+---
+
 ## MILESTONE 1 — before 4 pm today (~2.5 h)
 
 The IF data completes on its own in ~30 min. Two agents then take it to a meeting-ready state. These are **sequential** (H before I).
@@ -179,22 +188,27 @@ the "verify all claims" step Kuldeep explicitly asked for.
 Working dir: /Users/srujansai/Desktop/DRO-FairML. Read docs/FINAL_COMPLETION_PLAN.md and
 docs/UTKFACE_PIPELINE.md.
 
-The last "blocked" item. flair2 GPU access never came, but this machine has MPS and
-UTKFace is a PUBLIC dataset. Try to actually complete it:
-1. Attempt to obtain real UTKFace images from a public mirror (Kaggle / GitHub / academic
-   torrent). There is already results-adjacent data/raw/utkface_features_smoke.npz (a smoke
-   subset of ResNet18 features) — check whether a full feature set is obtainable or
-   extractable.
-2. If obtainable: extract ResNet18 features (fast on MPS), then run the SAME canonical
-   protocol (tau=1, k_inner=10, 6 seeds, the three attacks) via the UTKFace runner, writing
-   real (not synthetic) rows. Regenerate the UTKFace figures/tables. This turns a withdrawn
-   claim into a real fourth result.
-3. If genuinely not obtainable in the time window: leave UTKFace as honest future work —
-   keep docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md, ensure no paper/report claim
-   depends on synthetic data (Agent K), and state the blocker in limitations.
+The last blocked item — now UNBLOCKED. GPU access (flair2) is expected AND this machine
+has MPS AND UTKFace is a PUBLIC dataset. The primary goal is now to RUN IT FOR REAL, giving
+the paper a genuine fourth dataset (image modality) for Aug 10.
+1. Obtain real UTKFace images. Preferred: the flair2 GPU box once access lands (there is a
+   ready pipeline — docs/UTKFACE_PIPELINE.md, docs/SERVER_RUNBOOK.md, and
+   experiments/run_utkface_server.py). Fallback: a public mirror (Kaggle "jangedoo/utkface-
+   new" / the official GitHub) downloaded locally. data/raw/utkface_features_smoke.npz is a
+   smoke subset of ResNet18 features — confirm whether the full set can be extracted.
+2. Extract ResNet18 features (fast on GPU/MPS), then run the EXACT canonical protocol
+   (tau=1, k_inner=10, 6 seeds, all three attacks, epochs=60, pgd_steps=20) writing REAL
+   rows tagged as real (never dname='UTKFace (synthetic)'). Regenerate UTKFace figures/tables
+   and hand the numbers to Agent K for the paper's image-modality section.
+3. Only if access AND public download BOTH fail within the window: fall back to honest future
+   work — keep docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md and ensure no paper/report
+   claim depends on synthetic data.
+
+EFFICIENCY: this agent is independent of H/I/J/K/L — start it as soon as GPU access or the
+public download is in hand; it can run the whole 6-day window in parallel.
 
 CRITICAL: never let synthetic Gaussian features (run_utkface.py:_make_synthetic_utkface)
-be reported as real results. Tag provenance clearly. Report which path (2 or 3) you took.
+be reported as real results. Tag provenance on every row. Report which path (2 or 3) you took.
 ```
 
 ---
