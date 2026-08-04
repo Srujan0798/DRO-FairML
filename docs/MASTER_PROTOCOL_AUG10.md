@@ -36,7 +36,26 @@ that made those drops necessary (no GPU, slow laptop) **no longer exists as an e
 **Score (updated):** core paper assembly + claim-audit fixed; remaining hard gaps are
 **new experiments** (kNN k=5/15, clean τ ablation, full λ grid, random-vs-adv re-run under
 canonical, empirical-radii table, flair2 UTKFace). Do **not** retrain the locked 540
-without explicit greenlight.
+without explicit greenlight. (n=10 seed EXTENSION appends new rows only — greenlit by
+the project owner 2026-08-04; existing rows are never modified.)
+
+---
+
+## PART 1B — THE DEEPER ASKS (what they were actually saying, not just the checklist)
+
+Re-reading the chat as a conversation, not a task list, surfaces asks that the literal
+audit missed. These are now first-class work items (Wave 1.5 below).
+
+| # | Where | What they were really asking | Status |
+|---|---|---|---|
+| D1 | **Kuldeep, May 29 — his FIRST question ever:** "At lower corruption (α=0.1) the attack is too weak to differentiate. **Does the attack affect the radius?** If the attack is too weak, then DRO would perform well?" | The interaction between **attack strength and radius calibration**. DRO's ρ is calibrated to α, but the attack's *effective* strength varies — is DRO's advantage a function of the strength/radius match? | ❌ **NEVER ANSWERED, by anyone, ever.** → Agent N1 |
+| D2 | **Kuldeep, Jun 16 — a dictated protocol:** "Different tau value 1st; if not improving then change learning rates for lambda or something else; **check loss convergence plots and choose according to it on validation set**" | A specific 3-step high-α rescue procedure ending in **convergence diagnostics on validation data**. We have never produced a single loss-convergence plot. The "we tested τ=5/20 at α=0.3" reply he got was from data that is now deleted | ❌ **Protocol never executed as prescribed** → Agent N2 |
+| D3 | **Manisha, May 19:** "see the performance of DRO on Adult **etc**" | "etc" = more benchmarks. A fairness paper without **COMPAS** (and German Credit) is conspicuous to any reviewer | ❌ 3 tabular datasets only → Agent N3 |
+| D4 | **Kuldeep, Jun 30, verbatim:** "**if individual fairness is good for α=0.3, then we can state this clearly**" | With the REAL IF metric now in hand: Adult α=0.3 IF-violation 0.0258 (DRO) vs 0.0334 (Naive); Credit 0.1011 vs 0.1212 — **IF IS good for DRO at α=0.3.** He explicitly pre-authorized this claim; it must be tested (Wilcoxon on IF itself) and stated in the paper | ⚠️ Data exists, claim never formalized → Agent N4 |
+| D5 | **Kuldeep Q10, Jun 9:** K_inner=5 vs 10 | A clean K_inner ∈ {5,10,20} ablation closes it with committed data instead of the old "virtually identical" assertion | ❌ Old validation data deleted → Agent N5 |
+| D6 | **Kuldeep, Jun 16:** "for adult accuracy must be ≥ .78" + "Constant label predictor: DP=0, Accuracy 75–78%" | The 0.78 line and the per-dataset constant-predictor line drawn **in every accuracy figure**, not just mentioned in prose | ⚠️ Partial → fold into Agents P / I2 |
+| D7 | **Manisha, Jun 19 + May 19:** "Are you guys able to access flair2??" (asked twice) | She cares that the **server is actually used**. Wave 2 Agent U closes this literally | in plan |
+| D8 | UTKFace protected attribute is currently binarized (White/non-White) | The metrics code already supports >2 groups (max-min DP). **5-group race** UTKFace = a genuine multi-group fairness result, strictly stronger than binary | ❌ → folded into Agent U |
 
 ---
 
@@ -174,6 +193,89 @@ attack-aware radii calibration improve DRO under coordinated corruption? Commit.
 Commands in Part 2. Gate: `torch.cuda.is_available() → True, device_count → 2`.
 Do not start Wave 2's server work until this gate passes.
 
+### WAVE 1.5 (Day 1–2) — the deeper asks (Part 1B). All Mac-parallel, same driver pattern.
+
+**AGENT N1 — Attack-strength × radius study (Kuldeep's May-29 question, D1)**
+```
+Working dir: /Users/srujansai/Desktop/DRO-FairML. Read docs/MASTER_PROTOCOL_AUG10.md
+Part 1B row D1 and Part 2 "parallel-driver pattern".
+
+The question, verbatim (Kuldeep, May 29): "Does the attack affect the radius? If the
+attack is too weak, then DRO would perform well? specially at α=0.1." It has never been
+answered. Two arms, both NEW results files, never touching canonical_tau1.json:
+
+ARM A — attack strength at fixed α: pgd_steps ∈ {5, 50} (canonical is 20) ×
+3 datasets × attack='dp' × α ∈ {0.1, 0.2} × 6 seeds × 2 methods = 144 configs
+→ results/attack_strength.json. Add a per-run diagnostic: record the achieved ΔDP of
+the corruption itself (attack effectiveness), so strength is MEASURED, not assumed.
+
+ARM B — radius sensitivity at fixed attack: scale DRO's rho by {0.5, 2.0} (add a
+radii_scale kwarg to DroFairTrainer._compute_radii, provenance-recorded) × 3 datasets ×
+dp × 5 alphas × 6 seeds, DRO only = 180 configs → results/radius_sensitivity.json.
+
+Deliverable: results/attack_radius_summary.md + one figure — DRO advantage (Naive DP −
+DRO DP) as a function of measured attack strength and of radius scale. The answer to
+Kuldeep's question in one plot: is DRO's advantage driven by the attack/radius match?
+Honest either way. ~1.5 h total at 10 workers. Commit data + summary + figure.
+```
+
+**AGENT N2 — High-α rescue via Kuldeep's exact protocol (D2)**
+```
+Same working dir + driver pattern. Execute Kuldeep's Jun-16 procedure LITERALLY, in his
+order, with the diagnostics he named:
+
+STEP 1 — per-α tau: τ ∈ {2, 5, 20} at α ∈ {0.3, 0.4}, Adult, dp attack, 6 seeds,
+2 methods = 72 configs → results/high_alpha_tau.json.
+STEP 2 — (only what A3 doesn't cover) λ lr ∈ {0.01} extra arm at α ∈ {0.3,0.4} if Step 1
+fails: 24 configs, same file.
+STEP 3 — THE PART NEVER DONE: convergence diagnostics. Instrument the trainers to log
+per-epoch train/val loss + val accuracy (a `history` list on the trainer, dumped
+alongside each result row). Add one arm: epochs=200 with validation-based early stopping
+(patience 20) at α ∈ {0.3, 0.4}, Adult, dp, 6 seeds, 2 methods = 24 configs. Hypothesis:
+60 fixed epochs underfits at high α; if val-selected longer training lifts accuracy above
+the constant predictor (0.7521), THE DEFENSIBLE REGIME EXTENDS — a headline upgrade. If
+not, the α≥0.3 limitation finally has the convergence-plot evidence Kuldeep asked for.
+
+Deliverable: results/high_alpha_summary.md + convergence-curve figure (train/val loss vs
+epoch, per τ, per α — the literal "loss convergence plots ... on validation set" he
+requested) + paper text either extending the regime or closing it with evidence. Commit.
+```
+
+**AGENT N3 — More datasets: COMPAS + German Credit (D3, "Adult etc")**
+```
+Same working dir. Add two canonical fairness benchmarks to src/data/datasets.py
+following the existing get_dataset() pattern (train/val/test triples, protected attr):
+- COMPAS (ProPublica recidivism; protected = race African-American vs Caucasian) —
+  public CSV, add to data/download_data.sh
+- German Credit (UCI; protected = sex or age<25) — public, same treatment
+Unit tests for both loaders (shapes, protected-attr balance, no leakage).
+Then the full canonical protocol: 2 datasets × 3 attacks × 5 α × 6 seeds × 2 methods =
+360 configs → results/extended_datasets.json (NEW file). ~1.5–2 h. Deliverable:
+extended main-results table covering FIVE tabular datasets + UTKFace. If DRO's
+Adult/Credit pattern replicates on COMPAS/German, the paper's claim generalizes; if it
+doesn't (e.g. German is small/noisy), report that honestly — a scope statement beats an
+overclaim. Commit loaders + tests first, data second, summary third.
+```
+
+**AGENT N4 — "IF is good at α=0.3" formalized (D4, Kuldeep pre-authorized)**
+```
+Analysis-only, no new training. From results/canonical_tau1.json IF-attack rows: paired
+Wilcoxon on the IF-VIOLATION metric itself (not DP) per dataset per α. Verify the known
+means (Adult α=0.3: DRO 0.0258 vs Naive 0.0334; Credit 0.1011 vs 0.1212) and test
+significance at n=6 (n=10 after Agent S). Kuldeep said verbatim: "if individual fairness
+is good for α=0.3, then we can state this clearly." If the test passes, add the clear
+statement + a small IF-violation table to the paper's IF section; if only directional,
+state it as directional. → results/if_violation_wilcoxon.csv + paper text. Commit.
+```
+
+**AGENT N5 — K_inner ablation {5, 20} (D5, Q10 closed with data)**
+```
+Same driver pattern. K_inner ∈ {5, 20} (10 = canonical, do not re-run), DRO only,
+3 datasets × dp × 5 α × 6 seeds = 180 configs → results/kinner_ablation.json. ~40 min.
+Deliverable: the committed-data answer to Q10 — does K_inner matter beyond 5? One
+appendix table. Commit.
+```
+
 ### WAVE 2 (Day 2–3) — the upgrades the new hardware makes possible
 
 **AGENT S — Seeds n=6 → n=10 (tabular + UTKFace)**
@@ -201,6 +303,14 @@ vs our feature-space attack). src/corruption/image_pgd.py exists in git history
 protocol transplanted — α ∈ {0.1, 0.2}, 6 seeds, dp attack, 2 methods. If it lands, the
 paper gains a "feature-space vs pixel-space attack" section no reviewer will have seen
 from a course project. If it can't land by Day 4, cut it cleanly — (a) alone closes the ask.
+(c) MULTI-GROUP (D8): re-run the UTKFace grid with race as 5 GROUPS instead of the
+binary White/non-White collapse — src/evaluation/metrics.py already computes max-min DP
+for >2 groups. 5-group protected × dp attack × 5 α × 6 seeds × 2 methods = 60 configs
+→ results/utkface_multigroup.json. Multi-group fairness under adversarial corruption is
+strictly stronger than binary and almost certainly novel at this scope.
+(d) SECOND-IMAGE STRETCH (only if (a)–(c) land by Day 3): CelebA gender/attractiveness
+with protected=young, ResNet18 features on the L40S — same protocol, second image
+modality. Cut without guilt if time is short.
 ```
 
 **AGENT L2 — LSAC degeneracy: test the principled fix (Kuldeep Q4, completed honestly)**
@@ -250,6 +360,13 @@ one-pager), fix whatever they flag. **Day 7 — submit.**
 - [ ] docs/VERIFICATION_FINAL.md: zero mismatches
 - [ ] `make test && make validate && make paper && make report` green from clean clone
 - [ ] Advisors received the pre-read before submission
+- [ ] **D1 answered:** attack-strength × radius figure in the paper (Kuldeep's May-29 question)
+- [ ] **D2 executed:** convergence plots exist; high-α regime extended or closed with evidence
+- [ ] **D3:** COMPAS + German Credit in the main table (5 tabular datasets) or a written scope cut
+- [ ] **D4:** "IF is good at α=0.3" tested and stated (or bounded) in print
+- [ ] **D5:** K_inner ablation committed
+- [ ] **D6:** 0.78 line + per-dataset constant-predictor line on every accuracy figure
+- [ ] **D8:** UTKFace multi-group (5-race) result, or a written cut
 
 **The standard is unchanged since Jun 30: every number defensible, every negative
 result reported. Now there is also no compute excuse.**
