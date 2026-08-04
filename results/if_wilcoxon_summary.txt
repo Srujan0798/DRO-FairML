@@ -1,18 +1,19 @@
-Real IF-attack Wilcoxon (DRO better on DP, one-sided), n=6, from canonical_tau1.json
-Also shows IF-violation means so the IF-vs-DP tradeoff is visible.
+Real IF-attack Wilcoxon (seed-paired, n=6), from results/canonical_tau1.json
+H1 (one-sided): Naive metric > DRO metric (lower is better for DP and IF).
+Shows both DP and IF so the IF-vs-DP tradeoff is explicit.
 
-adult  if a=0.0: DP n=0.1491 d=0.1426 wins=6/6 p=0.0156 | IF n=0.0942 d=0.0933
-adult  if a=0.1: DP n=0.0819 d=0.0770 wins=6/6 p=0.0156 | IF n=0.0407 d=0.0328
-adult  if a=0.2: DP n=0.0474 d=0.0455 wins=6/6 p=0.0156 | IF n=0.0276 d=0.0222
-adult  if a=0.3: DP n=0.0227 d=0.0241 wins=1/6 p=0.8906 | IF n=0.0334 d=0.0258
-adult  if a=0.4: DP n=0.0042 d=0.0039 wins=4/6 p=0.5000 | IF n=0.0326 d=0.0233
-credit if a=0.0: DP n=0.0127 d=0.0119 wins=6/6 p=0.0156 | IF n=0.0236 d=0.0234
-credit if a=0.1: DP n=0.0056 d=0.0049 wins=4/6 p=0.1094 | IF n=0.0293 d=0.0257
-credit if a=0.2: DP n=0.0053 d=0.0045 wins=5/6 p=0.0312 | IF n=0.0779 d=0.0648
-credit if a=0.3: DP n=0.0049 d=0.0038 wins=6/6 p=0.0156 | IF n=0.1212 d=0.1011
-credit if a=0.4: DP n=0.0049 d=0.0035 wins=5/6 p=0.0469 | IF n=0.1454 d=0.1232
-lsac   if a=0.0: DP n=0.1447 d=0.1829 wins=0/6 p=1.0000 | IF n=0.0156 d=0.0228
-lsac   if a=0.1: DP n=0.0536 d=0.0614 wins=0/6 p=1.0000 | IF n=0.0174 d=0.0183
-lsac   if a=0.2: DP n=0.0419 d=0.0604 wins=0/6 p=1.0000 | IF n=0.0408 d=0.0425
-lsac   if a=0.3: DP n=0.0512 d=0.0564 wins=0/6 p=1.0000 | IF n=0.0997 d=0.0909
-lsac   if a=0.4: DP n=0.0502 d=0.0500 wins=2/6 p=0.5000 | IF n=0.1405 d=0.1246
+adult  if a=0.0: DP n=0.1491 d=0.1426 wins=6/6 p=0.0156 | IF n=0.0942 d=0.0933 wins=4/6 p=0.1562
+adult  if a=0.1: DP n=0.0819 d=0.0770 wins=6/6 p=0.0156 | IF n=0.0407 d=0.0328 wins=6/6 p=0.0156
+adult  if a=0.2: DP n=0.0474 d=0.0455 wins=6/6 p=0.0156 | IF n=0.0276 d=0.0222 wins=6/6 p=0.0156
+adult  if a=0.3: DP n=0.0227 d=0.0241 wins=1/6 p=0.8906 | IF n=0.0334 d=0.0258 wins=6/6 p=0.0156
+adult  if a=0.4: DP n=0.0042 d=0.0039 wins=4/6 p=0.5000 | IF n=0.0326 d=0.0233 wins=6/6 p=0.0156
+credit if a=0.0: DP n=0.0127 d=0.0119 wins=6/6 p=0.0156 | IF n=0.0236 d=0.0234 wins=4/6 p=0.1562
+credit if a=0.1: DP n=0.0056 d=0.0049 wins=4/6 p=0.1094 | IF n=0.0293 d=0.0257 wins=6/6 p=0.0156
+credit if a=0.2: DP n=0.0053 d=0.0045 wins=5/6 p=0.0312 | IF n=0.0779 d=0.0648 wins=6/6 p=0.0156
+credit if a=0.3: DP n=0.0049 d=0.0038 wins=6/6 p=0.0156 | IF n=0.1212 d=0.1011 wins=6/6 p=0.0156
+credit if a=0.4: DP n=0.0049 d=0.0035 wins=5/6 p=0.0469 | IF n=0.1454 d=0.1232 wins=6/6 p=0.0156
+lsac   if a=0.0: DP n=0.1447 d=0.1829 wins=0/6 p=1.0000 | IF n=0.0156 d=0.0228 wins=0/6 p=1.0000
+lsac   if a=0.1: DP n=0.0536 d=0.0614 wins=0/6 p=1.0000 | IF n=0.0174 d=0.0183 wins=2/6 p=0.7812
+lsac   if a=0.2: DP n=0.0419 d=0.0604 wins=0/6 p=1.0000 | IF n=0.0408 d=0.0425 wins=1/6 p=0.9688
+lsac   if a=0.3: DP n=0.0512 d=0.0564 wins=0/6 p=1.0000 | IF n=0.0997 d=0.0909 wins=6/6 p=0.0156
+lsac   if a=0.4: DP n=0.0502 d=0.0500 wins=2/6 p=0.5000 | IF n=0.1405 d=0.1246 wins=6/6 p=0.0156

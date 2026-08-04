@@ -17,7 +17,7 @@ Honest nuance: Adult DP at α = 0.1 is **5 of 6 seeds**, still p = 0.03.
 LSAC Combined: DRO wins. **LSAC DP: model collapses** — we flag it, not hide it.”
 
 ## IF (20 sec)
-“First real IF-attack numbers. **Mixed** — helps Adult/Credit at moderate α; **not** a clean win everywhere. Adult α = 0.3 under IF attack: IF better but DP worse.”
+“First real IF-attack numbers. On the **IF metric**, Adult and Credit win at α = 0.1 through 0.4 — including α = 0.3, which Kuldeep asked us to state clearly. **DP under IF is mixed** — Adult α = 0.3 loses on DP even while IF improves.”
 
 ## Scope (15 sec)
 “We only claim **α ≤ 0.2** for accuracy — above that both methods fall below the constant predictor on Adult and Credit.”

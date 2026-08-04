@@ -233,14 +233,25 @@ The IF-attack third is complete (180 rows; cosine IF metric
 non-degenerate, $\max|\mathrm{if\_clean}|\!\approx\!0.24$; full
 Wilcoxon in \texttt{results/if\_wilcoxon\_summary.txt} and
 Table~\ref{tab:wilcoxon-full}).
-Under the IF \emph{attack}, DRO still lowers \textbf{DP} vs Naive on
-Adult at $\alpha\le0.2$ ($6/6$, $p{=}0.0156$) and on most Credit
-cells (Credit $\alpha{=}0.1$ is $4/6$, n.s.).  On LSAC under IF
-attack DRO \emph{loses} on DP ($0/6$ at $\alpha\le0.3$).
-At Adult $\alpha\ge0.3$ the DP win under IF attack breaks even when
-the IF metric itself improves --- the two criteria are coupled but
-not interchangeable.  We do \emph{not} claim a clean three-attack
-sweep on every dataset.
+
+\textbf{IF metric itself (Kuldeep Jun~30: ``if individual fairness is good
+for $\alpha{=}0.3$, then we can state this clearly'').}
+Under the IF \emph{attack}, seed-paired one-sided Wilcoxon on the
+\textbf{IF violation} (not DP) shows DRO significantly better than Naive on
+Adult and Credit at every $\alpha\in\{0.1,0.2,0.3,0.4\}$ ($6/6$,
+$p{=}0.0156$).  Explicit high-$\alpha$ cells: Adult $\alpha{=}0.3$ IF
+$0.0334\!\to\!0.0258$; Credit $\alpha{=}0.3$ IF $0.1212\!\to\!0.1011$.
+LSAC only joins at $\alpha\in\{0.3,0.4\}$ on the IF metric
+($6/6$, $p{=}0.0156$); at $\alpha\le0.2$ LSAC/IF is a loss or n.s.
+
+\textbf{DP under the same IF attack is mixed} (coupling, not interchangeability):
+DRO still lowers DP on Adult at $\alpha\le0.2$ ($6/6$, $p{=}0.0156$) and on
+most Credit cells (Credit $\alpha{=}0.1$ is $4/6$, n.s.), but Adult
+$\alpha{=}0.3$ \emph{loses} on DP ($1/6$, $p{=}0.8906$) even while IF wins,
+and LSAC loses on DP for $\alpha\le0.3$ ($0/6$).  We therefore state clearly:
+\textbf{IF-targeted robustness holds for Adult/Credit including $\alpha{=}0.3$
+on the IF metric}, while DP-under-IF is not a second clean DP story.  We do
+\emph{not} claim a three-attack DP sweep on every dataset.
 
 \paragraph{Statistical significance.}
 The canonical grid uses $n{=}6$ seeds (0--5).  Wilcoxon signed-rank
@@ -275,4 +286,26 @@ We therefore treat UTKFace as a \textbf{real image-feature pilot}: protocol
 works end-to-end, but results \textbf{do not copy} the Adult/Credit
 $\alpha\le0.2$ narrative.  Prior synthetic-only smoke and the ``DRO inverts
 on image features'' claim remain \emph{withdrawn}.
+
+\begin{table}[h]
+\centering\small
+\caption{UTKFace REAL pilot (clean-test DP; $n{=}6$).  Wins $=$ seeds where
+DRO DP $<$ Naive DP.  Only $\alpha{=}0.4$ DP/Combined reach $p{<}0.05$.
+Source: \texttt{results/utkface\_summary.md}.}
+\label{tab:utkface-pilot}
+\begin{tabular}{llcccc}
+\toprule
+Attack & $\alpha$ & DP Naive & DP DRO & Wins & $p$ \\
+\midrule
+DP & 0.1 & 0.048 & 0.051 & 1/6 & 0.969 \\
+DP & 0.2 & 0.157 & 0.159 & 2/6 & 0.844 \\
+DP & 0.4 & 0.222 & 0.213 & 6/6 & 0.016 \\
+Combined & 0.1 & 0.031 & 0.033 & 2/6 & 0.953 \\
+Combined & 0.4 & 0.144 & 0.136 & 6/6 & 0.016 \\
+IF & 0.2 & 0.018 & 0.019 & 2/6 & 0.719 \\
+IF & 0.4 & 0.016 & 0.016 & 4/6 & 0.422 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 Full cell table: \texttt{results/utkface\_summary.md}.

@@ -1,7 +1,7 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (paper surgery: wire figures+tables; seed-paired Wilcoxon fix; drop unsupported 12–40× / kNN claims). Supersedes all prior STATUS / handoff docs.
-**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper PDF has figures/tables; advisor checklist current._
+_Last updated: 2026-08-04 (IF@α=0.3 formalized; UTKFace table in paper; kNN/validate claim cleanups). Supersedes all prior STATUS / handoff docs.
+**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3._
 
 ## 1. What this project is
 Implement **DRO-FAIR** (min-max Lagrangian with corruption-calibrated TV uncertainty
@@ -44,11 +44,10 @@ and **non-degenerate** under attack=if (max |if_clean| ≈ **0.239**). Verify an
 - **IF-attack third (COMPLETE — first real numbers):** max |if_clean| ≈ **0.239**.
   Full tables: `results/if_wilcoxon_summary.txt` + `docs/MEETING_2026-08-04.md`.
   **Verdict: MIXED** (not a clean three-attack mirror of DP+Combined).
-  - **Adult:** IF metric 6/6 p=0.0156 at α∈{0.1–0.4}; α=0 n.s. **DP under IF: win α≤0.2 (6/6);
-    LOSS α=0.3 (1/6, p=0.8906); n.s. α=0.4 (4/6).**
-  - **Credit:** IF metric 6/6 p=0.0156 at α≥0.1; DP under IF mostly wins (α=0.1 is **4/6 n.s.**).
+  - **Adult:** IF metric 6/6 p=0.0156 at α∈{0.1–0.4} (**incl. α=0.3** — Kuldeep-authorized IF claim). α=0 n.s. **DP under IF: win α≤0.2 (6/6); LOSS α=0.3 (1/6, p=0.8906); n.s. α=0.4 (4/6).**
+  - **Credit:** IF metric 6/6 p=0.0156 at α≥0.1 (**incl. α=0.3**); DP under IF mostly wins (α=0.1 is **4/6 n.s.**).
   - **LSAC:** IF lose/n.s. α≤0.2; only α∈{0.3,0.4} IF 6/6. DP under IF: **0/6 at α≤0.3**.
-  - Do **not** claim “wins on all three attacks on all datasets.”
+  - State **IF metric** wins where supported; do **not** claim “wins on all three attacks on all datasets” for DP.
 
 ## 4. Ablations
 Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dropped with

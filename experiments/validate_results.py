@@ -143,8 +143,12 @@ def validate():
               f"{'OK' if d_acc04 >= 0.60 else 'WARNING: low'}")
 
     print(f"\n{'=' * 70}")
-    print(f"DP WINS (Wilcoxon p<0.05):  {wins['dp']}/{wins['total']}  (need >= 6/9)")
-    print(f"IF WINS (Wilcoxon p<0.05):  {wins['if']}/{wins['total']}  (report claims 5/9)")
+    print(f"DP WINS (Wilcoxon p<0.05):  {wins['dp']}/{wins['total']}  (gate: need >= 6/9)")
+    print(
+        f"IF WINS under DP-attack (Wilcoxon p<0.05):  {wins['if']}/{wins['total']}  "
+        f"(expected ~0: IF near-zero under DP-targeted attack; "
+        f"real IF story is attack=if — see results/if_wilcoxon_summary.txt)"
+    )
     print(f"DP WINS (mean-based only):  {mean_wins['dp']}/{wins['total']}  (for reference)")
     print(f"IF WINS (mean-based only):  {mean_wins['if']}/{wins['total']}  (for reference)")
     if acc_drops:
@@ -156,6 +160,8 @@ def validate():
         print(f"{'=' * 70}")
         return False
 
+    # Headline gate: Adult+Credit DP wins dominate; LSAC/DP is known degenerate.
+    # Require at least 6 significant DP wins among the 9 gate cells (α∈{0.1,0.2,0.3}).
     passed = wins['dp'] >= 6
     print(f"RESULT: {'PASS' if passed else 'FAIL'}")
     print(f"{'=' * 70}")

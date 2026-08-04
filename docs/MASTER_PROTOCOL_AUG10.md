@@ -4,13 +4,12 @@
 submission. Basis: full audit of every file + line-by-line comparison against every
 recorded request from Prof. Manisha Padala and Kuldeep (chat log, May 19 – Jun 30).
 
-**Honest completion estimate: core science ~70%, advisor-ask coverage ~50%, paper
-assembly ~40%.** The 540-row tabular grid and 90-row REAL UTKFace grid are solid and
-committed. But multiple explicit advisor requests were "dropped/deferred" instead of
-delivered, the paper PDF contains no figures and no numeric tables, and the compute
-that made those drops necessary (no GPU, slow laptop) **no longer exists as an excuse**
-— we now have a 14-core M4 Pro (21 s/config measured) and a working flair2 node with
-2× NVIDIA L40S.
+**Honest completion estimate (updated 2026-08-04 evening):** core locked science
+~80% (540 + UTKFace 90 REAL), paper assembly ~85% (figures + tables + appendices
+wired; seed-paired Wilcoxon fixed), advisor-ask coverage ~55% (remaining gaps are
+mostly new experiments, not prose). The compute excuse is gone (M4 Pro + flair2
+L40S available), but **do not retrain or rewrite `canonical_tau1.json`** without
+explicit greenlight — extend with separate result files only.
 
 ---
 
@@ -51,7 +50,7 @@ audit missed. These are now first-class work items (Wave 1.5 below).
 | D1 | **Kuldeep, May 29 — his FIRST question ever:** "At lower corruption (α=0.1) the attack is too weak to differentiate. **Does the attack affect the radius?** If the attack is too weak, then DRO would perform well?" | The interaction between **attack strength and radius calibration**. DRO's ρ is calibrated to α, but the attack's *effective* strength varies — is DRO's advantage a function of the strength/radius match? | ❌ **NEVER ANSWERED, by anyone, ever.** → Agent N1 |
 | D2 | **Kuldeep, Jun 16 — a dictated protocol:** "Different tau value 1st; if not improving then change learning rates for lambda or something else; **check loss convergence plots and choose according to it on validation set**" | A specific 3-step high-α rescue procedure ending in **convergence diagnostics on validation data**. We have never produced a single loss-convergence plot. The "we tested τ=5/20 at α=0.3" reply he got was from data that is now deleted | ❌ **Protocol never executed as prescribed** → Agent N2 |
 | D3 | **Manisha, May 19:** "see the performance of DRO on Adult **etc**" | "etc" = more benchmarks. A fairness paper without **COMPAS** (and German Credit) is conspicuous to any reviewer | ❌ 3 tabular datasets only → Agent N3 |
-| D4 | **Kuldeep, Jun 30, verbatim:** "**if individual fairness is good for α=0.3, then we can state this clearly**" | With the REAL IF metric now in hand: Adult α=0.3 IF-violation 0.0258 (DRO) vs 0.0334 (Naive); Credit 0.1011 vs 0.1212 — **IF IS good for DRO at α=0.3.** He explicitly pre-authorized this claim; it must be tested (Wilcoxon on IF itself) and stated in the paper | ⚠️ Data exists, claim never formalized → Agent N4 |
+| D4 | **Kuldeep, Jun 30, verbatim:** "**if individual fairness is good for α=0.3, then we can state this clearly**" | Seed-paired IF Wilcoxon under IF attack: Adult/Credit α∈{0.1–0.4} all **6/6 p=0.0156** on IF metric (incl. α=0.3); Adult α=0.3 still **DP loss** under IF (coupling). Formalized in paper §results Q7 + `results/if_wilcoxon_summary.txt` | ✅ **DONE (locked data)** |
 | D5 | **Kuldeep Q10, Jun 9:** K_inner=5 vs 10 | A clean K_inner ∈ {5,10,20} ablation closes it with committed data instead of the old "virtually identical" assertion | ❌ Old validation data deleted → Agent N5 |
 | D6 | **Kuldeep, Jun 16:** "for adult accuracy must be ≥ .78" + "Constant label predictor: DP=0, Accuracy 75–78%" | The 0.78 line and the per-dataset constant-predictor line drawn **in every accuracy figure**, not just mentioned in prose | ⚠️ Partial → fold into Agents P / I2 |
 | D7 | **Manisha, Jun 19 + May 19:** "Are you guys able to access flair2??" (asked twice) | She cares that the **server is actually used**. Wave 2 Agent U closes this literally | in plan |
@@ -112,15 +111,11 @@ Working dir: /Users/srujansai/Desktop/DRO-FairML. Read docs/MASTER_PROTOCOL_AUG1
 row 14, docs/reference/PAPER_FINALIZATION_CHECKLIST.md (git history if deleted), and
 paper/main.tex.
 
-paper/main.pdf currently contains ZERO figures and ZERO numeric tables. Fix:
-1. Wire the main results table: \input{../paper/auto_generated/tabular_results} (or move
-   into sections/results.tex) — the reader must see the Adult/Credit/LSAC grid.
-2. Wire paper/auto_generated/wilcoxon.tex and key_findings.tex where they belong.
-3. Add figures to results.tex: fig1_main_results, fig2_dp_reduction_heatmap,
-   fig4_significance_matrix, fig5_accuracy_fairness_tradeoff, fig7_summary_win_rates
-   (\includegraphics{../figures/...}, with captions stating n=6, τ=1, defensible regime).
-4. \input the two orphaned appendices (appendix_q1_lambda, appendix_q5_empirical) after
-   \appendix — they will be refreshed by Agents A3/A5's new data in Wave 2.
+paper/main.pdf figures+tables WIRED (c1faa44+). Remaining polish only:
+1. Keep auto tables regenerated via `python3 experiments/generate_report_tables.py` after any stats fix.
+2. Prefer meeting figs + fig1/2/4/5/7; captions must state n=6, τ=1, defensible regime.
+3. Appendices already `\input`; refresh if new ablation JSONs land.
+4. Formalize IF@α=0.3 claim from locked IF Wilcoxon (Agent N4 / D4) — prose, no retrain.
 5. Add a UTKFace subsection to results.tex from results/utkface_summary.md numbers ONLY:
    DP mostly non-significant except α=0.4 (6/6, p=0.016, DP & Combined); IF violation
    consistently lower for DRO; accuracy never worse. Frame as different-modality finding.

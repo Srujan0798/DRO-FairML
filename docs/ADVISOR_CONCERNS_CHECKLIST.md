@@ -84,6 +84,8 @@
 | flair2 full GPU / pixel-level | Parked; Mac already has REAL feature pilot |
 | Empirical-radii full table in paper | Q5 appendix; uniform is SSOT for 540 |
 | Extra constant-predictor fig polish | Prefer figD1–D4 from 540 if re-sharing |
+| kNN k∈{5,10,15} / λ grid / random-vs-adv re-run | Explicit Kuldeep asks; **not** in locked 540 — optional Wave 1 if greenlit |
+| IF@α=0.3 claim | ✅ Formalized (Adult/Credit IF metric 6/6 p=0.0156 under IF attack) |
 
 ---
 

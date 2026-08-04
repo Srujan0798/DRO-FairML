@@ -77,9 +77,9 @@ IF metric was previously broken (near-zero). It is now cosine-based and non-dege
 
 | Dataset | Main message |
 |---------|----------------|
-| **Adult** | At **α = 0.1 and 0.2**, DRO is better on **both** IF and DP under IF attack (6/6). At α = 0.0, DP wins but IF is not significant (4/6). At **α = 0.3**, IF improves but **DP loses** (1/6). |
-| **Credit** | IF improves for α ≥ 0.1 (6/6); DP under IF is mostly favorable (α = 0.1 is weaker, 4/6, not significant). |
-| **LSAC** | Does not support the low-α story; DP under IF attack loses for α ≤ 0.3. |
+| **Adult** | **IF metric:** 6/6 p=0.016 at α∈{0.1–0.4} (including α=0.3: 0.033→0.026). **DP under IF:** wins α≤0.2; **loses at α=0.3 (1/6)** — coupling, not a DP sweep. |
+| **Credit** | **IF metric:** 6/6 p=0.016 at α≥0.1 (incl. α=0.3: 0.121→0.101). DP under IF mostly favorable (α=0.1 is 4/6 n.s.). |
+| **LSAC** | IF metric only at α∈{0.3,0.4}; DP under IF loses for α ≤ 0.3. |
 
 ---
 
@@ -128,7 +128,7 @@ At **α ≥ 0.3**, both DRO and Naive fall **below** the constant predictor on *
 
 1. **τ = 1** fixed the false “DRO fragile” story.  
 2. **Adult & Credit, α ≤ 0.2, DP + Combined:** DRO better on DP (n = 6), with honest **5/6** cells noted.  
-3. **IF attack:** real for the first time; **mixed** across datasets/α.  
+3. **IF attack:** IF metric wins Adult/Credit incl. **α=0.3**; DP-under-IF still **mixed**.  
 4. **LSAC/DP:** degenerate collapse — reported honestly.  
 5. **α ≥ 0.3:** out of claim scope on Adult/Credit (below constant predictor).
 
