@@ -576,13 +576,11 @@ confirm the radii remain sufficient on all three tabular datasets.
   \texttt{results/canonical\_tau1.json}).  The IF-attack third of the
   grid is complete (180 rows; earlier IF metrics were degenerate pre-fix;
   Adult/Credit $\alpha\le0.2$ support DRO on DP under IF attack; LSAC/IF does not).
-\item \textbf{UTKFace partial (no paper claim yet).}
-  Real features exist (\texttt{data/raw/utkface\_features.npz}, $N{=}23{,}705$);
-  a REAL-tagged grid is accumulating in \texttt{results/utkface\_canonical.json}
-  (DP complete; IF then Combined; target 90 configs).  Prior synthetic smoke
-  numbers and the ``DRO inverts on image features'' claim remain withdrawn
-  until the full multi-seed multi-attack grid is complete and reviewed.
-  flair2 is staged infrastructure only---not a dependency.
+\item \textbf{UTKFace complete REAL grid (90/90; mixed clean-test).}
+  Real features ($N{=}23{,}705$) and full dp/if/combined $\times$ $5\alpha$ $\times$ $6$ seeds
+  in \texttt{results/utkface\_canonical.json}.  Clean-test DP is mixed
+  (strongest significant DRO DP wins at high $\alpha$); do not equate with
+  Adult/Credit $\alpha\le0.2$.  Synthetic smoke claims remain withdrawn.
 \end{enumerate}
 
 % ─────────────────────────────────────────────────────────────────────────────
@@ -742,11 +740,13 @@ is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
   Honest read: Adult/Credit $\alpha\le0.2$ support DRO on DP under IF attack;
   LSAC/IF and Adult IF $\alpha\ge0.3$ do not.  The $k$-NN
   graph is insensitive to $k{\in}\{5,10,15\}$ (DP within ${\pm}0.003$).
-\item \textbf{UTKFace (partial REAL grid only):} Real ResNet features are
-  on disk; \texttt{results/utkface\_canonical.json} has a partial REAL-only
-  run (attack=\texttt{dp} so far).  No multi-seed full image claim yet.
-  Prior synthetic smoke ``DRO inverts on image features'' numbers remain
-  withdrawn.
+\item \textbf{UTKFace (complete REAL 90/90 grid; mixed clean-test story):}
+  Real ResNet features ($N{=}23{,}705$) and full protocol
+  (\texttt{results/utkface\_canonical.json}, all
+  \texttt{data\_provenance{=}REAL}).  Clean-test DP is mixed: significant
+  DRO wins mainly at high $\alpha$ (e.g.\ DP/Combined $\alpha{=}0.4$, $6/6$,
+  $p{=}0.016$), not a copy of Adult/Credit $\alpha\le0.2$.  Synthetic smoke
+  ``DRO inverts on image features'' remains withdrawn.
 \end{itemize}
 
 % ─────────────────────────────────────────────────────────────────────────────

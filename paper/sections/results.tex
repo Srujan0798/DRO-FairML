@@ -141,17 +141,27 @@ complete (540 rows).  Under IF attack the DP test is significant on
 Adult $\alpha\le0.2$ and most Credit cells; LSAC/IF and Adult IF
 $\alpha\ge0.3$ do not support a DP win (see summary file).
 
-\subsection{Image data (UTKFace) --- real features; grid not claimed}
+\subsection{Image data (UTKFace) --- real features; mixed clean-test results}
 \label{sec:results-utkface}
 
 UTKFace uses real ResNet18 features ($N{=}23{,}705$, gender prediction,
 race White/non-White as protected attribute;
-\texttt{data/raw/utkface\_features.npz}).  A multi-seed Fairness-Targeted
-PGD grid ($\tau{=}1$, $k_{\mathrm{inner}}{=}10$, same protocol as tabular)
-is running locally into \texttt{results/utkface\_canonical.json} with
-\texttt{data\_provenance{=}REAL}.  \textbf{No image-modality claim is made
-in this draft} until the 90-config grid is complete and reviewed.
-Prior synthetic-only smoke outputs remain non-results; the older
-``DRO inverts on image features'' claim stays \emph{withdrawn}.
-Server GPU (flair2) is proven infrastructure but \textbf{not required}
-for these numbers.
+\texttt{data/raw/utkface\_features.npz}).  We ran the same Fairness-Targeted
+PGD protocol as tabular ($\tau{=}1$, $k_{\mathrm{inner}}{=}10$, $n{=}6$,
+three attacks, five $\alpha$) into
+\texttt{results/utkface\_canonical.json} (all rows
+\texttt{data\_provenance{=}REAL}; 90/90 configs).
+
+\paragraph{Honest summary (clean test metrics, matching the tabular protocol).}
+Unlike Adult/Credit at $\alpha\le0.2$, clean-test DP under DP or Combined
+attack is \emph{not} a low-$\alpha$ DRO sweep: many cells are mixed or
+non-significant.  Significant clean DP wins for DRO appear mainly at
+\textbf{high $\alpha$}: e.g.\ DP attack $\alpha{=}0.4$ (Naive DP $0.222$ vs
+DRO $0.213$, $6/6$, $p{=}0.016$) and Combined $\alpha{=}0.4$ (Naive $0.144$
+vs DRO $0.136$, $6/6$, $p{=}0.016$).  Under the IF \emph{attack}, clean IF
+is often lower for DRO while clean DP remains mixed (coupling, as on tabular
+LSAC/Adult high-$\alpha$).  Accuracy stays high ($\approx0.78$--$0.86$).
+We therefore treat UTKFace as a \textbf{real image-feature pilot}: protocol
+works end-to-end, but results \textbf{do not copy} the Adult/Credit
+$\alpha\le0.2$ narrative.  Prior synthetic-only smoke and the ``DRO inverts
+on image features'' claim remain \emph{withdrawn}.

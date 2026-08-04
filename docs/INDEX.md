@@ -16,6 +16,8 @@
 
 - [ADVISOR_CONCERNS_CHECKLIST.md](ADVISOR_CONCERNS_CHECKLIST.md) — every Manisha/Kuldeep ask vs current status
 
+- [AUG10_SUBMISSION_CHECKLIST.md](AUG10_SUBMISSION_CHECKLIST.md) — submission gate
+
 ## Data truth
 - `results/canonical_tau1.json` — **540 rows**
 - `results/if_wilcoxon_summary.txt` — real IF Wilcoxon

@@ -1,6 +1,6 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (Agent I meeting brief). Supersedes all prior STATUS / handoff docs.
+_Last updated: 2026-08-04 (Aug 10 package). 2026-08-04 (Agent I meeting brief). Supersedes all prior STATUS / handoff docs.
 **CLEAR:** canonical grid **540/540** (IF 180); Agent H finalize complete; first real IF numbers below._
 
 ## 1. What this project is
@@ -65,22 +65,23 @@ written reasons; kNN retracted. None are part of the canonical claim.
 ## 6. Deliverables status
 | Item | State |
 |------|-------|
-| Canonical full grid (540 rows) | ✅ complete (unique 540; τ=1 / k_inner=10 / epochs=60; max\|if\|≈0.239) |
-| IF-attack third (180 rows) | ✅ complete — **MIXED** (see §3 + `if_wilcoxon_summary.txt`) |
-| Agent H finalize | ✅ tables/PDFs; meeting figs regenerated 2026-08-04 |
-| Agent V claim fixes | ✅ Adult/DP **5/6** at α=0.1; LSAC not “below baseline”; KULDEEP acc fixed; stale Jul-2 figs removed |
-| Meeting brief (4pm) | ✅ `docs/MEETING_2026-08-04.md` |
-| Verification | ✅ **LIVE 540-only** `docs/VERIFICATION_REPORT.md` (M1–M7 MATCH) |
-| Kuldeep correction | ✅ `docs/KULDEEP_CORRECTION.md` (human reviews & sends) |
-| UTKFace 90-row REAL grid | 🔄 local MPS (~50+/90); **no paper claim** |
-| flair2 | ⏸ parked (proven infrastructure only) |
+| Canonical full grid (540 rows) | ✅ complete (τ=1, k=10, n=6; IF non-deg max≈0.239) |
+| IF-attack third | ✅ complete — **MIXED** |
+| Agent V claim fixes | ✅ 5/6, LSAC pinned, figures from 540 |
+| Meeting handout (share) | ✅ `docs/MEETING_HANDOUT_2026-08-04.md` |
+| Verification LIVE | ✅ `docs/VERIFICATION_REPORT.md` |
+| UTKFace REAL 90/90 | ✅ complete; summary `results/utkface_summary.md` (**mixed clean-test**) |
+| Paper / report | ✅ Aug 10 narrative: tabular claim + honest UTKFace pilot |
+| flair2 | ⏸ parked (optional GPU later) |
 
-## 7. What remains (Aug 10)
-1. **M:** Finish local UTKFace to 90/90 REAL (or formal scope-out) → summarize honestly → optional paper subsection.  
-2. **K polish:** paper/report final pass vs 540 + mixed IF (mostly done).  
-3. **L ship gate:** every claim still traces to `canonical_tau1.json` after any prose edit.  
-4. **J (optional):** more consolidation only if needed — tree already slimmed.  
-5. **flair2:** revisit only if GPU-heavy work (e.g. pixel PGD) is explicitly greenlit.
+
+## 7. Aug 10 submission checklist
+1. ✅ Tabular 540 frozen; do not retrain.
+2. ✅ UTKFace 90/90 REAL in repo; paper states **mixed** clean-test (not Adult copy).
+3. ✅ Paper/report rebuilt with τ=1 / 5/6 / IF mixed / LSAC degenerate / UTKFace pilot.
+4. Final gate before send: `make test && make validate && make paper && make report`.
+5. Optional later: flair2 pixel-level experiments if greenlit.
+
 
 ## 8. How to run / verify
 ```bash

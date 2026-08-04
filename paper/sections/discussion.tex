@@ -47,10 +47,10 @@ use this approximation according to the attack") and does not claim
 the paper is wrong.
 See report appendix for the clean inversion derivation: $\pi_{\mathrm{clean}}[\mathrm{min}] = \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4\alpha$, etc. (B's math).
 
-\subsection{Image data (UTKFace) --- real features; claim deferred}
-The earlier ``DRO inverts on ResNet18 features'' claim from prior
-versions of this paper is withdrawn (synthetic smoke only).  Real
-features and a partial REAL-tagged grid exist locally
-(\texttt{results/utkface\_canonical.json}); we defer any image-modality
-result until the full protocol grid is complete and reviewed.
-See \S\ref{sec:results-utkface}.
+\subsection{Image data (UTKFace) --- real pilot; not a tabular copy}
+The earlier ``DRO inverts on ResNet18 features'' claim is withdrawn
+(synthetic smoke only).  The full 90-config REAL grid
+(\S\ref{sec:results-utkface}) shows a \textbf{mixed} clean-test pattern:
+stronger DRO DP wins mainly at high $\alpha$, not the Adult/Credit
+$\alpha\le0.2$ regime.  Image features and tabular data should not be
+conflated in the main claim.

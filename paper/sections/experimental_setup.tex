@@ -12,11 +12,11 @@ UTKFace & 23{,}705 & 512 (ResNet18) & Race (White/non-White) & Gender \\
 \bottomrule
 \end{tabular}
 \caption{Datasets.  Adult, Credit and LSAC form the complete 540-row
-tabular grid.  UTKFace uses \textbf{real} ResNet18 features extracted from
-public images (\texttt{data/raw/utkface\_features.npz}); a multi-seed
-Fairness-Targeted PGD grid is running locally and is \textbf{not} a paper
-claim until complete and reviewed.  Prior synthetic-smoke UTKFace numbers
-remain withdrawn.}
+tabular grid.  UTKFace uses \textbf{real} ResNet18 features
+(\texttt{data/raw/utkface\_features.npz}, $N{=}23{,}705$) with a complete
+90-config REAL protocol grid (same $\tau{=}1$, $k_{\mathrm{inner}}{=}10$,
+$n{=}6$; see \S\ref{sec:results-utkface}).  Prior synthetic-smoke UTKFace
+numbers remain withdrawn.}
 \label{tab:datasets}
 \end{table}
 
@@ -24,13 +24,12 @@ remain withdrawn.}
 We compare Naive-FAIR (fixed Lagrange multiplier) vs.\ DRO-FAIR
 (adaptive worst-case reweighting within a TV uncertainty set).
 Attacks: DP-only, IF-only, Combined, with $\alpha\in\{0.0, 0.1, 0.2,
-0.3, 0.4\}$ (tabular).  The canonical $\tau{=}1$, $k_{\mathrm{inner}}{=}10$
+0.3, 0.4\}$.  The tabular $\tau{=}1$, $k_{\mathrm{inner}}{=}10$
 grid is complete (540 rows: 3 datasets $\times$ 5 $\alpha$ $\times$ 3
 attacks $\times$ 6 seeds $\times$ 2 methods) and achieves Wilcoxon
 $p{<}0.05$ at $\alpha\le0.2$ on Adult and Credit under the DP-targeted and
-Combined attacks (Adult/DP $\alpha{=}0.1$ is $5/6$).  UTKFace real features
-exist locally; a multi-seed image grid is not claimed in this draft
-(prior synthetic smoke numbers remain withdrawn).
+Combined attacks (Adult/DP $\alpha{=}0.1$ is $5/6$).  UTKFace uses the same
+protocol on real image features (90 rows; \S\ref{sec:results-utkface}).
 
 Prediction temperature is fixed at $\tau{=}1$ across all
 $\alpha$ (per Kuldeep's Q12).  The earlier $\tau{=}100$ schedule for
