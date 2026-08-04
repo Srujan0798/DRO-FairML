@@ -1,7 +1,7 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04. Supersedes all prior STATUS / handoff docs.
-Light refresh: §6–§7 note local IF sweep in progress toward 540; DP+Combined still complete._
+_Last updated: 2026-08-04 (Agent I meeting brief). Supersedes all prior STATUS / handoff docs.
+**CLEAR:** canonical grid **540/540** (IF 180); Agent H finalize complete; first real IF numbers below._
 
 ## 1. What this project is
 Implement **DRO-FAIR** (min-max Lagrangian with corruption-calibrated TV uncertainty
@@ -22,13 +22,9 @@ fairness), accuracy.
 | radii_mode | uniform |
 | coordinated | False |
 
-**DP + Combined completed: 3 datasets × 5 α × {DP, Combined} × 6 seeds × 2 methods =
-360 rows** in `results/canonical_tau1.json`. The **IF-attack third** (target +180 → **540**
-total) was blocked for a long time by a degenerate IF metric (~1e-10). The metric is fixed
-(cosine-based); a **local parallel IF sweep is in progress** on 2026-08-04
-(`experiments/run_if_parallel.py`) — partial IF rows are non-degenerate when present.
-Do **not** treat IF as complete until `len(canonical_tau1.json) == 540` and IF count is 180.
-Verify anytime:
+**Full grid complete: 3 datasets × 5 α × {DP, IF, Combined} × 6 seeds × 2 methods =
+540 rows** in `results/canonical_tau1.json` (unique keys 540). IF metric is cosine-based
+and **non-degenerate** under attack=if (max |if_clean| ≈ **0.239**). Verify anytime:
 `python3 -c "import json,collections; d=json.load(open('results/canonical_tau1.json')); print(len(d), dict(collections.Counter(r['attack'] for r in d)))"`.
 
 ## 3. Verified results (n=6, read from canonical_tau1.json)
@@ -39,53 +35,45 @@ Verify anytime:
 - **LSAC / Combined:** genuine win, p = 0.016 at α = 0.1 / 0.3 / 0.4 (α=0.2 is 5/6, p=0.031).
 - **LSAC / DP:** DEGENERATE NEGATIVE — DRO loses to Naive at every α (0/6 seeds); DRO DP is
   *higher* (worse) than Naive; accuracy is pinned to the majority-class baseline (~0.90) and
-  Naive DP is frozen at 0.1827 for α ≥ 0.2. The model collapses to the constant predictor.
-  See `docs/LSAC_DEGENERACY.md`.
+  Naive DP is frozen at 0.1827 for α ≥ 0.2. See `docs/LSAC_DEGENERACY.md`.
 - **Defensible regime: α ≤ 0.2** on Adult and Credit. At α ≥ 0.3 both methods fall *below* the
   constant-predictor baseline on **Adult (0.752) and Credit (0.779)** → no method claim there.
-  **LSAC is not below baseline:** under DP attack accuracy stays **pinned at** the majority rate
-  (~0.902 vs 0.9016), the same degeneracy as above — not an accuracy collapse below constant.
-- **IF:** metric is fixed (cosine-based) in `src/evaluation/metrics.py`. PoC:
-  `results/if_poc_adult.json` (`if_clean ≈ 0.0333`). As of **2026-08-04**, a **local IF
-  sweep is in progress** (`experiments/run_if_parallel.py` → `canonical_tau1.json`). Live
-  snapshot **2026-08-04 ~13:46 IST**: **82/180 IF rows** (total **442/540**); Adult IF complete
-  (60/60), Credit in progress (~22), LSAC not started. IF-attack `if_clean` is
-  **non-degenerate** (max |if_clean| ≈ **0.098**, all IF rows ≫ 1e-6). DP/Combined rows still
-  show IF *metric column* ~0 because those attacks do not stress IF. **No full-grid IF claim
-  until IF = 180 / total 540 and tables/figures are regenerated.** Do not say “IF never
-  generated” or “IF cells are 0.0000” for the IF-attack third — that language is stale.
-  Live: `docs/LOOP_STATUS.md`.
+- **IF-attack third (COMPLETE — first real numbers):** max |if_clean| ≈ **0.239**.
+  Full tables: `results/if_wilcoxon_summary.txt` + `docs/MEETING_2026-08-04.md`.
+  **Verdict: MIXED** (not a clean three-attack mirror of DP+Combined).
+  - **Adult:** IF metric 6/6 p=0.0156 at α∈{0.1–0.4}; α=0 n.s. **DP under IF: win α≤0.2 (6/6);
+    LOSS α=0.3 (1/6, p=0.8906); n.s. α=0.4 (4/6).**
+  - **Credit:** IF metric 6/6 p=0.0156 at α≥0.1; DP under IF mostly wins (α=0.1 is **4/6 n.s.**).
+  - **LSAC:** IF lose/n.s. α≤0.2; only α∈{0.3,0.4} IF 6/6. DP under IF: **0/6 at α≤0.3**.
+  - Do **not** claim “wins on all three attacks on all datasets.”
 
 ## 4. Ablations
 Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dropped with
-written reasons; kNN retracted (was actually the Adult IF config, subsumed by the cluster
-re-run). None are part of the canonical claim.
+written reasons; kNN retracted. None are part of the canonical claim.
 
 ## 5. UTKFace (image modality)
-**Real features now on disk; full multi-seed attack grid not yet run.** On 2026-08-04 local Mac
-(MPS): images downloaded, `data/raw/utkface_features.npz` extracted (X=23705×512), and a
-**timing probe** wrote `results/utkface_timing_probe.json` with `data_provenance=REAL`
-(attack=dp, α=0, seed=0 only; ~24s wall). That is **not** a full experiment — do not claim
-UTKFace results in the paper. Historical synthetic-only smoke tests remain archived
-(`docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md`). Full grid deferred until IF sweep
-releases CPU cores (load was ~33 during 10-worker IF). See `docs/UTKFACE_STATUS.md`.
+**Real features on disk; full multi-seed attack grid not a paper claim yet.** Timing probe:
+`results/utkface_timing_probe.json` (`data_provenance=REAL`). Agent **M** is **blocked on
+flair2 SSH** for the intended server run; local MPS probe only. Scope-in full grid or formal
+drop for Aug 10. See `docs/UTKFACE_STATUS.md`.
 
 ## 6. Deliverables status
 | Item | State |
 |------|-------|
-| Canonical (DP+Combined, 360 rows) | ✅ committed |
-| IF-attack third (180 rows) | 🔄 **local sweep in progress** (2026-08-04; path **→540** total rows). Not complete until IF=180. |
-| Tables / figures / both PDFs | ✅ for DP+Combined; **re-run after IF hits 540** before claiming full-grid IF |
+| Canonical full grid (540 rows) | ✅ complete (unique 540; τ=1 / k_inner=10 / epochs=60 uniform; max\|if\|≈0.239) |
+| IF-attack third (180 rows) | ✅ complete — **first real IF numbers; MIXED** vs DP story (see §3) |
+| Agent H finalize | ✅ `results/if_wilcoxon_summary.txt`; tables; `paper/main.pdf` + `report/report.pdf` |
+| Meeting brief (4pm) | ✅ FINAL `docs/MEETING_2026-08-04.md` (honest 5/6 + IF MIXED) |
 | Kuldeep correction note | ✅ `docs/KULDEEP_CORRECTION.md` (draft — human reviews & sends) |
-| UTKFace | 🔄 **real features + 1-config MPS probe** (`docs/UTKFACE_STATUS.md`); full grid still pending |
+| UTKFace full grid | 🔄 **M blocked on flair2 SSH**; local real features + 1-config MPS probe only |
+| Note | H log: `compute_canonical_wilcoxon.py` once hit `ModuleNotFoundError: experiments`; IF summary + auto tables OK. L: `PYTHONPATH=.` if full wilcoxon artifact needed. |
 
-## 7. What remains (only two items)
-1. **IF local sweep → 540 (G1):** finish the 180 IF-attack rows
-   (`experiments/run_if_parallel.py` or `scripts/run_if_rerun_cluster.sh` — both resume-safe),
-   then **Agent H** finalize (`./scripts/agent_h_finalize.sh`) and regenerate tables/figures/PDFs.
-   Metric fix verified (`tests/test_metrics.py`). Live progress: `docs/LOOP_STATUS.md`.
-2. **UTKFace full grid (or formal drop):** real features already local; after IF frees cores,
-   run multi-α/seed protocol on MPS — or drop from Aug 10 scope (`docs/UTKFACE_STATUS.md`).
+## 7. What remains (Aug 10)
+1. **J more:** continue repo professionalize (archive dead paths, polish entrypoints).
+2. **K:** paper/report prose to 540-row tables + honest IF narrative (**MIXED**: Adult/Credit α≤0.2 yes; Adult α≥0.3 DP-under-IF loss; LSAC IF no; Adult/DP α=0.1 = 5/6).
+3. **L re-audit:** ship gate on full 540 + H artifacts (`docs/VERIFICATION_REPORT.md`).
+4. **M:** UTKFace blocked on **flair2 SSH** — full multi-seed grid or formal Aug 10 scope-out.
+5. Optional: fix PYTHONPATH for `experiments/compute_canonical_wilcoxon.py` in finalize script.
 
 ## 8. How to run / verify
 ```bash
@@ -96,7 +84,6 @@ make validate                 # Wilcoxon / consistency on current results
 make results && make deliverables   # regenerate tables + figures
 # Full repro path: see README.md "How to reproduce"
 ```
-
 
 ## 9. Constraints
 - Private repo, professor only. No publicity.
