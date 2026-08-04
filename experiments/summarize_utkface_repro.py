@@ -65,12 +65,23 @@ def main():
         "| attack | α | n_mac | n_gpu | Δ mean DP_dro (gpu−mac) | Δ mean acc_dro | note |",
         "|--------|---:|------:|------:|------------------------:|---------------:|------|",
     ]
+    def _fmt_delta(x: float) -> str:
+        """Empty-GPU / NaN cells as em-dash (not '+nan')."""
+        if x is None or (isinstance(x, float) and (np.isnan(x) or np.isinf(x))):
+            return "—"
+        return f"{x:+.4f}"
+
     mg, gg = _group(mac), _group(gpu)
     keys = sorted(set(mg) | set(gg), key=lambda x: (str(x[0]), x[1]))
     gap_cells = []
     for atk, a in keys:
         mr, gr = mg.get((atk, a), []), gg.get((atk, a), [])
-        mr_m = _matched_mac(mr, gr) if gr else mr
+        if not gr:
+            lines.append(
+                f"| {atk} | {a} | {len(mr)} | 0 | — | — | partial |"
+            )
+            continue
+        mr_m = _matched_mac(mr, gr)
         ddp = _mean(gr, "dro", "clean", "dp") - _mean(mr_m, "dro", "clean", "dp")
         dacc = _mean(gr, "dro", "clean", "acc") - _mean(mr_m, "dro", "clean", "acc")
         if abs(ddp) < GAP_THR and abs(dacc) < GAP_THR:
@@ -81,7 +92,7 @@ def main():
         else:
             note = "partial"
         lines.append(
-            f"| {atk} | {a} | {len(mr)} | {len(gr)} | {ddp:+.4f} | {dacc:+.4f} | {note} |"
+            f"| {atk} | {a} | {len(mr)} | {len(gr)} | {_fmt_delta(ddp)} | {_fmt_delta(dacc)} | {note} |"
         )
 
     lines += [
@@ -102,7 +113,7 @@ def main():
             "GAP" if len(gr) >= 6 and len(mr) >= 6 else "partial"
         )
         lines.append(
-            f"| {atk} | {a} | {len(gr)} | {ddp:+.4f} | {dacc:+.4f} | {note} |"
+            f"| {atk} | {a} | {len(gr)} | {_fmt_delta(ddp)} | {_fmt_delta(dacc)} | {note} |"
         )
 
     # Seed-wise max abs delta over matched cells
@@ -124,6 +135,24 @@ def main():
             )
             for k in common
         ]
+        signed_clean = [
+            (
+                abs(
+                    _metric(gpu_i[k]["dro"], "clean", "dp")
+                    - _metric(mac_i[k]["dro"], "clean", "dp")
+                ),
+                k,
+                _metric(gpu_i[k]["dro"], "clean", "dp"),
+                _metric(mac_i[k]["dro"], "clean", "dp"),
+            )
+            for k in common
+        ]
+        signed_clean.sort(reverse=True)
+        top = signed_clean[:5]
+        top_lines = [
+            f"  - {atk} α={a} s={s}: gpu={g:.4f} mac={m:.4f} |Δ|={d:.4f}"
+            for d, (atk, a, s), g, m in top
+        ]
         lines += [
             "",
             "## Matched seed-wise (all completed GPU cells)",
@@ -132,6 +161,8 @@ def main():
             f"- max\\|Δ DP_dro corrupted\\| = **{max(d_corr):.4f}**",
             f"- mean Δ DP_dro clean = "
             f"{float(np.mean([_metric(gpu_i[k]['dro'],'clean','dp')-_metric(mac_i[k]['dro'],'clean','dp') for k in common])):+.5f}",
+            "- Largest clean DP deltas (honest outliers, still OK if < thr):",
+            *top_lines,
         ]
 
     lines += [

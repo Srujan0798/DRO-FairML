@@ -70,5 +70,11 @@ nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv
 nvidia-smi --query-compute-apps=pid,used_memory,process_name --format=csv 2>/dev/null || true
 echo "== logs =="
 wc -c logs/u1_utkface_flair2.log logs/u2_multigroup.log 2>/dev/null || true
+# U1 log may be empty if the long-lived process was started without -u / pre-flush
+# code; do NOT restart U1 — results JSON is source of truth (puller + this script).
+u1sz=$(wc -c < logs/u1_utkface_flair2.log 2>/dev/null || echo 0)
+if [ "${u1sz// /}" = "0" ]; then
+  echo "  note: u1 log empty (known); monitor via results/utkface_flair2.json mtime"
+fi
 tail -3 logs/u2_multigroup.log 2>/dev/null || true
 REMOTE
