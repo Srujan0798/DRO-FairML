@@ -65,13 +65,56 @@ unexplained empirical correlation is a different, weaker claim than a derived on
 
 ### Phase 0 done when
 
-- [ ] Finding 2 disclosure checked across paper/report/docs, fixed if overclaiming
-- [ ] Finding 3 disclosure checked across every place IF appears, fixed if undisclosed
-- [ ] Q6 attack/eval k-NN graph mismatch resolved or confirmed already fixed, with line numbers
-- [ ] Q7 mathematical argument written, or explicitly marked unexplained
-- [ ] Findings appended to this file (below this line), don't rewrite the sections above
+- [x] Finding 2 disclosure checked across paper/report/docs, fixed if overclaiming
+- [x] Finding 3 disclosure checked across every place IF appears, fixed if undisclosed
+- [x] Q6 attack/eval k-NN graph mismatch resolved or confirmed already fixed, with line numbers
+- [x] Q7 mathematical argument written, or explicitly marked unexplained
+- [x] Findings appended to this file (below this line), don't rewrite the sections above
 
 **Findings go here:**
+
+### Phase 0 results (2026-08-04, Grok lane)
+
+#### Finding 2 — α=0 objectives (DISCLOSURE OK)
+- **Code:** `dro_fair.py` skips p-ascent when `alpha > 0` is false; tilted risk + λ dual still run.
+- **Paper:** `paper/sections/results.tex` lines 25–30 already state α=0 is **not** an attack cell and DRO vs Naive optimise **different** objectives (tilted / dual vs fixed-Lagrange BCE); excluded from attack-robustness headline.
+- **Verdict:** No overclaim of “robustness to zero corruption.” No prose fix required. Integration may mirror the same sentence in the report if any residual α=0 “win” language remains.
+
+#### Finding 3 — cosine IF vs original Euclidean (DISCLOSE FOR INTEGRATION)
+- **Eval default:** `metrics.compute_if_violation` / `compute_metrics_torch` use `metric='cosine'` (docstring lines 70–74, 144–147).
+- **Attack:** IF path uses `metric='cosine'` in `_precompute_if_neighbors` / greedy attack (`adversarial.py` 293–315, 424).
+- **Paper status:** Mentions “cosine IF” / “cosine fix” in results/conclusion but does **not** always spell out: “this is **not** the original paper Euclidean IF; absolute feature-space threshold was abandoned because it was degenerate.”
+- **Verdict:** **Flag for integration pass** — strengthen one explicit sentence wherever IF numbers appear (experimental setup + first IF table). Not a code bug. Numbers in tables measure angular IF, not the original Euclidean formula.
+
+#### Q6 — IF attack k-NN within-group vs global (FIXED)
+| Site | Graph | Metric | Lines |
+|------|-------|--------|-------|
+| Eval | **Global** (all samples) | cosine | `metrics.py` 101–104 |
+| Attack precompute | **Global** (`'global'` key, `np.arange(n)`) | cosine | `adversarial.py` 293–315, 424 |
+| Training (was gap) | **Global** | was **Euclidean** (sklearn default) | `dro_fair.py` / `naive_fair.py` `_build_knn_graph` |
+
+- **Kuldeep mismatch (within-group attack vs global eval):** **already fixed** on attack+eval — both global cosine.
+- **Residual found & fixed this session:** training IF graphs used default Euclidean distances while attack/eval used cosine. Updated both trainers to `metric='cosine'` so train = attack = eval.
+
+#### Q7 — Why IF-targeted attack can lower DP (mathematical sketch)
+DP measures a **group-mean** gap `|E[y|A=0] − E[y|A=1]|` (or soft rates). The IF attack maximises
+`Σ_{(i,j)∈N_k} max(0, |y_i−y_j| − d(x_i,x_j) − γ)` over label flips, i.e. it creates
+**local prediction disagreements among feature-neighbors**.
+
+Many near-boundary pairs are **cross-group** in feature space (features are not perfectly
+group-separable). Forcing such neighbors toward **similar** labels to create/remove IF
+violations (depending on the marginal-gain sign) tends to **pull group-conditional rates
+toward each other**: the attack is not maximising DP, so it has no incentive to keep
+minority/majority means far apart. Empirically (Adult IF-attack α=0.3) IF worsens while
+DP falls for DRO relative to Naive (or DRO loses on DP) — consistent with **coupling**, not
+with a DP-maximising adversary.
+
+This is a **plausible mechanism**, not a theorem that IF↑ always implies DP↓. We treat
+DP-under-IF as a **separate** reported outcome (mixed), not as a corollary of IF robustness.
+
+#### Phase 0 residual for integration (not Grok GPU)
+- Paper/report: one explicit “cosine ≠ original Euclidean IF” sentence (Finding 3).
+- Optional: re-run IF third after trainer cosine fix if advisors demand re-lock (canonical 540 was trained under old Euclidean train graph) — **do not silently retrain without greenlight**.
 
 ---
 

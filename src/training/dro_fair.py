@@ -183,10 +183,11 @@ class DroFairTrainer:
         return pi_clean
 
     def _build_knn_graph(self, X):
-        """Precompute k-NN graph for IF."""
+        """Precompute k-NN graph for IF (cosine; matches attack+eval after Agent A fix)."""
         n = len(X)
         k_eff = min(self.k, n - 1)
-        nbrs = NearestNeighbors(n_neighbors=k_eff + 1, n_jobs=1).fit(X)
+        # Cosine: same metric as FairnessTargetedPGD IF attack and metrics.compute_if_violation
+        nbrs = NearestNeighbors(n_neighbors=k_eff + 1, metric='cosine', n_jobs=1).fit(X)
         distances, indices = nbrs.kneighbors(X)
         edges_i, edges_j, edge_dists = [], [], []
         for i in range(n):

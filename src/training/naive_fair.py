@@ -41,10 +41,11 @@ class NaiveFairTrainer:
         self.n_samples = None
 
     def _build_knn_graph(self, X):
-        """Precompute k-NN graph and neighbor pair tensors for fast IF."""
+        """Precompute k-NN graph and neighbor pair tensors for fast IF (cosine)."""
         n = len(X)
         k_eff = min(self.k, n - 1)
-        nbrs = NearestNeighbors(n_neighbors=k_eff + 1, n_jobs=1).fit(X)
+        # Cosine: align with IF attack + eval (was sklearn default Euclidean)
+        nbrs = NearestNeighbors(n_neighbors=k_eff + 1, metric='cosine', n_jobs=1).fit(X)
         distances, indices = nbrs.kneighbors(X)
 
         edges_i = []
