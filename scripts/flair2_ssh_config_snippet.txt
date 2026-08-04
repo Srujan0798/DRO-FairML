@@ -1,0 +1,11 @@
+# Paste into ~/.ssh/config (or: cat scripts/flair2_ssh_config_snippet.txt >> ~/.ssh/config)
+# Then: ssh flair2
+
+Host flair2 flair2.iitgn.ac.in
+    HostName 10.0.62.234
+    # CHANGE THIS to your real flair2 username once granted:
+    User srujan.sai
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 6
