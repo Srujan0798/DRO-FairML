@@ -60,23 +60,35 @@ $\approx0.7788$, LSAC $\approx0.9016$.}
 Earlier results in this project used a stepped
 $\tau$-schedule: $\tau{=}100$ for $\alpha\le0.3$, $\tau{=}1$ for
 $\alpha{=}0.4$.  Under that schedule DRO \emph{lost} on Adult DP at
-$\alpha{=}0.1$--$0.3$ (e.g.\ $\alpha{=}0.2$: Naive $0.327147$ vs DRO
-$0.503047$, from the stepped-schedule pilot, $n{=}3$).  Switching to a single fixed $\tau{=}1$ for
-all $\alpha$ (per Kuldeep's Q12) flips the verdict: DRO now wins on
+every $\alpha\in\{0.1,...,0.4\}$ tested (e.g.\ $\alpha{=}0.2$: Naive
+$0.3258$ vs DRO $0.4582$, $n{=}6$).  Switching to a single fixed $\tau{=}1$
+for all $\alpha$ (per Kuldeep's Q12) flips the verdict: DRO now wins on
 DP at $\alpha\le0.2$ (no method claim is made at $\alpha\ge0.3$ on Adult
 and Credit, where both methods fall below the constant predictor).  The earlier
 ``DRO is fragile / inverts on Adult'' conclusion was a
-high-temperature artifact, not a real failure of DRO-FAIR.
+high-temperature artifact, not a real failure of DRO-FAIR.  This was
+originally established on a $n{=}3$, $k_{\mathrm{inner}}$-confounded
+pilot; a clean, complete re-run
+($n{=}6$, $k_{\mathrm{inner}}{=}10$ throughout, all three datasets,
+\texttt{results/tau\_ablation\_summary.md}) \textbf{confirms all 12
+comparable cells and contradicts none} --- the $\tau{=}100$-artifact
+finding is not a small-sample fluke.
 Table~\ref{tab:tau-comparison} makes the contrast explicit.
 
 \begin{table}[h]
 \centering\small
 \caption{Adult, DP attack: the ``DRO is fragile'' story was a
-$\tau{=}100$ artifact.  Same hyperparameters, only
-\texttt{get\_temperature()} monkey-patched to return a constant.
-\textbf{$\tau{=}1$ rows:} means over the full 6-seed canonical grid
-(\texttt{results/canonical\_tau1.json}, seeds $0$--$5$).
-\textbf{$\tau{=}10,100$ rows:} historical stepped-schedule pilot (seeds $0$--$2$, $n{=}3$).}
+$\tau{=}100$ artifact --- now confirmed by a clean, complete ablation.
+Same hyperparameters, only \texttt{get\_temperature()} monkey-patched to
+return a constant, $k_{\mathrm{inner}}{=}10$ throughout (the original
+$\tau$ ablation confounded $\tau$ with $k_{\mathrm{inner}}$; this re-run
+fixes that and adds Credit/LSAC, see
+\texttt{results/tau\_ablation\_summary.md}).
+\textbf{All rows: full 6-seed grid, seeds $0$--$5$}
+($\tau{=}1$ from \texttt{results/canonical\_tau1.json};
+$\tau{=}10,100$ from \texttt{results/tau\_ablation.json}, 360/360 complete).
+Of 12 comparable historical-pilot cells, this re-run \textbf{confirms all 12,
+contradicts none}.}
 \label{tab:tau-comparison}
 \rowcolors{2}{gray!8}{white}
 \begin{tabular}{cc ccc cc}
@@ -89,20 +101,20 @@ $\tau{=}100$ artifact.  Same hyperparameters, only
 \color{white}\textbf{Verdict} \\
 \midrule
 0.1 & 1   & 0.2026 & \cellcolor{wingreen}\textbf{0.1999} & $+$0.001 & 5/6 & DRO\;\checkmark \\
-0.1 & 10  & 0.1850 & \cellcolor{lossred}0.2231            & $+$0.001 & 0/3 & Tie \\
-0.1 & 100 & 0.1801 & \cellcolor{lossred}0.2033            & $+$0.002 & 0/3 & Tie \\
+0.1 & 10  & 0.1844 & \cellcolor{lossred}0.2205            & $+$0.003 & 0/6 & Naive\;\checkmark \\
+0.1 & 100 & 0.1787 & \cellcolor{lossred}0.2008            & $+$0.003 & 0/6 & Naive\;\checkmark \\
 \midrule
 0.2 & 1   & 0.2452 & \cellcolor{wingreen}\textbf{0.2334} & $+$0.003 & 6/6 & DRO\;\checkmark \\
-0.2 & 10  & 0.3382 & \cellcolor{lossred}0.4634            & $-$0.026 & 0/3 & Naive\;\checkmark \\
-0.2 & 100 & 0.3271 & \cellcolor{lossred}0.5030            & $-$0.025 & 0/3 & Naive\;\checkmark \\
+0.2 & 10  & 0.3401 & \cellcolor{lossred}0.4347            & $-$0.014 & 0/6 & Naive\;\checkmark \\
+0.2 & 100 & 0.3258 & \cellcolor{lossred}0.4582            & $-$0.014 & 0/6 & Naive\;\checkmark \\
 \midrule
 0.3 & 1   & 0.2848 & \cellcolor{wingreen}\textbf{0.2614} & $+$0.009 & 6/6 & DRO\;\checkmark \\
-0.3 & 10  & 0.5253 & \cellcolor{lossred}0.5532            & $+$0.010 & 0/3 & Naive\;\checkmark \\
-0.3 & 100 & 0.5313 & \cellcolor{lossred}0.5622            & $+$0.012 & 0/3 & Naive\;\checkmark \\
+0.3 & 10  & 0.5263 & \cellcolor{lossred}0.5445            & $+$0.017 & 1/6 & Naive\;\checkmark \\
+0.3 & 100 & 0.5345 & \cellcolor{lossred}0.5561            & $+$0.020 & 0/6 & Naive\;\checkmark \\
 \midrule
 0.4 & 1   & 0.3140 & \cellcolor{wingreen}\textbf{0.2855} & $+$0.010 & 6/6 & DRO\;\checkmark \\
-0.4 & 10  & 0.5158 & \cellcolor{lossred}0.5231            & $+$0.012 & 0/3 & Naive\;\checkmark \\
-0.4 & 100 & 0.5129 & \cellcolor{lossred}0.5260            & $+$0.016 & 0/3 & Naive\;\checkmark \\
+0.4 & 10  & 0.5014 & \cellcolor{lossred}0.5227            & $+$0.028 & 0/6 & Naive\;\checkmark \\
+0.4 & 100 & 0.4944 & \cellcolor{lossred}0.5256            & $+$0.034 & 0/6 & Naive\;\checkmark \\
 \bottomrule
 \end{tabular}
 \end{table}
