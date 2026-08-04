@@ -104,3 +104,12 @@ make results && make deliverables   # regenerate tables + figures
 - Private repo, professor only. No publicity.
 - No oracle leak: DRO knows only α (+ known attack structure for empirical radii) — never the
   true per-sample corruption mask.
+
+
+## Grok lane update (2026-08-04, HANDOFF_GROK)
+
+- **Phase 0 done:** findings in `docs/HANDOFF_GROK.md` (α=0 disclosure OK; cosine IF flagged for integration; Q6 global cosine attack+eval; training cosine fix; Q7 IF→DP sketch).
+- **flair2 U1 LIVE:** `results/utkface_flair2.json` (CUDA repro of 90-config protocol).
+- **flair2 U2 LIVE:** `results/utkface_multigroup.json` (5-race max-min DP eval).
+- **U3 pixel PGD:** blocked — raw UTKFace JPEGs not on flair2 (only feature cache); `src/corruption/image_pgd.py` restored for when images available.
+- Do not rewrite `canonical_tau1.json` / `utkface_canonical.json`.
