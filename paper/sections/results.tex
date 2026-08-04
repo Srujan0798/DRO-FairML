@@ -11,10 +11,15 @@ equal-or-slightly-higher for DRO, so this is a free fairness win, not an
 accuracy trade.  At $\alpha\ge0.3$ both methods fall below the
 constant-predictor baseline on \textbf{Adult and Credit} (LSAC under the
 DP attack stays pinned \emph{at} majority accuracy, not below), so we make
-no method claim there.  The IF-attack third is landing after a metric fix
-(earlier IF was degenerate, $\approx10^{-10}$, due to a threshold bug in
-\texttt{src/evaluation/metrics.py}); \textbf{no full IF claim} until that
-third is complete.  Full per-seed traces are in
+no method claim there.  The full attack grid is complete
+(\textbf{540 rows}: DP+IF+Combined $\times$ 3 datasets $\times$ 5 $\alpha$
+$\times$ 6 seeds $\times$ 2 methods).  The IF-attack third is
+\emph{mixed} (not a three-attack sweep): Adult/Credit $\alpha\le0.2$ still
+support DRO on DP under IF attack; LSAC/IF and Adult IF $\alpha\ge0.3$ do
+not (see \S\ref{sec:results-tabular} Q7 and
+\texttt{results/if\_wilcoxon\_summary.txt}).  Earlier IF metrics were
+degenerate ($\approx10^{-10}$) before the cosine fix in
+\texttt{src/evaluation/metrics.py}.  Full per-seed traces are in
 \texttt{results/canonical\_tau1.json}.
 
 \paragraph{Why the previous story is wrong.}

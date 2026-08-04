@@ -24,12 +24,13 @@ on image features'' claim is withdrawn.}
 We compare Naive-FAIR (fixed Lagrange multiplier) vs.\ DRO-FAIR
 (adaptive worst-case reweighting within a TV uncertainty set).
 Attacks: DP-only, IF-only, Combined, with $\alpha\in\{0.0, 0.1, 0.2,
-0.3, 0.4\}$ (tabular).  UTKFace was \textbf{not} run (blocked on GPU access); the prior reported UTKFace numbers were synthetic smoke tests, not a real run;
-if pursued, it would use $\alpha\in\{0.0, 0.1, 0.2\}$.  The canonical
-$\tau{=}1$, $k_{\mathrm{inner}}{=}10$ grid
-uses $n{=}6$ seeds (0--5) and achieves Wilcoxon $p{<}0.05$ at
-$\alpha\le0.2$ on Adult and Credit under the DP-targeted and Combined
-attacks.
+0.3, 0.4\}$ (tabular).  The canonical $\tau{=}1$, $k_{\mathrm{inner}}{=}10$
+grid is complete (540 rows: 3 datasets $\times$ 5 $\alpha$ $\times$ 3
+attacks $\times$ 6 seeds $\times$ 2 methods) and achieves Wilcoxon
+$p{<}0.05$ at $\alpha\le0.2$ on Adult and Credit under the DP-targeted and
+Combined attacks (Adult/DP $\alpha{=}0.1$ is $5/6$).  UTKFace real features
+exist locally; a multi-seed image grid is not claimed in this draft
+(prior synthetic smoke numbers remain withdrawn).
 
 Prediction temperature is fixed at $\tau{=}1$ across all
 $\alpha$ (per Kuldeep's Q12).  The earlier $\tau{=}100$ schedule for
