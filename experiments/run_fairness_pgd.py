@@ -48,7 +48,7 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
                            tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3,
                            corruptor_type='adversarial', lr_lambda=5e-3, attack_k=5,
                            radii_scale=1.0, radii_clamp=None, dump_history=False,
-                           pi_shrinkage_k=0.0):
+                           pi_shrinkage_k=0.0, lambda_max=1.5, beta=5.0):
     """Run single (dataset, alpha, seed, attack, method) experiment.
     All callers must pass (or rely on defaults for) full provenance params so every row
     includes k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
@@ -61,6 +61,13 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
       radii_clamp (Agent L2): per-group cap on rho_dp[j] (default None = canonical).
       pi_shrinkage_k: additive shrinkage of pi_clean toward 0.5 before computing rho_dp
         (LSAC-degeneracy hypothesis, alternative to radii_clamp; default 0.0 = canonical).
+      lambda_max, beta (DRO only; Naive's lambda_max stays hardcoded 1.5 for baseline
+        comparability): both were set once and never revisited after the tau=100 -> 1.0
+        fix. lambda_max=1.5 was a conservative cap chosen to survive the OLD tau=100
+        instability; beta=5.0 (tilted-risk sharpness) has never been ablated at all.
+        Testing whether either can be raised now that the actual instability source
+        (stepped tau) is gone, to see if DRO's fairness margin over Naive can grow
+        meaningfully rather than staying marginal. Defaults are canonical (unchanged).
 
     Extended for Agent N2 convergence diagnostics:
       dump_history: if True AND method=='dro', dump trainer.history (per-epoch train_loss,
@@ -141,6 +148,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         'radii_scale': float(radii_scale),
         'radii_clamp': (None if radii_clamp is None else float(radii_clamp)),
         'pi_shrinkage_k': float(pi_shrinkage_k),
+        'lambda_max': float(lambda_max),
+        'beta': float(beta),
         'attack_effectiveness': attack_effectiveness,
         'dp_clean_train': dp_clean_train,
         'dp_corrupted_train': dp_corrupted_train,
@@ -164,8 +173,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
         trainer = DroFairTrainer(
             model, alpha=alpha, device=device,
-            lr_theta=1e-3, lr_lambda=lr_lambda, lr_p=5e-3, lambda_max=1.5,
-            tau=tau, beta=5.0, k=attack_k, gamma=0.0,
+            lr_theta=1e-3, lr_lambda=lr_lambda, lr_p=5e-3, lambda_max=lambda_max,
+            tau=tau, beta=beta, k=attack_k, gamma=0.0,
             K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15,
             lambda_init=lambda_init, radii_mode=radii_mode,
             radii_scale=radii_scale, radii_clamp=radii_clamp,
