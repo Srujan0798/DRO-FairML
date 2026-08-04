@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Poll flair2 U1/U2 result JSONs; rsync + summarize each when its target is hit.
 # Independent finalization: U2=30 does not wait for U1=90 (and vice versa).
+# Also re-summarizes on every count increase so Mac partials stay fresh.
 # Does NOT touch run_utkface_* processes.
 set -euo pipefail
 
@@ -17,6 +18,8 @@ cd "$ROOT"
 u1_done=0
 u2_done=0
 last_partial=0
+prev_n1=-1
+prev_n2=-1
 
 # One SSH: U1/U2 counts + last cell + job alive flags (cheap).
 remote_snapshot() {
@@ -48,13 +51,6 @@ print('alive|u1=%d|u2=%d' % (
 PY" 2>/dev/null || echo "err"
 }
 
-count_remote() {
-  local file="$1"
-  ssh -o BatchMode=yes -o ConnectTimeout=15 "$REMOTE" \
-    "python3 -c \"import json,os;p='$RDIR/$file';print(len(json.load(open(p))) if os.path.exists(p) else 0)\"" \
-    2>/dev/null || echo err
-}
-
 rsync_one() {
   local file="$1"
   rsync -az "$REMOTE:$RDIR/$file" "$ROOT/results/"
@@ -72,7 +68,27 @@ finalize_u2() {
   echo "$(date) U2 FINALIZED 30/30 + multigroup summary" | tee -a "$LOG"
 }
 
-echo "$(date) puller start (independent U1/U2 finalize; poll=${POLL_SEC}s)" | tee -a "$LOG"
+# On count increase: rsync + summarize (skip if already finalized that job)
+partial_refresh() {
+  local n1="$1" n2="$2" grew=0
+  if [[ "$n1" =~ ^[0-9]+$ ]] && (( n1 > prev_n1 )) && [[ "$u1_done" == "0" ]]; then
+    rsync_one utkface_flair2.json || true
+    python3 experiments/summarize_utkface_repro.py >/dev/null || true
+    grew=1
+  fi
+  if [[ "$n2" =~ ^[0-9]+$ ]] && (( n2 > prev_n2 )) && [[ "$u2_done" == "0" ]]; then
+    rsync_one utkface_multigroup.json || true
+    python3 experiments/summarize_utkface_multigroup.py >/dev/null || true
+    grew=1
+  fi
+  if (( grew )); then
+    echo "$(date) count-up rsync+summarize U1=$n1 (was $prev_n1) U2=$n2 (was $prev_n2)" | tee -a "$LOG"
+  fi
+  if [[ "$n1" =~ ^[0-9]+$ ]]; then prev_n1=$n1; fi
+  if [[ "$n2" =~ ^[0-9]+$ ]]; then prev_n2=$n2; fi
+}
+
+echo "$(date) puller start (independent U1/U2 finalize; poll=${POLL_SEC}s; count-up summarize)" | tee -a "$LOG"
 
 while true; do
   snap=$(remote_snapshot || true)
@@ -88,13 +104,20 @@ while true; do
   if [[ "$n1" == "90" && "$u1_done" == "0" ]]; then
     finalize_u1
     u1_done=1
+    prev_n1=90
   fi
   if [[ "$n2" == "30" && "$u2_done" == "0" ]]; then
     finalize_u2
     u2_done=1
+    prev_n2=30
   fi
 
-  # cheap partial mirror every ~10 min so Mac has crash safety
+  # rsync+summarize whenever a count advances (keeps Mac partials fresh)
+  if [[ "$u1_done" == "0" || "$u2_done" == "0" ]]; then
+    partial_refresh "$n1" "$n2" || true
+  fi
+
+  # backup partial mirror every ~10 min even if counts stall
   now=$(date +%s)
   if (( now - last_partial >= 600 )); then
     rsync_one utkface_flair2.json || true
