@@ -311,7 +311,7 @@ def main():
                 epochs=args.epochs,
                 weight_decay=1e-4,
                 tau_warmup_epochs=15,
-                lambda_warmstart=0.01,
+                lambda_init=0.0,
             )
             t_d.fit(X_tr_adv_s, y_tr_a, a_tr_a, X_val=X_v_s, y_val=y_v, a_val=a_v, verbose=False)
             dro = compute_metrics_torch(
