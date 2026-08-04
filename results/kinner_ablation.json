@@ -573,5 +573,33 @@
     "n_seeds_planned": 6,
     "epochs": 60,
     "ablation": "n5_kinner"
+  },
+  {
+    "dataset": "adult",
+    "alpha": 0.2,
+    "seed": 1,
+    "attack": "dp",
+    "method": "dro",
+    "corruptor_type": "adversarial",
+    "lr_lambda": 0.005,
+    "attack_k": 5,
+    "radii_scale": 1.0,
+    "radii_clamp": null,
+    "attack_effectiveness": 0.17605307698249817,
+    "dp_clean_train": 0.19889548420906067,
+    "dp_corrupted_train": 0.0228424072265625,
+    "acc_clean": 0.7721393034825871,
+    "dp_clean": 0.22789089381694794,
+    "if_clean": 0.049884866923093796,
+    "total_time": 847.0020639896393,
+    "k_inner": 5,
+    "tau": 1.0,
+    "radii_mode": "uniform",
+    "lambda_init": 0.0,
+    "coordinated": false,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "ablation": "n5_kinner"
   }
 ]

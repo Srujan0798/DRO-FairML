@@ -14,9 +14,8 @@ Naive baseline: arms (c,d) use L2 naive (coordinated=True, same corrupted data a
 
 ## Coverage
 
-- L2 rows present: **70/120** (58.3%)
+- L2 rows present: **120/120** (100.0%)
 - Canonical LSAC/dp rows (arm a + naive-b): **60** (read-only; should be 60 = 5 alpha x 6 seeds x 2 methods)
-- **INCOMPLETE** — partial-data mode; re-run as more rows land (idempotent).
 
 ## Per (alpha, arm): DRO accuracy & DP
 
@@ -25,10 +24,10 @@ Constant-predictor baseline (LSAC): **0.9016**. Canonical DP freezes at ~0.222 f
 | alpha | (a) canonical acc | (a) canonical DP | (b) clamp=0.3 acc | (b) clamp=0.3 DP | (c) empirical acc | (c) empirical DP | (d) emp+clamp acc | (d) emp+clamp DP |
 |---|---|---|---|---|---|---|---|---|
 | 0.0 | 0.9023 (n=6) | 0.1829 | 0.9023 (n=6) | 0.1829 | 0.9023 (n=6) | 0.1829 | 0.9023 (n=6) | 0.1829 |
-| 0.1 | 0.9046 (n=6) | 0.2539 | 0.9048 (n=6) | 0.2554 | 0.9016 (n=6) | 0.1528 | 0.9016 (n=4) | 0.1489 |
-| 0.2 | 0.9033 (n=6) | 0.2230 | 0.9032 (n=6) | 0.2250 | 0.9016 (n=6) | 0.0849 | — | — |
-| 0.3 | 0.9032 (n=6) | 0.2220 | 0.9032 (n=6) | 0.2244 | 0.9016 (n=6) | 0.0846 | — | — |
-| 0.4 | 0.9029 (n=6) | 0.2211 | 0.9032 (n=6) | 0.2244 | 0.9016 (n=6) | 0.0843 | — | — |
+| 0.1 | 0.9046 (n=6) | 0.2539 | 0.9048 (n=6) | 0.2554 | 0.9016 (n=6) | 0.1528 | 0.9016 (n=6) | 0.1533 |
+| 0.2 | 0.9033 (n=6) | 0.2230 | 0.9032 (n=6) | 0.2250 | 0.9016 (n=6) | 0.0849 | 0.9016 (n=6) | 0.0851 |
+| 0.3 | 0.9032 (n=6) | 0.2220 | 0.9032 (n=6) | 0.2244 | 0.9016 (n=6) | 0.0846 | 0.9016 (n=6) | 0.0850 |
+| 0.4 | 0.9029 (n=6) | 0.2211 | 0.9032 (n=6) | 0.2244 | 0.9016 (n=6) | 0.0843 | 0.9016 (n=6) | 0.0850 |
 
 ## Degeneracy metrics per arm (DRO)
 
@@ -39,7 +38,7 @@ Thresholds: accuracy is 'off pin' if mean |acc - 0.9016| over alpha>=0.1 > 0.010
 | a | 0.0019 | 0.0019 | no | no |
 | b | 0.0020 | 0.0005 | no | no |
 | c | 0.0000 | 0.0005 | no | no |
-| d | 0.0000 | — | no | no |
+| d | 0.0000 | 0.0001 | no | no |
 
 ## Verdict per arm — does this arm un-degenerate LSAC?
 
@@ -50,11 +49,11 @@ An arm UN-DEGENERATES LSAC if BOTH: accuracy moves off the 0.9016 pin AND DP unf
 | a | no | acc_off_pin=0.0019 (>0.01? False); dp_spread_degen_band=0.0019 (>0.02? False) |
 | b | no | acc_off_pin=0.0020 (>0.01? False); dp_spread_degen_band=0.0005 (>0.02? False) |
 | c | no | acc_off_pin=0.0000 (>0.01? False); dp_spread_degen_band=0.0005 (>0.02? False) |
-| d | — | insufficient data (need >=2 of alpha={0.2,0.3,0.4}; have 0) |
+| d | no | acc_off_pin=0.0000 (>0.01? False); dp_spread_degen_band=0.0001 (>0.02? False) |
 
 ## Overall verdict
 
-**INCOMPLETE.** Not all fix arms have enough data to evaluate yet. Re-run this summary as more L2 rows land (idempotent). No verdict can be honestly stated against an empty band.
+**NO — the limitation stands WITH EVIDENCE.** None of the fix arms (uniform+clamp=0.3, empirical, empirical+clamp=0.3) move accuracy off the 0.9016 constant-predictor pin AND unfreeze DP across alpha. The LSAC/DP degeneracy is NOT an artifact of the un-clamped minority radius that principled radius calibration fixes. The diagnosis (docs/LSAC_DEGENERACY.md) is confirmed, and the limitation is now supported by a tested fix rather than an untested hypothesis. LSAC/DP remains a degenerate/diagnostic result, NOT a DRO win or loss.
 
 ## Arm-by-arm reading
 
@@ -78,13 +77,13 @@ An arm UN-DEGENERATES LSAC if BOTH: accuracy moves off the 0.9016 pin AND DP unf
 
 ### (d) empirical, coord=True, clamp=0.3
 
-- accuracy: alpha=0.0: 0.9023, alpha=0.1: 0.9016
-- DP: alpha=0.0: 0.1829, alpha=0.1: 0.1489
-- verdict: INCOMPLETE (insufficient data (need >=2 of alpha={0.2,0.3,0.4}; have 0))
+- accuracy: alpha=0.0: 0.9023, alpha=0.1: 0.9016, alpha=0.2: 0.9016, alpha=0.3: 0.9016, alpha=0.4: 0.9016
+- DP: alpha=0.0: 0.1829, alpha=0.1: 0.1533, alpha=0.2: 0.0851, alpha=0.3: 0.0850, alpha=0.4: 0.0850
+- verdict: still degenerate (acc_off_pin=0.0000 (>0.01? False); dp_spread_degen_band=0.0001 (>0.02? False))
 
 ## Provenance
 
-- Source (L2): `/Users/srujansai/Desktop/DRO-FairML/results/lsac_radii_fix.json` (70 rows)
+- Source (L2): `/Users/srujansai/Desktop/DRO-FairML/results/lsac_radii_fix.json` (120 rows)
 - Source (canonical reference): `/Users/srujansai/Desktop/DRO-FairML/results/canonical_tau1.json` (60 LSAC/dp rows)
 - clamp=0.3 justification: LSAC minority radius blows up to 0.53..0.87 (2.0..4.8x the majority radius 0.11..0.43) because pi_clean[minority]=0.1 shrinks the denominator. 0.3 caps the minority radius at the majority-group radius level, preventing minority over-weighting. Chosen on principle before running; not tuned-until-it-wins.
 - All arms: tau=1.0, k_inner=10, epochs=60, pgd_steps=20, lambda_init=0.0, lr_lambda=5e-3, attack_k=5, 6 seeds.
