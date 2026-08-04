@@ -322,3 +322,45 @@ _When IF reaches 180 rows, re-run the §2.7 matrix and fill:_
 - `paper/auto_generated/key_findings.tex` is hand-patched; regenerate path may overwrite — keep generator honest if re-run before IF=180.
 
 **Ship-critical prose M1–M7:** closed in the files listed above. Re-audit after IF hits 540.
+
+---
+
+## Post-540 re-audit (Agent L / completion loop) — 2026-08-04 ~14:17 IST
+
+**Canonical:** `results/canonical_tau1.json` — **540 rows**, unique keys **540**, attacks dp=180 / combined=180 / if=180.  
+**H artifacts:** `results/if_wilcoxon_summary.txt`, `results/canonical_wilcoxon.csv` (re-run with `PYTHONPATH=.`), `paper/main.pdf`, `report/report.pdf`.  
+**Provenance (all 540):** tau=1.0, k_inner=10, epochs=60, pgd_steps=20, lambda_init=0.0, radii_mode=uniform, coordinated=False.  
+**IF non-deg:** max |if_clean| on attack=if = **0.2389**; 180/180 ≫ 1e-6.
+
+### Adult/DP α=0.1 (honesty lock)
+
+Wins **5/6**, p=0.0312; loser **seed 2** (Naive 0.192526 vs DRO 0.192608). **MATCH** STATUS / MEETING.
+
+### IF-attack DP Wilcoxon (recomputed; matches summary)
+
+| Dataset | α≤0.2 DP story | Notes |
+|---------|----------------|-------|
+| adult | **6/6 every α**, p=0.0156 | solid |
+| credit | α=0.0 6/6; **α=0.1 4/6 n.s.**; α=0.2 5/6 | mixed at 0.1 |
+| lsac | **0/6** α≤0.3 | DP loss under IF attack |
+
+### IF-attack IF-metric Wilcoxon (recomputed)
+
+| Dataset | Read |
+|---------|------|
+| adult | α=0.0 4/6 n.s.; α∈{0.1–0.4} **6/6** p=0.0156 |
+| credit | α=0.0 4/6 n.s.; α≥0.1 **6/6** |
+| lsac | α≤0.2 loss/n.s. on IF; α≥0.3 **6/6** IF win while DP still fails |
+
+### Ship judgment (honest)
+
+| Claim class | Gate |
+|-------------|------|
+| Adult+Credit, α≤0.2, DP+Combined | **PASS** (n=6, p&lt;0.05; Adult DP α=0.1 = 5/6) |
+| Adult IF-attack α≤0.2 on DP (+ IF metric at 0.1/0.2) | **PASS** |
+| “All three attacks, all datasets” | **FAIL** — LSAC/IF DP loss; Adult IF α≥0.3 DP fails |
+| LSAC/DP | **FAIL** (degenerate; document, do not sell) |
+| UTKFace | **NOT READY** — REAL grid running (~12/90 rows at re-audit); no paper claim |
+
+**M6 residual:** prose must stay “DP+Combined + selective IF”, not blanket three-attack.  
+**M8 residual:** `make validate` Expected-150 tooling still secondary.

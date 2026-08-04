@@ -1,51 +1,139 @@
-# UTKFace status (2026-08-04)
+# UTKFace Status — Agent M
 
-**Honest summary:** real image features are available and a **single-config MPS probe** completed with `data_provenance=REAL`. There is **no** multi-seed, multi-α, multi-attack UTKFace result set yet. **Do not** put UTKFace numbers in the paper or meeting “claims” section until a full protocol run exists.
+**Date:** 2026-08-04  
+**Path taken:** **Path 2 — REAL data obtained and experiments running**  
+**Machine:** Mac (Apple Silicon MPS)
 
-## What exists on disk
+---
 
-| Item | Path / note |
-|------|-------------|
-| Images | `data/raw/utkface/` (Kaggle `utkface-new`, ~331MB zip extracted) |
-| Features | `data/raw/utkface_features.npz` — X=(23705, 512), y=gender, a=race_binary (White/nonWhite), meta=REAL_UTKFACE_IMAGES (mtime ~13:44 IST) |
-| Timing probe | `results/utkface_timing_probe.json` |
-| Partial canonical (paused) | `results/utkface_canonical.json` — **REAL**, attack=dp, α=0 only, seeds 0–4 (5 rows); process paused for IF cores (`logs/utkface_paused.txt`) |
-| Synthetic archive | `docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md` (old smoke tests only) |
+## Path decision
 
-## Probe result (not a full experiment)
+| Path | Meaning | Chosen? |
+|------|---------|---------|
+| 1 | flair2 GPU server | Not available (no account) |
+| **2** | **Public download + local MPS** | **YES** |
+| 3 | Scope out / blocked | No |
 
-Command (Agent M style):
+---
+
+## Data provenance (REAL)
+
+| Item | Value |
+|------|-------|
+| Source | Kaggle dataset `jangedoo/utkface-new` |
+| License note | copyright-authors (Kaggle listing) |
+| Download cmd | `kaggle datasets download -d jangedoo/utkface-new -p data/raw/utkface --unzip` |
+| Images path | `data/raw/utkface/UTKFace/` |
+| Image count | **23,705** valid `{age}_{gender}_{race}_{date}.jpg.chip.jpg` |
+| Feature cache | `data/raw/utkface_features.npz` |
+| Backbone | ResNet18 ImageNet (`IMAGENET1K_V1`), pre-FC 512-d |
+| Extract device | MPS (~63 s, ~381 img/s) |
+| Extract script | `scripts/extract_utkface_features.py` |
+| Meta tag in npz | `provenance=REAL_UTKFACE_IMAGES`, `synthetic=False` |
+
+### Label / protected attribute (canonical task)
+
+Trainers require **binary** protected attributes. Real setup:
+
+- **y** = gender (0=Female, 1=Male)
+- **a** = race binarized (**White=0 vs non-White=1**)
+
+This replaces the old broken override `a := y` (which made fairness degenerate: A≡Y).  
+Synthetic Gaussian fallback is **disabled by default** (`ALLOW_SYNTHETIC_UTKFACE=1` required for smoke).
+
+### Race distribution (real imbalance — not synthetic)
+
+White 10078 · Black 4526 · Asian 3434 · Indian 3975 · Others 1692  
+Gender: Female 12391 · Male 11314
+
+### What is NOT real
+
+- `data/raw/utkface_features_smoke.npz` — 24k balanced-race features with near-Gaussian norms; **do not treat as real**
+- Any historical rows with `dataset_display` / `dname` containing `synthetic`
+- `docs/_archive/UTKFACE_RESULTS_SYNTHETIC_SMOKE_ONLY.md` — archived synthetic-only smoke
+
+---
+
+## Experiment protocol (canonical)
+
+Matches tabular grid:
+
+| Hyperparam | Value |
+|------------|-------|
+| tau | 1.0 (fixed) |
+| k_inner | 10 |
+| epochs | 60 |
+| pgd_steps | 20 |
+| n_seeds | 6 |
+| alphas | 0.0, 0.1, 0.2, 0.3, 0.4 |
+| attacks | dp, if, combined |
+| lambda_max | 1.5 |
+| device | mps |
+| **Total configs** | **90** |
+
+Output: `results/utkface_canonical.json`  
+Runner: `experiments/run_utkface_server.py --output results/utkface_canonical.json`  
+Log: `logs/utkface_canonical_run.log` · agent log: `logs/utkface_agent_m.log`
+
+Every result row includes:
+
+- `data_provenance`: `"REAL"`
+- `dataset` / `dataset_display`: `"utkface"` / `"UTKFace"` (never synthetic)
+- `label_def`: `gender`, `protected_def`: `race_binary`
+- full provenance: `tau`, `k_inner`, `epochs`, `pgd_steps`, `n_seeds_planned`
+
+---
+
+## Progress
+
+Updated live as the grid runs. Target: **90/90 REAL rows**.
+
+| When (IST) | Rows | Notes |
+|------------|------|-------|
+| pre-CLEAR | 5–9 | paused / killed to protect IF sweep |
+| post-CLEAR ~14:09 | running | pid `run_utkface_server.py` on MPS |
+| **2026-08-04 ~14:17** | **12 / 90** | attack=`dp` only so far; α∈{0.0,0.1}; seeds 0–5; all `data_provenance=REAL` |
+| **2026-08-04 ~14:25** | **16 / 90** | `dp` α∈{0.0,0.1,0.2} (α=0.2 still filling); all REAL |
+
+**Early REAL snapshot (α=0.0, attack=dp, 6 seeds, seed 0 shown):** Naive acc≈0.859, DP≈0.020, IF≈0.069; DRO acc≈0.859, DP≈0.020, IF≈0.052. Full tables only after 90/90.
+
+**No paper claim until 90/90 (or scoped subset) verified.**
+
+Resume command if interrupted:
 
 ```bash
-python3 experiments/run_utkface.py --attack dp --alphas 0.0 --n_seeds 1 \
+export PYTHONUNBUFFERED=1
+python3 -u experiments/run_utkface_server.py \
+  --attacks dp if combined \
+  --alphas 0.0 0.1 0.2 0.3 0.4 \
+  --n_seeds 6 \
   --tau 1.0 --k_inner 10 --epochs 60 --pgd_steps 20 \
-  --output results/utkface_timing_probe.json
+  --device mps \
+  --output results/utkface_canonical.json \
+  | tee -a logs/utkface_canonical_run.log
 ```
 
-| Field | Value |
-|-------|--------|
-| device | **mps** |
-| attack / α / seed | dp / **0.0** / **0** |
-| provenance | **REAL** |
-| wall time | ~24 s (train+eval both methods) |
-| Naive clean | acc≈0.859, dp≈0.020, if≈0.069 |
-| DRO clean | acc≈0.859, dp≈0.020, if≈0.052 |
+---
 
-α=0 means clean==corrupted in the probe JSON (expected). This only shows the pipeline loads real features and trains; **no robustness claim**.
+## Early REAL numbers (α=0.0, attack=dp, 6 seeds)
 
-## What is still missing
+Clean accuracy ≈ **0.86** for both Naive and DRO (ResNet features are predictive of gender).  
+Clean DP ≈ **0.02** (small race disparity on gender prediction at α=0).  
+All rows tagged `data_provenance=REAL`.
 
-- Full protocol: attacks ∈ {dp, combined, if} × α ∈ {0,0.1,0.2,0.3,0.4} × seeds 0–5 (or agreed subset).
-- Wilcoxon / tables / paper language for image modality.
-- Decision: ship as appendix modality **or** drop from Aug 10 scope if time-constrained.
+Full tables after grid completion — do not cite smoke/synthetic archive numbers.
 
-## Sequencing
+---
 
-While tabular IF sweep (`run_if_parallel.py`, pid 10146) needs cores, **do not** thrash CPU with a full UTKFace grid. After **total=540**, push hard on MPS.
+## Code changes (Agent M)
 
-Rough cost from probe: ~24 s/config → e.g. 3×5×6 = 90 configs ≈ **~36 min** sequential (optimistic; IF attack may be slower).
+1. `scripts/extract_utkface_features.py` — MPS/CUDA/CPU, provenance metadata in npz  
+2. `src/data/datasets.py` — `load_utkface` auto-loads real cache; fails loudly if missing; binary race protected attr  
+3. `experiments/run_utkface.py` — no synthetic by default; REAL tags; MPS; resume-safe writes; no A≡Y override  
+4. `experiments/run_utkface_server.py` — device auto (cuda>mps>cpu); `--output` for single canonical JSON  
 
-## Claims policy
+---
 
-- ✅ “Real UTKFace features extracted; pipeline runs on MPS.”
-- ❌ “DRO wins on UTKFace” / any multi-α table / inversion claims (historical synthetic inversion **withdrawn**).
+## Blockers
+
+None for Path 2. Full grid ETA ~25–40 min on MPS after start (~17–27 s/config).
