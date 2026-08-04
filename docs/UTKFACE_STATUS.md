@@ -1,6 +1,6 @@
 # UTKFace Status
 
-**Updated:** 2026-08-05 (Grok lane live)  
+**Updated:** 2026-08-05 ~03:10 IST (Grok lane)  
 
 ## Mac MPS canonical (LOCKED — paper pilot)
 **Grid: COMPLETE 90/90 REAL.** Summary: `results/utkface_summary.md`.
@@ -19,13 +19,13 @@
 ## flair2 CUDA (LIVE — Grok lane)
 | Job | File | Target | Status |
 |-----|------|--------|--------|
-| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **in progress** — see `docs/WAVE1_LIVE_PROGRESS.md` |
-| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **in progress** |
+| **U1** CUDA repro | `results/utkface_flair2.json` | 90 | **17/90** — dp α=0.2 seed=4 done; jobs alive |
+| **U2** 5-race multi | `results/utkface_multigroup.json` | 30 | **16/30** — α=0.2 seed=4 running |
 | **U3** pixel PGD | `results/utkface_pixel_pgd.json` | 24 (planned) | prepared, not started |
 
-- Repro partial: matched cells so far max\|ΔDP_dro\|≈0.007 (0 GAP). Summary: `results/utkface_reproducibility_summary.md`
-- Multi-group partial: `results/utkface_multigroup_summary.md`
+- Repro partial: **17** matched cells, max\|ΔDP_dro\|≈0.007 (**0 GAP**). Summary: `results/utkface_reproducibility_summary.md`
+- Multi-group partial: `results/utkface_multigroup_summary.md` (α=0.2 multi **4/4** so far)
 - U3: images via `scripts/flair2_link_utkface_images.sh`; runner `experiments/run_utkface_pixel_pgd.py`
+- Live table: `docs/WAVE1_LIVE_PROGRESS.md`
 
 See git history for earlier path notes (download, extract, runner).
-
