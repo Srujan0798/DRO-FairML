@@ -293,11 +293,23 @@ def _refresh_appendix(rows, n_expected, means, answer_a, answer_b):
                            rf"$\eta_{{\lambda}}{{=}}{lrl:.3f}$: acc$={acc:.4f}$ (n={n}).")
         a_lines.append(r"\end{itemize}")
     else:
-        a_lines.append(rf"\textbf{{No}} (so far). No $\alpha{{=}}0.3$ cell reaches acc "
-                       rf"$>{ADULT_CONSTANT_PREDICTOR:.4f}$"
-                       + (r" on the partial grid" if incomplete else "")
-                       + r"; high-$\alpha$ is not rescued by dual-step tuning alone, consistent "
-                       r"with the locked main-text claim.")
+        if incomplete:
+            a_lines.append(
+                rf"\textbf{{No}} (so far). No $\alpha{{=}}0.3$ cell reaches acc "
+                rf"$>{ADULT_CONSTANT_PREDICTOR:.4f}$ on the partial grid; high-$\alpha$ "
+                r"is not rescued by dual-step tuning alone, consistent with the locked "
+                r"main-text claim."
+            )
+        else:
+            a_lines.append(
+                rf"\textbf{{No.}} Across the complete $12$-cell grid ($n{{=}}6$ each), no "
+                rf"$\alpha{{=}}0.3$ cell reaches acc $>{ADULT_CONSTANT_PREDICTOR:.4f}$ "
+                r"(best mean acc $\approx0.685$ at $\lambda_{\mathrm{init}}{=}0.1$). "
+                r"High-$\alpha$ accuracy is \emph{not} rescued by dual-step "
+                r"$(\lambda_{\mathrm{init}},\eta_{\lambda})$ tuning alone --- consistent "
+                r"with the locked main-text claim that $\alpha\ge0.3$ is outside the "
+                r"defensible accuracy regime on Adult."
+            )
     a_lines.append("")
     a_lines.append(r"\paragraph{Recommendation}")
     a_lines.append(r"Retain the locked defaults ($\lambda_{\mathrm{init}}{=}0.0$, "

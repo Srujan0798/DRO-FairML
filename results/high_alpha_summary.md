@@ -1,12 +1,12 @@
 # Agent N2 — high-α rescue (Kuldeep Jun-16 3-step protocol)
 
-Analysis-only. No new training. Source: `results/high_alpha_tau.json` (18/120 rows). Adult constant-predictor acc = **0.7521**.
+Analysis-only. No new training. Source: `results/high_alpha_tau.json` (26/120 rows). Adult constant-predictor acc = **0.7521**.
 
 Kuldeep, Jun 16 (verbatim): "Different tau value 1st if not improving then change learning rates for lamda or something else check loss convergence plots and choose according to it on validation set".
 
 ## Coverage
 
-- STEP 1 (τ ∈ {2,5,20}): 18/72 rows
+- STEP 1 (τ ∈ {2,5,20}): 26/72 rows
 - STEP 2 (lr_lambda=0.01): 0/24 rows
 - STEP 3 (epochs=200, dump_history): 0/24 rows
 - **INCOMPLETE** — partial-data mode; re-run as rows land (idempotent).
@@ -26,15 +26,15 @@ STEP 1 cells (τ ∈ {2,5,20}, Adult, dp, α∈{0.3,0.4}, 6 seeds, 2 methods). �
 
 | α | τ | method | n | acc | dp | acc>0.7521? |
 |---|---|---|---|---|---|---|
-| 0.3 | 2.0 | dro | 2 | 0.6797 | 0.3936 | ✗ |
-| 0.3 | 5.0 | dro | 2 | 0.6791 | 0.5184 | ✗ |
-| 0.3 | 20.0 | dro | 2 | 0.6786 | 0.5582 | ✗ |
-| 0.3 | 2.0 | naive | 4 | 0.6680 | 0.3990 | — |
-| 0.3 | 5.0 | naive | 4 | 0.6659 | 0.4960 | — |
-| 0.3 | 20.0 | naive | 4 | 0.6629 | 0.5276 | — |
+| 0.3 | 2.0 | dro | 3 | 0.6779 | 0.3936 | ✗ |
+| 0.3 | 5.0 | dro | 4 | 0.6759 | 0.5174 | ✗ |
+| 0.3 | 20.0 | dro | 4 | 0.6772 | 0.5531 | ✗ |
+| 0.3 | 2.0 | naive | 5 | 0.6682 | 0.3996 | — |
+| 0.3 | 5.0 | naive | 5 | 0.6661 | 0.4938 | — |
+| 0.3 | 20.0 | naive | 5 | 0.6635 | 0.5262 | — |
 
 **Verdict (STEP 1):** 
-INCOMPLETE (18/72 rows) — cannot conclude yet.
+INCOMPLETE (26/72 rows) — cannot conclude yet.
 
 ## STEP 2 — does lr_lambda=0.01 help at high α?
 

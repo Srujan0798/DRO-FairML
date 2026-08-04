@@ -1,7 +1,7 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (Wave-1 A4 random-vs-adv running sequential; N4 IF@0.3 artifact linked; RVA summarizer). Supersedes all prior STATUS / handoff docs.
-**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3._
+_Last updated: 2026-08-04 ~23:20 IST (A3 λ-grid **COMPLETE 72/72**; N2 high-α next in orchestrator; concurrent oversubscribe jobs still live — do not pkill). Supersedes all prior STATUS / handoff docs.
+**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3; Adult/DP α=0.1 = **5/6**.
 
 ## 1. What this project is
 Implement **DRO-FAIR** (min-max Lagrangian with corruption-calibrated TV uncertainty
@@ -76,7 +76,8 @@ via `experiments/run_a*.py` + `run_ablation_parallel.py` (hard-refuses
 | UTKFace REAL 90/90 | ✅ complete; summary `results/utkface_summary.md` (**mixed clean-test**) |
 | Paper / report | ✅ Aug 10 narrative + **wired figures/tables** (540-backed); honest UTKFace pilot |
 | flair2 | ✅ **UNLOCKED** — 2× L40S, torch 2.6.0+cu124, `docs/FLAIR2_GPU_READY.md` |
-| Wave-1 ablations (advisor gaps) | 🔄 **A4 random-vs-adv running** → `results/random_vs_adversarial.json` (separate; never touch 540). Summarize: `python3 experiments/summarize_rva.py` |
+| Wave-1 A3 λ/lr grid | ✅ **72/72** `results/lambda_grid.json` + `lambda_grid_summary.md` — λ_init=0.1 improves DP+acc vs default; **no** α=0.3 acc rescue >0.7521 |
+| Wave-1 other ablations | 🔄 A4/A5/A1/A2/N5 partial on disk; N2 high-α **LIVE** (orchestrator); separate JSONs only |
 | IF@α=0.3 formalization (N4) | ✅ `results/if_wilcoxon_n4_summary.md` (analysis on locked 540) |
 
 
@@ -84,8 +85,8 @@ via `experiments/run_a*.py` + `run_ablation_parallel.py` (hard-refuses
 1. ✅ Tabular 540 frozen; do not retrain.
 2. ✅ UTKFace 90/90 REAL in repo; paper states **mixed** clean-test (not Adult copy).
 3. ✅ Paper/report rebuilt with τ=1 / 5/6 / IF mixed / LSAC degenerate / UTKFace pilot.
-4. ✅ Final gate: `make test` (65 pass) && `make validate` (PASS) && `make paper` && `make report`.
-5. 🔄 Wave-1 advisor ablations in progress (not required to share paper/report).
+4. ✅ Final gate: `make test` (90 pass) && `make validate` (PASS) && `make paper` && `make report`.
+5. 🔄 Wave-1 advisor ablations: A3 done; rest in progress (not required to share paper/report).
 6. Optional later: flair2 pixel-level experiments if greenlit.
 
 

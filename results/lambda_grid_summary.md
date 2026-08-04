@@ -1,12 +1,11 @@
 # Agent A3 — λ/lr grid summary (Adult, DP, α∈{0.2,0.3}, DRO)
 
 Analysis-only. No new training. Source: `results/lambda_grid.json` 
-(63/72 rows). Adult constant-predictor acc = **0.7521**.
+(72/72 rows). Adult constant-predictor acc = **0.7521**.
 
 ## Coverage
 
-- λ-grid rows present: **63/72** (87.5%)
-- **INCOMPLETE** — partial-data mode; re-run as more rows land (idempotent).
+- λ-grid rows present: **72/72** (100.0%)
 
 ## Per-cell table (α, λ_init, lr_λ)
 
@@ -20,12 +19,12 @@ Default cell (λ_init=0.0, lr_λ=0.005) marked **default**. ✓ = acc > 0.7521 (
 | 0.2 | 0.01 | 0.005 | 6 | 0.2326 | 0.7594 | ✓ | -0.0007 | +0.0007 |
 | 0.2 | 0.10 | 0.001 | 6 | 0.2219 | 0.7674 | ✓ | -0.0115 | +0.0088 |
 | 0.2 | 0.10 | 0.005 | 6 | 0.2202 | 0.7679 | ✓ | -0.0132 | +0.0093 |
-| 0.3 | 0.00 | 0.001 | 4 | 0.2636 | 0.6768 | ✗ | +0.0033 | -0.0007 |
-| 0.3 | 0.00 | 0.005 | 4 | 0.2603 **default** | 0.6775 | ✗ | +0.0000 | +0.0000 |
-| 0.3 | 0.01 | 0.001 | 4 | 0.2626 | 0.6781 | ✗ | +0.0023 | +0.0005 |
-| 0.3 | 0.01 | 0.005 | 5 | 0.2612 | 0.6789 | ✗ | +0.0009 | +0.0013 |
-| 0.3 | 0.10 | 0.001 | 5 | 0.2399 | 0.6861 | ✗ | -0.0204 | +0.0086 |
-| 0.3 | 0.10 | 0.005 | 5 | 0.2358 | 0.6864 | ✗ | -0.0245 | +0.0089 |
+| 0.3 | 0.00 | 0.001 | 6 | 0.2638 | 0.6750 | ✗ | +0.0024 | -0.0006 |
+| 0.3 | 0.00 | 0.005 | 6 | 0.2614 **default** | 0.6755 | ✗ | +0.0000 | +0.0000 |
+| 0.3 | 0.01 | 0.001 | 6 | 0.2631 | 0.6759 | ✗ | +0.0017 | +0.0004 |
+| 0.3 | 0.01 | 0.005 | 6 | 0.2604 | 0.6773 | ✗ | -0.0010 | +0.0017 |
+| 0.3 | 0.10 | 0.001 | 6 | 0.2406 | 0.6844 | ✗ | -0.0207 | +0.0089 |
+| 0.3 | 0.10 | 0.005 | 6 | 0.2367 | 0.6849 | ✗ | -0.0247 | +0.0093 |
 
 ## (a) Does any (λ, lr) beat the default on DP without accuracy loss?
 
@@ -34,9 +33,10 @@ Default cell (λ_init=0.0, lr_λ=0.005) marked **default**. ✓ = acc > 0.7521 (
 - α=0.2, λ_init=0.01, lr_λ=0.005: ΔDP=-0.0007, Δacc=+0.0007 (n=6)
 - α=0.2, λ_init=0.10, lr_λ=0.005: ΔDP=-0.0132, Δacc=+0.0093 (n=6)
 - α=0.2, λ_init=0.10, lr_λ=0.001: ΔDP=-0.0115, Δacc=+0.0088 (n=6)
-- α=0.3, λ_init=0.10, lr_λ=0.001: ΔDP=-0.0204, Δacc=+0.0086 (n=5)
-- α=0.3, λ_init=0.10, lr_λ=0.005: ΔDP=-0.0245, Δacc=+0.0089 (n=5)
+- α=0.3, λ_init=0.10, lr_λ=0.001: ΔDP=-0.0207, Δacc=+0.0089 (n=6)
+- α=0.3, λ_init=0.10, lr_λ=0.005: ΔDP=-0.0247, Δacc=+0.0093 (n=6)
+- α=0.3, λ_init=0.01, lr_λ=0.005: ΔDP=-0.0010, Δacc=+0.0017 (n=6)
 
 ## (b) Does ANY cell rescue α=0.3 accuracy above 0.7521?
 
-**No.** No α=0.3 cell currently reaches acc > 0.7521. (File INCOMPLETE — re-run as more rows land.)
+**No.** No α=0.3 cell currently reaches acc > 0.7521. High-α is not rescued by dual-step tuning alone — consistent with the locked paper claim.
