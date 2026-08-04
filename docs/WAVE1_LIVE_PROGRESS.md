@@ -1,26 +1,25 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~03:12 IST_
+_Last tick: 2026-08-05 ~03:22 IST_
 
 ## Counts (do not pkill)
 
 | Job | Target | Count | Last | PID | alive |
 |-----|--------|------:|------|-----|-------|
-| **U1** | 90 | **17** | dp α=0.2 seed=4 done; seed=5 running | 3482009 | yes (~3.1h elapsed) |
-| **U2** | 30 | **17** | α=0.2 seed=4 done; seed=5 running | 3482442 | yes (~3.1h elapsed) |
+| **U1** | 90 | **17** | dp α=0.2 seed=4 done; **seed=5 in progress** (~10+ min) | 3482009 | yes (~3.3h, ~3200% CPU) |
+| **U2** | 30 | **17** | α=0.2 seed=4 done; **seed=5 in log** | 3482442 | yes (~3.3h, ~3150% CPU) |
 
-GPU: both L40S ~637 MiB each (feature-space PGD; CPU-heavy kNN stretches). Do not kill.
+GPU: both L40S ~637 MiB, util often 0% during CPU-heavy kNN/attack stretches (CUDA still reserved). Do not kill.
 
-Puller PID alive (poll 120s). ETA ~20 h (U1, ~73 left × ~16 min) / ~3.4 h (U2, ~13 left).
+Puller: restarted with last-cell logging (PID on Mac). ETA ~19.6 h (U1) / ~3.5 h (U2).
 
 ## Signals
-- Repro: **17** matched, max\|ΔDP_dro clean\| **0.0072**, **0 GAP**
-- α=0.2 seeds 0–4: seed-wise |ΔDP| ≤ 0.0013 (s0 −0.0002 … s4 −0.0003)
-- U2 α=0.2 n=5: multi wins **4/5** (seed 4 multi loss; still partial)
+- Repro: **17** matched, max\|ΔDP\| **0.0072**, **0 GAP**
+- U2 α=0.2 n=5: multi wins **4/5**
 
-## Ops note
-- `logs/u1_utkface_flair2.log` is **empty** (stdout redirected but 0 B) — trust JSON mtime / puller counts, not that log. U2 log is fine.
-- Monitor: `ssh flair2 'python3 -c "…len(json)…"'` or Mac `logs/u12_puller.log`
+## Ops
+- U1 log empty: flair2 copy of `run_utkface_server.py` had **no `flush=True`** (stdout fully buffered under nohup). Disk file re-synced with Mac flush fix for **future** runs; **current U1 process unchanged** — monitor via JSON mtime / puller.
+- One-shot status: `bash scripts/flair2_u12_status.sh`
 
 ## Open
-- Finish U1=90 / U2=30; U3 after free GPU (needs JPEGs + launch_u3)
+- Finish U1=90 / U2=30; U3 after free GPU (+ JPEGs); launch_u3 refuses while U1/U2 alive

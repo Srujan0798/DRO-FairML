@@ -8,6 +8,7 @@ ROOT="${ROOT:-/Users/srujansai/Desktop/DRO-FairML}"
 LOG="${LOG:-$ROOT/logs/u12_puller.log}"
 REMOTE="${REMOTE:-flair2}"
 RDIR="${RDIR:-/data/srujan.sai/DRO-FairML-run/results}"
+RBASE="${RBASE:-/data/srujan.sai/DRO-FairML-run}"
 POLL_SEC="${POLL_SEC:-120}"
 
 mkdir -p "$ROOT/logs" "$ROOT/results"
@@ -16,6 +17,36 @@ cd "$ROOT"
 u1_done=0
 u2_done=0
 last_partial=0
+
+# One SSH: U1/U2 counts + last cell + job alive flags (cheap).
+remote_snapshot() {
+  ssh -o BatchMode=yes -o ConnectTimeout=15 "$REMOTE" \
+    "python3 - <<'PY'
+import json, os, subprocess
+from pathlib import Path
+R = Path('$RDIR')
+def info(name, target):
+    p = R / name
+    if not p.exists():
+        print(f'{name}|0|{target}|none|0')
+        return
+    d = json.loads(p.read_text())
+    if d:
+        r = d[-1]
+        last = f\"{r.get('attack','?')}/a={r.get('alpha')}/s={r.get('seed')}\"
+        t = round(float(r.get('total_time') or 0), 0)
+    else:
+        last, t = 'empty', 0
+    print(f'{name}|{len(d)}|{target}|{last}|{t}')
+info('utkface_flair2.json', 90)
+info('utkface_multigroup.json', 30)
+ps = subprocess.getoutput('ps -eo args')
+print('alive|u1=%d|u2=%d' % (
+    1 if 'run_utkface_server.py' in ps else 0,
+    1 if 'run_utkface_multigroup.py' in ps else 0,
+))
+PY" 2>/dev/null || echo "err"
+}
 
 count_remote() {
   local file="$1"
@@ -44,9 +75,15 @@ finalize_u2() {
 echo "$(date) puller start (independent U1/U2 finalize; poll=${POLL_SEC}s)" | tee -a "$LOG"
 
 while true; do
-  n1=$(count_remote utkface_flair2.json)
-  n2=$(count_remote utkface_multigroup.json)
-  echo "$(date) U1=$n1/90 U2=$n2/30 u1_done=$u1_done u2_done=$u2_done" | tee -a "$LOG"
+  snap=$(remote_snapshot || true)
+  n1=$(echo "$snap" | awk -F'|' '/utkface_flair2/{print $2; exit}')
+  n2=$(echo "$snap" | awk -F'|' '/utkface_multigroup/{print $2; exit}')
+  last1=$(echo "$snap" | awk -F'|' '/utkface_flair2/{print $4; exit}')
+  last2=$(echo "$snap" | awk -F'|' '/utkface_multigroup/{print $4; exit}')
+  alive=$(echo "$snap" | awk -F'|' '/^alive/{print; exit}')
+  n1=${n1:-err}
+  n2=${n2:-err}
+  echo "$(date) U1=$n1/90 last=$last1 | U2=$n2/30 last=$last2 | $alive u1_done=$u1_done u2_done=$u2_done" | tee -a "$LOG"
 
   if [[ "$n1" == "90" && "$u1_done" == "0" ]]; then
     finalize_u1
