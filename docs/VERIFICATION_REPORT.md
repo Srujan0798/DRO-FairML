@@ -51,16 +51,16 @@ Adult Naive accuracy (DP): α=0.3 → **0.6669**, α=0.4 → **0.5512** (DRO 0.6
 ### LSAC / Combined
 Wins at α=0.1/0.3/0.4 (p=0.0156); α=0.2 is 5/6.
 
-### IF-attack third (honest)
-See `results/if_wilcoxon_summary.txt`.
+### IF-attack third (honest; seed-paired)
+See `results/if_wilcoxon_summary.txt` (now includes IF-metric p-values).
 
-| Dataset | Verdict |
-|---------|---------|
-| Adult | MIXED — DP under IF wins α≤0.2; **LOSS α=0.3** (1/6); IF metric often improves |
-| Credit | Mostly WIN on IF metric; DP under IF weaker at α=0.1 (4/6 n.s.) |
-| LSAC | LOSS on DP under IF for α≤0.3 |
+| Dataset | IF metric (under IF attack) | DP under IF attack |
+|---------|----------------------------|--------------------|
+| Adult | **WIN** α∈{0.1–0.4} 6/6 p=0.0156 (**incl. α=0.3**: 0.0334→0.0258) | WIN α≤0.2; **LOSS α=0.3** (1/6, p=0.8906) |
+| Credit | **WIN** α≥0.1 6/6 p=0.0156 (**incl. α=0.3**: 0.1212→0.1011) | Mostly win; α=0.1 is 4/6 n.s. |
+| LSAC | WIN only α∈{0.3,0.4}; lose/n.s. α≤0.2 | **LOSS** α≤0.3 (0/6) |
 
-**Do not claim** a clean three-attack sweep on all datasets.
+**State IF metric wins where supported.** Do **not** claim a clean three-attack **DP** sweep.
 
 ---
 
@@ -96,7 +96,9 @@ See `results/if_wilcoxon_summary.txt`.
 
 ## 4. UTKFace
 
-`results/utkface_canonical.json` — **REAL** features / partial grid only.  
+`results/utkface_canonical.json` — **90/90 REAL** (ResNet18 features; all `data_provenance=REAL`).  
+Clean-test DP is **mixed** (significant DRO wins mainly at high α on DP/Combined).  
+Summary: `results/utkface_summary.md` (+ machine-readable `utkface_canonical_summary.json`). 
 **No paper claim** until a reviewed multi-attack multi-seed subset exists.
 
 ---

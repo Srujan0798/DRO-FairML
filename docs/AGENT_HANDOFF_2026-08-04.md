@@ -1,13 +1,13 @@
 # Agent handoff — 2026-08-04 (post Aug 10 final gate)
 
 **Aligned with:** Grok session + Claude Code session `00b1a526…`  
-**HEAD:** `origin/main` — Aug 10 package complete.
+**HEAD:** `origin/main` — keep polishing toward Aug 10 (science frozen).
 
 ## Meeting (done)
 Present from: `docs/MEETING_HANDOUT_2026-08-04.md`  
 Figures: `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf`.
 
-Honest lines: Adult/DP **α=0.1 = 5/6**; IF **mixed**; LSAC/DP **degenerate**; UTKFace **90/90 REAL mixed pilot**.
+Honest lines: Adult/DP **α=0.1 = 5/6**; **IF metric** Adult/Credit incl. **α=0.3** (6/6); DP-under-IF **mixed**; LSAC/DP **degenerate**; UTKFace **90/90 REAL mixed pilot**.
 
 ---
 
@@ -15,13 +15,14 @@ Honest lines: Adult/DP **α=0.1 = 5/6**; IF **mixed**; LSAC/DP **degenerate**; U
 | Item | Status |
 |------|--------|
 | Tabular **540** (dp/if/combined = 180) | ✅ frozen — **never write** `canonical_tau1.json` |
-| Real IF numbers | ✅ mixed story in MEETING + `if_wilcoxon_summary.txt` |
+| Real IF numbers | ✅ IF metric formalized + DP-under-IF mixed (`if_wilcoxon_summary.txt`) |
 | **Agent V** mismatches + Jul-2 figs | ✅ STATUS / KULDEEP / VERIFICATION / figs fixed & pushed |
-| Repo cleanup | ✅ slim tree; archives purged; `origin/main` updated |
+| Paper assembly | ✅ figures + auto tables + appendices in `paper/main.pdf` |
+| Seed-paired Wilcoxon fix | ✅ `generate_report_tables.build_wilcoxon` pairs by seed |
 | flair2 access / L40S / code / features | ✅ proven — **PARKED** (no torch install; don’t restart) |
 | **Local UTKFace REAL** | ✅ **90/90** — `results/utkface_canonical.json` + `utkface_summary.md` |
-| Paper / report Aug 10 narrative | ✅ mixed UTKFace pilot; τ=1 / 5/6 / IF mixed / LSAC |
-| Final gate | ✅ `make test` (62) + `validate` PASS + paper + report |
+| Paper / report Aug 10 narrative | ✅ mixed UTKFace pilot; τ=1 / 5/6 / IF@0.3 / LSAC |
+| Final gate | ✅ `make test` (64) + `validate` PASS + paper + report |
 
 ---
 

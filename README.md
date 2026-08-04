@@ -48,7 +48,7 @@ Source of truth: `results/canonical_tau1.json` + Wilcoxon in `results/canonical_
 |--------------|---------|
 | **Adult & Credit, α ≤ 0.2** | DRO improves DP vs Naive under **DP** and **Combined** attacks (paired Wilcoxon, n=6; note Adult/DP α=0.1 is **5/6**, still p&lt;0.05). |
 | **LSAC / DP** | **Degenerate** — DRO collapses toward majority predictor; not a method win. See [`docs/LSAC_DEGENERACY.md`](docs/LSAC_DEGENERACY.md). |
-| **IF attack** | **MIXED** — cosine IF is non-degenerate (max \|if_clean\| ≈ 0.24). Adult/Credit support IF-side wins at low α, but DP-under-IF is not a clean three-attack mirror (e.g. Adult α≥0.3 DP loss under IF; LSAC/IF does not support the low-α DP story). **Do not claim a clean IF sweep.** |
+| **IF attack** | **MIXED (split metrics)** — cosine IF non-degenerate (max \|if_clean\| ≈ 0.24). **IF metric:** Adult/Credit win at α∈{0.1–0.4} incl. **α=0.3** (6/6, p=0.0156). **DP under IF:** Adult wins α≤0.2 but **loses α=0.3**; LSAC loses α≤0.3. Not a clean three-attack DP sweep. See `results/if_wilcoxon_summary.txt`. |
 | **α ≥ 0.3** | Both methods can fall below the constant-predictor accuracy baseline on Adult/Credit → no strong method claim in that regime. |
 | **UTKFace** | **REAL 90/90** (`results/utkface_canonical.json`); clean-test DP **mixed** (significant DRO wins mainly at high α). See `results/utkface_summary.md`. |
 

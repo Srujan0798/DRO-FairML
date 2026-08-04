@@ -13,15 +13,15 @@
 ## Claims (must match)
 1. τ=1 makes DRO robust on Adult & Credit at α≤0.2 (DP+Combined)
 2. Adult/DP α=0.1 is **5/6**, not 6/6 every α
-3. IF attack **mixed**
+3. IF attack **mixed on DP**; **IF metric** Adult/Credit wins incl. **α=0.3** (6/6, p=0.0156)
 4. LSAC/DP **degenerate**
-5. α≥0.3: below constant predictor on Adult/Credit only
+5. α≥0.3 accuracy: below constant predictor on Adult/Credit only (LSAC/DP pinned at baseline)
 6. UTKFace: real pilot; **mixed clean-test**; not Adult copy-paste
 
 ## Build (final gate — DONE 2026-08-04; paper figures wired same day)
 ```bash
 make test && make validate && make paper && make report
-# 62 passed | validate PASS | paper/main.pdf (~319 KB with figures+tables) + report/report.pdf
+# 64 passed | validate PASS | paper/main.pdf (figures+tables+figD1) + report/report.pdf
 # Regenerate tables after any Wilcoxon/script fix: python3 experiments/generate_report_tables.py
 ```
 

@@ -15,7 +15,12 @@ On Jun 30 (5:47pm and 5:59pm) we sent `adult_if_*.pdf` as "individual fairness" 
 
 Those numbers came from the **DP column**, not IF. At that time the IF metric was degenerate — identically ~0 in every row due to a threshold-calibration bug. Under **DP and Combined attacks**, the IF *metric column* is still ~machine zero (max |IF| across those 360 rows is **4.66e-10**). So the project had **no valid IF results** on Jun 30, and the "IF" plots were DP plots under an IF label.
 
-**Current position (2026-08-04):** the IF metric is fixed (cosine-based). The **full IF-attack third is complete** (180/180 rows; max |if_clean| ≈ **0.239**). The IF story is **mixed**, not a clean three-attack sweep: Adult/Credit support DRO on DP under IF attack at α≤0.2; Adult α=0.3 under IF loses on DP (1/6); LSAC/IF fails on DP for α≤0.3. Old Jun-30 IF figures stay withdrawn. See `results/if_wilcoxon_summary.txt`.
+**Current position (2026-08-04):** the IF metric is fixed (cosine-based). The **full IF-attack third is complete** (180/180 rows; max |if_clean| ≈ **0.239**). Split the claim carefully:
+
+- **IF metric** (what you asked to state if good at α=0.3): Adult and Credit are significant at every α∈{0.1–0.4} including **α=0.3** (6/6, p=0.0156; Adult 0.0334→0.0258, Credit 0.1212→0.1011).
+- **DP under the same IF attack** is **mixed**: Adult wins α≤0.2 but **loses at α=0.3** (1/6); LSAC loses α≤0.3 on DP.
+
+Not a clean three-attack **DP** sweep. Old Jun-30 IF figures stay withdrawn. See `results/if_wilcoxon_summary.txt`.
 
 ## 2. LSAC was reported "pending" but is in fact complete — and it is a loss (and degenerate)
 
@@ -57,7 +62,7 @@ On **LSAC** the accuracy does **not** fall *below* 0.9016 under the DP attack �
 - **Adult / DP:** DRO better at every α with p ≤ 0.031 — **α=0.1 is 5/6** (seed 2 loses, p=0.0312); **others 6/6** (p=0.0156). **Not** “all six α are 6/6.” At the defensible bound (α ≤ 0.2): Naive 0.1491 / DRO 0.1426 (p=0.016) at α=0.0; Naive 0.2026 / DRO 0.1999 (p=0.031) at α=0.1; Naive 0.2452 / DRO 0.2334 (p=0.016) at α=0.2.
 - **Adult / Combined:** 6/6 wins at every α, p=0.016.
 - **Credit:** under DP and Combined, DRO beats Naive at every cell with p < 0.05 (Combined α=0.1 is 5/6).
-- **IF-attack third (complete, mixed):** do **not** claim a clean third-attack sweep; report Adult/Credit α≤0.2 support and LSAC / high-α caveats honestly (`results/if_wilcoxon_summary.txt`).
+- **IF-attack third (complete, mixed):** **IF metric** wins Adult/Credit incl. α=0.3; **DP under IF** is mixed (Adult α=0.3 DP loss). Do **not** claim a clean third-attack DP sweep (`results/if_wilcoxon_summary.txt`).
 
 ## One caveat to flag
 

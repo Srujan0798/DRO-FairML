@@ -1,6 +1,6 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (IF@α=0.3 formalized; UTKFace table in paper; kNN/validate claim cleanups). Supersedes all prior STATUS / handoff docs.
+_Last updated: 2026-08-04 (doc claim sync: README/VERIFICATION/KULDEEP IF@0.3; figD1 in paper; Wilcoxon pairing tests). Supersedes all prior STATUS / handoff docs.
 **CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3._
 
 ## 1. What this project is
@@ -50,8 +50,8 @@ and **non-degenerate** under attack=if (max |if_clean| ≈ **0.239**). Verify an
   - State **IF metric** wins where supported; do **not** claim “wins on all three attacks on all datasets” for DP.
 
 ## 4. Ablations
-Adjudicated in `docs/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv dropped with
-written reasons; kNN retracted. None are part of the canonical claim.
+Adjudicated in `docs/reference/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv
+dropped with written reasons; kNN retracted. None are part of the canonical claim.
 
 ## 5. UTKFace (image modality)
 **REAL local MPS grid COMPLETE — 90/90 rows (`data_provenance=REAL`).**  
@@ -78,7 +78,7 @@ written reasons; kNN retracted. None are part of the canonical claim.
 1. ✅ Tabular 540 frozen; do not retrain.
 2. ✅ UTKFace 90/90 REAL in repo; paper states **mixed** clean-test (not Adult copy).
 3. ✅ Paper/report rebuilt with τ=1 / 5/6 / IF mixed / LSAC degenerate / UTKFace pilot.
-4. ✅ Final gate: `make test` (62 pass) && `make validate` (PASS) && `make paper` && `make report`.
+4. ✅ Final gate: `make test` (64 pass) && `make validate` (PASS) && `make paper` && `make report`.
 5. Optional later: flair2 pixel-level experiments if greenlit.
 
 

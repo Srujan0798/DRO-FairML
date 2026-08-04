@@ -356,13 +356,14 @@ Table~\ref{tab:main_results} reports mean over 6 seeds on the clean test set.
 
 \begin{figure}[H]
   \centering
+  \includegraphics[width=0.95\textwidth]{../figures/fig_tau1_headline.pdf}\\[0.6em]
   \includegraphics[width=\textwidth]{../figures/fig1_main_results.pdf}
-  \caption{\textbf{Main results.}
-    DRO-FAIR (\textcolor{dro}{green}) vs Naive-FAIR (\textcolor{naive}{red})
-    across all datasets and metrics on the clean test set.
-    Error bars $=\pm 1\,\mathrm{SE}$ ($n{=}6$ seeds).
-    Significance markers above DRO line: $*p{<}0.05$,\;
-    $**p{<}0.01$,\; $***p{<}0.001$ (Wilcoxon one-sided).}
+  \caption{\textbf{Main results (canonical $\tau{=}1$, $n{=}6$).}
+    Top: Adult DP headline with seed win counts (honest $5/6$ at $\alpha{=}0.1$).
+    Bottom: DRO-FAIR (\textcolor{dro}{green}) vs Naive-FAIR (\textcolor{naive}{red})
+    overview across datasets/metrics on the clean test set.
+    Error bars $=\pm 1\,\mathrm{SE}$.  Defensible accuracy regime remains
+    $\alpha\le0.2$ on Adult/Credit.}
   \label{fig:main_results}
 \end{figure}
 

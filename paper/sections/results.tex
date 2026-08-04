@@ -259,8 +259,20 @@ one-sided $p{<}0.05$ holds at $\alpha\le0.2$ on Adult and Credit under
 the DP-targeted and Combined attacks (seed-paired; verified in
 \texttt{results/canonical\_tau1.json}).  The full attack grid is
 complete (540 rows).  Under IF attack the DP test is significant on
-Adult $\alpha\le0.2$ and most Credit cells; LSAC/IF and Adult IF
-$\alpha\ge0.3$ do not support a DP win (see summary file).
+Adult $\alpha\le0.2$ and most Credit cells; Adult IF $\alpha{=}0.3$ and
+LSAC/IF do not support a DP win (see summary file).  The IF
+\emph{metric} tests are separate and support Adult/Credit through
+$\alpha{=}0.4$ (above).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{../figures/figD1_constant_predictor_accuracy.pdf}
+\caption{Accuracy vs.\ $\alpha$ with the constant-predictor baseline
+(Adult majority $\approx0.752$).  At $\alpha\ge0.3$ both methods fall
+below the line on Adult/Credit --- the defensible method claim remains
+$\alpha\le0.2$ for accuracy, even when fairness gaps favour DRO.}
+\label{fig:constant-predictor}
+\end{figure}
 
 \subsection{Image data (UTKFace) --- real features; mixed clean-test results}
 \label{sec:results-utkface}
