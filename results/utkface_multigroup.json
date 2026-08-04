@@ -1174,5 +1174,152 @@
       }
     },
     "total_time": 853.2374949455261
+  },
+  {
+    "dataset": "utkface",
+    "alpha": 0.4,
+    "seed": 0,
+    "attack": "dp",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "data_provenance": "REAL",
+    "protected_train": "race_binary_White_vs_nonWhite",
+    "protected_eval_multi": "race_5way",
+    "race_names": {
+      "0": "White",
+      "1": "Black",
+      "2": "Asian",
+      "3": "Indian",
+      "4": "Other"
+    },
+    "naive": {
+      "acc": 0.7810588483442312,
+      "dp_binary": 0.22055020928382874,
+      "dp_multigroup": 0.26592883467674255,
+      "if_cosine": 0.10112929344177246,
+      "group_pos_rates": {
+        "White": 0.31020990014076233,
+        "Black": 0.5140364170074463,
+        "Asian": 0.5761387348175049,
+        "Indian": 0.4933505356311798,
+        "Other": 0.5682985782623291
+      }
+    },
+    "dro": {
+      "acc": 0.7856992195739295,
+      "dp_binary": 0.21261456608772278,
+      "dp_multigroup": 0.25580349564552307,
+      "if_cosine": 0.08442604541778564,
+      "group_pos_rates": {
+        "White": 0.3144254982471466,
+        "Black": 0.5109463930130005,
+        "Asian": 0.5702289938926697,
+        "Indian": 0.49011939764022827,
+        "Other": 0.5662252902984619
+      }
+    },
+    "total_time": 137.38770008087158
+  },
+  {
+    "dataset": "utkface",
+    "alpha": 0.4,
+    "seed": 1,
+    "attack": "dp",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "data_provenance": "REAL",
+    "protected_train": "race_binary_White_vs_nonWhite",
+    "protected_eval_multi": "race_5way",
+    "race_names": {
+      "0": "White",
+      "1": "Black",
+      "2": "Asian",
+      "3": "Indian",
+      "4": "Other"
+    },
+    "naive": {
+      "acc": 0.7755747732545877,
+      "dp_binary": 0.23261553049087524,
+      "dp_multigroup": 0.2813625931739807,
+      "if_cosine": 0.09791650623083115,
+      "group_pos_rates": {
+        "White": 0.32015836238861084,
+        "Black": 0.5401690006256104,
+        "Asian": 0.6015209555625916,
+        "Indian": 0.5128569602966309,
+        "Other": 0.5874430537223816
+      }
+    },
+    "dro": {
+      "acc": 0.7791605146593545,
+      "dp_binary": 0.2179735004901886,
+      "dp_multigroup": 0.2564278542995453,
+      "if_cosine": 0.07634178549051285,
+      "group_pos_rates": {
+        "White": 0.3272651731967926,
+        "Black": 0.5358265042304993,
+        "Asian": 0.5836930274963379,
+        "Indian": 0.5100988149642944,
+        "Other": 0.5798119306564331
+      }
+    },
+    "total_time": 179.1052052974701
+  },
+  {
+    "dataset": "utkface",
+    "alpha": 0.4,
+    "seed": 2,
+    "attack": "dp",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "data_provenance": "REAL",
+    "protected_train": "race_binary_White_vs_nonWhite",
+    "protected_eval_multi": "race_5way",
+    "race_names": {
+      "0": "White",
+      "1": "Black",
+      "2": "Asian",
+      "3": "Indian",
+      "4": "Other"
+    },
+    "naive": {
+      "acc": 0.7823244041341489,
+      "dp_binary": 0.2261672019958496,
+      "dp_multigroup": 0.28488391637802124,
+      "if_cosine": 0.1055506020784378,
+      "group_pos_rates": {
+        "White": 0.3133729100227356,
+        "Black": 0.5191576480865479,
+        "Asian": 0.5982568264007568,
+        "Indian": 0.48793119192123413,
+        "Other": 0.5932945013046265
+      }
+    },
+    "dro": {
+      "acc": 0.7878084792237925,
+      "dp_binary": 0.21489909291267395,
+      "dp_multigroup": 0.2688150107860565,
+      "if_cosine": 0.09267695993185043,
+      "group_pos_rates": {
+        "White": 0.3226487338542938,
+        "Black": 0.5200920104980469,
+        "Asian": 0.5914637446403503,
+        "Indian": 0.4869903028011322,
+        "Other": 0.5909637212753296
+      }
+    },
+    "total_time": 139.12596321105957
   }
 ]

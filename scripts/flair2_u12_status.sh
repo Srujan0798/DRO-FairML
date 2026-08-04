@@ -24,22 +24,25 @@ def show(path, target):
         f"  last: attack={r.get('attack')} alpha={r.get('alpha')} seed={r.get('seed')} "
         f"total_time={r.get('total_time',0):.0f}s | json_age={age/60:.1f} min"
     )
-    if age > 25 * 60:
-        print(f"  WARN: no new row for {age/60:.0f} min (typical cell ~16 min; stall if >>30)")
+    # Stall threshold scales with recent cell length (α=0.4 ~3 min; α=0.3 ~16 min).
+    recent_ts = [float(x["total_time"]) for x in d[-5:] if x.get("total_time")]
+    typical = (sum(recent_ts) / len(recent_ts)) if recent_ts else 16 * 60
+    stall_thr = max(25 * 60, 2.5 * typical)
+    if age > stall_thr:
+        print(f"  WARN: no new row for {age/60:.0f} min (recent cell ~{typical/60:.0f} min; stall if >>{stall_thr/60:.0f})")
     c = Counter((x.get("attack"), x.get("alpha")) for x in d)
     for k, v in sorted(c.items(), key=lambda kv: (str(kv[0][0]), kv[0][1] or 0)):
         print(f"  {k}: {v}")
-    # Prefer recent higher-α timings when available (better ETA for remaining grid).
-    ts = [x["total_time"] for x in d if float(x.get("alpha") or 0) >= 0.3 and x.get("total_time")]
-    src = "α≥0.3"
-    if len(ts) < 2:
-        ts = [x["total_time"] for x in d if float(x.get("alpha") or 0) >= 0.2 and x.get("total_time")]
+    # ETA from last-k wall times (tracks pace better than mixing α=0.3~16m with α=0.4~3m).
+    last_k = [float(x["total_time"]) for x in d[-8:] if x.get("total_time")]
+    src = f"last {len(last_k)}"
+    if len(last_k) < 2:
+        last_k = [float(x["total_time"]) for x in d if float(x.get("alpha") or 0) >= 0.2 and x.get("total_time")]
         src = "α≥0.2"
     rem = target - len(d)
-    if ts and rem > 0:
-        mean_t = sum(ts) / len(ts)
-        print(f"  ETA ~{rem * mean_t / 3600:.1f} h ({rem} left × {mean_t/60:.0f} min, from {src} cells n={len(ts)})")
-        # If a cell is in flight, estimate when next row lands.
+    if last_k and rem > 0:
+        mean_t = sum(last_k) / len(last_k)
+        print(f"  ETA ~{rem * mean_t / 3600:.1f} h ({rem} left × {mean_t/60:.0f} min, from {src} cells)")
         if age < mean_t:
             print(f"  next row ETA ~{(mean_t - age)/60:.0f} min (if mid-cell)")
 
