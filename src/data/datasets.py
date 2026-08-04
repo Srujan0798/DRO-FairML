@@ -149,6 +149,153 @@ def load_lsac(data_dir='data/raw'):
     return X, y, a, 'LSAC'
 
 
+def load_compas(data_dir='data/raw'):
+    """Load and preprocess the COMPAS (ProPublica recidivism) dataset.
+
+    Source: ProPublica's compas-analysis repo (public)
+      https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv
+    Local: data/raw/compas-scores-two-years.csv
+
+    Protected attribute (race), binarized — STANDARD FAIRNESS PRACTICE:
+      a = 1  if African-American
+      a = 0  if Caucasian
+    Only these two groups are retained (Hispanic/Asian/Other/Native American
+    are dropped). This is the 2-group split used by ProPublica's original
+    "Machine Bias" analysis and by Hardt, Price, Srebro (2016) "Equality of
+    Opportunity: Disparate Accuracy and Equalized Odds in Fair Prediction"
+    (arXiv:1610.02413), the canonical COMPAS fairness benchmark. Mapping
+    1=African-American, 0=Caucasian follows the convention of measuring DP as
+    |P(recid=1 | AA) - P(recid=1 | Caucasian)|.
+
+    Label: two_year_recid (0=no recidivism within 2 years, 1=recidivated).
+
+    Leakage hygiene: identity columns (id/name/dob), post-outcome and score
+    columns (is_recid, decile_score, *score_text*, *decile_score.1*, event,
+    v_*_score*, type_of_assessment), and post-arrest case/jail/charge columns
+    are dropped before modeling. Only pre-screening features survive.
+
+    Rows with NA in the surviving feature columns are dropped. Categorical
+    features are LabelEncoded.
+
+    Returns X, y, a, 'COMPAS'.
+    """
+    os.makedirs(data_dir, exist_ok=True)
+    path = os.path.join(data_dir, 'compas-scores-two-years.csv')
+
+    if not os.path.exists(path):
+        _download_file(
+            'https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv',
+            path
+        )
+
+    df = pd.read_csv(path)
+
+    # Restrict to the two-group race benchmark (African-American vs Caucasian)
+    df = df[df['race'].isin(['African-American', 'Caucasian'])].copy()
+    df = df.dropna(subset=['two_year_recid', 'race']).reset_index(drop=True)
+
+    # Target: two_year_recid (already 0/1)
+    y = df['two_year_recid'].astype(np.float32).values
+
+    # Protected attribute: 1=African-American, 0=Caucasian
+    a = (df['race'] == 'African-American').astype(np.int64).values
+
+    # Leakage columns: identity, post-outcome scores, and post-arrest case info.
+    leak_cols = {
+        'id', 'name', 'first', 'last', 'dob', 'compas_screening_date',
+        'is_recid', 'decile_score', 'decile_score.1', 'score_text',
+        'v_type_of_assessment', 'v_decile_score', 'v_score_text',
+        'v_screening_date', 'screening_date', 'type_of_assessment',
+        'event', 'start', 'end',
+        'r_case_number', 'r_charge_degree', 'r_days_from_arrest',
+        'r_offense_date', 'r_charge_desc', 'r_jail_in', 'r_jail_out',
+        'vr_case_number', 'vr_charge_degree', 'vr_offense_date',
+        'vr_charge_desc', 'violent_recid', 'is_violent_recid',
+        'c_case_number', 'c_offense_date', 'c_arrest_date',
+        'c_days_from_compas', 'c_jail_in', 'c_jail_out',
+        'days_b_screening_arrest', 'in_custody', 'out_custody',
+        'priors_count.1',
+    }
+    drop_cols = [c for c in leak_cols if c in df.columns]
+    drop_cols += ['two_year_recid', 'race']
+    df = df.drop(columns=drop_cols)
+
+    # Drop rows with NA in the surviving features, then re-align y/a
+    df = df.dropna().reset_index(drop=True)
+    y = y[df.index.values]
+    a = a[df.index.values]
+
+    # Encode remaining categorical columns
+    for col in df.columns:
+        if df[col].dtype == 'object' or pd.api.types.is_string_dtype(df[col]):
+            le = LabelEncoder()
+            df[col] = le.fit_transform(df[col].astype(str))
+
+    X = df.values.astype(np.float32)
+    return X, y, a, 'COMPAS'
+
+
+def load_german(data_dir='data/raw'):
+    """Load and preprocess the German Credit (UCI statlog) dataset.
+
+    Source: UCI Machine Learning Repository (statlog/german)
+      https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data
+    Local: data/raw/german.data
+    Format: space-separated, no header, 20 attributes + 1 label column.
+
+    Protected attribute: sex (1=male, 0=female).
+      Derived from attribute 9 (Personal status and sex) per the UCI
+      german.doc codebook:
+        A91 : male   : divorced/separated
+        A92 : female : divorced/separated/married
+        A93 : male   : single
+        A94 : male   : married/widowed
+        A95 : female : single
+      => male = {A91, A93, A94}, female = {A92, A95}.
+      Sex is chosen (over age<25) for consistency with the Adult and Credit
+      loaders, which also use sex as the binary protected attribute.
+
+    Label: credit outcome (1=good, 0=bad). Raw column is 1=good, 2=bad, so we
+    remap 1->1 (good) and 2->0 (bad).
+
+    Categorical columns (the A*-coded attributes) are LabelEncoded. Numeric
+    columns are passed through.
+
+    Returns X, y, a, 'German'.
+    """
+    os.makedirs(data_dir, exist_ok=True)
+    path = os.path.join(data_dir, 'german.data')
+
+    if not os.path.exists(path):
+        _download_file(
+            'https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data',
+            path
+        )
+
+    # Space-separated, no header, 21 columns (20 attrs + label)
+    df = pd.read_csv(path, sep=r'\s+', header=None)
+    df = df.dropna().reset_index(drop=True)
+
+    # Protected attribute: sex from column 8 (Personal status and sex)
+    sex_male = df[8].isin(['A91', 'A93', 'A94'])
+    a = sex_male.astype(np.int64).values
+
+    # Label: column 20 (1=good, 2=bad) -> (1=good, 0=bad)
+    y = (df[20] == 1).astype(np.float32).values
+
+    # Drop label and protected-attr columns from features
+    df = df.drop(columns=[8, 20])
+
+    # Encode any categorical (object/string) columns with LabelEncoder
+    for col in df.columns:
+        if df[col].dtype == 'object' or pd.api.types.is_string_dtype(df[col]):
+            le = LabelEncoder()
+            df[col] = le.fit_transform(df[col].astype(str))
+
+    X = df.values.astype(np.float32)
+    return X, y, a, 'German'
+
+
 def load_utkface(data_dir='data/raw/utkface', feature_cache=None):
     """Load and preprocess UTKFace dataset.
 
@@ -254,6 +401,10 @@ def get_dataset(name, data_dir='data/raw', test_size=0.2, val_size=0.15, random_
         X, y, a, dname = load_credit(data_dir)
     elif name == 'lsac':
         X, y, a, dname = load_lsac(data_dir)
+    elif name == 'compas':
+        X, y, a, dname = load_compas(data_dir)
+    elif name == 'german':
+        X, y, a, dname = load_german(data_dir)
     elif name == 'utkface':
         # data_dir for tabular is 'data/raw'; UTKFace lives under data/raw/utkface + feature cache
         utk_dir = data_dir if 'utkface' in os.path.basename(data_dir.rstrip('/')) else os.path.join(data_dir, 'utkface')

@@ -236,30 +236,47 @@ def _refresh_appendix(rows, n_expected, means, answer_a, answer_b):
                    r"$\tau{=}1$ 540-row canonical grid. The locked main-text defaults are "
                    r"$\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5\times10^{-3}$.")
     a_lines.append("")
+    # Ship-safe: only n>=6 cells enter the paper appendix as claims.
+    answer_a_full = [t for t in (answer_a or []) if t[5] >= 6]
+    answer_a_pilot = [t for t in (answer_a or []) if t[5] < 6]
+    answer_b_full = [t for t in (answer_b or []) if t[3] >= 6]
+    n_rows = len(rows)
+    incomplete = n_rows < n_expected
+
     a_lines.append(r"\paragraph{Setup}")
     a_lines.append(r"Adult, attack=dp, $\alpha\in\{0.2,0.3\}$, $n{=}6$ seeds, DRO only, "
                    r"$\lambda_{\mathrm{init}}\in\{0.0,0.01,0.1\}$, "
                    r"$\eta_{\lambda}\in\{0.001,0.005\}$. Source: "
                    r"\texttt{results/lambda\_grid.json}. Adult constant-predictor accuracy "
-                   f"= {ADULT_CONSTANT_PREDICTOR:.4f}.")
+                   f"= {ADULT_CONSTANT_PREDICTOR:.4f}."
+                   + (rf" Grid progress at write time: {n_rows}/{n_expected} rows "
+                      r"(resume-safe; $\alpha{=}0.2$ cells with $n{=}6$ are treated as complete)."
+                      if incomplete else ""))
     a_lines.append("")
     a_lines.append(r"\paragraph{Default cell}")
     if default_cell_02:
         a_lines.append(rf"$\alpha{{=}}0.2$ default ($\lambda_{{\mathrm{{init}}}}{{=}}0.0$, "
                        rf"$\eta_{{\lambda}}{{=}}5{{\times}}10^{{-3}}$): {_fmt(default_cell_02)}.")
     if default_cell_03:
-        a_lines.append(rf"$\alpha{{=}}0.3$ default: {_fmt(default_cell_03)}.")
+        note = r" (pilot $n{<}6$ --- not a locked claim)" if default_cell_03["n"] < 6 else ""
+        a_lines.append(rf"$\alpha{{=}}0.3$ default: {_fmt(default_cell_03)}{note}.")
     a_lines.append("")
     a_lines.append(r"\paragraph{Q1(a): does any cell beat the default on DP without accuracy loss?}")
-    if answer_a:
-        a_lines.append(r"\textbf{Yes.} The following cells lower DP relative to the default "
-                       r"at the same $\alpha$ without losing accuracy:")
+    if answer_a_full:
+        a_lines.append(r"\textbf{Yes} (seed-complete cells, $n{=}6$ only). The following cells lower DP "
+                       r"relative to the default at the same $\alpha$ without losing accuracy:")
         a_lines.append(r"\begin{itemize}")
-        for (alpha, li, lrl, dp_diff, acc_diff, n) in answer_a:
+        for (alpha, li, lrl, dp_diff, acc_diff, n) in answer_a_full:
             a_lines.append(rf"\item $\alpha{{=}}{alpha:.1f}$, $\lambda_{{\mathrm{{init}}}}{{=}}{li:.2f}$, "
                            rf"$\eta_{{\lambda}}{{=}}{lrl:.3f}$: $\Delta$DP$={dp_diff:+.4f}$, "
                            rf"$\Delta$acc$={acc_diff:+.4f}$ (n={n}).")
         a_lines.append(r"\end{itemize}")
+        if answer_a_pilot:
+            a_lines.append(r"Partial $n{<}6$ cells that point the same way are deferred until the "
+                           r"grid completes (not listed as evidence here).")
+    elif answer_a_pilot:
+        a_lines.append(r"\textbf{Pilot only} ($n{<}6$): some cells currently lower DP without acc "
+                       r"loss, but we withhold a paper claim until $n{=}6$ per cell.")
     else:
         a_lines.append(r"\textbf{No.} No cell in the grid both lowers DP and holds accuracy "
                        r"relative to the default. The defaults are a stable operating point, "
@@ -267,25 +284,28 @@ def _refresh_appendix(rows, n_expected, means, answer_a, answer_b):
     a_lines.append("")
     a_lines.append(r"\paragraph{Q1(b): does any cell rescue $\alpha{=}0.3$ accuracy above "
                    r"the constant-predictor baseline?}")
-    if answer_b:
-        a_lines.append(rf"\textbf{{Yes.}} Cells at $\alpha{{=}}0.3$ with acc $>{ADULT_CONSTANT_PREDICTOR:.4f}$:")
+    if answer_b_full:
+        a_lines.append(rf"\textbf{{Yes.}} Cells at $\alpha{{=}}0.3$ with acc $>{ADULT_CONSTANT_PREDICTOR:.4f}$ "
+                       r"and $n{=}6$:")
         a_lines.append(r"\begin{itemize}")
-        for (li, lrl, acc, n) in answer_b:
+        for (li, lrl, acc, n) in answer_b_full:
             a_lines.append(rf"\item $\lambda_{{\mathrm{{init}}}}{{=}}{li:.2f}$, "
                            rf"$\eta_{{\lambda}}{{=}}{lrl:.3f}$: acc$={acc:.4f}$ (n={n}).")
         a_lines.append(r"\end{itemize}")
     else:
-        a_lines.append(rf"\textbf{{No.}} No $\alpha{{=}}0.3$ cell reaches acc $>{ADULT_CONSTANT_PREDICTOR:.4f}$; "
-                       r"high-$\alpha$ is not rescued by dual-step tuning alone, consistent with "
-                       r"the locked main-text claim.")
+        a_lines.append(rf"\textbf{{No}} (so far). No $\alpha{{=}}0.3$ cell reaches acc "
+                       rf"$>{ADULT_CONSTANT_PREDICTOR:.4f}$"
+                       + (r" on the partial grid" if incomplete else "")
+                       + r"; high-$\alpha$ is not rescued by dual-step tuning alone, consistent "
+                       r"with the locked main-text claim.")
     a_lines.append("")
     a_lines.append(r"\paragraph{Recommendation}")
     a_lines.append(r"Retain the locked defaults ($\lambda_{\mathrm{init}}{=}0.0$, "
                    r"$\eta_{\lambda}{=}5\times10^{-3}$) for the main protocol. "
-                   + ("Where cells beat the default on DP without acc loss, report them as "
+                   + ("Where $n{=}6$ cells beat the default on DP without acc loss, report them as "
                       "sensitivity evidence, not a replacement claim."
-                      if answer_a else
-                      "The grid confirms the defaults are a stable operating point."))
+                      if answer_a_full else
+                      "The grid so far supports the defaults as a stable operating point."))
 
     with open(APPENDIX_TEX, "w") as f:
         f.write("\n".join(a_lines) + "\n")

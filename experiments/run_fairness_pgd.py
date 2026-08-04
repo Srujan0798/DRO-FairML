@@ -45,8 +45,9 @@ def _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, 
 
 
 def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=20,
-                          tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3,
-                          corruptor_type='adversarial', lr_lambda=5e-3, attack_k=5):
+                           tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3,
+                           corruptor_type='adversarial', lr_lambda=5e-3, attack_k=5,
+                           radii_scale=1.0, radii_clamp=None, dump_history=False):
     """Run single (dataset, alpha, seed, attack, method) experiment.
     All callers must pass (or rely on defaults for) full provenance params so every row
     includes k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
@@ -55,6 +56,15 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
       corruptor_type: 'adversarial' (FairnessTargetedPGD, canonical) or 'random' (RandomCorruptor, A4).
       lr_lambda: dual learning rate override (A3 lambda grid; default 5e-3 = canonical).
       attack_k: k-NN neighborhood for IF attack (A1 kNN ablation; default 5 = canonical attack k).
+      radii_scale (Agent N1): global multiplier on rho_dp/rho_if (default 1.0 = canonical).
+      radii_clamp (Agent L2): per-group cap on rho_dp[j] (default None = canonical).
+
+    Extended for Agent N2 convergence diagnostics:
+      dump_history: if True AND method=='dro', dump trainer.history (per-epoch train_loss,
+        val_acc, val_dp, val_if, val_loss, current_tau, ...) to
+        results/history_{dataset}_{attack}_{alpha}_{seed}_{method}.json. OFF by default so
+        canonical reruns are byte-identical and unaffected. Only DRO history is dumped
+        because N2's convergence plots are for the DRO trainer.
     """
     import random
     random.seed(seed)
@@ -95,6 +105,27 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         X_train, y_train, a_train
     )
 
+    # Agent N1 (Kuldeep May 29): MEASURED attack effectiveness — the ΔDP the
+    # corruption itself induces on the TRAINING labels, computed pre-training
+    # on numpy arrays (no torch). This is the key measurement Kuldeep asked
+    # for: "Does the attack affect the radius? ... if the attack is too weak,
+    # then DRO would perform well?" Strength must be MEASURED, not assumed.
+    # Guarded so existing callers are unaffected (defaults to None on any
+    # failure). Uses compute_dp_violation (binary |P(y=1|a=0) - P(y=1|a=1)|).
+    try:
+        from src.evaluation.metrics import compute_dp_violation
+        y_tr_np = np.asarray(y_train).astype(np.float32)
+        a_tr_np = np.asarray(a_train)
+        y_att_np = np.asarray(y_train_att).astype(np.float32)
+        a_att_np = np.asarray(a_train_att)
+        dp_clean_train = float(compute_dp_violation(y_tr_np, a_tr_np))
+        dp_corrupted_train = float(compute_dp_violation(y_att_np, a_att_np))
+        attack_effectiveness = abs(dp_corrupted_train - dp_clean_train)
+    except Exception:
+        dp_clean_train = None
+        dp_corrupted_train = None
+        attack_effectiveness = None
+
     result = {
         'dataset': dataset_name,
         'alpha': alpha,
@@ -104,6 +135,11 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         'corruptor_type': corruptor_type,
         'lr_lambda': float(lr_lambda),
         'attack_k': int(attack_k),
+        'radii_scale': float(radii_scale),
+        'radii_clamp': (None if radii_clamp is None else float(radii_clamp)),
+        'attack_effectiveness': attack_effectiveness,
+        'dp_clean_train': dp_clean_train,
+        'dp_corrupted_train': dp_corrupted_train,
     }
 
     if method == 'naive':
@@ -127,7 +163,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
             lr_theta=1e-3, lr_lambda=lr_lambda, lr_p=5e-3, lambda_max=1.5,
             tau=tau, beta=5.0, k=attack_k, gamma=0.0,
             K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15,
-            lambda_init=lambda_init, radii_mode=radii_mode
+            lambda_init=lambda_init, radii_mode=radii_mode,
+            radii_scale=radii_scale, radii_clamp=radii_clamp
         )
         trainer.fit(X_train_att, y_train_att, a_train_att,
                      X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
@@ -145,6 +182,21 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps,
         n_seeds_planned, epochs, attack_k=attack_k,
     )
+
+    # Agent N2 convergence diagnostics: dump per-epoch DRO history to a JSON file
+    # alongside the result row. Gated by dump_history (default False) so canonical
+    # reruns are unaffected. Only DRO history is dumped — N2's convergence plots are
+    # for the DRO trainer; Naive history stays accessible via trainer.history in-process.
+    if dump_history and method == 'dro':
+        os.makedirs('results', exist_ok=True)
+        history_path = os.path.join(
+            'results',
+            f"history_{dataset_name}_{attack}_{alpha}_{seed}_{method}.json"
+        )
+        with open(history_path, 'w') as _hf:
+            json.dump(trainer.history, _hf, indent=2)
+        result['history_path'] = history_path
+
     return result
 
 

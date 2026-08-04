@@ -4,25 +4,23 @@
 This appendix records the \emph{$\lambda_{\mathrm{init}}\times\eta_{\lambda}$} grid (Kuldeep's Q1) on Adult under the DP attack, separate from the locked $\tau{=}1$ 540-row canonical grid. The locked main-text defaults are $\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5\times10^{-3}$.
 
 \paragraph{Setup}
-Adult, attack=dp, $\alpha\in\{0.2,0.3\}$, $n{=}6$ seeds, DRO only, $\lambda_{\mathrm{init}}\in\{0.0,0.01,0.1\}$, $\eta_{\lambda}\in\{0.001,0.005\}$. Source: \texttt{results/lambda\_grid.json}. Adult constant-predictor accuracy = 0.7521.
+Adult, attack=dp, $\alpha\in\{0.2,0.3\}$, $n{=}6$ seeds, DRO only, $\lambda_{\mathrm{init}}\in\{0.0,0.01,0.1\}$, $\eta_{\lambda}\in\{0.001,0.005\}$. Source: \texttt{results/lambda\_grid.json}. Adult constant-predictor accuracy = 0.7521. Grid progress at write time: 55/72 rows (resume-safe; $\alpha{=}0.2$ cells with $n{=}6$ are treated as complete).
 
 \paragraph{Default cell}
 $\alpha{=}0.2$ default ($\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5{\times}10^{-3}$): DP=0.2334, acc=0.7586, n=6, acc>0.7521: yes.
-$\alpha{=}0.3$ default: DP=0.2730, acc=0.6872, n=1, acc>0.7521: no.
+$\alpha{=}0.3$ default: DP=0.2641, acc=0.6789, n=3, acc>0.7521: no (pilot $n{<}6$ --- not a locked claim).
 
 \paragraph{Q1(a): does any cell beat the default on DP without accuracy loss?}
-\textbf{Yes.} The following cells lower DP relative to the default at the same $\alpha$ without losing accuracy:
+\textbf{Yes} (seed-complete cells, $n{=}6$ only). The following cells lower DP relative to the default at the same $\alpha$ without losing accuracy:
 \begin{itemize}
 \item $\alpha{=}0.2$, $\lambda_{\mathrm{init}}{=}0.01$, $\eta_{\lambda}{=}0.005$: $\Delta$DP$=-0.0007$, $\Delta$acc$=+0.0007$ (n=6).
 \item $\alpha{=}0.2$, $\lambda_{\mathrm{init}}{=}0.10$, $\eta_{\lambda}{=}0.005$: $\Delta$DP$=-0.0132$, $\Delta$acc$=+0.0093$ (n=6).
 \item $\alpha{=}0.2$, $\lambda_{\mathrm{init}}{=}0.10$, $\eta_{\lambda}{=}0.001$: $\Delta$DP$=-0.0115$, $\Delta$acc$=+0.0088$ (n=6).
-\item $\alpha{=}0.3$, $\lambda_{\mathrm{init}}{=}0.10$, $\eta_{\lambda}{=}0.001$: $\Delta$DP$=-0.0176$, $\Delta$acc$=+0.0093$ (n=1).
-\item $\alpha{=}0.3$, $\lambda_{\mathrm{init}}{=}0.10$, $\eta_{\lambda}{=}0.005$: $\Delta$DP$=-0.0207$, $\Delta$acc$=+0.0098$ (n=1).
-\item $\alpha{=}0.3$, $\lambda_{\mathrm{init}}{=}0.01$, $\eta_{\lambda}{=}0.005$: $\Delta$DP$=-0.0003$, $\Delta$acc$=+0.0007$ (n=1).
 \end{itemize}
+Partial $n{<}6$ cells that point the same way are deferred until the grid completes (not listed as evidence here).
 
 \paragraph{Q1(b): does any cell rescue $\alpha{=}0.3$ accuracy above the constant-predictor baseline?}
-\textbf{No.} No $\alpha{=}0.3$ cell reaches acc $>0.7521$; high-$\alpha$ is not rescued by dual-step tuning alone, consistent with the locked main-text claim.
+\textbf{No} (so far). No $\alpha{=}0.3$ cell reaches acc $>0.7521$ on the partial grid; high-$\alpha$ is not rescued by dual-step tuning alone, consistent with the locked main-text claim.
 
 \paragraph{Recommendation}
-Retain the locked defaults ($\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5\times10^{-3}$) for the main protocol. Where cells beat the default on DP without acc loss, report them as sensitivity evidence, not a replacement claim.
+Retain the locked defaults ($\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5\times10^{-3}$) for the main protocol. Where $n{=}6$ cells beat the default on DP without acc loss, report them as sensitivity evidence, not a replacement claim.

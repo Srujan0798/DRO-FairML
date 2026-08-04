@@ -58,3 +58,42 @@ The earlier ``DRO inverts on ResNet18 features'' claim is withdrawn
 stronger DRO DP wins mainly at high $\alpha$, not the Adult/Credit
 $\alpha\le0.2$ regime.  Image features and tabular data should not be
 conflated in the main claim.
+
+\subsection{Limitations}
+\label{sec:limitations}
+We report three honest limitations that bound the scope of the claims
+above.
+\begin{enumerate}
+\item \textbf{LSAC/DP degeneracy.}  Under the DP attack on LSAC, the
+DRO model collapses to the constant (majority-class) predictor:
+accuracy is pinned to the LSAC majority rate $\approx0.9016$ at every
+$\alpha$, and DP does not move monotonically with corruption (it peaks
+at $\alpha{=}0.1$ and falls at $\alpha\ge0.2$).  DRO loses to Naive on
+LSAC/DP at every $\alpha$ ($0/6$ seeds).  This is an artifact of the TV
+radii formula $\rho_{\mathrm{DP},j}=\alpha/((1-\alpha)\pi_j+\alpha)$ on
+LSAC's $\sim90/10$ imbalanced protected group (the minority radius
+blows up and over-weights a near-empty group), \emph{not} evidence that
+``DRO loses on LSAC.''  Full diagnosis in
+\texttt{docs/LSAC\_DEGENERACY.md}; LSAC/DP is reported as a degenerate
+diagnostic and excluded from the DP win table, while LSAC/Combined is a
+genuine clean win ($p{=}0.0156$ at $\alpha\in\{0.1,0.3,0.4\}$).
+
+\item \textbf{$\alpha\ge0.3$ constant-predictor bound (Adult+Credit).}
+At $\alpha\ge0.3$ on Adult and Credit, both methods' accuracy falls
+below the per-dataset constant-predictor baseline (Adult
+$\approx0.7521$, Credit $\approx0.7788$).  We make no method claim in
+this regime, even when fairness gaps still favour DRO.  LSAC is not
+``below'' its baseline --- it is pinned \emph{at} it ($\approx0.9016$)
+under the DP attack, which is the degeneracy of item~1.
+
+\item \textbf{IF story is MIXED.}  The IF \emph{metric} supports DRO on
+Adult/Credit at $\alpha\in\{0.1$--$0.4\}$ including $\alpha{=}0.3$
+($6/6$, $p{=}0.0156$; \S\ref{sec:results-tabular}), but
+DP-under-IF-attack is not a second clean DP story: Adult $\alpha{=}0.3$
+loses on DP ($\mathrm{DP}_{\mathrm{DRO}}{=}0.0241 >
+\mathrm{DP}_{\mathrm{Naive}}{=}0.0227$, $1/6$) even while IF wins, and
+LSAC/IF loses on DP for $\alpha\le0.3$.  The IF and DP metrics are
+\emph{coupled}, not interchangeable; we state the IF win clearly but
+pair it with the DP-coupling caveat rather than claiming a three-attack
+DP sweep.
+\end{enumerate}

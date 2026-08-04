@@ -35,8 +35,10 @@ completeness but exclude it from the attack-robustness headline
 \caption{Adult, DP attack: clean DP vs.\ corruption budget $\alpha$ under
 fixed $\tau{=}1$ (canonical 540-row grid, $n{=}6$ seeds).  DRO is lower
 than Naive at every $\alpha$; win counts on the plot include the honest
-\textbf{$5/6$} cell at $\alpha{=}0.1$ ($p{=}0.031$).  Defensible
-accuracy regime remains $\alpha\le0.2$.}
+\textbf{$5/6$} cell at $\alpha{=}0.1$ ($p{=}0.031$).  The
+constant-predictor accuracy baseline for Adult is $\approx0.7521$; the
+defensible accuracy regime remains $\alpha\le0.2$ (both methods fall
+below the constant-predictor line at $\alpha\ge0.3$).}
 \label{fig:tau1-headline}
 \end{figure}
 
@@ -46,7 +48,9 @@ accuracy regime remains $\alpha\le0.2$.}
 \caption{DP-attack Wilcoxon win summary across datasets and $\alpha$
 (seed-paired, one-sided $H_1$: Naive DP $>$ DRO DP; $n{=}6$).
 Adult and Credit support DRO; LSAC/DP is a \textbf{degenerate loss}
-(constant-predictor collapse).}
+(constant-predictor collapse at the LSAC majority rate $\approx0.9016$).
+Constant-predictor accuracy baselines: Adult $\approx0.7521$, Credit
+$\approx0.7788$, LSAC $\approx0.9016$.}
 \label{fig:wilcoxon-matrix}
 \end{figure}
 
@@ -140,7 +144,10 @@ LSAC/DP shows negative $\Delta$DP (DRO worse) at every $\alpha$.}
 \includegraphics[width=0.95\textwidth]{../figures/fig1_main_results.pdf}
 \caption{Main results overview from the locked $\tau{=}1$ protocol
 ($n{=}6$).  Interpret together with Tables~\ref{tab:full-grid}--\ref{tab:wilcoxon-full};
-the defensible method claim is Adult/Credit, $\alpha\le0.2$, DP+Combined.}
+the defensible method claim is Adult/Credit, $\alpha\le0.2$, DP+Combined.
+Constant-predictor accuracy baselines (Adult $\approx0.7521$, Credit
+$\approx0.7788$, LSAC $\approx0.9016$) bound the $\alpha\ge0.3$ regime
+on Adult/Credit; LSAC stays pinned at its baseline.}
 \label{fig:main-results}
 \end{figure}
 
@@ -149,7 +156,8 @@ the defensible method claim is Adult/Credit, $\alpha\le0.2$, DP+Combined.}
 \includegraphics[width=0.92\textwidth]{../figures/fig2_dp_reduction_heatmap.pdf}
 \caption{DP reduction heatmap (Naive $-$ DRO; positive $=$ DRO better)
 under the canonical protocol.  LSAC/DP cells are the known degenerate
-negative (red / negative reduction).}
+negative (red / negative reduction); LSAC accuracy is pinned at the
+constant-predictor baseline $\approx0.9016$ at every $\alpha$.}
 \label{fig:dp-heatmap}
 \end{figure}
 
@@ -157,7 +165,10 @@ negative (red / negative reduction).}
 \centering
 \includegraphics[width=0.85\textwidth]{../figures/fig4_significance_matrix.pdf}
 \caption{Significance matrix for seed-paired Wilcoxon on DP
-($p{<}0.05$).  Matches the $5/6$ and $6/6$ counts discussed in the text.}
+($p{<}0.05$).  Matches the $5/6$ and $6/6$ counts discussed in the text.
+Accuracy remains above the constant-predictor baseline
+(Adult $\approx0.7521$, Credit $\approx0.7788$) only at $\alpha\le0.2$
+on Adult/Credit.}
 \label{fig:sig-matrix}
 \end{figure}
 
@@ -166,8 +177,10 @@ negative (red / negative reduction).}
 \includegraphics[width=0.85\textwidth]{../figures/fig5_accuracy_fairness_tradeoff.pdf}
 \caption{Accuracy--fairness tradeoff under the locked grid.  At
 $\alpha\ge0.3$ on Adult/Credit both methods fall below the
-constant-predictor accuracy baselines (Adult $\approx0.752$, Credit
-$\approx0.779$); we make no method claim there.}
+constant-predictor accuracy baselines (Adult $\approx0.7521$, Credit
+$\approx0.7788$); LSAC is pinned at its constant-predictor line
+($\approx0.9016$) at every $\alpha$ under the DP attack.  We make no
+method claim in the below-baseline regime.}
 \label{fig:tradeoff}
 \end{figure}
 
@@ -176,7 +189,10 @@ $\approx0.779$); we make no method claim there.}
 \includegraphics[width=0.85\textwidth]{../figures/fig7_summary_win_rates.pdf}
 \caption{Summary win rates across the canonical grid.  Not a claim of a
 clean three-attack sweep: IF-attack outcomes remain \emph{mixed}
-(Table~\ref{tab:wilcoxon-full}).}
+(Table~\ref{tab:wilcoxon-full}).  Win counts are restricted to the
+$\alpha\le0.2$ regime where accuracy is above the constant-predictor
+baselines (Adult $\approx0.7521$, Credit $\approx0.7788$); LSAC/DP is
+excluded as degenerate.}
 \label{fig:win-rates}
 \end{figure}
 
@@ -248,8 +264,9 @@ LSAC only joins at $\alpha\in\{0.3,0.4\}$ on the IF metric
 \textbf{DP under the same IF attack is mixed} (coupling, not interchangeability):
 DRO still lowers DP on Adult at $\alpha\le0.2$ ($6/6$, $p{=}0.0156$) and on
 most Credit cells (Credit $\alpha{=}0.1$ is $4/6$, n.s.), but Adult
-$\alpha{=}0.3$ \emph{loses} on DP ($1/6$, $p{=}0.8906$) even while IF wins,
-and LSAC loses on DP for $\alpha\le0.3$ ($0/6$).  We therefore state clearly:
+$\alpha{=}0.3$ \emph{loses} on DP ($\mathrm{DP}_{\mathrm{DRO}}{=}0.0241 >
+\mathrm{DP}_{\mathrm{Naive}}{=}0.0227$, $1/6$, $p{=}0.8906$) even while IF
+wins, and LSAC loses on DP for $\alpha\le0.3$ ($0/6$).  We therefore state clearly:
 \textbf{IF-targeted robustness holds for Adult/Credit including $\alpha{=}0.3$
 on the IF metric}, while DP-under-IF is not a second clean DP story.  We do
 \emph{not} claim a three-attack DP sweep on every dataset.
@@ -269,9 +286,11 @@ $\alpha{=}0.4$ (above).
 \centering
 \includegraphics[width=0.92\textwidth]{../figures/figD1_constant_predictor_accuracy.pdf}
 \caption{Accuracy vs.\ $\alpha$ with the constant-predictor baseline
-(Adult majority $\approx0.752$).  At $\alpha\ge0.3$ both methods fall
-below the line on Adult/Credit --- the defensible method claim remains
-$\alpha\le0.2$ for accuracy, even when fairness gaps favour DRO.}
+drawn per dataset (Adult majority $\approx0.7521$, Credit
+$\approx0.7788$, LSAC $\approx0.9016$).  At $\alpha\ge0.3$ both methods
+fall below the line on Adult/Credit --- the defensible method claim
+remains $\alpha\le0.2$ for accuracy, even when fairness gaps favour
+DRO.  LSAC stays pinned at its baseline under the DP attack.}
 \label{fig:constant-predictor}
 \end{figure}
 

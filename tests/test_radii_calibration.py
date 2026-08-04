@@ -122,6 +122,98 @@ def test_default_radii_mode_is_uniform():
     assert trainer.radii_mode == 'uniform'
 
 
+def test_default_radii_scale_and_clamp():
+    """Defaults: radii_scale=1.0 (no change), radii_clamp=None (no clamping)."""
+    trainer = DroFairTrainer(_make_dummy_model(), alpha=0.2)
+    assert trainer.radii_scale == 1.0
+    assert trainer.radii_clamp is None
+
+
+def test_radii_scale():
+    """Agent N1: radii_scale=2.0 should make rho exactly 2x the scale=1.0 version.
+
+    Verifies the global radius multiplier is applied to BOTH rho_dp (per-group)
+    and rho_if (scalar), and that scale=1.0 reproduces the canonical closed form.
+    """
+    a = np.array([0] * 700 + [1] * 300, dtype=np.int64)
+    rng = np.random.RandomState(7); rng.shuffle(a)
+    alpha = 0.2
+
+    t1 = DroFairTrainer(_make_dummy_model(), alpha=alpha, radii_scale=1.0, epochs=1)
+    t2 = DroFairTrainer(_make_dummy_model(), alpha=alpha, radii_scale=2.0, epochs=1)
+    rho_dp1, rho_if1 = t1._compute_radii(a)
+    rho_dp2, rho_if2 = t2._compute_radii(a)
+
+    for j in [0, 1]:
+        assert abs(rho_dp2[j] - 2.0 * rho_dp1[j]) < 1e-9, \
+            f"rho_dp[{j}] not 2x: {rho_dp1[j]} -> {rho_dp2[j]}"
+    assert abs(rho_if2 - 2.0 * rho_if1) < 1e-9, \
+        f"rho_if not 2x: {rho_if1} -> {rho_if2}"
+
+
+def test_radii_clamp():
+    """Agent L2: per-group radius clamp caps rho_dp[j] at the cap value.
+
+    Simulates the LSAC 90/10 imbalance where the uniform closed form gives the
+    tiny minority group a degenerate radius (denom -> 0 => rho_dp -> 1.0 or above).
+    With radii_clamp=0.3, no group's rho_dp exceeds 0.3.
+    """
+    n = 1000
+    a_clean = np.array([0] * 900 + [1] * 100, dtype=np.int64)  # 90/10 LSAC-like
+    rng = np.random.RandomState(0); rng.shuffle(a_clean)
+    alpha = 0.2
+    nc = int(alpha * n)
+    n_min_corr = min(int(0.7 * nc), int((a_clean == 1).sum()))  # cap at minority pop
+    n_maj_corr = nc - n_min_corr
+    a_corrupt = a_clean.copy()
+    a_corrupt[rng.choice(np.where(a_clean == 1)[0], n_min_corr, replace=False)] = 0
+    a_corrupt[rng.choice(np.where(a_clean == 0)[0], n_maj_corr, replace=False)] = 1
+
+    # Unclamped: minority rho_dp is large (degenerate on imbalanced data)
+    t_unclamped = DroFairTrainer(_make_dummy_model(), alpha=alpha, radii_clamp=None, epochs=1)
+    rho_dp_un, _ = t_unclamped._compute_radii(a_corrupt)
+    minority_rho_un = max(rho_dp_un)
+    assert minority_rho_un > 0.3, \
+        f"setup invariant failed: minority rho_dp should be >0.3, got {minority_rho_un}"
+
+    # Clamped at 0.3: no group exceeds the cap
+    t_clamped = DroFairTrainer(_make_dummy_model(), alpha=alpha, radii_clamp=0.3, epochs=1)
+    rho_dp_cl, _ = t_clamped._compute_radii(a_corrupt)
+    for j in [0, 1]:
+        assert rho_dp_cl[j] <= 0.3 + 1e-9, \
+            f"rho_dp[{j}] exceeds clamp: {rho_dp_cl[j]}"
+    # The previously-degenerate group is now actually capped (not just below 0.3 by chance)
+    assert max(rho_dp_cl) <= 0.3 + 1e-9
+    assert max(rho_dp_cl) < minority_rho_un, \
+        f"clamp did not reduce the minority radius: {max(rho_dp_cl)} vs {minority_rho_un}"
+
+
+def test_empirical_differs_from_uniform_imbalanced_90_10():
+    """Agent A5 verification: on a 90/10 imbalanced split at alpha=0.2,
+    empirical rho_dp != uniform rho_dp. Confirms empirical mode is actually
+    ACTIVE under coordinated=True (not silently no-op'd as in an earlier version).
+    """
+    n = 1000
+    a_clean = np.array([0] * 900 + [1] * 100, dtype=np.int64)
+    rng = np.random.RandomState(0); rng.shuffle(a_clean)
+    alpha = 0.2
+    nc = int(alpha * n)
+    n_min_corr = min(int(0.7 * nc), int((a_clean == 1).sum()))
+    n_maj_corr = nc - n_min_corr
+    a_corrupt = a_clean.copy()
+    a_corrupt[rng.choice(np.where(a_clean == 1)[0], n_min_corr, replace=False)] = 0
+    a_corrupt[rng.choice(np.where(a_clean == 0)[0], n_maj_corr, replace=False)] = 1
+
+    t_e = DroFairTrainer(_make_dummy_model(), alpha=alpha, radii_mode='empirical', epochs=1)
+    t_u = DroFairTrainer(_make_dummy_model(), alpha=alpha, radii_mode='uniform', epochs=1)
+    rho_e, _ = t_e._compute_radii(a_corrupt)
+    rho_u, _ = t_u._compute_radii(a_corrupt)
+
+    assert not np.allclose(rho_e, rho_u, atol=1e-4), \
+        f"empirical == uniform on imbalanced data (empirical mode not active!): " \
+        f"empirical={rho_e}, uniform={rho_u}"
+
+
 def test_empirical_mode_end_to_end_adult():
     """Empirical mode should train end-to-end on real Adult data without error.
 

@@ -25,7 +25,7 @@ class NaiveFairTrainer:
 
     def __init__(self, model, device='cpu', lr_theta=1e-3, lr_lambda=5e-3,
                  lambda_max=1.5, tau=1.0, k=5, gamma=0.0,
-                 epochs=60, weight_decay=1e-4, tau_warmup_epochs=0):
+                 epochs=60, weight_decay=1e-4, tau_warmup_epochs=0, history_path=None):
         self.model = model.to(device)
         self.device = device
         self.lr_theta = lr_theta
@@ -37,6 +37,7 @@ class NaiveFairTrainer:
         self.epochs = epochs
         self.weight_decay = weight_decay
         self.tau_warmup_epochs = tau_warmup_epochs
+        self.history_path = history_path
         self.n_samples = None
 
     def _build_knn_graph(self, X):
@@ -119,7 +120,13 @@ class NaiveFairTrainer:
         # Precompute k-NN edges
         edge_i, edge_j, edge_dists = self._build_knn_graph(X)
 
-        history = {'train_loss': [], 'val_acc': [], 'val_dp': [], 'val_if': []}
+        # Per-epoch history (Agent N2 convergence diagnostics). Schema matches
+        # DroFairTrainer.history so the same plotting code handles both. val_acc/
+        # val_dp/val_if are sampled every 5 epochs (legacy cadence, unchanged);
+        # train_loss/val_loss/current_tau are recorded EVERY epoch so the
+        # convergence plots have per-epoch resolution on the primary signals.
+        history = {'train_loss': [], 'val_acc': [], 'val_dp': [], 'val_if': [],
+                   'val_loss': [], 'current_tau': []}
 
         for epoch in range(self.epochs):
             self.model.train()
@@ -158,7 +165,20 @@ class NaiveFairTrainer:
                     lambda_if + self.lr_lambda * g_if, 0, self.lambda_max
                 )
 
-            history['train_loss'].append(total_loss.item())
+            history['train_loss'].append(float(total_loss.item()))
+            history['current_tau'].append(float(current_tau))
+
+            # Per-epoch val_loss (BCE on clean validation) — cheap, always available
+            # when X_val is provided, gives the convergence curve N2 needs.
+            if X_val is not None:
+                with torch.no_grad():
+                    Xv_t = torch.tensor(X_val, dtype=torch.float32, device=self.device)
+                    yv_t = torch.tensor(y_val, dtype=torch.float32, device=self.device)
+                    val_logits = self.model(Xv_t)
+                    val_loss = F.binary_cross_entropy_with_logits(val_logits, yv_t)
+                history['val_loss'].append(float(val_loss.item()))
+            else:
+                history['val_loss'].append(float('nan'))
 
             # Validation every 5 epochs
             # Audit: uses epoch's current_tau (not self.tau) for consistency with training.
@@ -169,9 +189,9 @@ class NaiveFairTrainer:
                     self.model, X_val, y_val, a_val,
                     device=self.device, temperature=current_tau, k=self.k, gamma=self.gamma
                 )
-                history['val_acc'].append(metrics['accuracy'])
-                history['val_dp'].append(metrics['dp_violation'])
-                history['val_if'].append(metrics['if_violation'])
+                history['val_acc'].append(float(metrics['accuracy']))
+                history['val_dp'].append(float(metrics['dp_violation']))
+                history['val_if'].append(float(metrics['if_violation']))
 
                 if verbose:
                     print(
@@ -181,6 +201,13 @@ class NaiveFairTrainer:
                         f"val_if={metrics['if_violation']:.4f}"
                     )
 
+        # Expose as self.history (Agent N2 convergence plots read trainer.history).
+        self.history = history
+
+        if self.history_path:
+            import json as _json
+            with open(self.history_path, 'w') as _hf:
+                _json.dump(history, _hf, indent=2)
         return history
 
     def predict(self, X):

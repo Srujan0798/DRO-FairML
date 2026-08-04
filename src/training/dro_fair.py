@@ -31,7 +31,8 @@ class DroFairTrainer:
                  lr_p=5e-3, lambda_max=1.5, tau=1.0, beta=5.0, k=5, gamma=0.0,
                  K_inner=10, epochs=60, weight_decay=1e-4,
                  use_dp=True, use_if=True, tau_warmup_epochs=15,
-                 lambda_init=0.0, radii_mode='uniform', history_path=None):
+                 lambda_init=0.0, radii_mode='uniform', history_path=None,
+                 radii_scale=1.0, radii_clamp=None):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -61,6 +62,17 @@ class DroFairTrainer:
         if radii_mode not in ('uniform', 'empirical'):
             raise ValueError(f"radii_mode must be 'uniform' or 'empirical', got {radii_mode!r}")
         self.radii_mode = radii_mode
+        # radii_scale (Agent N1): global multiplier on rho_dp/rho_if. Default 1.0
+        # leaves the canonical closed form unchanged. Used to test whether DRO's
+        # advantage is a function of the match between attack strength and radius
+        # calibration (Kuldeep's first question, May 29). Provenance-recorded.
+        self.radii_scale = float(radii_scale)
+        # radii_clamp (Agent L2): per-group cap on rho_dp[j]. Default None leaves
+        # canonical behavior. When set, no single group's radius exceeds the cap —
+        # prevents the tiny minority group's radius from blowing up on imbalanced
+        # data like LSAC (~90/10), where uniform mode produces rho_dp[minority]=1.0
+        # (degenerate). This is HYPOTHESIS TESTING, not tuning-until-it-wins.
+        self.radii_clamp = float(radii_clamp) if radii_clamp is not None else None
         self.history_path = history_path
         self.rho_dp = None
         self.rho_if = None
@@ -114,6 +126,16 @@ class DroFairTrainer:
             denom = (1 - self.alpha) * pi_clean[j] + self.alpha
             rho_dp.append(self.alpha / denom if denom > 0 else 1.0)
         rho_if = 2 * self.alpha - self.alpha ** 2
+
+        # Agent N1: global radius scale (provenance-recorded; default 1.0 = canonical).
+        if self.radii_scale != 1.0:
+            rho_dp = [r * self.radii_scale for r in rho_dp]
+            rho_if = rho_if * self.radii_scale
+        # Agent L2: per-group radius clamp (LSAC degeneracy fix; default None = canonical).
+        # Cap rho_dp[j] so the tiny minority group's radius cannot blow up on
+        # imbalanced data. Applied after scaling so the cap is in scaled units.
+        if self.radii_clamp is not None:
+            rho_dp = [min(r, self.radii_clamp) for r in rho_dp]
         return rho_dp, rho_if
 
     def _empirical_pi_clean(self, pi_obs):
