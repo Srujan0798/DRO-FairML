@@ -18,8 +18,10 @@ $\times$ 6 seeds $\times$ 2 methods).  The IF-attack third is
 support DRO on DP under IF attack; LSAC/IF and Adult IF $\alpha\ge0.3$ do
 not (see Q7 below and
 \texttt{results/if\_wilcoxon\_summary.txt}).  Earlier IF metrics were
-degenerate ($\approx10^{-10}$) before the cosine fix in
-\texttt{src/evaluation/metrics.py}.  Full per-seed traces are in
+degenerate ($\approx10^{-10}$) under the paper's original Euclidean feature-space
+threshold; all IF numbers below use the cosine (angular) IF metric in
+\texttt{src/evaluation/metrics.py} and are \emph{not} the original Euclidean IF.
+Full per-seed traces are in
 \texttt{results/canonical\_tau1.json}.
 
 \paragraph{$\alpha{=}0$ is not an attack cell.}

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Compare Mac MPS utkface_canonical.json vs flair2 CUDA utkface_flair2.json."""
 from __future__ import annotations
+
 import json
 from pathlib import Path
 from collections import defaultdict
@@ -10,34 +11,34 @@ ROOT = Path(__file__).resolve().parents[1]
 MAC = ROOT / "results" / "utkface_canonical.json"
 GPU = ROOT / "results" / "utkface_flair2.json"
 OUT = ROOT / "results" / "utkface_reproducibility_summary.md"
+GAP_THR = 0.02
 
 
-def _clean_dp(block):
+def _metric(block, which: str, name: str) -> float:
     if not isinstance(block, dict):
         return float("nan")
-    c = block.get("clean") or block
-    return float(c.get("dp_violation", c.get("dp_clean", float("nan"))))
+    sub = block.get(which) or block
+    if not isinstance(sub, dict):
+        return float("nan")
+    if name == "dp":
+        return float(sub.get("dp_violation", sub.get("dp_clean", float("nan"))))
+    if name == "acc":
+        return float(sub.get("accuracy", sub.get("acc", float("nan"))))
+    if name == "if":
+        return float(sub.get("if_violation", sub.get("if_clean", float("nan"))))
+    return float("nan")
 
 
-def _clean_acc(block):
-    c = block.get("clean") or block
-    return float(c.get("accuracy", c.get("acc", float("nan"))))
-
-
-def load_mac(rows):
-    # nested naive/dro per seed
-    g = defaultdict(list)
-    for r in rows:
-        g[(r["attack"], float(r["alpha"]))].append(r)
-    return g
-
-
-def load_gpu(rows):
-    # same nested schema from run_utkface
+def _group(rows):
     g = defaultdict(list)
     for r in rows:
         g[(r.get("attack"), float(r["alpha"]))].append(r)
     return g
+
+
+def _mean(rs, method, which, name):
+    vals = [_metric(r[method], which, name) for r in rs if method in r]
+    return float(np.nanmean(vals)) if vals else float("nan")
 
 
 def main():
@@ -52,40 +53,89 @@ def main():
         "Protocol: τ=1, k_inner=10, epochs=60, pgd_steps=20, n_seeds=6, REAL features.",
         "Same seeds 0–5. Large gaps are bugs to investigate.",
         "",
+        "## Clean test (primary)",
+        "",
         "| attack | α | n_mac | n_gpu | Δ mean DP_dro (gpu−mac) | Δ mean acc_dro | note |",
         "|--------|---:|------:|------:|------------------------:|---------------:|------|",
     ]
-    mg, gg = load_mac(mac), load_gpu(gpu)
+    mg, gg = _group(mac), _group(gpu)
     keys = sorted(set(mg) | set(gg), key=lambda x: (str(x[0]), x[1]))
+    gap_cells = []
     for atk, a in keys:
         mr, gr = mg.get((atk, a), []), gg.get((atk, a), [])
-        def mean_dp(rs, method):
-            vals = []
-            for r in rs:
-                if method in r:
-                    vals.append(_clean_dp(r[method]))
-            return float(np.nanmean(vals)) if vals else float("nan")
-        def mean_acc(rs, method):
-            vals = []
-            for r in rs:
-                if method in r:
-                    vals.append(_clean_acc(r[method]))
-            return float(np.nanmean(vals)) if vals else float("nan")
-        ddp = mean_dp(gr, "dro") - mean_dp(mr, "dro")
-        dacc = mean_acc(gr, "dro") - mean_acc(mr, "dro")
-        note = "OK" if abs(ddp) < 0.02 else ("GAP" if len(gr) >= 6 and len(mr) >= 6 else "partial")
+        ddp = _mean(gr, "dro", "clean", "dp") - _mean(mr, "dro", "clean", "dp")
+        dacc = _mean(gr, "dro", "clean", "acc") - _mean(mr, "dro", "clean", "acc")
+        if abs(ddp) < GAP_THR and abs(dacc) < GAP_THR:
+            note = "OK"
+        elif len(gr) >= 6 and len(mr) >= 6:
+            note = "GAP"
+            gap_cells.append((atk, a, ddp, dacc))
+        else:
+            note = "partial"
         lines.append(
             f"| {atk} | {a} | {len(mr)} | {len(gr)} | {ddp:+.4f} | {dacc:+.4f} | {note} |"
         )
+
+    lines += [
+        "",
+        "## Corrupted (attacked) test",
+        "",
+        "| attack | α | n_gpu | Δ mean DP_dro_corr | Δ mean acc_dro_corr | note |",
+        "|--------|---:|------:|-------------------:|--------------------:|------|",
+    ]
+    for atk, a in keys:
+        mr, gr = mg.get((atk, a), []), gg.get((atk, a), [])
+        if not gr:
+            continue
+        ddp = _mean(gr, "dro", "corrupted", "dp") - _mean(mr, "dro", "corrupted", "dp")
+        dacc = _mean(gr, "dro", "corrupted", "acc") - _mean(mr, "dro", "corrupted", "acc")
+        note = "OK" if abs(ddp) < GAP_THR and abs(dacc) < GAP_THR else (
+            "GAP" if len(gr) >= 6 and len(mr) >= 6 else "partial"
+        )
+        lines.append(
+            f"| {atk} | {a} | {len(gr)} | {ddp:+.4f} | {dacc:+.4f} | {note} |"
+        )
+
+    # Seed-wise max abs delta over matched cells
+    mac_i = {(r["attack"], float(r["alpha"]), int(r["seed"])): r for r in mac}
+    gpu_i = {(r.get("attack"), float(r["alpha"]), int(r["seed"])): r for r in gpu}
+    common = sorted(set(mac_i) & set(gpu_i))
+    if common:
+        d_clean = [
+            abs(
+                _metric(gpu_i[k]["dro"], "clean", "dp")
+                - _metric(mac_i[k]["dro"], "clean", "dp")
+            )
+            for k in common
+        ]
+        d_corr = [
+            abs(
+                _metric(gpu_i[k]["dro"], "corrupted", "dp")
+                - _metric(mac_i[k]["dro"], "corrupted", "dp")
+            )
+            for k in common
+        ]
+        lines += [
+            "",
+            "## Matched seed-wise (all completed GPU cells)",
+            f"- Matched cells: **{len(common)}**",
+            f"- max\\|Δ DP_dro clean\\| = **{max(d_clean):.4f}**",
+            f"- max\\|Δ DP_dro corrupted\\| = **{max(d_corr):.4f}**",
+            f"- mean Δ DP_dro clean = "
+            f"{float(np.mean([_metric(gpu_i[k]['dro'],'clean','dp')-_metric(mac_i[k]['dro'],'clean','dp') for k in common])):+.5f}",
+        ]
+
     lines += [
         "",
         "### Verdict",
-        f"- Grid complete on both: **{len(mac)==90 and len(gpu)==90}**",
+        f"- Grid complete on both: **{len(mac) == 90 and len(gpu) == 90}**",
+        f"- GAP cells (clean, n≥6 both sides, thr={GAP_THR}): **{len(gap_cells)}**"
+        + (f" — {gap_cells}" if gap_cells else ""),
         "- If any cell is GAP with n=6 both sides, investigate device/nondeterminism before claiming CUDA repro.",
         "",
     ]
-    OUT.write_text("\n".join(lines))
-    print("wrote", OUT, "mac", len(mac), "gpu", len(gpu))
+    OUT.write_text("\n".join(lines) + "\n")
+    print("wrote", OUT, "mac", len(mac), "gpu", len(gpu), "matched", len(common) if common else 0)
 
 
 if __name__ == "__main__":

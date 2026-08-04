@@ -1,25 +1,23 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~02:19 IST_
+_Last tick: 2026-08-05 ~02:30 IST_
 
 ## Counts (do not pkill)
 
-| Job | Target | Count | Last | Alive |
-|-----|--------|------:|------|-------|
-| **U1** | 90 | **14** | dp α=0.2 seed=1 (t≈538s) | PID 3482009 GPU0 |
-| **U2** | 30 | **14** | α=0.2 seed=1; mid seed=2 | PID 3482442 GPU1 |
+| Job | Target | Count | Notes |
+|-----|--------|------:|-------|
+| **U1** | 90 | **14** (live may be same mid-cell) | PID 3482009 GPU0; last written dp α=0.2 seed=1; **actively computing** seed=2 |
+| **U2** | 30 | **14** | PID 3482442 GPU1; mid α=0.2 seed=2 |
 
-Puller OK. ETA ~20h (U1) / ~4.2h (U2). Seed time variance ~540–1100s normal.
+Puller OK. Jobs confirmed R-state with rising CPU ticks (not hung).
 
 ## Signals
-- U1 repro: **14** matched, max|ΔDP|=0.0072, **0 GAP**
-- U2 α=0.2 n=2: multi wins 2/2; multi DP ~0.22 (vs ~0.13 at α≤0.1)
+- Repro summarizer now reports **clean + corrupted** DP/acc deltas.
+- Local mirror: max\|ΔDP clean\|=0.0072, max\|ΔDP corrupted\|=0.0064 (0 GAP).
+- U3: ImageNet ResNet18 weights **cached** on flair2 (`~/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth`).
 
-## U3 prep (not started)
-- `experiments/run_utkface_pixel_pgd.py` restored (τ=1, race-binary, resume-safe)
-- Image link: `CONFIRM=1 bash scripts/flair2_link_utkface_images.sh` when GPU free
-- Do not launch until U1 or U2 frees a GPU
+## Finding 3
+- Paper now states cosine IF ≠ original Euclidean IF (`paper/sections/results.tex`).
 
 ## Open
-- U1=90 / U2=30 → finalize summaries
-- U3 after GPU free
+- Wait U1=90 / U2=30; U3 after free GPU + CONFIRM symlink.

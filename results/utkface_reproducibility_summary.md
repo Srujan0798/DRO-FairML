@@ -6,6 +6,8 @@
 Protocol: τ=1, k_inner=10, epochs=60, pgd_steps=20, n_seeds=6, REAL features.
 Same seeds 0–5. Large gaps are bugs to investigate.
 
+## Clean test (primary)
+
 | attack | α | n_mac | n_gpu | Δ mean DP_dro (gpu−mac) | Δ mean acc_dro | note |
 |--------|---:|------:|------:|------------------------:|---------------:|------|
 | combined | 0.0 | 6 | 0 | +nan | +nan | partial |
@@ -24,6 +26,22 @@ Same seeds 0–5. Large gaps are bugs to investigate.
 | if | 0.3 | 6 | 0 | +nan | +nan | partial |
 | if | 0.4 | 6 | 0 | +nan | +nan | partial |
 
+## Corrupted (attacked) test
+
+| attack | α | n_gpu | Δ mean DP_dro_corr | Δ mean acc_dro_corr | note |
+|--------|---:|------:|-------------------:|--------------------:|------|
+| dp | 0.0 | 6 | +0.0002 | +0.0001 | OK |
+| dp | 0.1 | 6 | +0.0010 | +0.0001 | OK |
+| dp | 0.2 | 2 | +0.0018 | +0.0049 | OK |
+
+## Matched seed-wise (all completed GPU cells)
+- Matched cells: **14**
+- max\|Δ DP_dro clean\| = **0.0072**
+- max\|Δ DP_dro corrupted\| = **0.0064**
+- mean Δ DP_dro clean = +0.00076
+
 ### Verdict
 - Grid complete on both: **False**
+- GAP cells (clean, n≥6 both sides, thr=0.02): **0**
 - If any cell is GAP with n=6 both sides, investigate device/nondeterminism before claiming CUDA repro.
+
