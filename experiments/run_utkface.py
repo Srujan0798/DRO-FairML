@@ -303,16 +303,24 @@ def main():
                           f"DRO clean: acc={result['dro']['clean']['accuracy']:.3f} "
                           f"dp={result['dro']['clean']['dp_violation']:.3f} "
                           f"if={result['dro']['clean']['if_violation']:.3f}")
-                    # Resume-safe: write after every config
-                    with open(results_path, 'w') as f:
+                    # Resume-safe atomic write after every config
+                    tmp = results_path + ".tmp"
+                    with open(tmp, 'w') as f:
                         json.dump(all_results, f, indent=2)
+                        f.flush()
+                        os.fsync(f.fileno())
+                    os.replace(tmp, results_path)
                 except Exception as e:
                     print(f"  FAILED: {e}")
                     import traceback
                     traceback.print_exc()
 
-    with open(results_path, 'w') as f:
+    tmp = results_path + ".tmp"
+    with open(tmp, 'w') as f:
         json.dump(all_results, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, results_path)
     print(f"\nSaved {len(all_results)} results to {results_path}")
     # Quick provenance check on last result if present
     if all_results:
