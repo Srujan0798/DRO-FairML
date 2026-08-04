@@ -1,17 +1,16 @@
 """Convert the flat canonical grid (results/canonical_tau1.json) into the
-nested ``results/all_results.json`` schema expected by
-``experiments/generate_figures.py``.
+nested ``results/all_results.json`` schema used by
+``experiments/generate_results.py`` (``make results``).
 
 The canonical grid is flat:
     {dataset, alpha, attack, method, seed, acc_clean, dp_clean, if_clean, ...}
-``generate_figures.py`` expects one row per (dataset, alpha, seed) with a
-nested ``naive`` / ``dro`` block, each holding ``clean`` / ``corrupted``
+The nested schema is one row per (dataset, alpha, seed) with a
+``naive`` / ``dro`` block, each holding ``clean`` / ``corrupted``
 metric dicts keyed by ``accuracy`` / ``dp_violation`` / ``if_violation``.
 
 We use the DP-targeted attack (the paper's headline) for the DP-violation
-and accuracy panels. With IF-attack rows still pending the cluster re-run,
-the IF-violation panel will reflect the IF metric measured under the DP
-attack (honest, non-degenerate post-fix values), not the IF attack proper.
+and accuracy panels. IF-attack cells live in ``canonical_tau1.json``; this
+bridge still defaults to ``attack=dp`` for the nested table/plot path.
 """
 
 import json
@@ -61,7 +60,7 @@ def main():
     print(f"Converted {len(nested)} rows (attack={attack}) -> {OUT}")
     with open(OUT, "w") as f:
         json.dump(nested, f, indent=2)
-    print("Run: python3 experiments/generate_figures.py")
+    print("Run: python3 main.py --generate-results  # or: make results")
 
 
 if __name__ == "__main__":

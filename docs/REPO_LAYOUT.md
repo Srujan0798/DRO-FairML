@@ -16,10 +16,9 @@ DRO-FairML/
 │
 ├── experiments/           Runners, analysis, plots (not the library)
 │   ├── run_canonical.py   Canonical τ=1 / K=10 / n=6 → results/canonical_tau1.json
-│   ├── validate_results.py
-│   ├── compute_canonical_wilcoxon.py
-│   ├── generate_report_tables.py / generate_all_deliverables.py / generate_*.py
-│   └── _archive/          Old one-off runners
+│   ├── validate_results.py / compute_canonical_wilcoxon.py
+│   ├── generate_report_tables.py / generate_all_deliverables.py / generate_results.py
+│   └── _archive/          Old one-off runners + legacy fig gens
 │
 ├── results/               Committed experiment outputs (source of paper numbers)
 │   ├── canonical_tau1.json          ★ 540-row grid
@@ -33,6 +32,7 @@ DRO-FairML/
 │
 ├── docs/                  Design, meeting, verification
 │   ├── MEETING_2026-08-04.md   Meeting brief (honest tables)
+│   ├── CLEAN_TREE.md           Post-cleanup “what lives where”
 │   ├── REPO_LAYOUT.md          ← you are here
 │   ├── INDEX.md                Doc index
 │   ├── VERIFICATION_REPORT.md
@@ -42,7 +42,7 @@ DRO-FairML/
 ├── tests/                 pytest suite
 ├── data/                  download_data.sh + raw tabular files
 ├── configs/               default.yaml
-├── scripts/               Server / finalize helpers (optional)
+├── scripts/               5 ops helpers (finalize / UTKFace / flair2); rest in _archive/
 └── logs/                  Run logs; archive_root/ holds moved root noise
 ```
 

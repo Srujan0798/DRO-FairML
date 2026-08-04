@@ -7,11 +7,13 @@
 | [../STATUS.md](../STATUS.md) | Single source of truth (status) |
 | [MEETING_2026-08-04.md](MEETING_2026-08-04.md) | 4pm meeting brief + real IF |
 | [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md) | Claim → data audit |
+| [CLEAN_TREE.md](CLEAN_TREE.md) | Post-cleanup one-page “what lives where” |
 
 ## Science & design
 | Doc | Purpose |
 |-----|---------|
 | [KEY_FORMULAS.md](KEY_FORMULAS.md) | Math |
+| [Q5_derivation.md](Q5_derivation.md) | Empirical radii derivation |
 | [FAIRNESS_PGD_DESIGN.md](FAIRNESS_PGD_DESIGN.md) | Attack design |
 | [LSAC_DEGENERACY.md](LSAC_DEGENERACY.md) | Honest LSAC/DP failure |
 | [KULDEEP_CORRECTION.md](KULDEEP_CORRECTION.md) | Claim corrections |
@@ -37,8 +39,7 @@
 | [LOOP_STATUS.md](LOOP_STATUS.md) | 5-min cleanup-loop board |
 
 ## Archive
-Superseded agent prompts, partial analyses, hardcoded-number hunt artifacts, and chat exports live in `_archive/` (see `_archive/cleanup_2026-08-04/`).
+Superseded agent prompts, MASTER plans, partial analyses, hardcoded-number hunt artifacts, and chat exports live in `_archive/` (see `_archive/cleanup_2026-08-04/`).
 
 ## Data truth
 All numeric claims → `results/canonical_tau1.json` (540 rows) and `results/if_wilcoxon_summary.txt`.
-- [CLEAN_TREE.md](CLEAN_TREE.md) — post-cleanup map

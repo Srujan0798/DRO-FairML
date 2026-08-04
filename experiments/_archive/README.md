@@ -6,7 +6,7 @@
 `run_canonical.py`, `run_if_parallel.py`, `run_fairness_pgd.py`, `loaders.py`,  
 `compute_canonical_wilcoxon.py`, `generate_report_tables.py`, `generate_results.py`,  
 `generate_final_figures.py`, `generate_all_deliverables.py`, `validate_results.py`,  
-`canonical_to_all_results.py`, `generate_figures.py` (legacy fig1–7 bridge),  
+`canonical_to_all_results.py` (nested bridge for `make results`),  
 `run_utkface.py`, `run_utkface_server.py`, `meeting_summary.py`, `verify_theory.py`,  
 `run_experiments.py` (still referenced by `Makefile` / `main.py` legacy targets),  
 `run_canonical_empirical.py`, headline `plot_*` still used for regeneration.
@@ -112,8 +112,8 @@
 
 - Canonical tabular: `run_canonical.py`, `run_if_parallel.py`, `run_fairness_pgd.py`, `loaders.py`
 - Stats/tables: `compute_canonical_wilcoxon.py`, `generate_report_tables.py`, `validate_results.py`, `meeting_summary.py`
-- Figures (active): `generate_final_figures.py`, `generate_all_deliverables.py`, `generate_results.py`, `generate_figures.py`, `canonical_to_all_results.py`, `generate_fig8_matrix.py`
-- Headline plots still regeneratable: `plot_tau1_headline.py`, `plot_win_curves_tau1.py`, `plot_acc_win_curves.py`, `plot_acc_by_attack.py`, `plot_if_by_attack.py`
+- Figures (active Makefile path): `generate_all_deliverables.py`, `generate_results.py`, `canonical_to_all_results.py`
+- Headline plots archived here (regenerate from `_archive/` if needed): `plot_*`, `generate_final_figures.py`
 - UTKFace entry: `run_utkface.py`, `run_utkface_server.py`
 - Legacy Makefile/`main.py` hooks: `run_experiments.py`, `verify_theory.py`
 - Appendix companion: `run_canonical_empirical.py`
@@ -123,5 +123,11 @@
 | Script | Role |
 |--------|------|
 | `generate_latex_extras.py` | Runtime/ablation LaTeX extras; unused by Makefile / paper auto_generated path |
+| `generate_figures.py` | Legacy fig1–fig7 from nested `all_results`; superseded by `generate_results.py` / final figs |
+| `generate_fig8_matrix.py` | Attack–defense matrix; not a Makefile target |
 
-*Last updated: 2026-08-04 cleanup loop (post-Stage 3).*
+*Last updated: 2026-08-04 professional tree cleanup (scripts/results/docs).*
+
+## 2026-08-04 batch (tau_ablation-dependent / superseded)
+- plot_tau1_headline.py, plot_acc_by_attack.py, plot_if_by_attack.py, plot_acc_win_curves.py, plot_win_curves_tau1.py — require archived tau_ablation_*.json
+- generate_final_figures.py — superseded by generate_all_deliverables.py (canonical-only)
