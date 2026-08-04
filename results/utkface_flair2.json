@@ -987,5 +987,91 @@
     "epochs": 60,
     "coordinated": false,
     "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.3,
+    "seed": 5,
+    "attack": "dp",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.797721999578148,
+        "dp_violation": 0.18212255835533142,
+        "if_violation": 0.08411414176225662
+      },
+      "corrupted": {
+        "accuracy": 0.7654503269352457,
+        "dp_violation": 0.3568652272224426,
+        "if_violation": 0.09151844680309296
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.7987766294030795,
+        "dp_violation": 0.17734989523887634,
+        "if_violation": 0.0664757490158081
+      },
+      "corrupted": {
+        "accuracy": 0.7684032904450537,
+        "dp_violation": 0.34502100944519043,
+        "if_violation": 0.07326464354991913
+      }
+    },
+    "total_time": 875.4302544593811,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.4,
+    "seed": 0,
+    "attack": "dp",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.7810588483442312,
+        "dp_violation": 0.22055020928382874,
+        "if_violation": 0.10112929344177246
+      },
+      "corrupted": {
+        "accuracy": 0.7363425437671377,
+        "dp_violation": 0.3548133969306946,
+        "if_violation": 0.12843117117881775
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.7856992195739295,
+        "dp_violation": 0.21261456608772278,
+        "if_violation": 0.08442604541778564
+      },
+      "corrupted": {
+        "accuracy": 0.7390845813119595,
+        "dp_violation": 0.351729154586792,
+        "if_violation": 0.10981246083974838
+      }
+    },
+    "total_time": 151.6542489528656,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
   }
 ]

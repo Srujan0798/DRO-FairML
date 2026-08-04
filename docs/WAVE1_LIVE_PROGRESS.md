@@ -1,25 +1,25 @@
 # flair2 U1/U2 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~04:50 IST_
+_Last tick: 2026-08-05 ~05:04 IST_
 
 ## Counts (do not pkill)
 
 | Job | Target | Count | Last | PID | alive |
 |-----|--------|------:|------|-----|-------|
-| **U1** | 90 | **23** | dp α=0.3 seed **4** (~1026s); s5 in flight | 3482009 | yes (~4.8h) |
-| **U2** | 30 | **23** | α=0.3 seed **4**; log **RUN a=0.3 s=5** | 3482442 | yes (~4.8h) |
+| **U1** | 90 | **25** | dp **α=0.4 s0** done (α=0.3 **6/6**); s1 in flight | 3482009 | yes (~5.0h) |
+| **U2** | 30 | **24** | α=0.3 **6/6**; log **RUN a=0.4 s=0** | 3482442 | yes (~5.0h) |
 
-Puller OK. ETA ~18.6 h (U1) / ~1.9 h (U2). U3 JPEGs ready (23708).
+Puller OK. ETA ~15.5 h (U1) / ~1.6 h (U2). U3 JPEGs ready (23708).
 
 ## Signals
-- Repro: **23** matched, **0 GAP**; max\|ΔDP clean\| **0.0072** (outlier: dp α=0.1 s1 gpu−mac); rest mostly ≤0.001
-- U2 α=0.3 n=5 multi wins **4/1/5** (DRO/tie/n) — s3 still **tie**; s4 multi DRO but bin Naive
-- U1 stdout log still **0 bytes** (redirect/buffering ghost); JSON is SoT — do not restart
+- Repro: **25** matched, **0 GAP**; max\|ΔDP clean\| **0.0072** (dp α=0.1 s1); α=0.3 full OK (mean Δ +0.0004)
+- U2 α=0.3 complete multi **5/1/6** (DRO/tie/n); bin↔multi agreement **4/6** (s3,s4 disagree)
+- Jobs healthy: multi-core CPU ~3200%, GPU util bursts; U1 log still empty (JSON SoT)
 
 ## This tick
-- Rsync partials U1=23 U2=23; re-summarize both
-- Repro summarizer: no more `+nan` for missing cells (—); top seed-wise Δ list
-- Status script notes empty U1 log honestly
+- Caught α=0.3 completion both jobs + U1 first α=0.4 cell
+- Multigroup summarizer: bin↔multi winner agreement line
+- Refreshed UTKFACE_STATUS + WAVE1
 
 ## Open
-- U1=90 / U2=30; U3 after free GPU (do not launch until U1/U2 done or one GPU free without killing)
+- U1=90 / U2=30; U3 after free GPU

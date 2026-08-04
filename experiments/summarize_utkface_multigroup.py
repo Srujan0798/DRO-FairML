@@ -91,15 +91,24 @@ def main():
         if not cell:
             continue
         lines += ["", f"### Per-seed multi @ α={a} (n={len(cell)})", ""]
+        agree = disagree = 0
         for r in cell:
             n, d = r["naive"]["dp_multigroup"], r["dro"]["dp_multigroup"]
             win = _winner(n, d)
             bn, bd = r["naive"]["dp_binary"], r["dro"]["dp_binary"]
             bwin = _winner(bn, bd)
+            if win == bwin:
+                agree += 1
+            else:
+                disagree += 1
             lines.append(
                 f"- s{int(r['seed'])}: multi N={n:.4f} D={d:.4f} → **{win}** "
                 f"(bin N={bn:.4f} D={bd:.4f} → {bwin})"
             )
+        lines.append(
+            f"- bin↔multi winner agreement: **{agree}/{len(cell)}** "
+            f"(disagreements={disagree}; multi max-min can flip vs binary White/non-White)"
+        )
         break  # only the highest α present
 
     lines += [
