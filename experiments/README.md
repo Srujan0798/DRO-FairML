@@ -21,7 +21,9 @@ Active drivers for the **canonical** DRO-FairML pipeline. One-offs live in `_arc
 |--------|------|
 | `run_canonical.py` | **Canonical** tabular grid (τ=1, K=10, n=6) — optional retrain |
 | `run_if_parallel.py` | IF-attack third (already complete in committed JSON) |
-| `run_fairness_pgd.py` | FairnessTargetedPGD entry |
+| `run_fairness_pgd.py` | FairnessTargetedPGD entry (+ Wave-1 kwargs: attack_k, lr_lambda, corruptor_type) |
+| `run_ablation_parallel.py` | Shared ablation driver (**refuses** writing locked 540/UTKFace) |
+| `run_a1_knn.py` … `run_a5_empirical.py`, `run_n5_kinner.py` | Wave-1 advisor ablations → separate `results/*_*.json` |
 | `run_canonical_empirical.py` | Q5 empirical radii mode (optional) |
 | `run_utkface.py` / `run_utkface_server.py` | REAL UTKFace (default no synthetic) |
 | `run_experiments.py` | **DEPRECATED** legacy n_seeds=10; needs `FORCE_LEGACY=1` |

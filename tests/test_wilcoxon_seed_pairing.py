@@ -41,6 +41,18 @@ def test_adult_if_alpha02_dp_pvalue_matches_seed_paired():
     assert abs(float(cell["dp_pvalue"]) - 0.015625) < 1e-6
 
 
+def test_ablation_driver_refuses_locked_science_paths():
+    from experiments.run_ablation_parallel import _assert_safe_results_path
+    import pytest
+
+    with pytest.raises(RuntimeError):
+        _assert_safe_results_path("results/canonical_tau1.json")
+    with pytest.raises(RuntimeError):
+        _assert_safe_results_path("results/utkface_canonical.json")
+    # Separate ablation path is allowed
+    _assert_safe_results_path("results/knn_ablation.json")
+
+
 def test_adult_dp_alpha01_is_five_of_six():
     rows = json.loads((ROOT / "results" / "canonical_tau1.json").read_text())
     by_seed = {}

@@ -25,7 +25,8 @@ from src.evaluation.metrics import compute_metrics_torch
 from src.temperature import get_temperature
 
 
-def _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs):
+def _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs,
+                    attack_k=5):
     """Ensure EVERY saved row records full config provenance per §1.4 and §4 of MASTER_PLAN.
     Mandatory keys: k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
     """
@@ -38,15 +39,22 @@ def _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, 
         'pgd_steps': int(pgd_steps),
         'n_seeds_planned': int(n_seeds_planned),
         'epochs': int(epochs),
+        'attack_k': int(attack_k),
     })
     return result
 
 
 def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu', verbose=False, epochs=60, k_inner=10, pgd_steps=20,
-                          tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3):
+                          tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3,
+                          corruptor_type='adversarial', lr_lambda=5e-3, attack_k=5):
     """Run single (dataset, alpha, seed, attack, method) experiment.
     All callers must pass (or rely on defaults for) full provenance params so every row
     includes k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
+
+    Extended for Wave 1 ablations (backward-compatible defaults preserve canonical grid):
+      corruptor_type: 'adversarial' (FairnessTargetedPGD, canonical) or 'random' (RandomCorruptor, A4).
+      lr_lambda: dual learning rate override (A3 lambda grid; default 5e-3 = canonical).
+      attack_k: k-NN neighborhood for IF attack (A1 kNN ablation; default 5 = canonical attack k).
     """
     import random
     random.seed(seed)
@@ -64,15 +72,24 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         tau = get_temperature(alpha)
     input_dim = X_train.shape[1]
 
-    attack_obj = FairnessTargetedPGD(
-        alpha=alpha,
-        target_metric=attack,
-        pgd_steps=pgd_steps,
-        epsilon=0.3,
-        pgd_step_size=0.02,
-        coordinated=coordinated,
-        random_state=seed
-    )
+    if corruptor_type == 'random':
+        from src.corruption.adversarial import RandomCorruptor
+        attack_obj = RandomCorruptor(
+            alpha=alpha, epsilon=0.3,
+            feature_attack=True, label_flip=True, attr_flip=True,
+            random_state=seed
+        )
+    else:
+        attack_obj = FairnessTargetedPGD(
+            alpha=alpha,
+            target_metric=attack,
+            pgd_steps=pgd_steps,
+            epsilon=0.3,
+            pgd_step_size=0.02,
+            coordinated=coordinated,
+            random_state=seed,
+            k=attack_k
+        )
 
     X_train_att, y_train_att, a_train_att, _ = attack_obj.corrupt(
         X_train, y_train, a_train
@@ -84,28 +101,31 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         'seed': seed,
         'attack': attack,
         'method': method,
+        'corruptor_type': corruptor_type,
+        'lr_lambda': float(lr_lambda),
+        'attack_k': int(attack_k),
     }
 
     if method == 'naive':
         model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
         trainer = NaiveFairTrainer(
             model, device=device,
-            lr_theta=1e-3, lr_lambda=5e-3, lambda_max=1.5,
-            tau=tau, k=5, gamma=0.0,
+            lr_theta=1e-3, lr_lambda=lr_lambda, lambda_max=1.5,
+            tau=tau, k=attack_k, gamma=0.0,
             epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15
         )
         trainer.fit(X_train_att, y_train_att, a_train_att,
                      X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
         metrics = compute_metrics_torch(
             trainer.model, X_test, y_test, a_test,
-            device=device, temperature=tau, k=5, gamma=0.0
+            device=device, temperature=tau, k=attack_k, gamma=0.0
         )
     else:
         model = MLPClassifier(input_dim, hidden_dims=[128, 64], dropout=0.1)
         trainer = DroFairTrainer(
             model, alpha=alpha, device=device,
-            lr_theta=1e-3, lr_lambda=5e-3, lr_p=5e-3, lambda_max=1.5,
-            tau=tau, beta=5.0, k=5, gamma=0.0,
+            lr_theta=1e-3, lr_lambda=lr_lambda, lr_p=5e-3, lambda_max=1.5,
+            tau=tau, beta=5.0, k=attack_k, gamma=0.0,
             K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15,
             lambda_init=lambda_init, radii_mode=radii_mode
         )
@@ -113,7 +133,7 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
                      X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)
         metrics = compute_metrics_torch(
             trainer.model, X_test, y_test, a_test,
-            device=device, temperature=tau, k=5, gamma=0.0
+            device=device, temperature=tau, k=attack_k, gamma=0.0
         )
 
     result['acc_clean'] = float(metrics['accuracy'])
@@ -121,7 +141,10 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
     result['if_clean'] = float(metrics['if_violation'])
     result['total_time'] = time.time() - start_time
 
-    result = _add_provenance(result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs)
+    result = _add_provenance(
+        result, k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps,
+        n_seeds_planned, epochs, attack_k=attack_k,
+    )
     return result
 
 

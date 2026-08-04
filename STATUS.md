@@ -1,6 +1,6 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 (doc claim sync: README/VERIFICATION/KULDEEP IF@0.3; figD1 in paper; Wilcoxon pairing tests). Supersedes all prior STATUS / handoff docs.
+_Last updated: 2026-08-04 (Wave-1 ablation drivers landed; refuse write to locked 540/UTKFace; claim docs still current). Supersedes all prior STATUS / handoff docs.
 **CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3._
 
 ## 1. What this project is
@@ -50,8 +50,12 @@ and **non-degenerate** under attack=if (max |if_clean| ≈ **0.239**). Verify an
   - State **IF metric** wins where supported; do **not** claim “wins on all three attacks on all datasets” for DP.
 
 ## 4. Ablations
-Adjudicated in `docs/reference/ABLATION_STATUS_REPORT.md`: tau / lambda / random-vs-adv
-dropped with written reasons; kNN retracted. None are part of the canonical claim.
+Historical notes: `docs/reference/ABLATION_STATUS_REPORT.md`. **Canonical claim still
+excludes ablations.** Wave-1 re-runs (if/when complete) write **separate** files only:
+`results/knn_ablation.json`, `tau_ablation.json`, `lambda_grid.json`,
+`random_vs_adversarial.json`, `empirical_radii.json`, `kinner_ablation.json`
+via `experiments/run_a*.py` + `run_ablation_parallel.py` (hard-refuses
+`canonical_tau1.json` / `utkface_canonical.json`).
 
 ## 5. UTKFace (image modality)
 **REAL local MPS grid COMPLETE — 90/90 rows (`data_provenance=REAL`).**  

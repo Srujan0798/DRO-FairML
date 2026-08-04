@@ -45,7 +45,7 @@ DRO-FairML/
 │       ├── FAIRNESS_PGD_DESIGN.md, Q5_derivation.md, UTKFACE_PIPELINE.md, SERVER_RUNBOOK.md
 │       └── TAU1_ABLATION_SUMMARY.md
 │
-├── tests/                 pytest suite (62 passing)
+├── tests/                 pytest suite (64 passing)
 ├── data/                  download_data.sh + raw tabular files (gitignored)
 ├── configs/               default.yaml
 ├── scripts/                4 operational helpers: agent_h_finalize.sh,
