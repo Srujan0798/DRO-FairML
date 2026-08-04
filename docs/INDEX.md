@@ -7,10 +7,14 @@ the two handoff docs below, kept deliberately separate so their file writes neve
 
 ## Task assignments — the only two docs an agent needs to start work
 
-| Doc | Owner |
-|-----|-------|
-| [HANDOFF_GLM.md](HANDOFF_GLM.md) | GLM — Mac CPU ablation queue |
-| [HANDOFF_GROK.md](HANDOFF_GROK.md) | Grok — flair2 GPU work |
+**Both docs open with a PHASE 0 correctness audit — first-principles verification of
+the actual theory/formulas, not new experiments. Direct instruction: don't rush this,
+resume Phase 1 (new experiments) only once Phase 0's checkboxes are done.**
+
+| Doc | Owner | Phase 0 covers |
+|-----|-------|-----------------|
+| [HANDOFF_GLM.md](HANDOFF_GLM.md) | GLM | Training/radii math — the "uniform" radii formula appears to have never executed in any canonical row (Finding 1), the TV→L1 ×2 factor is unverified, tilted-risk/dual-ascent formulas need hand re-derivation |
+| [HANDOFF_GROK.md](HANDOFF_GROK.md) | Grok | Metrics/attack math — α=0 disclosure, IF cosine-metric disclosure, IF attack/eval k-NN graph match, IF→DP coupling argument |
 
 ## Status and findings (read-only reference, current)
 
