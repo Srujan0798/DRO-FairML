@@ -76,14 +76,16 @@ via `experiments/run_a*.py` + `run_ablation_parallel.py` (hard-refuses
 | UTKFace REAL 90/90 | ✅ complete; summary `results/utkface_summary.md` (**mixed clean-test**) |
 | Paper / report | ✅ Aug 10 narrative + **wired figures/tables** (540-backed); honest UTKFace pilot |
 | flair2 | ⏸ parked (optional GPU later) |
+| Wave-1 ablations (advisor gaps) | 🔄 **RUNNING sequential** A3→A4→A5→N5→A1→A2 (`logs/wave1_ablations.log`; separate JSONs only) |
 
 
 ## 7. Aug 10 submission checklist
 1. ✅ Tabular 540 frozen; do not retrain.
 2. ✅ UTKFace 90/90 REAL in repo; paper states **mixed** clean-test (not Adult copy).
 3. ✅ Paper/report rebuilt with τ=1 / 5/6 / IF mixed / LSAC degenerate / UTKFace pilot.
-4. ✅ Final gate: `make test` (64 pass) && `make validate` (PASS) && `make paper` && `make report`.
-5. Optional later: flair2 pixel-level experiments if greenlit.
+4. ✅ Final gate: `make test` (65 pass) && `make validate` (PASS) && `make paper` && `make report`.
+5. 🔄 Wave-1 advisor ablations in progress (not required to share paper/report).
+6. Optional later: flair2 pixel-level experiments if greenlit.
 
 
 ## 8. How to run / verify

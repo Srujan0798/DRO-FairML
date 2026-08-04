@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-"""Sequential Wave-1 ablation launcher (spawn-safe)."""
+"""Sequential Wave-1 ablation launcher (stable on macOS; no process-pool hangs)."""
 import subprocess, sys, os, time
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 scripts = [
-    ("experiments/run_a3_lambda.py", "4"),
-    ("experiments/run_a4_rva.py", "4"),
-    ("experiments/run_a5_empirical.py", "4"),
-    ("experiments/run_n5_kinner.py", "4"),
-    ("experiments/run_a1_knn.py", "4"),
-    ("experiments/run_a2_tau.py", "4"),
+    "experiments/run_a3_lambda.py",
+    "experiments/run_a4_rva.py",
+    "experiments/run_a5_empirical.py",
+    "experiments/run_n5_kinner.py",
+    "experiments/run_a1_knn.py",
+    "experiments/run_a2_tau.py",
 ]
-for s, w in scripts:
-    print(f"\n==== LAUNCH {s} workers={w} {time.strftime('%H:%M:%S')} ====", flush=True)
-    rc = subprocess.call([sys.executable, s, w])
+for s in scripts:
+    print(f"\n==== LAUNCH {s} sequential {time.strftime('%H:%M:%S')} ====", flush=True)
+    # workers=0 or 1 → sequential in driver
+    rc = subprocess.call([sys.executable, s, "0"])
     print(f"==== EXIT {s} rc={rc} {time.strftime('%H:%M:%S')} ====", flush=True)
 print("ALL WAVE1 DONE", flush=True)
