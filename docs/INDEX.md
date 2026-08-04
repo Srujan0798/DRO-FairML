@@ -32,11 +32,12 @@
 |-----|---------|
 | [REPO_AUDIT.md](REPO_AUDIT.md) | Full inventory |
 | [REPO_CONSOLIDATION_PLAN.md](REPO_CONSOLIDATION_PLAN.md) | Cleanup stages |
+| [REPO_LAYOUT.md](REPO_LAYOUT.md) | One-screen tree map |
 | [PAPER_FINALIZATION_CHECKLIST.md](PAPER_FINALIZATION_CHECKLIST.md) | Paper checklist |
-| [HARDCODED_NUMBERS_HUNT.md](HARDCODED_NUMBERS_HUNT.md) | Stale number hunt |
+| [LOOP_STATUS.md](LOOP_STATUS.md) | 5-min cleanup-loop board |
 
 ## Archive
-Superseded agent prompts, partial analyses, and chat exports live in `_archive/`.
+Superseded agent prompts, partial analyses, hardcoded-number hunt artifacts, and chat exports live in `_archive/` (see `_archive/cleanup_2026-08-04/`).
 
 ## Data truth
 All numeric claims → `results/canonical_tau1.json` (540 rows) and `results/if_wilcoxon_summary.txt`.

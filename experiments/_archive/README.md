@@ -112,10 +112,16 @@
 
 - Canonical tabular: `run_canonical.py`, `run_if_parallel.py`, `run_fairness_pgd.py`, `loaders.py`
 - Stats/tables: `compute_canonical_wilcoxon.py`, `generate_report_tables.py`, `validate_results.py`, `meeting_summary.py`
-- Figures (active): `generate_final_figures.py`, `generate_all_deliverables.py`, `generate_results.py`, `generate_figures.py`, `canonical_to_all_results.py`, `generate_fig8_matrix.py`, `generate_latex_extras.py`
+- Figures (active): `generate_final_figures.py`, `generate_all_deliverables.py`, `generate_results.py`, `generate_figures.py`, `canonical_to_all_results.py`, `generate_fig8_matrix.py`
 - Headline plots still regeneratable: `plot_tau1_headline.py`, `plot_win_curves_tau1.py`, `plot_acc_win_curves.py`, `plot_acc_by_attack.py`, `plot_if_by_attack.py`
 - UTKFace entry: `run_utkface.py`, `run_utkface_server.py`
 - Legacy Makefile/`main.py` hooks: `run_experiments.py`, `verify_theory.py`
 - Appendix companion: `run_canonical_empirical.py`
 
-*Last updated: Stage 3 archive (2026-08-04).*
+### Later cleanup (2026-08-04 loop)
+
+| Script | Role |
+|--------|------|
+| `generate_latex_extras.py` | Runtime/ablation LaTeX extras; unused by Makefile / paper auto_generated path |
+
+*Last updated: 2026-08-04 cleanup loop (post-Stage 3).*
