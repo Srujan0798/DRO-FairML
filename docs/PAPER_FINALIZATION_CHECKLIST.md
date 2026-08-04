@@ -1,11 +1,14 @@
-# Paper / Report Finalization Checklist (Agent K — PREP)
+# Paper / Report Finalization Checklist (Agent K)
 
-**Date:** 2026-08-04 · **Phase:** PREP (before Agent H lands full IF)  
-**Do not invent IF numbers. Do not claim real UTKFace results.**  
-**Canonical source of truth:** `results/canonical_tau1.json` (regenerated tables via `experiments/generate_report_tables.py`).  
-**IF Wilcoxon target:** `results/if_wilcoxon_summary.txt` (written by Agent H; not present until 540-row regen).
+> **CURRENT (2026-08-04 post-540):** Grid is **540/540 complete**. IF is **MIXED** (not a clean sweep).  
+> Adult/DP α=0.1 is **5/6**. LSAC/DP degenerate. Paper/report prose largely scrubbed of  
+> “pending/cluster/360” IF language — remaining “pending” is only UTKFace full grid + Q5 empirical JSON.  
+> **Do not claim UTKFace** until multi-attack REAL cells exist.  
+> Sections below retain PREP inventory as an audit trail; treat open IF-pending items as **mostly closed**.
 
-**Live grid at checklist write time:** ~421 rows (`dp` 180, `combined` 180, `if` ~61 and rising); IF non-degenerate (`if_clean` max ≈ 0.098). Full story waits for 540.
+**Date:** 2026-08-04 · **Phase:** POST-H (IF third landed; MIXED narrative)  
+**Canonical source of truth:** `results/canonical_tau1.json` (540 rows).  
+**IF Wilcoxon:** `results/if_wilcoxon_summary.txt`. Meeting: `docs/MEETING_2026-08-04.md`.
 
 ---
 

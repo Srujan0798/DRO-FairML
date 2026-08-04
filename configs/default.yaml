@@ -28,4 +28,5 @@ corruption:
   - 0.4
   epsilon: 0.1
   mode: adversarial
-  coordinated: true
+  # Canonical 540-row grid uses coordinated=False (see STATUS.md / run_canonical).
+  coordinated: false
