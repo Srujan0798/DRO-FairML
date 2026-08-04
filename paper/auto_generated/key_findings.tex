@@ -5,6 +5,6 @@
 % full honesty caveats (IF metric degenerate pre-fix; LSAC/DP degenerate run).
 \newcommand{\tabularReductionRange}{lower DP for DRO across the defensible regime (Adult \& Credit, $\alpha\le0.2$, DP \& Combined attacks; abs.\ DP deltas from canonical\_tau1.json)}
 \newcommand{\tabularSigTests}{Wilcoxon one-sided, $p<0.05$, $n=6$ seeds, on Adult+Credit DP \& Combined attacks at $\alpha\le0.2$}
-\newcommand{\tabularNExperiments}{Canonical grid complete for DP \& Combined attacks (360 rows, 6 seeds); IF-attack third incomplete (local sweep after metric fix) --- no full IF claim until 180/180}
+\newcommand{\tabularNExperiments}{Canonical grid complete: 540 rows (DP+IF+Combined $\times$ 3 datasets $\times$ 5 $\alpha$ $\times$ 6 seeds $\times$ 2 methods). IF-attack third non-degenerate; honest read: Adult/Credit $\alpha\le0.2$ support DRO on DP under IF attack; LSAC/IF and Adult IF $\alpha\ge0.3$ do not (see \texttt{results/if\_wilcoxon\_summary.txt}).}
 \newcommand{\tauoneHeadline}{Fixing $\tau{=}1$ (replacing the stepped $\tau{=}100$ schedule) makes DRO-FAIR beat Naive-FAIR on DP at $\alpha\le0.2$ on Adult and Credit under the DP-targeted and Combined attacks ($p{<}0.05$, $n{=}6$; Adult/DP $\alpha{=}0.1$ is $5/6$, others $6/6$).}
 \newcommand{\tauoneFramingSwitch}{The earlier ``DRO is fragile'' finding was a high-temperature artifact (stepped $\tau{=}100$ schedule for $\alpha\le0.3$); switching to fixed $\tau{=}1$ inverts that conclusion.}

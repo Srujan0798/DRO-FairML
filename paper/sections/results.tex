@@ -81,13 +81,11 @@ random is non-zero); Adult $\alpha{=}0.3$ $+0.38$ vs $+0.02$
 absolute terms because LSAC's clean DP is small (see \S\ref{sec:lsac-framing}).
 
 \paragraph{k-NN graph ablation (Adult).}
-The IF-attack third is incomplete after the metric fix (earlier IF was
-degenerate, $\approx10^{-10}$); no full IF claim is made here.  The
-$k$-NN graph construction is available from
+The $k$-NN graph construction is available from
 \texttt{results/knn\_ablation\_k\{5,10,15\}.json}; the attack graph is
 insensitive to $k\!\in\!\{5,10,15\}$ (DP values across $k$ are within
 $\pm0.003$ of each other at every $\alpha$), so $k{=}5$ is a safe
-default for the IF-attack completion run.
+default for the IF attack.
 
 \paragraph{Empirical radii (Q5).}
 The bias-corrected clean-proportion formula
@@ -112,39 +110,38 @@ consequence of LSAC's near-zero clean DP, which makes the DP-targeted
 attack ineffective.  By contrast, LSAC/Combined is a genuine clean win
 (Wilcoxon $p{=}0.0156$ at $\alpha{=}0.1,0.3,0.4$).  The canonical
 $\tau{=}1$, $k_{\mathrm{inner}}{=}10$, 6-seed grid is complete
-(360 rows; DP+Combined attacks); this paper reports Adult and Credit
-because they are the mature findings.  IF results on LSAC remain
-pending completion of the IF-attack third (earlier IF metrics were
-degenerate).
+(\textbf{540 rows}: DP+IF+Combined); Adult and Credit remain the
+defensible lead, with LSAC reported as split (Combined win / DP
+degeneracy / IF-attack DP loss).
 
-\paragraph{Q7: IF $\leftrightarrow$ DP coupling (pending).}
-The IF-attack third of the canonical grid is incomplete at write time
-(local re-run after the IF-metric fix; partial rows are non-degenerate),
-so we withdraw full-grid numeric IF claims until that third is complete.
-Conceptually, the DP and IF criteria are not independent under
-coordinated attacks: an attack optimised for one fairness criterion can
-shrink or expand the other.  This coupling will be characterised once the
-IF-attack third of the grid is complete.
+\paragraph{Q7: IF $\leftrightarrow$ DP coupling (complete grid).}
+The IF-attack third is complete (180 rows; cosine IF metric
+non-degenerate, $\max|\mathrm{if\_clean}|\!\approx\!0.24$; full
+Wilcoxon in \texttt{results/if\_wilcoxon\_summary.txt}).
+Under the IF \emph{attack}, DRO still lowers \textbf{DP} vs Naive on
+Adult at $\alpha\le0.2$ ($6/6$, $p{=}0.0156$) and on most Credit
+cells (Credit $\alpha{=}0.1$ is $4/6$, n.s.).  On LSAC under IF
+attack DRO \emph{loses} on DP ($0/6$ at $\alpha\le0.3$).
+At Adult $\alpha\ge0.3$ the DP win under IF attack breaks even when
+the IF metric itself improves --- the two criteria are coupled but
+not interchangeable.  We do \emph{not} claim a clean three-attack
+sweep on every dataset.
 
 \paragraph{Statistical significance.}
 The canonical grid uses $n{=}6$ seeds (0--5).  Wilcoxon signed-rank
 one-sided $p{<}0.05$ holds at $\alpha\le0.2$ on Adult and Credit under
 the DP-targeted and Combined attacks (verified in
-\texttt{results/canonical\_tau1.json}).  The DP+Combined attack grid is
-complete (360 rows); the IF-attack third is incomplete (local sweep after
-the metric fix) and is not claimed here.
+\texttt{results/canonical\_tau1.json}).  The full attack grid is
+complete (540 rows).  Under IF attack the DP test is significant on
+Adult $\alpha\le0.2$ and most Credit cells; LSAC/IF and Adult IF
+$\alpha\ge0.3$ do not support a DP win (see summary file).
 
-\subsection{Image data (UTKFace) --- future work, no real run to date}
+\subsection{Image data (UTKFace) --- real features local; full grid pending}
 \label{sec:results-utkface}
 
-UTKFace is the third task of the project but \textbf{no real UTKFace
-image experiment has ever been run}.  GPU access to
-\texttt{flair2.iitgn.ac.in} was never granted (the access request was
-drafted but never sent), so the pipeline substitutes
-\texttt{\_make\_synthetic\_utkface} --- random Gaussian 512-d features
---- whenever real images are absent.  The only UTKFace outputs produced
-to date are therefore \emph{synthetic smoke tests}, not a real GPU run,
-and the prior ``DRO inverts on image features'' claim is
-\emph{withdrawn}.  The modality question (DRO vs.\ Naive on ResNet18
-features under adversarial label corruption) remains open pending real
-image data.
+UTKFace is the third task of the project.  Real ResNet-style features are
+now extracted locally (\texttt{data/raw/utkface\_features.npz}); a multi-seed
+Fairness-Targeted PGD grid is running post-canonical-clear and is
+\textbf{not} claimed in this draft.  Prior synthetic-only smoke outputs
+remain non-results; the older ``DRO inverts on image features'' claim stays
+\emph{withdrawn}.  flair2 GPU access is still optional once SSH is available.

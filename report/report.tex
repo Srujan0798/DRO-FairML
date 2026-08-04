@@ -114,8 +114,9 @@ original Jun~30 report for Adult DP, with accuracy equal-or-better.
 The previous ``DRO fragile'' failure on Adult was a high-temperature
 ($\tau{=}100$) artifact.  LSAC/DP is a degenerate negative result
 (constant-predictor collapse, DRO loses at $0/6$ seeds); LSAC/Combined
-is a genuine win ($p{=}0.0156$).  IF-attack results are pending a cluster
-re-run (earlier IF metrics were degenerate, $\approx10^{-10}$).
+is a genuine win ($p{=}0.0156$).  IF-attack results are complete (180 rows;
+see \texttt{results/if\_wilcoxon\_summary.txt}); earlier incomplete wording is
+obsolete.  Pre-fix IF metrics were degenerate ($\approx10^{-10}$).
 All theoretical formulas are numerically verified.
 Code, results, and diagnostics are fully reproducible. (See KULDEEP\_DISCUSSION.md + paper/sections/results.tex for full traceable tables.)
 \end{mdframed}
@@ -326,9 +327,9 @@ Preprocessing: StandardScaler, 80/20 stratified train/test split.
 Training data corrupted at each $\alpha$; validation/test stay clean.
 Test evaluation on both clean and adversarially corrupted versions.
 Seeds: 0--5 ($n{=}6$) for the canonical $\tau{=}1$,
-$k_{\mathrm{inner}}{=}10$ grid.  The DP+Combined attack grid is complete
-(360 rows: 3 datasets $\times$ 5 $\alpha$ $\times$ 6 seeds $\times$ 2
-methods); the IF-attack third is pending a cluster re-run.
+$k_{\mathrm{inner}}{=}10$ grid.  The full attack grid is complete
+(540 rows: 3 datasets $\times$ 5 $\alpha$ $\times$ 3 attacks $\times$ 6 seeds $\times$ 2
+methods); the IF-attack third is complete (180 rows; $\max|\mathrm{if\_clean}|\approx0.24$; mixed by dataset --- Adult/Credit $\alpha\le0.2$ OK on DP; LSAC/IF DP loss).
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Main Results}
@@ -366,7 +367,7 @@ Wilcoxon signed-rank test on per-seed DP deltas (one-sided $H_1$: Naive DP
 $>$ DRO DP).  On the canonical $n{=}6$ grid, $p{<}0.05$ holds at
 $\alpha\le0.2$ on Adult and Credit under the DP-targeted and Combined
 attacks (verified in \texttt{results/canonical\_tau1.json}).  The
-IF-attack third of the grid is pending a cluster re-run; earlier IF
+IF-attack third of the grid is complete (180 rows); earlier IF
 metrics were degenerate ($\approx10^{-10}$).
 
 \input{sections/auto_generated_wilcoxon.tex}
@@ -484,7 +485,7 @@ The $k$-NN graph construction is available from
 \texttt{results/knn\_ablation\_k*.json}; the attack graph is insensitive
 to $k{\in}\{5,10,15\}$ (DP values across $k$ are within ${\pm}0.003$ of
 each other at every $\alpha$), so $k{=}5$ is a safe default.  The
-IF-attack evaluation rows are pending a cluster re-run (the IF metric was
+IF-attack evaluation rows are complete (180/180; the IF metric was
 degenerate, $\approx10^{-10}$, in earlier runs); the pending re-run will
 use this $k{=}5$ default.
 
@@ -518,11 +519,11 @@ near-zero baseline DP bias, which makes the DP-targeted attack
 ineffective.  By contrast, LSAC/Combined is a genuine clean win
 ($p{=}0.0156$ at $\alpha{=}0.1,0.3,0.4$).
 
-Q7: the IF-attack rows of the canonical grid are not yet generated (cluster
-re-run pending after the IF-metric fix), so the earlier numeric IF claims
-are withdrawn.  Conceptually, the DP and IF criteria are coupled under
+Q7: the IF-attack rows of the canonical grid are complete (180/180 after
+the IF-metric fix; see \texttt{results/if\_wilcoxon\_summary.txt}). Earlier
+pre-fix numeric IF claims remain withdrawn.  Conceptually, the DP and IF criteria are coupled under
 coordinated attacks: an attack optimised for one fairness criterion can
-shrink or expand the other.  This will be characterised once the IF-attack
+shrink or expand the other.  Coupling is characterised on the full IF-attack
 third of the grid is regenerated. (See also paper/sections/results.tex.)
 
 \subsection{Empirical Radii (Q5)}
@@ -567,7 +568,8 @@ confirm the radii remain sufficient on all three tabular datasets.
   The canonical grid uses $n{=}6$ seeds (0--5), giving Wilcoxon
   $p{<}0.05$ at $\alpha\le0.2$ on Adult and Credit (verified in
   \texttt{results/canonical\_tau1.json}).  The IF-attack third of the
-  grid is pending a cluster re-run (earlier IF metrics were degenerate).
+  grid is complete (180 rows; earlier IF metrics were degenerate pre-fix;
+  Adult/Credit $\alpha\le0.2$ support DRO on DP under IF attack; LSAC/IF does not).
 \item \textbf{UTKFace blocked on GPU.}
   No real UTKFace image experiment has been run; the prior reported
   numbers were synthetic smoke tests (random Gaussian features).  The
@@ -727,9 +729,10 @@ is $(k_{\text{eff}} - \text{disagree}) / k_{\text{eff}}$.
   than hiding it.
 \item \textbf{Adversarial $\gg$ random:} Adversarial PGD raises DP $12$--$40\times$
   more than random label noise at matched $\alpha$ on Adult.
-\item \textbf{IF attack is pending:} The IF-attack rows of the canonical grid
-  are not yet generated (cluster re-run pending after the IF-metric fix);
-  the earlier IF metrics were degenerate ($\approx10^{-10}$).  The $k$-NN
+\item \textbf{IF attack is complete:} The IF-attack rows of the canonical grid
+  are generated (180/180); earlier IF metrics were degenerate ($\approx10^{-10}$).
+  Honest read: Adult/Credit $\alpha\le0.2$ support DRO on DP under IF attack;
+  LSAC/IF and Adult IF $\alpha\ge0.3$ do not.  The $k$-NN
   graph is insensitive to $k{\in}\{5,10,15\}$ (DP within ${\pm}0.003$).
 \item \textbf{GPU server issue:} UTKFace experiments are blocked pending
   GPU server access; the only UTKFace outputs to date are synthetic smoke
@@ -757,20 +760,20 @@ DRO loses on Adult'' result was a high-temperature artifact (stepped
 $\tau{=}100$ schedule for $\alpha{\le}0.3$); switching to fixed $\tau{=}1$
 inverts that conclusion.  LSAC/DP is a degenerate negative result
 (constant-predictor collapse, DRO loses at $0/6$ seeds); LSAC/Combined is
-a genuine win ($p{=}0.0156$).  The IF-attack rows are pending a cluster
+a genuine win ($p{=}0.0156$).  The IF-attack rows are complete; under IF attack Adult/Credit $\alpha\le0.2$ still support DRO on DP while LSAC/IF is a DP loss (cluster
 re-run (earlier IF metrics were degenerate, $\approx10^{-10}$).
 
 On Adult, adversarial PGD raises DP $12$--$40\times$ more than random
 label noise at matched $\alpha$, ruling out the ``attack too weak''
 counter-explanation for the low-$\alpha$ cells.
 
-The canonical DP+Combined grid is complete (360 rows); Adult and Credit
+The canonical full grid is complete (540 rows); Adult and Credit
 at $\alpha\le0.2$ are the mature findings.  LSAC/Combined is a genuine win
 ($p{=}0.0156$); LSAC/DP is a degenerate negative result.  The IF-attack
-rows are pending a cluster re-run.  The UTKFace
-experiment is blocked on GPU access (no real run to date; prior numbers
-were synthetic smoke tests) and the earlier ``DRO inverts on image
-features'' claim is withdrawn. Q5 empirical radii math in appendix (see also KULDEEP\_DISCUSSION.md).
+rows are complete (180/180; Adult/Credit $\alpha\le0.2$ support DRO on DP;
+LSAC/IF is a DP loss --- not a three-attack sweep).  UTKFace has real
+local features; a multi-seed grid is running and not claimed here (prior
+synthetic smoke tests withdrawn). Q5 empirical radii math in appendix (see also KULDEEP\_DISCUSSION.md).
 
 \paragraph{Practical takeaway.}
 When deploying DRO-FAIR, fix the prediction temperature and re-validate
@@ -780,7 +783,7 @@ source of the ``DRO is fragile'' finding.
 
 \paragraph{Future directions.}
 \begin{itemize}
-\item IF-attack third of the canonical grid (cluster re-run after the IF-metric fix).
+\item IF-attack third of the canonical grid --- DONE (180/180 after metric fix; honest mixed read).
 \item Empirical radii calibration under known attack structure (Q5; uniform-vs-empirical comparison pending canonical\_tau1\_empirical.json).
 \item UTKFace on GPU (blocked on flair2 access).
 \item Dataset-adaptive $\lambda_{\max}$.
@@ -791,7 +794,7 @@ source of the ``DRO is fragile'' finding.
 \vspace{0.5em}
 {\small
 Code: \texttt{github.com/Srujan0798/DRO-FairML}\quad|\quad
-Canonical $\tau{=}1$ grid complete (360 rows; \texttt{results/canonical\_tau1.json}), 32 unit tests, 8 theory verifications.
+Canonical $\tau{=}1$ grid complete (540 rows; \texttt{results/canonical\_tau1.json}), 32 unit tests, 8 theory verifications.
 }
 
 % ─────────────────────────────────────────────────────────────────────────────
