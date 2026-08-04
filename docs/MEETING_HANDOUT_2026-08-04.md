@@ -77,8 +77,8 @@ IF metric was previously broken (near-zero). It is now cosine-based and non-dege
 
 | Dataset | Main message |
 |---------|----------------|
-| **Adult** | At α ≤ 0.2, DRO is better on both IF and DP under IF attack. At **α = 0.3**, IF improves but **DP loses** (1/6). |
-| **Credit** | IF improves for α ≥ 0.1; DP under IF mostly favorable (α = 0.1 weaker, 4/6). |
+| **Adult** | At **α = 0.1 and 0.2**, DRO is better on **both** IF and DP under IF attack (6/6). At α = 0.0, DP wins but IF is not significant (4/6). At **α = 0.3**, IF improves but **DP loses** (1/6). |
+| **Credit** | IF improves for α ≥ 0.1 (6/6); DP under IF is mostly favorable (α = 0.1 is weaker, 4/6, not significant). |
 | **LSAC** | Does not support the low-α story; DP under IF attack loses for α ≤ 0.3. |
 
 ---
@@ -109,20 +109,17 @@ At **α ≥ 0.3**, both DRO and Naive fall **below** the constant predictor on *
 
 ---
 
-## 6. Figures for this meeting
+## 6. Figures (attach with this note)
 
-1. **τ = 1 headline** — Adult DP vs α (Naive vs DRO), win counts annotated  
-2. **Wilcoxon / win summary** — DP-attack win matrix across datasets and α  
-
-(PDFs: `figures/fig_tau1_headline.pdf`, `figures/fig_final_wilcoxon_table.pdf`)
+1. **τ = 1 headline** — Adult DP vs α (Naive vs DRO), seed win counts marked  
+2. **Win / significance summary** — DP-attack wins across Adult, Credit, LSAC and α  
 
 ---
 
-## 7. Next steps (to submission)
+## 7. Next steps
 
-1. Finish UTKFace multi-seed multi-attack grid (real data only) or scope as future work.  
-2. Final paper/report polish with the **mixed IF** narrative and honest LSAC/DP section.  
-3. Keep every reported number traceable to the locked 540-row result file.
+1. Complete the UTKFace multi-seed multi-attack runs on **real** image features (or list as future work if incomplete).  
+2. Final paper/report write-up with the **mixed IF** story and honest LSAC/DP section.
 
 ---
 
