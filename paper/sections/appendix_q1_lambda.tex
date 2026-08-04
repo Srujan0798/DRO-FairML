@@ -4,11 +4,11 @@
 This appendix records the \emph{$\lambda_{\mathrm{init}}\times\eta_{\lambda}$} grid (Kuldeep's Q1) on Adult under the DP attack, separate from the locked $\tau{=}1$ 540-row canonical grid. The locked main-text defaults are $\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5\times10^{-3}$.
 
 \paragraph{Setup}
-Adult, attack=dp, $\alpha\in\{0.2,0.3\}$, $n{=}6$ seeds, DRO only, $\lambda_{\mathrm{init}}\in\{0.0,0.01,0.1\}$, $\eta_{\lambda}\in\{0.001,0.005\}$. Source: \texttt{results/lambda\_grid.json}. Adult constant-predictor accuracy = 0.7521. Grid progress at write time: 55/72 rows (resume-safe; $\alpha{=}0.2$ cells with $n{=}6$ are treated as complete).
+Adult, attack=dp, $\alpha\in\{0.2,0.3\}$, $n{=}6$ seeds, DRO only, $\lambda_{\mathrm{init}}\in\{0.0,0.01,0.1\}$, $\eta_{\lambda}\in\{0.001,0.005\}$. Source: \texttt{results/lambda\_grid.json}. Adult constant-predictor accuracy = 0.7521. Grid progress at write time: 63/72 rows (resume-safe; $\alpha{=}0.2$ cells with $n{=}6$ are treated as complete).
 
 \paragraph{Default cell}
 $\alpha{=}0.2$ default ($\lambda_{\mathrm{init}}{=}0.0$, $\eta_{\lambda}{=}5{\times}10^{-3}$): DP=0.2334, acc=0.7586, n=6, acc>0.7521: yes.
-$\alpha{=}0.3$ default: DP=0.2641, acc=0.6789, n=3, acc>0.7521: no (pilot $n{<}6$ --- not a locked claim).
+$\alpha{=}0.3$ default: DP=0.2603, acc=0.6775, n=4, acc>0.7521: no (pilot $n{<}6$ --- not a locked claim).
 
 \paragraph{Q1(a): does any cell beat the default on DP without accuracy loss?}
 \textbf{Yes} (seed-complete cells, $n{=}6$ only). The following cells lower DP relative to the default at the same $\alpha$ without losing accuracy:

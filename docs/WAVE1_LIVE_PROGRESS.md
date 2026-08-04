@@ -1,50 +1,42 @@
 # Wave-1 ablation live progress
 
-_Updated continuously while grids run. Canonical seeds 0–5 (**540**) + UTKFace **90** are **locked**. On-disk `canonical_tau1.json` may be 560 (+20 partial N10); loaders default to locked 540. Ablations never rewrite those paths._
+_Updated continuously while grids run. Canonical seeds 0–5 (**540**) + UTKFace **90** locked. Ablations never rewrite those paths. Loaders default to locked 540 (`include_extension=False`)._
 
 ## Ship package (ready anytime)
 - `paper/main.pdf`, `report/report.pdf`
-- Locked science: seeds 0–5 in `results/canonical_tau1.json` (**540**); `results/utkface_canonical.json` (**90 REAL**)
-- Claims: Adult/DP α=0.1 **5/6**; IF mixed; LSAC/DP degenerate; UTKFace mixed; α≥0.3 acc claim Adult/Credit only
+- Locked claims: Adult/DP α=0.1 **5/6**; IF mixed; LSAC/DP degenerate; UTKFace mixed; α≥0.3 acc Adult/Credit only
+- No 12–40× in paper (A4 partial still ≪12×)
 
-## Ablation grids (separate JSON; resume-safe)
+## Writers (do not pkill)
 
-| Ablation | File | Target | Status |
-|----------|------|--------|--------|
-| A3 λ/lr grid | `results/lambda_grid.json` | 72 | **LIVE** — α=0.2 complete (36/36); α=0.3 filling |
-| N2 high-α | `results/high_alpha_tau.json` | — | queued after A3 |
-| A5 empirical radii | `results/empirical_radii.json` | 180 | queued (69 on disk) |
-| L2 LSAC radii | `results/lsac_radii_fix.json` | — | queued |
-| A4 random vs adversarial | `results/random_vs_adversarial.json` | 144 | queued (43 on disk) |
-| A2 τ ablation | `results/tau_ablation.json` | 360 | queued (76 on disk) |
-| N5 K_inner | `results/kinner_ablation.json` | 180 | queued (23 on disk) |
-| A1 kNN attack_k | `results/knn_ablation.json` | 360 | queued (48 on disk) |
-| N1 attack strength | `results/attack_strength.json` | — | queued |
-| S N10 extension | append-only canonical | +360 tabular | queued last |
+| Job | Status |
+|-----|--------|
+| A3 λ (`run_a3_lambda.py`) | **LIVE** — orchestrator parent + late second parent observed (same JSON). Disk currently **no key dups**. Per-file merge-lock restored in code for *future* processes. |
+| A1 kNN, A2 τ, A4 RvA, A5 empirical, N5 K_inner, N2 high-α | **LIVE** concurrent (launched ~23:05; oversubscribes CPU) |
+| Original orchestrator `scripts/orchestrate_wave1.sh` | Still running A3 phase |
 
-Orchestrator: `scripts/orchestrate_wave1.sh` (sequential, `ABLATION_WORKERS=12`). One parent per JSON.
+**Attention:** machine-wide `_AblationLock` was briefly bypassed in `run_ablation_parallel.run`; **restored** this tick. Also added per-JSON re-read+key-merge on append. Running processes still use in-memory code from launch — do not start more parents.
 
-## Partial findings (honest; not full-grid claims)
-- **A3 λ (α=0.2 complete, n=6):** λ_init=0.1 improves DP and acc vs default (λ_init=0, lr=0.005); λ_init=0.01/lr=0.005 mild DP gain. **α=0.3:** no acc>0.7521 yet (max≈0.70); incomplete.
-- **A4 RvA:** partial Adult multipliers **≪12×** — paper keeps qualitative pilot language only.
-- **A5 empirical radii:** no DP gain vs uniform on available cells (pilot).
-- **A1 kNN:** larger k raises IF violation (partial Adult).
-- **N5 K_inner / A2 τ:** incomplete; τ=1 locked story unchanged (5/6 at Adult/DP α=0.1).
+## Ablation grids
+
+| Ablation | File | Target | Snapshot |
+|----------|------|--------|----------|
+| A3 λ/lr | `lambda_grid.json` | 72 | **65/72** (α=0.2 full; α=0.3 filling) |
+| A4 RvA | `random_vs_adversarial.json` | 144 | 43/144 |
+| A5 empirical | `empirical_radii.json` | 180 | 69/180 |
+| N5 K_inner | `kinner_ablation.json` | 180 | 23/180 |
+| A1 kNN | `knn_ablation.json` | 360 | 48/360 |
+| A2 τ | `tau_ablation.json` | 360 | 76/360 |
+
+## Partial findings (honest)
+- **A3 α=0.2 (n=6 complete):** λ_init=0.1 beats default on DP+acc; no α=0.3 acc>0.7521 yet (max≈0.70).
+- **A4:** multipliers 0.2–1.1× on partial Adult — **not** 12–40×.
+- **A5 / N5 / A1 / A2:** incomplete; no new main-claim text.
 
 ## Rules
-1. Never write `canonical_tau1.json` or `utkface_canonical.json` from ablations.
-2. One parent process per results file (no dual writers).
-3. Negative results are valid — write them honestly.
-4. Never pkill `run_a*`, orchestrator, or JSON writers mid-flight.
-5. Do not put incomplete multipliers (e.g. 12–40×) in paper until A4=144 + n=6 cells.
+1. Never write canonical / utkface from ablations.
+2. One parent per results file — do not launch seconds.
+3. Never pkill `run_a*` / orchestrator / JSON writers.
+4. flair2/NVIDIA parked.
 
-## Snapshot
-
-- `random_vs_adversarial`: **43/144** (30%)
-- `lambda_grid`: **54/72** (75%; **LIVE** — α=0.2 done; α=0.3 filling)
-- `empirical_radii`: **69/180** (38%)
-- `kinner_ablation`: **23/180** (13%)
-- `knn_ablation`: **48/360** (13%)
-- `tau_ablation`: **76/360** (21%)
-
-_Last snapshot: 2026-08-04T22:56:00 IST_
+_Last snapshot: 2026-08-04T23:08:00 IST_

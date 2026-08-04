@@ -167,15 +167,43 @@ class _AblationLock:
 
 
 def _append_result(rows, res, provenance_extras, results_file, label, c, done, todo_n, t0):
+    """Append one result with disk re-read + key-merge under a per-file flock.
+
+    Concurrent parents writing the same JSON (should not happen when the
+    machine-wide _AblationLock is held, but has happened when that lock was
+    bypassed) must not clobber each other: always re-load disk, union by
+    ``_key``, then atomic replace. Updates ``rows`` in place to the merged list.
+    """
     if provenance_extras:
         for k, v in provenance_extras.items():
             res[k] = v
-    rows.append(res)
-    atomic_save(rows, results_file)
+    import fcntl
+    lock_path = results_file + ".writelock"
+    os.makedirs(os.path.dirname(os.path.abspath(results_file)) or ".", exist_ok=True)
+    with open(lock_path, "a+") as lf:
+        fcntl.flock(lf.fileno(), fcntl.LOCK_EX)
+        disk = []
+        if os.path.exists(results_file):
+            try:
+                with open(results_file) as f:
+                    disk = json.load(f)
+                if not isinstance(disk, list):
+                    disk = []
+            except (json.JSONDecodeError, OSError):
+                disk = list(rows)
+        by = {}
+        for r in disk:
+            by[_key(r)] = r
+        for r in rows:
+            by[_key(r)] = r
+        by[_key(res)] = res
+        merged = list(by.values())
+        atomic_save(merged, results_file)
+        rows[:] = merged
     print(
         f"[{label}][{done}/{todo_n}] {c[0]} a={c[1]} s={c[2]} {c[3]} {c[4]} "
         f"acc={res['acc_clean']:.3f} dp={res['dp_clean']:.4f} "
-        f"if={res['if_clean']:.4f} ({time.time()-t0:.0f}s)",
+        f"if={res['if_clean']:.4f} ({time.time()-t0:.0f}s) rows_on_disk={len(rows)}",
         flush=True,
     )
 
@@ -231,12 +259,12 @@ def _run_locked(results_file, configs, provenance_extras=None, workers=4, label=
 
     use_pool = workers > 1
     if use_pool:
-        # Use fork on POSIX (spawn crashes on macOS Python 3.14 for this workload;
-        # fork inherits interpreter state so the worker imports cleanly).
-        ctx = mp.get_context("fork") if sys.platform != "win32" else mp.get_context("spawn")
-        print(f"[{label}] trying ProcessPoolExecutor(workers={workers}, {ctx.get_start_method()})…", flush=True)
+        # ThreadPoolExecutor: torch releases the GIL during CPU-bound matmuls, so
+        # threads give real parallelism without the macOS fork-pool crashes.
+        from concurrent.futures import ThreadPoolExecutor
+        print(f"[{label}] ThreadPoolExecutor(workers={workers})…", flush=True)
         try:
-            with ProcessPoolExecutor(max_workers=workers, mp_context=ctx) as ex:
+            with ThreadPoolExecutor(max_workers=workers) as ex:
                 futs = {ex.submit(_worker, c): c for c in todo}
                 for fut in as_completed(futs):
                     c = futs[fut]
@@ -250,8 +278,8 @@ def _run_locked(results_file, configs, provenance_extras=None, workers=4, label=
                     except Exception as e:
                         print(f"[{label}] FAILED {c}: {e}", flush=True)
                         traceback.print_exc()
-        except BrokenExecutor as e:
-            print(f"[{label}] Process pool broken ({e}).", flush=True)
+        except Exception as e:
+            print(f"[{label}] thread pool error ({e}).", flush=True)
 
         if done == 0 and n_todo > 0:
             print(

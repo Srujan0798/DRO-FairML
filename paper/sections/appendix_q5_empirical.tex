@@ -9,7 +9,7 @@ In the \textit{uniform mode}, we assume no prior knowledge of the attack structu
 \paragraph{Coordinated Attack Structure}
 In the \textit{empirical mode}, we exploit the observation that real-world adversarial attacks are often coordinated, targeting specific demographic groups (70\% of the budget directed at the minority group). The empirical clean proportions are adjusted as $\pi_{\mathrm{clean}}[\mathrm{min}] = \pi_{\mathrm{obs}}[\mathrm{min}] + 0.4\alpha$, $\pi_{\mathrm{clean}}[\mathrm{maj}] = \pi_{\mathrm{obs}}[\mathrm{maj}] - 0.4\alpha$, clipped to $[0,1]$ and renormalised.
 
-\paragraph{Comparison (Adult, DP attack, $n{=}6$ seeds, DRO only)}
+\paragraph{Comparison (Adult, DP attack, DRO only; partial OK)}
 Same corrupted data (\texttt{coordinated=True}); only the radius calibration differs. Source: \texttt{results/empirical\_radii.json}.
 
 \begin{center}
