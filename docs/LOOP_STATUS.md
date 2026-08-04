@@ -1,24 +1,24 @@
 # Completion-loop status
 
-**Timestamp:** 2026-08-04 13:46 IST (2026-08-04T08:16Z)  
+**Timestamp:** 2026-08-04 13:48 IST (tick end)  
 **Tick role:** DRO-FairML completion loop (8 min cadence)
 
 ## Grid progress (read-only)
 
 | Metric | Value |
 |--------|-------|
-| `results/canonical_tau1.json` total | **442 / 540** |
-| attacks | dp=**180**, combined=**180**, if=**82** |
-| unique `(dataset,attack,alpha,seed,method)` | **442** (== total; no dups) |
+| `results/canonical_tau1.json` total | **444 / 540** |
+| attacks | dp=**180**, combined=**180**, if=**84** |
+| unique `(dataset,attack,alpha,seed,method)` | **444** (== total; no dups) |
 | max \|if_clean\| on IF rows | **≈0.0978** (≫ 1e-6; non-degenerate) |
-| IF by dataset | Adult **60/60**, Credit **~22**, LSAC **0** |
-| Sole writer pid **10146** | **ALIVE** — `python experiments/run_if_parallel.py 10` (~20+ min elapsed, 10 spawn workers) |
-| Other experiment writers | **none** (no second `run_fairness_pgd` / `run_canonical` / second IF writer) |
+| IF by dataset | Adult **60/60**, Credit in progress, LSAC not started (as of mid-tick) |
+| Sole writer pid **10146** | **ALIVE** — `python experiments/run_if_parallel.py 10` (~23 min, 10 workers) |
+| Other experiment writers | **none** (UTKFace paused; no second IF writer) |
 | **Clear to finalize?** | **NO** — need IF=180, total=540, unique=540, then H |
 
 ### ETA (rough)
 
-~82 IF rows in ~20 min wall → ~4 rows/min with 10 workers. Remaining ~98 → **~25–40 min** if rate holds (Credit finishing, LSAC next). Re-check each tick.
+~84 IF rows in ~23 min wall → ~3.5–4 rows/min. Remaining ~96 → **~25–40 min** if rate holds. Re-check each tick.
 
 ## What finished this tick
 
