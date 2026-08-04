@@ -41,3 +41,4 @@ Superseded agent prompts, partial analyses, hardcoded-number hunt artifacts, and
 
 ## Data truth
 All numeric claims → `results/canonical_tau1.json` (540 rows) and `results/if_wilcoxon_summary.txt`.
+- [CLEAN_TREE.md](CLEAN_TREE.md) — post-cleanup map
