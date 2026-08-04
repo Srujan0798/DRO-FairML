@@ -54,6 +54,14 @@ def test_ablation_driver_refuses_locked_science_paths():
 
 
 def test_adult_dp_alpha01_is_five_of_six():
+    """Locked to the original n=6 baseline (seeds 0-5).
+
+    Agent S is appending seeds 6-9 to results/canonical_tau1.json for the n=10
+    extension (append-only; the original 540 rows are byte-identical, verified
+    separately). This test asserts an invariant of that original n=6 slice, so
+    it must not pick up the new seeds — do that in a separate n=10 test once
+    Agent S's extension is complete and verified.
+    """
     rows = json.loads((ROOT / "results" / "canonical_tau1.json").read_text())
     by_seed = {}
     for r in rows:
@@ -61,8 +69,10 @@ def test_adult_dp_alpha01_is_five_of_six():
             r["dataset"] == "adult"
             and r["attack"] == "dp"
             and abs(float(r["alpha"]) - 0.1) < 1e-9
+            and int(r["seed"]) < 6
         ):
             by_seed.setdefault(int(r["seed"]), {})[r["method"]] = r
+    assert sorted(by_seed) == [0, 1, 2, 3, 4, 5]
     wins = sum(
         by_seed[s]["dro"]["dp_clean"] < by_seed[s]["naive"]["dp_clean"]
         for s in by_seed
