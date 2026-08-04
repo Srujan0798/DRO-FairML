@@ -1,18 +1,19 @@
-# Figures (LIVE)
+# Figures (LIVE after 2026-08-04 cleanup)
 
-## Regenerated from 540-row canonical (2026-08-04) — prefer these for meeting
-- `fig_tau1_headline.pdf` — Adult DP, wins [6,5,6,6,6]
-- `fig_final_wilcoxon_table.pdf` / `figD10_final_wilcoxon_table.pdf` — DP win matrix
-- `figD1`–`figD4` — constant-predictor / tradeoff (deliverables regen)
-- `fig1`, `fig2`, `fig4`, `fig5`, `fig7`, `main_results`, `test_time_eval` — report includes (regen 2026-08-04)
+## Meeting / claim figures (from 540-row canonical)
+| File | Role |
+|------|------|
+| `fig_tau1_headline.pdf` | Adult DP vs α; wins **[6,5,6,6,6]** |
+| `fig_final_wilcoxon_table.pdf` | DP-attack win matrix (same as `figD10_*`) |
+| `figD1`–`figD4` | Constant-predictor + tradeoff |
+| `figD8`–`figD9` | Lambda heatmaps (if present) |
+| `fig1`, `fig2`, `fig4`, `fig5`, `fig7`, `main_results`, `test_time_eval` | Report includes |
 
-## Older stamps (optional / incomplete data)
-- `fig_final_constant_predictor_*`, `fig_final_lambda_*`, `fig_final_tradeoff_*` — mtime **Jul 2** (pre-540); prefer `figD*` where overlapping
-- `figD5`–`figD7` convergence — **Jul 20**; need `results/individual/` histories (not present) — do not claim as 540-fresh
-- `fig_acc_win_curves_tau1.pdf` — **Jul 2**
-- `fig_high_alpha_*` — optional high-α panels
+## Removed on purpose
+Pre-540 Jul-2 `fig_final_*` (except wilcoxon), Jul-20 convergence `figD5–7` (no per-run histories), old win-curves, high-α extras.
 
-Regenerate meeting pair:
+## Regen
 ```bash
 python3 experiments/plot_meeting_figs_540.py
+PYTHONPATH=. python3 experiments/generate_all_deliverables.py   # may skip missing optional inputs
 ```

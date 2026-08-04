@@ -5,7 +5,7 @@
 |-----|------|
 | [../STATUS.md](../STATUS.md) | Single source of truth — 540 complete, IF MIXED, Adult/DP α=0.1 = 5/6 |
 | [MEETING_2026-08-04.md](MEETING_2026-08-04.md) | 4pm brief — every table from canonical |
-| [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md) | Claim audit (see Agent V section at end for live MATCH) |
+| [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md) | **LIVE 540-only** claim audit (see Agent V section at end for live MATCH) |
 | [KULDEEP_CORRECTION.md](KULDEEP_CORRECTION.md) | Honest corrections for advisor |
 | [LSAC_DEGENERACY.md](LSAC_DEGENERACY.md) | LSAC/DP collapse |
 | [KEY_FORMULAS.md](KEY_FORMULAS.md) | Math |
