@@ -94,10 +94,11 @@ Updated live as the grid runs. Target: **90/90 REAL rows**.
 | post-CLEAR ~14:09 | running | pid `run_utkface_server.py` on MPS |
 | **2026-08-04 ~14:17** | **12 / 90** | attack=`dp` only so far; α∈{0.0,0.1}; seeds 0–5; all `data_provenance=REAL` |
 | **2026-08-04 ~14:25** | **16 / 90** | `dp` α∈{0.0,0.1,0.2} (α=0.2 still filling); all REAL |
+| **2026-08-04 ~14:35** | **21 / 90** | `dp` only; α∈{0.0,0.1,0.2} complete (6 seeds); α=0.3 partial (3 seeds); all REAL |
 
 **Early REAL snapshot (α=0.0, attack=dp, 6 seeds, seed 0 shown):** Naive acc≈0.859, DP≈0.020, IF≈0.069; DRO acc≈0.859, DP≈0.020, IF≈0.052. Full tables only after 90/90.
 
-**No paper claim until 90/90 (or scoped subset) verified.**
+**No paper claim until 90/90 (or scoped subset) verified.** Report real row count only.
 
 Resume command if interrupted:
 

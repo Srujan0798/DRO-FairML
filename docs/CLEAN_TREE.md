@@ -26,7 +26,7 @@ paper/  report/  results/  scripts/  src/  tests/
 |-----|-------------|
 | `src/` | Trainers, `FairnessTargetedPGD`, metrics, models, radii, `temperature.py` (τ=1) |
 | `experiments/` | Canonical pipeline + Makefile artifact gens + UTKFace + headline plots (see below) |
-| `scripts/` | **5** operational helpers only (see below) |
+| `scripts/` | **4** operational helpers only (see below) |
 | `tests/` | Full pytest suite (`make test`) |
 | `main.py` | Legacy CLI: `make results` → `generate_results.py` |
 
@@ -38,14 +38,15 @@ paper/  report/  results/  scripts/  src/  tests/
 | Makefile artifacts | `generate_results.py` (`make results`), `generate_report_tables.py` (`make tables`), `generate_all_deliverables.py` (`make deliverables`) |
 | Archived plots | Headline `plot_*` + `generate_final_figures` / `generate_figures` / `generate_fig8_matrix` live under `experiments/_archive/` |
 
-### `scripts/` live set (5)
+### `scripts/` live set (4)
 | File | Role |
 |------|------|
 | `agent_h_finalize.sh` | Post-540 finalize / gate |
-| `watch_sweep_readonly.sh` | Read-only IF/count poller |
 | `deploy_utkface_flair2.sh` | flair2 UTKFace deploy |
 | `extract_utkface_features.py` | ResNet feature extract |
 | `flair2_ssh_config_snippet.txt` | SSH Host snippet |
+
+(`watch_sweep_readonly.sh` archived — IF third complete.)
 
 ## `results/` live (claims only)
 ```

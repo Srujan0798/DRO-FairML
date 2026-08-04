@@ -687,7 +687,7 @@ def main():
         for e in errors:
             print(f"  - {e}")
         print("Canonical-based figures that succeeded were written under figures/.")
-        print("Fix missing live inputs or use generate_final_figures.py / compute_canonical_wilcoxon.py.")
+        print("Fix missing live inputs or use compute_canonical_wilcoxon.py / generate_report_tables.py.")
         sys.exit(1)
     print("AGENT C MILESTONE: All required figures generated successfully!")
     print("=" * 80)
