@@ -33,3 +33,5 @@ Active drivers for the **canonical** DRO-FairML pipeline. One-offs live in `_arc
 2. Never load `results/stale_archived/` for claims.
 3. IF story is **mixed**; Adult/DP α=0.1 is **5/6**; LSAC/DP degenerate.
 4. UTKFace: report REAL row counts only; no paper claim until multi-attack cells exist.
+
+| `plot_meeting_figs_540.py` | Meeting headline figs from canonical 540 |

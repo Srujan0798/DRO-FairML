@@ -103,6 +103,8 @@ Updated live as the grid runs. Target: **90/90 REAL rows**.
 
 | **2026-08-04 ~14:55** | **38 / 90** | {'dp': 30, 'if': 8}; all REAL |
 
+| **2026-08-04 ~15:00** | **41 / 90** | {'dp': 30, 'if': 11}; all REAL |
+
 **Early REAL snapshot (α=0.0, attack=dp, 6 seeds, seed 0 shown):** Naive acc≈0.859, DP≈0.020, IF≈0.069; DRO acc≈0.859, DP≈0.020, IF≈0.052. Full tables only after 90/90.
 
 **No paper claim until 90/90 (or scoped subset) verified.** Report real row count only.
