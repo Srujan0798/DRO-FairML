@@ -75,7 +75,7 @@ via `experiments/run_a*.py` + `run_ablation_parallel.py` (hard-refuses
 | Verification LIVE | ✅ `docs/VERIFICATION_REPORT.md` |
 | UTKFace REAL 90/90 | ✅ complete; summary `results/utkface_summary.md` (**mixed clean-test**) |
 | Paper / report | ✅ Aug 10 narrative + **wired figures/tables** (540-backed); honest UTKFace pilot |
-| flair2 | ⏸ parked (optional GPU later) |
+| flair2 | ✅ **UNLOCKED** — 2× L40S, torch 2.6.0+cu124, `docs/FLAIR2_GPU_READY.md` |
 | Wave-1 ablations (advisor gaps) | 🔄 **A4 random-vs-adv running** → `results/random_vs_adversarial.json` (separate; never touch 540). Summarize: `python3 experiments/summarize_rva.py` |
 | IF@α=0.3 formalization (N4) | ✅ `results/if_wilcoxon_n4_summary.md` (analysis on locked 540) |
 
