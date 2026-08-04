@@ -36,7 +36,7 @@ paper/  report/  results/  scripts/  src/  tests/
 | Runners | `run_canonical.py`, `run_if_parallel.py`, `run_fairness_pgd.py`, `run_canonical_empirical.py`, `run_utkface.py`, `run_utkface_server.py`, `run_experiments.py` (legacy / `FORCE_LEGACY=1`) |
 | I/O + stats | `loaders.py`, `canonical_to_all_results.py`, `compute_canonical_wilcoxon.py`, `validate_results.py`, `meeting_summary.py`, `verify_theory.py` |
 | Makefile artifacts | `generate_results.py` (`make results`), `generate_report_tables.py` (`make tables`), `generate_all_deliverables.py` (`make deliverables`) |
-| Archived plots | Headline `plot_*` + `generate_final_figures` / `generate_figures` / `generate_fig8_matrix` live under `experiments/_archive/` |
+| Archived plots | Old `plot_*` / `generate_final_figures` / `generate_figures` / `generate_fig8_matrix` lived under `experiments/_archive/` (removed from tree; in git history) |
 
 ### `scripts/` live set (4)
 | File | Role |
@@ -64,14 +64,13 @@ stale_archived/              old knn/lambda/if_chunks/if_poc/partials — do not
 - Meeting / figD / figC / heatmaps kept; do not delete PDFs paper may need
 - Prefer archive over delete
 
-## Archives (not deleted)
-| Path | Contents |
-|------|----------|
-| `docs/_archive/` | Agent prompts, MASTER plans, old handoffs, chat strays |
-| `experiments/_archive/` | One-off runners, old fig gens (`generate_figures`, `generate_fig8_matrix`, latex extras, …) |
-| `scripts/_archive/` | Watchers, orchestrators, `finalize_experiments.py`, cluster IF re-run |
-| `results/stale_archived/` | Partial JSON, knn/lambda ablations, IF chunks, POC rows |
-| `logs/` (+ `archive_root/`) | Run logs |
+## Archives
+`docs/_archive/`, `experiments/_archive/`, `scripts/_archive/`, `paper/_archive/`, and `figures/historical/` were removed from the working tree (history remains in git).
+| Path | Status |
+|------|--------|
+| `docs/_archive/`, `experiments/_archive/`, `scripts/_archive/`, `paper/_archive/`, `figures/historical/` | Removed from working tree |
+| `results/stale_archived/` | Still present — partial JSON / old ablations; do not claim |
+| `logs/` (+ `archive_root/`) | Run logs kept |
 
 ## Makefile map → scripts
 | Target | Entry |
@@ -106,5 +105,7 @@ make install && make data && make test && make validate && make paper && make re
 | `logs/archive_root/bulk_pre_540/` | Old IF batch logs |
 | `__pycache__`, `.pytest_cache` | Regenerable |
 | Meeting/τ=100 figs → `figures/historical/` | Clutter; not canonical claims |
+| Working-tree `_archive/` + `figures/historical/` | Removed (git history keeps content) |
+| Duplicate `figures/*.png` when `.pdf` exists | PDF sufficient for meeting/paper |
 
 Repo ~**207MB** after (was ~764MB). File count ~**760** (was ~68k).
