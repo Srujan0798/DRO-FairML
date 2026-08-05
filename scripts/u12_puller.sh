@@ -29,9 +29,10 @@ if [[ -f results/utkface_multigroup.json ]]; then
   n=$(python3 -c "import json; print(len(json.load(open('results/utkface_multigroup.json'))))" 2>/dev/null || echo 0)
   if [[ "$n" == "30" ]]; then u2_done=1; prev_n2=30; fi
 fi
+# U3 intentional grid: 6 seeds × α∈{0.1,0.2} = 12 rows (not 24).
 if [[ -f results/utkface_pixel_pgd.json ]]; then
   n=$(python3 -c "import json; print(len(json.load(open('results/utkface_pixel_pgd.json'))))" 2>/dev/null || echo 0)
-  if [[ "$n" == "24" ]]; then u3_done=1; prev_n3=24; fi
+  if [[ "$n" == "12" ]]; then u3_done=1; prev_n3=12; fi
 fi
 
 remote_snapshot() {
@@ -55,12 +56,15 @@ def info(name, target):
     print(f'{name}|{len(d)}|{target}|{last}|{t}')
 info('utkface_flair2.json', 90)
 info('utkface_multigroup.json', 30)
-info('utkface_pixel_pgd.json', 24)
-ps = subprocess.getoutput('ps -eo args')
+info('utkface_pixel_pgd.json', 12)
+# pgrep bracket trick avoids matching this checker process's own argv.
+def alive(pat):
+    r = subprocess.run(['pgrep', '-f', pat], capture_output=True)
+    return 1 if r.returncode == 0 else 0
 print('alive|u1=%d|u2=%d|u3=%d' % (
-    1 if 'run_utkface_server.py' in ps else 0,
-    1 if 'run_utkface_multigroup.py' in ps else 0,
-    1 if 'run_utkface_pixel_pgd.py' in ps else 0,
+    alive('[e]xperiments/run_utkface_server.py'),
+    alive('[e]xperiments/run_utkface_multigroup.py'),
+    alive('[e]xperiments/run_utkface_pixel_pgd.py'),
 ))
 PY" 2>/dev/null || echo "err"
 }
@@ -85,7 +89,7 @@ finalize_u2() {
 finalize_u3() {
   rsync_one utkface_pixel_pgd.json
   python3 experiments/summarize_utkface_pixel_pgd.py
-  echo "$(date) U3 FINALIZED 24/24 + pixel_pgd summary" | tee -a "$LOG"
+  echo "$(date) U3 FINALIZED 12/12 + pixel_pgd summary" | tee -a "$LOG"
 }
 
 partial_refresh() {
@@ -127,7 +131,7 @@ while true; do
   n1=${n1:-err}
   n2=${n2:-err}
   n3=${n3:-err}
-  echo "$(date) U1=$n1/90 last=$last1 | U2=$n2/30 last=$last2 | U3=$n3/24 last=$last3 | $alive u1_done=$u1_done u2_done=$u2_done u3_done=$u3_done" | tee -a "$LOG"
+  echo "$(date) U1=$n1/90 last=$last1 | U2=$n2/30 last=$last2 | U3=$n3/12 last=$last3 | $alive u1_done=$u1_done u2_done=$u2_done u3_done=$u3_done" | tee -a "$LOG"
 
   if [[ "$n1" == "90" && "$u1_done" == "0" ]]; then
     finalize_u1
@@ -139,10 +143,10 @@ while true; do
     u2_done=1
     prev_n2=30
   fi
-  if [[ "$n3" == "24" && "$u3_done" == "0" ]]; then
+  if [[ "$n3" == "12" && "$u3_done" == "0" ]]; then
     finalize_u3
     u3_done=1
-    prev_n3=24
+    prev_n3=12
   fi
 
   if [[ "$u1_done" == "0" || "$u2_done" == "0" || "$u3_done" == "0" ]]; then

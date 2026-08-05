@@ -51,20 +51,22 @@ def show(path, target):
 
 show("utkface_flair2.json", 90)
 show("utkface_multigroup.json", 30)
-show("utkface_pixel_pgd.json", 24)
+# U3 intentional grid: 6 seeds × α∈{0.1,0.2} = 12 (see run_utkface_pixel_pgd.py / HANDOFF_GROK)
+show("utkface_pixel_pgd.json", 12)
 
 ps = subprocess.getoutput("ps -eo pid,etime,pcpu,args")
 print("== processes ==")
 found = 0
 for line in ps.splitlines():
+    # Require experiments/ path so status checker argv / docs strings do not false-positive.
     if any(
         k in line
         for k in (
-            "run_utkface_server.py",
-            "run_utkface_multigroup.py",
-            "run_utkface_pixel_pgd.py",
+            "experiments/run_utkface_server.py",
+            "experiments/run_utkface_multigroup.py",
+            "experiments/run_utkface_pixel_pgd.py",
         )
-    ):
+    ) and "python" in line.lower() and "flair2_u12_status" not in line:
         print(" ", line[:200])
         found += 1
 if not found:

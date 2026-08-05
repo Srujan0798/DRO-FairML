@@ -112,4 +112,6 @@ make results && make deliverables   # regenerate tables + figures
 - **flair2 U1 DONE:** `results/utkface_flair2.json` (CUDA repro of 90-config protocol; reproducibility summary `results/utkface_reproducibility_summary.md` — max ΔDP < 0.013, all OK).
 - **flair2 U2 DONE:** `results/utkface_multigroup.json` (5-race max-min DP eval; 30/30; summary `results/utkface_multigroup_summary.md` — DRO wins multi-group DP at α≥0.2, 6/6 at α=0.4).
 - **flair2 U3 DONE:** `results/utkface_pixel_pgd.json` (pixel-space PGD on raw UTKFace JPEGs; 12/12 cells α∈{0.1,0.2}; summary `results/pixel_pgd_summary.md` — DP mixed 4/6 at α=0.1, 2/6 at α=0.2; IF clean 6/6 wins both α; contrast to U1 feature-space in summary).
+- **Ops fix (late tick):** `scripts/u12_puller.sh` + `flair2_u12_status.sh` had U3 target **24** (stale) and false-positive process alive flags (checker argv self-match). Corrected to **12** + pgrep bracket detection so puller can finalize/exit. Docs `WAVE1_LIVE_PROGRESS.md` / `UTKFACE_STATUS.md` synced. GPUs idle; no U1/U2/U3 workers.
 - Do not rewrite `canonical_tau1.json` / `utkface_canonical.json`.
+- **Next:** U4 CelebA optional stretch only; paper/report integration is a separate pass (do not re-edit tex unless Finding 3 cosine sentence missing — already present).
