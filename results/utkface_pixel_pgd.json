@@ -1,0 +1,60 @@
+[
+  {
+    "dataset": "utkface",
+    "seed": 0,
+    "alpha": 0.1,
+    "attack": "pixel_pgd",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 10,
+    "pgd_eps": 0.01568627450980392,
+    "n_seeds_planned": 6,
+    "n_images": 23704,
+    "data_dir": "/data/srujan.sai/UTKFace",
+    "data_provenance": "REAL_PIXELS",
+    "protected_def": "race_binary_White_vs_nonWhite",
+    "label_def": "gender",
+    "naive": {
+      "accuracy": 0.8576249736342544,
+      "dp_violation": 0.015103846788406372,
+      "if_violation": 0.073435939848423
+    },
+    "dro": {
+      "accuracy": 0.8616325669689939,
+      "dp_violation": 0.009748369455337524,
+      "if_violation": 0.06259403377771378
+    },
+    "total_time": 232.47838973999023
+  },
+  {
+    "dataset": "utkface",
+    "seed": 0,
+    "alpha": 0.2,
+    "attack": "pixel_pgd",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 10,
+    "pgd_eps": 0.01568627450980392,
+    "n_seeds_planned": 6,
+    "n_images": 23704,
+    "data_dir": "/data/srujan.sai/UTKFace",
+    "data_provenance": "REAL_PIXELS",
+    "protected_def": "race_binary_White_vs_nonWhite",
+    "label_def": "gender",
+    "naive": {
+      "accuracy": 0.8561484918793504,
+      "dp_violation": 0.015495449304580688,
+      "if_violation": 0.0701131820678711
+    },
+    "dro": {
+      "accuracy": 0.8635309006538705,
+      "dp_violation": 0.01930314302444458,
+      "if_violation": 0.05590641871094704
+    },
+    "total_time": 210.64017868041992
+  }
+]
