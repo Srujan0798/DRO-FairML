@@ -136,10 +136,14 @@ def main():
     # --- pre-flight: snapshot + hash the first 540 rows ---
     with open(CANON) as f:
         rows = json.load(f)
-    if len(rows) != EXPECTED_EXISTING:
-        print(f"ABORT: canonical has {len(rows)} rows, expected {EXPECTED_EXISTING}. "
-              f"Another writer may have already run. Inspect before proceeding.", flush=True)
+    if len(rows) < EXPECTED_EXISTING:
+        print(f"ABORT: canonical has {len(rows)} rows, expected at least {EXPECTED_EXISTING}. "
+              f"File may be corrupted. Inspect before proceeding.", flush=True)
         return 2
+    # Handle resume: file may already have >540 rows from a previous S run
+    if len(rows) > EXPECTED_EXISTING:
+        print(f"[PRE] canonical has {len(rows)} rows (> {EXPECTED_EXISTING}); "
+              f"resuming — will append remaining seeds 6-9 configs", flush=True)
     head_hash_before = hashlib.sha256(
         json.dumps(rows[:EXPECTED_EXISTING], indent=2).encode()
     ).hexdigest()

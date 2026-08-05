@@ -70,9 +70,10 @@ def _worker(cfg):
 
 def _key(r):
     return (r.get('dataset'), r.get('alpha'), r.get('seed'), r.get('method'),
-            r.get('attack'), r.get('k_inner'), r.get('tau'),
-            r.get('lambda_init'), r.get('lr_lambda'), r.get('radii_mode'),
-            r.get('coordinated'), r.get('corruptor_type', 'adversarial'),
+            r.get('attack'), r.get('k_inner'), r.get('pgd_steps', 20),
+            r.get('tau'), r.get('lambda_init'), r.get('lr_lambda'),
+            r.get('radii_mode'), r.get('coordinated'),
+            r.get('corruptor_type', 'adversarial'),
             r.get('attack_k', 5),
             r.get('radii_scale', 1.0), r.get('radii_clamp', None))
 
