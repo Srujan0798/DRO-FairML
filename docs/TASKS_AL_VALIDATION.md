@@ -153,6 +153,39 @@ recommendation for choosing μ (e.g. "largest μ whose validation accuracy stays
 
 ---
 
+## TASK C2 — Compound AL with a larger radius (the second under-enforcement lever)
+
+**Why:** the N1 radius ablation (now complete, 180/180) found that **11 of 15
+(dataset, α) cells prefer `radii_scale=2.0` over the canonical 1.0**, and that
+the DP-minimising radius grows with measured attack strength
+(Spearman ρ=+0.668, p=0.0065 — this also confirms Kuldeep's original May-29
+hypothesis). In other words the canonical closed-form radius is systematically
+*too small*.
+
+That is the **same diagnosis as the AL finding, arriving independently**: the
+canonical configuration under-enforces the robust/fair objective — once through
+a starved dual (fixed by AL), once through an undersized uncertainty set. Two
+independent lines of evidence pointing the same way is a much stronger paper
+argument than either alone, and it is worth stating that way.
+
+**Do:** Adult, α ∈ {0.2, 0.3}, 6 seeds, 2×2 design:
+`radii_scale ∈ {1.0, 2.0} × aug_lagrangian_mu ∈ {0, 5}`. The canonical and
+AL-only arms already exist; this adds `radii_scale=2.0` alone and the combined
+arm. Both parameters are already plumbed through `run_single_experiment` — no
+new trainer code needed.
+
+**Pre-register:** do the two levers **compound** (combined beats both singles),
+are they **redundant** (combined ≈ best single, meaning they fix the same
+deficiency), or do they **conflict**? Write down which you expect and why
+*before* running. Apply the degeneracy guard — a larger radius plus a stronger
+penalty is exactly the combination most likely to collapse the model.
+
+**Deliver:** `results/al_radius_compound_summary.md` + a plain statement of
+which of the three outcomes occurred. "Redundant" is a genuinely interesting
+and publishable answer, not a failure.
+
+---
+
 ## TASK D — Paper and report integration (do only after A completes)
 
 **Why:** the paper currently has no AL section, and its Future Work still lists
