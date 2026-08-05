@@ -48,7 +48,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
                            tau=None, lambda_init=0.0, radii_mode='uniform', coordinated=False, n_seeds_planned=3,
                            corruptor_type='adversarial', lr_lambda=5e-3, attack_k=5,
                            radii_scale=1.0, radii_clamp=None, dump_history=False,
-                           pi_shrinkage_k=0.0, lambda_max=1.5, beta=5.0):
+                           pi_shrinkage_k=0.0, lambda_max=1.5, beta=5.0,
+                           aug_lagrangian_mu=0.0):
     """Run single (dataset, alpha, seed, attack, method) experiment.
     All callers must pass (or rely on defaults for) full provenance params so every row
     includes k_inner, tau, radii_mode, lambda_init, coordinated, pgd_steps, n_seeds_planned, epochs.
@@ -68,6 +69,11 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         Testing whether either can be raised now that the actual instability source
         (stepped tau) is gone, to see if DRO's fairness margin over Naive can grow
         meaningfully rather than staying marginal. Defaults are canonical (unchanged).
+      aug_lagrangian_mu (DRO-FAIR-AL, pre-registered 2026-08-05): quadratic
+        constraint penalty (mu/2)*g^2 in the DRO Lagrangian; targets the diagnosed
+        lambda-starvation bottleneck (dual decay caps lambda at ~0.01-0.02, so the
+        linear lambda*g term is nearly inert). DRO only; default 0.0 = exact no-op.
+        See docs/superpowers/specs/2026-08-05-augmented-lagrangian-design.md.
 
     Extended for Agent N2 convergence diagnostics:
       dump_history: if True AND method=='dro', dump trainer.history (per-epoch train_loss,
@@ -150,6 +156,7 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
         'pi_shrinkage_k': float(pi_shrinkage_k),
         'lambda_max': float(lambda_max),
         'beta': float(beta),
+        'aug_lagrangian_mu': float(aug_lagrangian_mu),
         'attack_effectiveness': attack_effectiveness,
         'dp_clean_train': dp_clean_train,
         'dp_corrupted_train': dp_corrupted_train,
@@ -178,7 +185,8 @@ def run_single_experiment(dataset_name, alpha, seed, attack, method, device='cpu
             K_inner=k_inner, epochs=epochs, weight_decay=1e-4, tau_warmup_epochs=15,
             lambda_init=lambda_init, radii_mode=radii_mode,
             radii_scale=radii_scale, radii_clamp=radii_clamp,
-            pi_shrinkage_k=pi_shrinkage_k
+            pi_shrinkage_k=pi_shrinkage_k,
+            aug_lagrangian_mu=aug_lagrangian_mu
         )
         trainer.fit(X_train_att, y_train_att, a_train_att,
                      X_val=X_val, y_val=y_val, a_val=a_val, verbose=verbose)

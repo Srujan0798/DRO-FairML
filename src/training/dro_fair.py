@@ -32,7 +32,8 @@ class DroFairTrainer:
                  K_inner=10, epochs=60, weight_decay=1e-4,
                  use_dp=True, use_if=True, tau_warmup_epochs=15,
                  lambda_init=0.0, radii_mode='uniform', history_path=None,
-                 radii_scale=1.0, radii_clamp=None, pi_shrinkage_k=0.0):
+                 radii_scale=1.0, radii_clamp=None, pi_shrinkage_k=0.0,
+                 aug_lagrangian_mu=0.0):
         self.model = model.to(device)
         self.device = device
         self.alpha = alpha
@@ -84,6 +85,17 @@ class DroFairTrainer:
         # true proportion is genuinely small (not just noisily estimated), shrinkage
         # may fail to fix LSAC just as radii_clamp did — report honestly either way.
         self.pi_shrinkage_k = float(pi_shrinkage_k)
+        # aug_lagrangian_mu (DRO-FAIR-AL, pre-registered 2026-08-05): quadratic
+        # constraint penalty (mu/2)*g^2 added to the Lagrangian for each active
+        # constraint. Motivation: the geometric dual decay (0.95^epoch) caps
+        # lambda's total accumulation at ~0.01-0.02, so the linear lambda*g term
+        # is nearly inert (Arm-A byte-identical lambda_max no-op confirms the
+        # ceiling never binds). The quadratic term supplies a constraint gradient
+        # mu*g*grad(g) from epoch 0, independent of lambda's slow ascent
+        # (classical augmented Lagrangian; Hestenes 1969, Bertsekas 1982).
+        # mu=0.0 (default) is an exact no-op preserving canonical behavior.
+        # See docs/superpowers/specs/2026-08-05-augmented-lagrangian-design.md.
+        self.aug_lagrangian_mu = float(aug_lagrangian_mu)
         self.history_path = history_path
         self.rho_dp = None
         self.rho_if = None
@@ -341,6 +353,14 @@ class DroFairTrainer:
             # === STEP 3a: UPDATE θ (outer minimization) ===
             # Per paper Algorithm 1: θ update happens BEFORE inner max on p
             total_loss = L_tilt + (lambda_dp * g_dp if self.use_dp else 0.0) + (lambda_if * g_if if self.use_if else 0.0)
+            if self.aug_lagrangian_mu > 0:
+                # DRO-FAIR-AL: quadratic penalty (mu/2)*g^2 per active constraint.
+                # Guarded so mu=0 stays byte-identical to canonical (no extra graph nodes).
+                mu = self.aug_lagrangian_mu
+                if self.use_dp:
+                    total_loss = total_loss + 0.5 * mu * g_dp * g_dp
+                if self.use_if:
+                    total_loss = total_loss + 0.5 * mu * g_if * g_if
             opt_theta.zero_grad()
             total_loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.5)
