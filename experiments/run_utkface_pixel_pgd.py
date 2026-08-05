@@ -126,8 +126,9 @@ def pgd_attack_pixels(model, X_pix, y, eps=4 / 255, steps=10, step_size=1 / 255,
     X_adv = (X_adv + torch.empty_like(X_adv).uniform_(-eps, eps)).clamp(X_min, X_max)
     for _ in range(steps):
         X_adv = X_adv.detach().requires_grad_(True)
-        logits = model(X_adv).squeeze(-1)
-        loss = nn.functional.binary_cross_entropy_with_logits(logits, y)
+        # view(-1): avoid squeeze turning [1] → scalar when batch size is 1
+        logits = model(X_adv).reshape(-1)
+        loss = nn.functional.binary_cross_entropy_with_logits(logits, y.reshape(-1))
         loss.backward()
         with torch.no_grad():
             X_adv = X_adv + step_size * X_adv.grad.sign()
@@ -136,19 +137,30 @@ def pgd_attack_pixels(model, X_pix, y, eps=4 / 255, steps=10, step_size=1 / 255,
 
 
 def to_pixel_tensor(paths, transform, batch=64, device="cpu"):
+    """Load JPEGs → [N,3,224,224] float tensor. Keep on CPU for full UTKFace (~N·9MB)."""
     out = []
     for i in range(0, len(paths), batch):
         chunk = [transform(Image.open(p).convert("RGB")) for p in paths[i : i + batch]]
         out.append(torch.stack(chunk))
-    return torch.cat(out, dim=0).to(device)
+    t = torch.cat(out, dim=0)
+    if device != "cpu":
+        # Never move the full train split to GPU — OOM on 24k×224×224.
+        raise ValueError("to_pixel_tensor must stay on CPU; batch to GPU in features/PGD")
+    return t
 
 
-def features_from_pixels(backbone, X_pix, batch=128, device="cpu"):
+def features_from_pixels(backbone, X_pix, normalize_fn, batch=64, device="cpu"):
+    """ResNet features; normalize + forward in small GPU batches (X_pix stays CPU)."""
     feats = []
     with torch.no_grad():
         for i in range(0, X_pix.shape[0], batch):
-            f = backbone(X_pix[i : i + batch].to(device)).flatten(1)
+            chunk = X_pix[i : i + batch].to(device, non_blocking=True)
+            chunk = normalize_fn(chunk)
+            f = backbone(chunk).flatten(1)
             feats.append(f.cpu().numpy())
+            del chunk, f
+    if device.startswith("cuda"):
+        torch.cuda.empty_cache()
     return np.concatenate(feats, axis=0).astype(np.float32)
 
 
@@ -219,13 +231,15 @@ def main():
             print(f"\n[pixel_pgd] seed={s} alpha={alpha}", flush=True)
             t0 = time.time()
 
-            X_tr_pix = to_pixel_tensor([files[i] for i in idx_tr], transform, device=device)
-            X_v_pix = to_pixel_tensor([files[i] for i in idx_v], transform, device=device)
-            X_te_pix = to_pixel_tensor([files[i] for i in idx_te], transform, device=device)
+            # Pixels stay on CPU (~15k×3×224×224 float ≈ 9 GiB RAM, not VRAM).
+            X_tr_pix = to_pixel_tensor([files[i] for i in idx_tr], transform, device="cpu")
+            X_v_pix = to_pixel_tensor([files[i] for i in idx_v], transform, device="cpu")
+            X_te_pix = to_pixel_tensor([files[i] for i in idx_te], transform, device="cpu")
 
-            X_tr = features_from_pixels(backbone, normalize(X_tr_pix), device=device)
-            X_v = features_from_pixels(backbone, normalize(X_v_pix), device=device)
-            X_te = features_from_pixels(backbone, normalize(X_te_pix), device=device)
+            X_tr = features_from_pixels(backbone, X_tr_pix, normalize, device=device)
+            X_v = features_from_pixels(backbone, X_v_pix, normalize, device=device)
+            X_te = features_from_pixels(backbone, X_te_pix, normalize, device=device)
+            del X_v_pix, X_te_pix  # only train pixels needed for PGD
             scaler = StandardScaler().fit(X_tr)
             X_tr_s = scaler.transform(X_tr).astype(np.float32)
             X_v_s = scaler.transform(X_v).astype(np.float32)
@@ -242,21 +256,25 @@ def main():
                 loss.backward()
                 opt.step()
             head.eval()
+            del X_tr_st, y_tr_t
 
             n_corrupt = max(1, int(alpha * len(idx_tr)))
             with torch.no_grad():
                 margins = head(torch.tensor(X_tr_s, device=device)).squeeze(-1).cpu().numpy()
             target_local = np.argsort(-np.abs(margins))[:n_corrupt]
 
-            X_attacked_pix = X_tr_pix.clone()
+            # Mutate train pixels in place for corrupted subset (reloaded each α cell).
             y_tr_arr = y_all[idx_tr]
-            BATCH = 64
+            attack_model = PixelToLogit(backbone, head).to(device).eval()
+            BATCH = 32  # PGD holds activations; keep small
+            mean_d = mean_t.to(device)
+            std_d = std_t.to(device)
             for start in range(0, len(target_local), BATCH):
                 idx = target_local[start : start + BATCH]
-                X_chunk = X_tr_pix[idx]
+                X_chunk = X_tr_pix[idx].to(device)  # batch only
                 y_chunk = torch.tensor(y_tr_arr[idx], dtype=torch.float32, device=device)
                 X_chunk_n_adv = pgd_attack_pixels(
-                    PixelToLogit(backbone, head).to(device).eval(),
+                    attack_model,
                     normalize(X_chunk),
                     y_chunk,
                     eps=args.pgd_eps,
@@ -264,10 +282,15 @@ def main():
                     step_size=args.pgd_eps / 4,
                     device=device,
                 )
-                X_chunk_adv = (X_chunk_n_adv * std_t.to(device) + mean_t.to(device)).clamp(0, 1)
-                X_attacked_pix[idx] = X_chunk_adv.cpu() if X_attacked_pix.device.type == "cpu" else X_chunk_adv
+                X_chunk_adv = (X_chunk_n_adv * std_d + mean_d).clamp(0, 1)
+                X_tr_pix[idx] = X_chunk_adv.cpu()
+                del X_chunk, y_chunk, X_chunk_n_adv, X_chunk_adv
+            del attack_model
+            if device.startswith("cuda"):
+                torch.cuda.empty_cache()
 
-            X_tr_adv = features_from_pixels(backbone, normalize(X_attacked_pix), device=device)
+            X_tr_adv = features_from_pixels(backbone, X_tr_pix, normalize, device=device)
+            del X_tr_pix
             X_tr_adv_s = scaler.transform(X_tr_adv).astype(np.float32)
 
             y_tr_a = y_all[idx_tr].copy()

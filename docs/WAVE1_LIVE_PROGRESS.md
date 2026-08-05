@@ -1,26 +1,25 @@
 # flair2 U1/U2/U3 live progress (Grok lane)
 
-_Last tick: 2026-08-05 ~05:20 IST_
+_Last tick: 2026-08-05 ~05:34 IST_
 
 ## Counts (do not pkill)
 
 | Job | Target | Count | Last | PID | alive |
 |-----|--------|------:|------|-----|-------|
-| **U1** | 90 | **35** | **dp 30/30 done**; if α=0.0 seeds 0–4; s5+ | 3482009 | yes (~5.2h) GPU0 |
-| **U2** | 30 | **30** | **COMPLETE** α=0.0–0.4 × 6 seeds | — | done |
-| **U3** | 24 | **0** (started) | seed=0 α=0.1 loading/training | 3504795 | yes GPU1 |
+| **U1** | 90 | **42** | dp **30/30**; if α=0.0–0.1 **12/12**; if α=0.2 next | 3482009 | yes GPU0 |
+| **U2** | 30 | **30** | **COMPLETE** | — | done |
+| **U3** | 24 | **0** (running) | seed=0 α=0.1 (post-OOM fix) | 3507049 | yes GPU1 ~693MiB |
 
-Puller: **U2 FINALIZED**. ETA U1 ~ remaining if+combined; α=0.0 if cells ~fast.
+Puller OK (U2 finalized). U1 if cells ~2 min → if+combined remaining ~48 cells ~1–2 h at current pace.
 
 ## Signals
-- Repro: **35** matched, **0 GAP**; max\|ΔDP clean\| **0.0072** (dp α=0.1 s1)
-- U2 multi wins by α: 6/4/5/5/6 of 6 (α=0.0–0.4); α=0.3 one multi **tie**; bin α=0.1 **0/6** DRO
-- U3: 23704 JPEGs; concurrent on free GPU1 while U1 holds GPU0
+- Repro: **42** matched, **0 GAP**; max\|ΔDP clean\| **0.0072**
+- U3 first launch **OOM** (full train pixels on GPU ~40 GiB) — fixed: CPU pixels + batched GPU features/PGD; smoke 512 OK; relaunched
 
 ## This tick
-- **U2 COMPLETE** 30/30 — summary finalized (puller + Mac)
-- Status ETA: last-k cell times; stall thr scales with pace
-- Launch U3: allow free-GPU while U1 alive; CSV parse fix; started PID 3504795
+- Diagnosed U3 CUDA OOM at `normalize(X_attacked_pix)` full-tensor
+- Fixed `run_utkface_pixel_pgd.py` memory path; BCE batch-1 shape fix
+- Relaunched U3 on GPU1 concurrent with U1
 
 ## Open
-- U1=90; U3=24; U2 done (human review before paper)
+- U1=90; U3=24; U2 done

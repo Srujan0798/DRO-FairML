@@ -12,10 +12,10 @@ if [[ ! -d /data/srujan.sai/UTKFace ]]; then
   CONFIRM=1 bash scripts/flair2_link_utkface_images.sh
 fi
 
-# 2) Do not double-start U3
-if pgrep -f 'experiments/run_utkface_pixel_pgd.py' >/dev/null 2>&1; then
+# 2) Do not double-start U3 (match real python workers only, not this shell/ssh wrappers)
+if pgrep -f '[p]ython.*experiments/run_utkface_pixel_pgd.py' >/dev/null 2>&1; then
   echo "U3 already running:"
-  pgrep -af 'run_utkface_pixel_pgd' || true
+  pgrep -af '[p]ython.*run_utkface_pixel_pgd' || true
   exit 0
 fi
 
