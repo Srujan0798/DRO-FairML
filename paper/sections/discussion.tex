@@ -102,6 +102,22 @@ LSAC/IF loses on DP for $\alpha\le0.3$.  The IF and DP metrics are
 \emph{coupled}, not interchangeable; we state the IF win clearly but
 pair it with the DP-coupling caveat rather than claiming a three-attack
 DP sweep.
+
+\item \textbf{Reproducibility gap in the canonical grid's IF column.}
+The canonical grid was executed before the $k$-NN graph used by the
+\emph{training} IF constraint was aligned to the cosine metric already
+used by the attack and evaluation code. Under that earlier Euclidean
+graph, rows run with the DP and COMBINED attacks record an IF violation
+of $\approx10^{-11}$ --- floating-point noise, not a measured quantity.
+We therefore report no IF effect size or $p$-value for those rows
+(Table~\ref{tab:wilcoxon-full}); quoting a Wilcoxon result computed on
+noise would be meaningless, and doing so had previously produced two
+spuriously ``significant'' cells with a $0.0\%$ effect size. Re-running
+the affected rows under the corrected metric reproduces accuracy exactly
+and shifts DP by $O(10^{-7})$, so \emph{no DP conclusion in this paper
+depends on the fix}; only the IF column of the DP/COMBINED rows is
+affected, and it is withdrawn rather than restated. The IF-attack rows,
+where the metric is non-degenerate, are unaffected and reported normally.
 \end{enumerate}
 
 \subsection{Future Work}

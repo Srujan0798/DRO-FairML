@@ -146,7 +146,15 @@ the IF attack.}
 \caption{Seed-paired Wilcoxon (one-sided): percent reduction and $p$-value
 for DP and IF.  $^{***}$ marks $p{<}0.05$.  Positive $\Delta$\% means DRO
 is better.  Adult/DP $\alpha{=}0.1$ is the honest $5/6$ cell ($p{=}0.031$).
-LSAC/DP shows negative $\Delta$DP (DRO worse) at every $\alpha$.}
+LSAC/DP shows negative $\Delta$DP (DRO worse) at every $\alpha$.
+IF columns are reported as ``--'' for the DP and COMBINED attacks: in those
+rows the canonical grid records an IF violation of $\approx10^{-11}$, which is
+floating-point noise rather than a measured quantity (an artifact of the
+Euclidean $k$-NN training graph used when the grid was run; the metric was
+subsequently aligned to cosine, matching the attack and evaluation code).
+Testing noise against noise is not meaningful, so no effect size or $p$-value
+is quoted there. The IF-attack rows, where the metric is non-degenerate, are
+reported normally. See the reproducibility note in \S\ref{sec:limitations}.}
 \label{tab:wilcoxon-full}
 \resizebox{\textwidth}{!}{%
 \input{auto_generated/wilcoxon.tex}

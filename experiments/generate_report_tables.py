@@ -27,6 +27,28 @@ def load_canonical_rows():
     return load_canonical_tau1()
 
 
+IF_DEGENERATE_TOL = 1e-6
+
+
+def _format_if_cell(row):
+    """Render the two IF columns (effect %, p-value), or mark them degenerate.
+
+    Under the DP and COMBINED attacks the canonical rows carry an IF violation
+    of ~1e-11 -- floating-point noise, not a measured quantity. It is an
+    artifact of the pre-fix Euclidean k-NN training graph (corrected to cosine
+    in 04d00a6, after the canonical grid was run). Running a Wilcoxon test on
+    noise produced p-values that printed as significant (*** at p=0.016 for
+    adult/combined alpha=0.1 and 0.3) beside a 0.0%% effect size -- an
+    indefensible pairing. Such cells are now printed as "--" rather than
+    given a fake number and a significance star.
+    """
+    if row['if_naive_mean'] <= IF_DEGENERATE_TOL:
+        return "-- & --"
+    if_red = 100 * row['if_diff_mean'] / (row['if_naive_mean'] + 1e-8)
+    if_sig = "***" if row['if_pvalue'] < 0.05 else ""
+    return f"{if_red:.1f}\\% & {row['if_pvalue']:.3f}{if_sig}"
+
+
 def build_summary(rows):
     """Per (dataset, alpha, attack, method) mean/sem of acc/dp/if."""
     recs = []
@@ -148,13 +170,12 @@ def generate_wilcoxon_tex(wdf, outpath):
         if row['attack'] != 'dp':
             continue
         dp_red = 100 * row['dp_diff_mean'] / (row['dp_naive_mean'] + 1e-8)
-        if_red = 100 * row['if_diff_mean'] / (row['if_naive_mean'] + 1e-8) if row['if_naive_mean'] > 1e-6 else 0.0
         dp_sig = "***" if row['dp_pvalue'] < 0.05 else ""
-        if_sig = "***" if row['if_pvalue'] < 0.05 else ""
+        if_cell = _format_if_cell(row)
         lines.append(
             f"{row['dataset'].capitalize()} & {row['alpha']:.1f} & "
             f"{dp_red:.1f}\\% & {row['dp_pvalue']:.3f}{dp_sig} & "
-            f"{if_red:.1f}\\% & {row['if_pvalue']:.3f}{if_sig} \\\\"
+            f"{if_cell} \\\\"
         )
 
     lines.append("\\bottomrule")
@@ -274,16 +295,12 @@ def generate_paper_wilcoxon_tex(wdf, outpath):
 
     for _, row in wdf.iterrows():
         dp_red = 100 * row['dp_diff_mean'] / (row['dp_naive_mean'] + 1e-8)
-        if_red = (
-            100 * row['if_diff_mean'] / (row['if_naive_mean'] + 1e-8)
-            if row['if_naive_mean'] > 1e-6 else 0.0
-        )
         dp_sig = "***" if row['dp_pvalue'] < 0.05 else ""
-        if_sig = "***" if row['if_pvalue'] < 0.05 else ""
+        if_cell = _format_if_cell(row)
         lines.append(
             f"{row['dataset'].capitalize()} & {row['attack'].upper()} & {row['alpha']:.1f} & "
             f"{dp_red:.1f}\\% & {row['dp_pvalue']:.3f}{dp_sig} & "
-            f"{if_red:.1f}\\% & {row['if_pvalue']:.3f}{if_sig} \\\\"
+            f"{if_cell} \\\\"
         )
 
     lines.append("\\bottomrule")
