@@ -56,5 +56,63 @@
       "if_violation": 0.05590641871094704
     },
     "total_time": 210.64017868041992
+  },
+  {
+    "dataset": "utkface",
+    "seed": 1,
+    "alpha": 0.1,
+    "attack": "pixel_pgd",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 10,
+    "pgd_eps": 0.01568627450980392,
+    "n_seeds_planned": 6,
+    "n_images": 23704,
+    "data_dir": "/data/srujan.sai/UTKFace",
+    "data_provenance": "REAL_PIXELS",
+    "protected_def": "race_binary_White_vs_nonWhite",
+    "label_def": "gender",
+    "naive": {
+      "accuracy": 0.858046825564227,
+      "dp_violation": 0.016291826963424683,
+      "if_violation": 0.07510504871606827
+    },
+    "dro": {
+      "accuracy": 0.8574140476692681,
+      "dp_violation": 0.016499370336532593,
+      "if_violation": 0.05614535138010979
+    },
+    "total_time": 222.79958605766296
+  },
+  {
+    "dataset": "utkface",
+    "seed": 1,
+    "alpha": 0.2,
+    "attack": "pixel_pgd",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 10,
+    "pgd_eps": 0.01568627450980392,
+    "n_seeds_planned": 6,
+    "n_images": 23704,
+    "data_dir": "/data/srujan.sai/UTKFace",
+    "data_provenance": "REAL_PIXELS",
+    "protected_def": "race_binary_White_vs_nonWhite",
+    "label_def": "gender",
+    "naive": {
+      "accuracy": 0.8531955283695423,
+      "dp_violation": 0.01585298776626587,
+      "if_violation": 0.07479818910360336
+    },
+    "dro": {
+      "accuracy": 0.8574140476692681,
+      "dp_violation": 0.019656330347061157,
+      "if_violation": 0.05780743435025215
+    },
+    "total_time": 202.2840440273285
   }
 ]

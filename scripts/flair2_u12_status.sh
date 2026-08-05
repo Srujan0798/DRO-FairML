@@ -25,11 +25,14 @@ def show(path, target):
         f"total_time={r.get('total_time',0):.0f}s | json_age={age/60:.1f} min"
     )
     # Stall threshold scales with recent cell length (α=0.4 ~3 min; α=0.3 ~16 min).
+    # Skip stall WARN when grid already at target (e.g. U2=30/30 finished).
     recent_ts = [float(x["total_time"]) for x in d[-5:] if x.get("total_time")]
     typical = (sum(recent_ts) / len(recent_ts)) if recent_ts else 16 * 60
     stall_thr = max(25 * 60, 2.5 * typical)
-    if age > stall_thr:
+    if len(d) < target and age > stall_thr:
         print(f"  WARN: no new row for {age/60:.0f} min (recent cell ~{typical/60:.0f} min; stall if >>{stall_thr/60:.0f})")
+    elif len(d) >= target:
+        print(f"  COMPLETE {len(d)}/{target}")
     c = Counter((x.get("attack"), x.get("alpha")) for x in d)
     for k, v in sorted(c.items(), key=lambda kv: (str(kv[0][0]), kv[0][1] or 0)):
         print(f"  {k}: {v}")
@@ -48,12 +51,20 @@ def show(path, target):
 
 show("utkface_flair2.json", 90)
 show("utkface_multigroup.json", 30)
+show("utkface_pixel_pgd.json", 24)
 
 ps = subprocess.getoutput("ps -eo pid,etime,pcpu,args")
 print("== processes ==")
 found = 0
 for line in ps.splitlines():
-    if "run_utkface_server.py" in line or "run_utkface_multigroup.py" in line:
+    if any(
+        k in line
+        for k in (
+            "run_utkface_server.py",
+            "run_utkface_multigroup.py",
+            "run_utkface_pixel_pgd.py",
+        )
+    ):
         print(" ", line[:200])
         found += 1
 if not found:
@@ -72,12 +83,10 @@ echo "== GPU =="
 nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv
 nvidia-smi --query-compute-apps=pid,used_memory,process_name --format=csv 2>/dev/null || true
 echo "== logs =="
-wc -c logs/u1_utkface_flair2.log logs/u2_multigroup.log 2>/dev/null || true
-# U1 log may be empty if the long-lived process was started without -u / pre-flush
-# code; do NOT restart U1 — results JSON is source of truth (puller + this script).
+wc -c logs/u1_utkface_flair2.log logs/u2_multigroup.log logs/u3_pixel_pgd.log 2>/dev/null || true
 u1sz=$(wc -c < logs/u1_utkface_flair2.log 2>/dev/null || echo 0)
 if [ "${u1sz// /}" = "0" ]; then
   echo "  note: u1 log empty (known); monitor via results/utkface_flair2.json mtime"
 fi
-tail -3 logs/u2_multigroup.log 2>/dev/null || true
+tail -5 logs/u3_pixel_pgd.log 2>/dev/null || true
 REMOTE
