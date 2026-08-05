@@ -45,8 +45,8 @@ def main() -> None:
         "",
         "wins = DRO strict lower DP (ties if |N−D| < 1e-5).",
         "",
-        "| α | n | DP N | DP D | wins (D/tie/n) | mean ΔDP (N−D) | acc N | acc D | IF N | IF D |",
-        "|---:|--:|-----:|-----:|---------------:|---------------:|------:|------:|-----:|-----:|",
+        "| α | n | DP N | DP D | wins_DP (D/tie/n) | mean ΔDP | wins_IF (D/tie/n) | IF N | IF D | acc N | acc D |",
+        "|---:|--:|-----:|-----:|-----------------:|---------:|-----------------:|-----:|-----:|------:|------:|",
     ]
     by_a: dict[float, list] = defaultdict(list)
     for r in rows:
@@ -62,10 +62,13 @@ def main() -> None:
         di = [r["dro"]["if_violation"] for r in cell]
         wins = sum(1 for n, d in zip(nd, dd) if _winner(n, d) == "DRO")
         ties = sum(1 for n, d in zip(nd, dd) if _winner(n, d) == "tie")
+        iw = sum(1 for n, d in zip(ni, di) if _winner(n, d) == "DRO")
+        it = sum(1 for n, d in zip(ni, di) if _winner(n, d) == "tie")
         lines.append(
             f"| {a} | {len(cell)} | {mean(nd):.4f} | {mean(dd):.4f} | "
             f"{wins}/{ties}/{len(cell)} | {mean(n - d for n, d in zip(nd, dd)):+.4f} | "
-            f"{mean(na):.4f} | {mean(da):.4f} | {mean(ni):.4f} | {mean(di):.4f} |"
+            f"{iw}/{it}/{len(cell)} | {mean(ni):.4f} | {mean(di):.4f} | "
+            f"{mean(na):.4f} | {mean(da):.4f} |"
         )
 
     # Per-seed for highest α present

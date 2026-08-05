@@ -2105,5 +2105,177 @@
     "epochs": 60,
     "coordinated": false,
     "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.3,
+    "seed": 1,
+    "attack": "if",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.8512971946846657,
+        "dp_violation": 0.017842382192611694,
+        "if_violation": 0.04443563148379326
+      },
+      "corrupted": {
+        "accuracy": 0.8192364480067497,
+        "dp_violation": 0.005552113056182861,
+        "if_violation": 0.04855269566178322
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.8525627504745834,
+        "dp_violation": 0.022087514400482178,
+        "if_violation": 0.041332632303237915
+      },
+      "corrupted": {
+        "accuracy": 0.8240877452014344,
+        "dp_violation": 0.005929768085479736,
+        "if_violation": 0.04393729194998741
+      }
+    },
+    "total_time": 155.03167605400085,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.3,
+    "seed": 2,
+    "attack": "if",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.850031638894748,
+        "dp_violation": 0.014654576778411865,
+        "if_violation": 0.045044563710689545
+      },
+      "corrupted": {
+        "accuracy": 0.8354777473106939,
+        "dp_violation": 0.001122802495956421,
+        "if_violation": 0.04622086137533188
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.8540392322294874,
+        "dp_violation": 0.009227186441421509,
+        "if_violation": 0.04057344049215317
+      },
+      "corrupted": {
+        "accuracy": 0.8367433031006117,
+        "dp_violation": 0.003605574369430542,
+        "if_violation": 0.042469099164009094
+      }
+    },
+    "total_time": 140.66514015197754,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.3,
+    "seed": 3,
+    "attack": "if",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.839907192575406,
+        "dp_violation": 0.023889631032943726,
+        "if_violation": 0.042818278074264526
+      },
+      "corrupted": {
+        "accuracy": 0.8061590381775997,
+        "dp_violation": 0.009931445121765137,
+        "if_violation": 0.053704116493463516
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.843492933980173,
+        "dp_violation": 0.028967738151550293,
+        "if_violation": 0.037331972271203995
+      },
+      "corrupted": {
+        "accuracy": 0.8004640371229699,
+        "dp_violation": 0.011825025081634521,
+        "if_violation": 0.05065358430147171
+      }
+    },
+    "total_time": 144.90268778800964,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
+  },
+  {
+    "dataset": "utkface",
+    "dataset_display": "UTKFace",
+    "alpha": 0.3,
+    "seed": 4,
+    "attack": "if",
+    "lambda_max": 1.5,
+    "data_provenance": "REAL",
+    "label_def": "gender",
+    "protected_def": "race_binary",
+    "naive": {
+      "clean": {
+        "accuracy": 0.843492933980173,
+        "dp_violation": 0.011114448308944702,
+        "if_violation": 0.04281264543533325
+      },
+      "corrupted": {
+        "accuracy": 0.7485762497363425,
+        "dp_violation": 0.0050574541091918945,
+        "if_violation": 0.08875586092472076
+      }
+    },
+    "dro": {
+      "clean": {
+        "accuracy": 0.8443366378401181,
+        "dp_violation": 0.01414152979850769,
+        "if_violation": 0.03452981635928154
+      },
+      "corrupted": {
+        "accuracy": 0.7428812486817127,
+        "dp_violation": 0.009968042373657227,
+        "if_violation": 0.07854410260915756
+      }
+    },
+    "total_time": 148.7941393852234,
+    "k_inner": 10,
+    "tau": 1.0,
+    "pgd_steps": 20,
+    "n_seeds_planned": 6,
+    "epochs": 60,
+    "coordinated": false,
+    "radii_mode": "uniform"
   }
 ]

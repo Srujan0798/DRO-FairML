@@ -153,6 +153,19 @@ def main():
             f"  - {atk} α={a} s={s}: gpu={g:.4f} mac={m:.4f} |Δ|={d:.4f}"
             for d, (atk, a, s), g, m in top
         ]
+        # Per-attack max |Δ| (catches IF/combined drift separately from DP)
+        by_atk = defaultdict(list)
+        for k in common:
+            by_atk[k[0]].append(
+                abs(
+                    _metric(gpu_i[k]["dro"], "clean", "dp")
+                    - _metric(mac_i[k]["dro"], "clean", "dp")
+                )
+            )
+        atk_lines = [
+            f"  - {atk}: n={len(vs)} max|ΔDP_clean|={max(vs):.4f} mean|Δ|={float(np.mean(vs)):.4f}"
+            for atk, vs in sorted(by_atk.items(), key=lambda x: str(x[0]))
+        ]
         lines += [
             "",
             "## Matched seed-wise (all completed GPU cells)",
@@ -161,6 +174,8 @@ def main():
             f"- max\\|Δ DP_dro corrupted\\| = **{max(d_corr):.4f}**",
             f"- mean Δ DP_dro clean = "
             f"{float(np.mean([_metric(gpu_i[k]['dro'],'clean','dp')-_metric(mac_i[k]['dro'],'clean','dp') for k in common])):+.5f}",
+            "- By attack (clean DP_dro):",
+            *atk_lines,
             "- Largest clean DP deltas (honest outliers, still OK if < thr):",
             *top_lines,
         ]

@@ -114,5 +114,92 @@
       "if_violation": 0.05780743435025215
     },
     "total_time": 202.2840440273285
+  },
+  {
+    "dataset": "utkface",
+    "seed": 2,
+    "alpha": 0.1,
+    "attack": "pixel_pgd",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 10,
+    "pgd_eps": 0.01568627450980392,
+    "n_seeds_planned": 6,
+    "n_images": 23704,
+    "data_dir": "/data/srujan.sai/UTKFace",
+    "data_provenance": "REAL_PIXELS",
+    "protected_def": "race_binary_White_vs_nonWhite",
+    "label_def": "gender",
+    "naive": {
+      "accuracy": 0.8652183083737608,
+      "dp_violation": 0.020272374153137207,
+      "if_violation": 0.08145438134670258
+    },
+    "dro": {
+      "accuracy": 0.8656401603037334,
+      "dp_violation": 0.0174868106842041,
+      "if_violation": 0.06625773012638092
+    },
+    "total_time": 231.5658299922943
+  },
+  {
+    "dataset": "utkface",
+    "seed": 2,
+    "alpha": 0.2,
+    "attack": "pixel_pgd",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 10,
+    "pgd_eps": 0.01568627450980392,
+    "n_seeds_planned": 6,
+    "n_images": 23704,
+    "data_dir": "/data/srujan.sai/UTKFace",
+    "data_provenance": "REAL_PIXELS",
+    "protected_def": "race_binary_White_vs_nonWhite",
+    "label_def": "gender",
+    "naive": {
+      "accuracy": 0.8652183083737608,
+      "dp_violation": 0.023167163133621216,
+      "if_violation": 0.07838129997253418
+    },
+    "dro": {
+      "accuracy": 0.8669057160936511,
+      "dp_violation": 0.022264063358306885,
+      "if_violation": 0.0628480315208435
+    },
+    "total_time": 195.33835220336914
+  },
+  {
+    "dataset": "utkface",
+    "seed": 3,
+    "alpha": 0.1,
+    "attack": "pixel_pgd",
+    "device": "cuda",
+    "tau": 1.0,
+    "k_inner": 10,
+    "epochs": 60,
+    "pgd_steps": 10,
+    "pgd_eps": 0.01568627450980392,
+    "n_seeds_planned": 6,
+    "n_images": 23704,
+    "data_dir": "/data/srujan.sai/UTKFace",
+    "data_provenance": "REAL_PIXELS",
+    "protected_def": "race_binary_White_vs_nonWhite",
+    "label_def": "gender",
+    "naive": {
+      "accuracy": 0.8605779371440624,
+      "dp_violation": 0.03139728307723999,
+      "if_violation": 0.07957318425178528
+    },
+    "dro": {
+      "accuracy": 0.8586796034591858,
+      "dp_violation": 0.024416863918304443,
+      "if_violation": 0.06743096560239792
+    },
+    "total_time": 220.8529212474823
   }
 ]
