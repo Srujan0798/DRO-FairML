@@ -26,3 +26,4 @@ GPUs idle (0 MiB). Images linked: `/data/srujan.sai/UTKFace` → kshitish (n_jpg
 - U1–U3 GPU lane **done**. U4 CelebA stretch optional only.
 - Integration: paper/report already has cosine IF disclosure (Finding 3); leave further paper edits to integration pass
 - Do not rewrite `canonical_tau1.json` / `utkface_canonical.json`
+- **ATTENTION:** accidental `git checkout -- results/canonical_tau1.json` wiped uncommitted ~900-row expansion back to HEAD 568 rows — see `STATUS.md` Grok section; GLM may need to re-extend
