@@ -1,7 +1,7 @@
 # UTKFace reproducibility: Mac MPS vs flair2 CUDA
 
 - Mac rows: **90/90** (`results/utkface_canonical.json`)
-- flair2 rows: **53/90** (`results/utkface_flair2.json`)
+- flair2 rows: **58/90** (`results/utkface_flair2.json`)
 
 Protocol: τ=1, k_inner=10, epochs=60, pgd_steps=20, n_seeds=6, REAL features.
 Same seeds 0–5. Large gaps are bugs to investigate.
@@ -24,8 +24,8 @@ Cell means use **seed-matched** Mac rows only when GPU is partial.
 | if | 0.0 | 6 | 6 | +0.0002 | +0.0001 | OK |
 | if | 0.1 | 6 | 6 | -0.0001 | +0.0000 | OK |
 | if | 0.2 | 6 | 6 | +0.0002 | +0.0000 | OK |
-| if | 0.3 | 6 | 5 | -0.0006 | +0.0011 | OK |
-| if | 0.4 | 6 | 0 | — | — | partial |
+| if | 0.3 | 6 | 6 | -0.0004 | +0.0007 | OK |
+| if | 0.4 | 6 | 4 | +0.0005 | +0.0002 | OK |
 
 ## Corrupted (attacked) test
 
@@ -39,22 +39,23 @@ Cell means use **seed-matched** Mac rows only when GPU is partial.
 | if | 0.0 | 6 | +0.0002 | +0.0001 | OK |
 | if | 0.1 | 6 | -0.0003 | +0.0001 | OK |
 | if | 0.2 | 6 | +0.0003 | +0.0007 | OK |
-| if | 0.3 | 5 | +0.0006 | +0.0011 | OK |
+| if | 0.3 | 6 | +0.0005 | +0.0011 | OK |
+| if | 0.4 | 4 | -0.0002 | -0.0001 | OK |
 
 ## Matched seed-wise (all completed GPU cells)
-- Matched cells: **53**
+- Matched cells: **58**
 - max\|Δ DP_dro clean\| = **0.0072**
 - max\|Δ DP_dro corrupted\| = **0.0122**
-- mean Δ DP_dro clean = +0.00029
+- mean Δ DP_dro clean = +0.00030
 - By attack (clean DP_dro):
   - dp: n=30 max|ΔDP_clean|=0.0072 mean|Δ|=0.0007
-  - if: n=23 max|ΔDP_clean|=0.0014 mean|Δ|=0.0005
+  - if: n=28 max|ΔDP_clean|=0.0014 mean|Δ|=0.0006
 - Largest clean DP deltas (honest outliers, still OK if < thr):
   - dp α=0.1 s=1: gpu=0.0564 mac=0.0492 |Δ|=0.0072
   - dp α=0.3 s=5: gpu=0.1773 mac=0.1758 |Δ|=0.0015
   - if α=0.3 s=0: gpu=0.0068 mac=0.0082 |Δ|=0.0014
+  - if α=0.4 s=1: gpu=0.0186 mac=0.0173 |Δ|=0.0013
   - dp α=0.2 s=1: gpu=0.1625 mac=0.1613 |Δ|=0.0013
-  - if α=0.3 s=1: gpu=0.0221 mac=0.0233 |Δ|=0.0012
 
 ### Verdict
 - Grid complete on both: **False**
