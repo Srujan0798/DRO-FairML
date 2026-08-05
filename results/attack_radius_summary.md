@@ -9,8 +9,7 @@ Two arms, both stamping **MEASURED attack effectiveness** — the |ΔDP| the cor
 
 - ARM A (attack_strength.json): **72/144** rows (50.0%)
   - **ARM A INCOMPLETE** — partial-data mode; re-run as more rows land.
-- ARM B (radius_sensitivity.json): **75/180** rows (41.7%)
-  - **ARM B INCOMPLETE** — partial-data mode; re-run as more rows land.
+- ARM B (radius_sensitivity.json): **180/180** rows (100.0%)
 - Canonical DP rows (pgd_steps=20, radii_scale=1.0, read-only): 180
 
 ## ARM A — DRO advantage vs MEASURED attack strength
@@ -54,8 +53,24 @@ radii_scale ∈ {0.5, 1.0(canonical), 2.0}; attack='dp'; DRO only. Naive is radi
 | adult | 0.4 | 2.0 | 6 | 0.3140 | 0.2804 | +0.0336 | 0.1519 | 6 |
 | credit | 0.0 | 0.5 | 6 | 0.0127 | 0.0119 | +0.0008 | 0.0000 | 6 |
 | credit | 0.0 | 2.0 | 6 | 0.0127 | 0.0119 | +0.0008 | 0.0000 | 6 |
-| credit | 0.1 | 0.5 | 2 | 0.0151 | 0.0119 | +0.0032 | 0.0310 | 2 |
-| credit | 0.1 | 2.0 | 1 | 0.0151 | 0.0071 | +0.0080 | 0.0310 | 1 |
+| credit | 0.1 | 0.5 | 6 | 0.0151 | 0.0135 | +0.0017 | 0.0310 | 6 |
+| credit | 0.1 | 2.0 | 6 | 0.0151 | 0.0134 | +0.0018 | 0.0310 | 6 |
+| credit | 0.2 | 0.5 | 6 | 0.0198 | 0.0179 | +0.0019 | 0.0491 | 6 |
+| credit | 0.2 | 2.0 | 6 | 0.0198 | 0.0177 | +0.0021 | 0.0491 | 6 |
+| credit | 0.3 | 0.5 | 6 | 0.0253 | 0.0230 | +0.0023 | 0.4900 | 6 |
+| credit | 0.3 | 2.0 | 6 | 0.0253 | 0.0228 | +0.0025 | 0.4900 | 6 |
+| credit | 0.4 | 0.5 | 6 | 0.0191 | 0.0174 | +0.0016 | 0.0509 | 6 |
+| credit | 0.4 | 2.0 | 6 | 0.0191 | 0.0164 | +0.0026 | 0.0509 | 6 |
+| lsac | 0.0 | 0.5 | 6 | 0.1447 | 0.1829 | -0.0382 | 0.0000 | 6 |
+| lsac | 0.0 | 2.0 | 6 | 0.1447 | 0.1829 | -0.0382 | 0.0000 | 6 |
+| lsac | 0.1 | 0.5 | 6 | 0.2201 | 0.2557 | -0.0355 | 0.0714 | 6 |
+| lsac | 0.1 | 2.0 | 6 | 0.2201 | 0.2525 | -0.0324 | 0.0714 | 6 |
+| lsac | 0.2 | 0.5 | 6 | 0.1827 | 0.2252 | -0.0425 | 0.0970 | 6 |
+| lsac | 0.2 | 2.0 | 6 | 0.1827 | 0.2211 | -0.0384 | 0.0970 | 6 |
+| lsac | 0.3 | 0.5 | 6 | 0.1827 | 0.2247 | -0.0420 | 0.0970 | 6 |
+| lsac | 0.3 | 2.0 | 6 | 0.1827 | 0.2193 | -0.0365 | 0.0970 | 6 |
+| lsac | 0.4 | 0.5 | 6 | 0.1827 | 0.2242 | -0.0415 | 0.0970 | 6 |
+| lsac | 0.4 | 2.0 | 6 | 0.1827 | 0.2176 | -0.0349 | 0.0970 | 6 |
 
 ### ARM B — optimal radius per (dataset, α)
 
@@ -67,15 +82,23 @@ radii_scale ∈ {0.5, 1.0(canonical), 2.0}; attack='dp'; DRO only. Naive is radi
 | adult | 0.3 | 2 | 2.0 | 0.2561 | — | 0.1915 |
 | adult | 0.4 | 2 | 2.0 | 0.2804 | — | 0.1519 |
 | credit | 0.0 | 2 | 0.5 | 0.0119 | — | 0.0000 |
-| credit | 0.1 | 2 | 2.0 | 0.0071 | — | 0.0310 |
+| credit | 0.1 | 2 | 2.0 | 0.0134 | — | 0.0310 |
+| credit | 0.2 | 2 | 2.0 | 0.0177 | — | 0.0491 |
+| credit | 0.3 | 2 | 2.0 | 0.0228 | — | 0.4900 |
+| credit | 0.4 | 2 | 2.0 | 0.0164 | — | 0.0509 |
+| lsac | 0.0 | 2 | 0.5 | 0.1829 | — | 0.0000 |
+| lsac | 0.1 | 2 | 2.0 | 0.2525 | — | 0.0714 |
+| lsac | 0.2 | 2 | 2.0 | 0.2211 | — | 0.0970 |
+| lsac | 0.3 | 2 | 2.0 | 0.2193 | — | 0.0970 |
+| lsac | 0.4 | 2 | 2.0 | 0.2176 | — | 0.0970 |
 
-Best-radius counts across 7 (ds,α) cells: {2.0: 4, 0.5: 3}.
+Best-radius counts across 15 (ds,α) cells: {2.0: 11, 0.5: 4}.
 
-Spearman ρ (attack_eff vs best_radii_scale) = +0.728 (p=0.0635).
-→ Directional: stronger attacks weakly prefer larger radii but not significantly at this n.
+Spearman ρ (attack_eff vs best_radii_scale) = +0.668 (p=0.0065).
+→ Stronger attacks prefer LARGER radii: the radius that minimizes DRO DP tracks the corruption strength. **Kuldeep's hypothesis confirmed**: the radius matters and should match the attack.
 
 ## Verdict — Kuldeep's question answered
 
-ARM A: directional but not significant (ρ=+0.029, p=0.9572). DRO advantage trends up with attack strength but is not significant at this n. ARM B: directional but not significant (ρ=+0.728, p=0.0635).
+ARM A: directional but not significant (ρ=+0.029, p=0.9572). DRO advantage trends up with attack strength but is not significant at this n. ARM B: the radius that minimizes DRO DP grows significantly with attack strength (ρ=+0.668, p=0.0065) — DRO's fairness is a function of the radius/attack MATCH.
 
 Source files: `results/attack_strength.json`, `results/radius_sensitivity.json`, canonical (read-only).
