@@ -229,13 +229,19 @@ attack is ineffective on Adult/Credit. The qualitative claim
 ``adversarial $\gg$ random'' from the historical pilot does not survive
 the seed-paired re-run and is withdrawn.
 
-\paragraph{k-NN graph for the IF attack (scope note).}
+\paragraph{k-NN graph for the IF attack (resolved).}
 Canonical IF-attack rows use the default $k{=}5$ neighbourhood graph in
-the attack construction.  A full $k\in\{5,10,15\}$ ablation table is
-\emph{not} part of the locked 540-row science file; we therefore do not
-claim $k$-insensitivity as a verified result here.  Default $k{=}5$ is
-used consistently for all IF-attack cells in
-\texttt{results/canonical\_tau1.json}.
+the attack construction. Default $k{=}5$ is used consistently for all
+IF-attack cells in \texttt{results/canonical\_tau1.json}. A separate
+$k\in\{5,15\}$ ablation (360/360 rows, 30 cells, seed-paired,
+$n{=}6$; \texttt{results/knn\_ablation\_summary.md}) shows the
+attack's strength \emph{does} depend on $k$ for the IF metric itself
+(29/30 cells significant, mean $\Delta$IF $=+0.0798$ going from
+$k{=}5$ to $k{=}15$) but the DP results that anchor our main claims
+are largely insensitive to this choice (only 3/30 cells significant,
+mean $\Delta$DP $=-0.0035$). We therefore do not claim
+$k$-invariance of the IF numbers, but the DP-based method comparisons
+are robust to it.
 
 \paragraph{$K_{\mathrm{inner}}$ sensitivity (Kuldeep's Q10, resolved).}
 Kuldeep asked whether $K_{\mathrm{inner}}{=}5$ is acceptable for CPU

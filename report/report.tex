@@ -515,14 +515,24 @@ consistent with LSAC/DP's broader degeneracy (Q3 framing) rather than
 attack ineffectiveness. \textbf{The ``adversarial $\gg$ random'' claim
 is withdrawn}; it does not survive the seed-paired re-run.
 
-\subsection{IF k-NN Ablation (scope)}
+\subsection{IF k-NN Ablation (resolved)}
 
 Canonical IF-attack rows use the default $k{=}5$ neighbourhood in the
-attack construction.  A committed $k\in\{5,10,15\}$ ablation JSON is
-\emph{not} currently in the tree, so we do not claim $k$-insensitivity as
-a verified result.  The IF-attack evaluation rows themselves are complete
-(180/180; the IF metric was degenerate, $\approx10^{-10}$, in earlier runs)
-under this fixed $k{=}5$ default.
+attack construction. A $k\in\{5,15\}$ ablation is now complete
+(360/360 rows, all 30 dataset$\times\alpha\times$method cells,
+seed-paired Wilcoxon, $n{=}6$). The IF-attack's strength \textbf{does}
+depend on $k$: raising $k$ from 5 to 15 increases IF-violation in
+29/30 cells (mean $\Delta$IF $=+0.0798$, $p{<}0.05$ in all 29) --- a
+larger neighbourhood makes the attack's local-consistency target
+harder to satisfy. DP is comparatively insensitive: only 3/30 cells
+show a significant $\Delta$DP, and the mean shift is small and mixed
+in sign ($-0.0035$). \textbf{Conclusion:} the canonical $k{=}5$ choice
+materially affects the IF numbers reported (they should not be
+read as $k$-invariant), but the DP-attack results that anchor the
+main method claims are robust to this choice. The IF-attack
+evaluation rows themselves are complete (180/180; the IF metric was
+degenerate, $\approx10^{-10}$, in earlier runs) under the fixed
+$k{=}5$ default.
 
 \subsection{Hyperparameter Grid (Q1)}
 
