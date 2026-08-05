@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 INP = ROOT / "results" / "utkface_pixel_pgd.json"
 U1 = ROOT / "results" / "utkface_flair2.json"
 OUT = ROOT / "results" / "pixel_pgd_summary.md"
-TARGET = 24  # 6 seeds × 2 alphas
+TARGET = 12  # 6 seeds × 2 alphas (each row has both Naive and DRO)
 TIE_EPS = 1e-5
 
 
@@ -128,7 +128,7 @@ def main() -> None:
             f"| {a} | {len(c3)} | {u3s} | {len(c1)} | {u1c} | {u1k} |"
         )
 
-    lines += ["", f"device=cuda flair2. target {TARGET} cells (6 seeds × α∈{{0.1,0.2}})."]
+    lines += ["", f"device=cuda flair2. target {TARGET} cells (6 seeds × α∈{{0.1,0.2}} — each row has Naive+DRO)."]
     if not complete:
         lines.append(f"**PARTIAL** — not for paper claims until {TARGET}/{TARGET}.")
     else:

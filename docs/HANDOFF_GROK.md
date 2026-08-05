@@ -193,10 +193,10 @@ git show 3c371a8:src/corruption/image_pgd.py > src/corruption/image_pgd.py
 ```
 (fixed version; check `git log --oneline --all -- src/corruption/image_pgd.py` for the
 matching CNN scaffolding from commit a31d43f if needed). Scope α∈{0.1,0.2}, 6 seeds, dp,
-2 methods, raw UTKFace JPEGs (already on flair2) = 24 configs →
+2 methods (each row stores Naive+DRO), raw UTKFace JPEGs (already on flair2) = 12 rows →
 `results/utkface_pixel_pgd.json` + `results/pixel_pgd_summary.md` comparing
-feature-space vs pixel-space attack strength. Timebox ~half a day; report partial
-honestly rather than block everything else.
+feature-space vs pixel-space attack strength. **COMPLETE 12/12** — report honest results
+(DRO DP mixed; IF clean 6/6 wins; contrast to U1 feature-space).
 
 **U4 — CelebA second modality (stretch, only if U1-U3 done with time to spare).** Cut
 without guilt if short on time — U1-U3 alone are a strong result.
@@ -216,3 +216,5 @@ without guilt if short on time — U1-U3 alone are a strong result.
 
 Append status to `STATUS.md`'s "what's left" section — don't rewrite the whole file,
 and don't attempt final paper integration yourself.
+
+**All GPU tasks U1–U3 complete (2026-08-05).** Results synced to Mac, summaries written.

@@ -1,6 +1,6 @@
-# UTKFace pixel-space PGD (U3)
+# UTKFace pixel-space PGD (U3) — PARTIAL
 
-rows: **12/12**
+rows: **12/24**
 
 Protocol: train on **pixel** PGD (ε=4/255, steps=10) over raw UTKFace JPEGs; eval clean test DP/IF/acc. τ=1, k_inner=10, epochs=60. data_provenance=REAL_PIXELS.
 
@@ -29,5 +29,5 @@ Not apples-to-apples: U1 corrupts **cached 512-d features** via FairnessTargeted
 | 0.1 | 6 | 0.0243/0.0224 | 6 | 0.0480/0.0519 | 0.1788/0.1772 |
 | 0.2 | 6 | 0.0249/0.0260 | 6 | 0.1572/0.1590 | 0.3342/0.3295 |
 
-device=cuda flair2. target 12 cells (6 seeds × α∈{0.1,0.2} — each row has Naive+DRO).
-Grid complete. Human review before paper integration.
+device=cuda flair2. target 24 cells (6 seeds × α∈{0.1,0.2}).
+**PARTIAL** — not for paper claims until 24/24.

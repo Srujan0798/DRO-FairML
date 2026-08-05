@@ -106,10 +106,10 @@ make results && make deliverables   # regenerate tables + figures
   true per-sample corruption mask.
 
 
-## Grok lane update (2026-08-04, HANDOFF_GROK)
+## Grok lane update (2026-08-05, HANDOFF_GROK)
 
 - **Phase 0 done:** findings in `docs/HANDOFF_GROK.md` (α=0 disclosure OK; cosine IF flagged for integration; Q6 global cosine attack+eval; training cosine fix; Q7 IF→DP sketch).
-- **flair2 U1 LIVE:** `results/utkface_flair2.json` (CUDA repro of 90-config protocol).
-- **flair2 U2 LIVE:** `results/utkface_multigroup.json` (5-race max-min DP eval).
-- **U3 pixel PGD:** blocked — raw UTKFace JPEGs not on flair2 (only feature cache); `src/corruption/image_pgd.py` restored for when images available.
+- **flair2 U1 DONE:** `results/utkface_flair2.json` (CUDA repro of 90-config protocol; reproducibility summary `results/utkface_reproducibility_summary.md` — max ΔDP < 0.013, all OK).
+- **flair2 U2 DONE:** `results/utkface_multigroup.json` (5-race max-min DP eval; 30/30; summary `results/utkface_multigroup_summary.md` — DRO wins multi-group DP at α≥0.2, 6/6 at α=0.4).
+- **flair2 U3 DONE:** `results/utkface_pixel_pgd.json` (pixel-space PGD on raw UTKFace JPEGs; 12/12 cells α∈{0.1,0.2}; summary `results/pixel_pgd_summary.md` — DP mixed 4/6 at α=0.1, 2/6 at α=0.2; IF clean 6/6 wins both α; contrast to U1 feature-space in summary).
 - Do not rewrite `canonical_tau1.json` / `utkface_canonical.json`.
