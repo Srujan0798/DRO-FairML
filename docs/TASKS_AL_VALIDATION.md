@@ -232,6 +232,39 @@ defects found, with severity. Finding a real problem is a successful outcome.
 
 ---
 
+## TASK F — Close the canonical reproducibility gap (decision needed before starting)
+
+**Why:** `results/canonical_tau1.json` can no longer be reproduced by current
+code. It was run before commit `04d00a6` aligned the training IF k-NN graph to
+cosine. Verified by rerunning Adult/DP α=0.2 seed 0: accuracy reproduces
+*exactly*, DP shifts by ~1.3e-7, but IF goes from 3.5e-11 (noise) to 0.0457
+(a real value). All 30 DP/COMBINED rows in the paper's Wilcoxon table are
+affected. This has been disclosed in the Limitations section and the bogus
+significance stars removed — but disclosure is a patch, not a fix.
+
+**The decision (needs Prof. Manisha's call, not an agent's):** ship with the
+disclosure, or re-run the grid so the artifact is reproducible end-to-end?
+
+- **Cost of re-running:** 540 rows. Calibrating from the AL run (48 rows in
+  ~30 min at 12 workers) gives roughly **5–6 hours** — one overnight run.
+- **What changes:** DP results shift by ~1e-7 (no conclusion moves, no p-value
+  or win count changes). The IF column of DP/COMBINED rows becomes real
+  instead of noise. Accuracy is unchanged.
+- **Risk of NOT re-running:** an examiner who checks out the repo and reruns a
+  row gets different IF numbers than the paper reports. That is a bad thing to
+  be asked about in a viva.
+- **Recommendation:** re-run. The cost is one night, the DP story is provably
+  unaffected, and it converts a disclosed limitation into a non-issue.
+
+**If approved, do:** re-run the full canonical grid with current code into a
+**new file** (`results/canonical_tau1_cosine.json` — do **not** overwrite the
+locked file), then diff every row against the original and publish the diff
+before switching any table over. `tests/test_degenerate_if_reporting.py` will
+fail once the rows become non-degenerate — that is intentional; update the
+Limitations text at that point to say the gap is closed.
+
+---
+
 ## Suggested assignment
 
 | Agent | Tasks | Rationale |
