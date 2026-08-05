@@ -10,7 +10,7 @@ larger, not merely present.
 The canonical trainer (`src/training/dro_fair.py`) enforces the DP/IF
 constraints only through the linear dual term `λ·g`:
 
-```
+```text
 total_loss = L_tilt + λ_dp·g_dp + λ_if·g_if          (line ~343)
 λ ← clamp(λ + lr_λ·0.95^epoch · g, 0, λ_max)         (lines ~328, ~353)
 ```
@@ -25,8 +25,12 @@ Two facts make this term nearly inert:
    (`results/fairness_aggressiveness_summary.md`) found `λ_max: 1.5 → 2.0`
    produced 6/6 byte-identical outputs: the ceiling is never touched, so
    the *accumulation rate*, not the cap, is the binding bottleneck.
-   (A single-seed history dump quantifying max λ and the penalty's share of
-   the loss is attached to the results write-up.)
+   (Measured, single-seed history dump, Adult α=0.2 seed 0, canonical
+   settings: max λ_dp over 60 epochs = **0.0119** vs ceiling 1.5 (126×
+   below); mean g_dp = 0.180; max penalty λ·g = **0.0029** vs final
+   train loss 0.538 — the constraint term is ~0.5% of the loss. Under
+   μ=5 the AL constraint gradient μ·g ≈ 0.9, roughly a 75× stronger
+   signal than the effective λ ever provides.)
 
 Consequence: the fairness penalty contributes ~1e-3 to a total loss of
 ~0.4 — the constraint machinery that differentiates DRO from Naive barely
@@ -38,7 +42,7 @@ old unstable τ=100 schedule; the instability they guarded against is gone
 
 **A. Augmented Lagrangian (chosen).** Add a quadratic constraint penalty:
 
-```
+```text
 total_loss = L_tilt + λ_dp·g_dp + (μ/2)·g_dp² + λ_if·g_if + (μ/2)·g_if²
 ```
 
