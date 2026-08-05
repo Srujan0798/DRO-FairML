@@ -882,7 +882,8 @@ source of the ``DRO is fragile'' finding.
 \paragraph{Future directions.}
 \begin{itemize}
 \item IF-attack third of the canonical grid --- DONE (180/180 after metric fix; honest mixed read).
-\item UTKFace REAL feature pilot --- DONE (90/90; mixed clean-test). Optional later: flair2 pixel-space if greenlit.
+\item UTKFace REAL feature pilot --- DONE (90/90; mixed clean-test).
+\item UTKFace pixel-space PGD (U3, stretch) --- DONE (12/12; corrupts raw pixels then re-extracts features, vs.\ U1's cached-feature attack). Honest mixed read: DP wins 4/6 at $\alpha{=}0.1$ but only 2/6 at $\alpha{=}0.2$ (mean $\Delta$DP $-0.0012$, i.e.\ Naive slightly better there); IF wins 6/6 at both $\alpha$. Not integrated into the main paper narrative --- reported here as a secondary robustness check.
 \item Empirical radii calibration under known attack structure (Q5; uniform-vs-empirical comparison pending canonical\_tau1\_empirical.json).
 \item Dataset-adaptive $\lambda_{\max}$.
 \end{itemize}
