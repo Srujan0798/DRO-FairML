@@ -7,8 +7,7 @@ Two arms, both stamping **MEASURED attack effectiveness** — the |ΔDP| the cor
 
 ## Coverage
 
-- ARM A (attack_strength.json): **72/144** rows (50.0%)
-  - **ARM A INCOMPLETE** — partial-data mode; re-run as more rows land.
+- ARM A (attack_strength.json): **144/144** rows (100.0%)
 - ARM B (radius_sensitivity.json): **180/180** rows (100.0%)
 - Canonical DP rows (pgd_steps=20, radii_scale=1.0, read-only): 180
 
@@ -20,18 +19,24 @@ pgd_steps ∈ {5, 20(canonical), 50}; attack='dp'; α ∈ {0.1, 0.2}. DRO advant
 |---|---|---|---|---|---|---|---|---|---|---|
 | adult | 0.1 | 5 | 6 | 0.2150 | 0.2125 | +0.0025 | 5/6 | 0.0469 * | 0.0534 | 12 |
 | adult | 0.1 | 20 | 6 | 0.2026 | 0.1999 | +0.0027 | 5/6 | 0.0312 * | — | 0 |
+| adult | 0.1 | 50 | 6 | 0.2017 | 0.1999 | +0.0018 | 4/6 | 0.1094  | 0.0534 | 12 |
 | adult | 0.2 | 5 | 6 | 0.2618 | 0.2436 | +0.0182 | 6/6 | 0.0156 * | 0.1761 | 12 |
 | adult | 0.2 | 20 | 6 | 0.2452 | 0.2334 | +0.0119 | 6/6 | 0.0156 * | — | 0 |
+| adult | 0.2 | 50 | 6 | 0.2438 | 0.2334 | +0.0105 | 6/6 | 0.0156 * | 0.1761 | 12 |
 | credit | 0.1 | 5 | 6 | 0.0174 | 0.0157 | +0.0017 | 6/6 | 0.0156 * | 0.0310 | 12 |
 | credit | 0.1 | 20 | 6 | 0.0151 | 0.0134 | +0.0017 | 6/6 | 0.0156 * | — | 0 |
+| credit | 0.1 | 50 | 6 | 0.0150 | 0.0134 | +0.0016 | 6/6 | 0.0156 * | 0.0310 | 12 |
 | credit | 0.2 | 5 | 6 | 0.0239 | 0.0211 | +0.0028 | 6/6 | 0.0156 * | 0.0491 | 12 |
 | credit | 0.2 | 20 | 6 | 0.0198 | 0.0178 | +0.0020 | 6/6 | 0.0156 * | — | 0 |
+| credit | 0.2 | 50 | 6 | 0.0197 | 0.0178 | +0.0019 | 6/6 | 0.0156 * | 0.0491 | 12 |
 | lsac | 0.1 | 5 | 6 | 0.1870 | 0.2311 | -0.0441 | 0/6 | 1.0000  | 0.0714 | 12 |
 | lsac | 0.1 | 20 | 6 | 0.2201 | 0.2539 | -0.0338 | 0/6 | 1.0000  | — | 0 |
+| lsac | 0.1 | 50 | 6 | 0.2193 | 0.2539 | -0.0347 | 0/6 | 1.0000  | 0.0714 | 12 |
 | lsac | 0.2 | 5 | 6 | 0.1459 | 0.1976 | -0.0517 | 0/6 | 1.0000  | 0.0970 | 12 |
 | lsac | 0.2 | 20 | 6 | 0.1827 | 0.2230 | -0.0403 | 0/6 | 1.0000  | — | 0 |
+| lsac | 0.2 | 50 | 6 | 0.1824 | 0.2230 | -0.0406 | 0/6 | 1.0000  | 0.0970 | 12 |
 
-**Spearman ρ (attack_eff vs DRO_advantage) = +0.029 (p=0.9572)** across 6 (ds,α,pgd_steps) cells.
+**Spearman ρ (attack_eff vs DRO_advantage) = +0.057 (p=0.8614)** across 12 (ds,α,pgd_steps) cells.
 
 → Directional: DRO advantage trends up with attack strength but not significantly at this n.
 
@@ -99,6 +104,6 @@ Spearman ρ (attack_eff vs best_radii_scale) = +0.668 (p=0.0065).
 
 ## Verdict — Kuldeep's question answered
 
-ARM A: directional but not significant (ρ=+0.029, p=0.9572). DRO advantage trends up with attack strength but is not significant at this n. ARM B: the radius that minimizes DRO DP grows significantly with attack strength (ρ=+0.668, p=0.0065) — DRO's fairness is a function of the radius/attack MATCH.
+ARM A: directional but not significant (ρ=+0.057, p=0.8614). DRO advantage trends up with attack strength but is not significant at this n. ARM B: the radius that minimizes DRO DP grows significantly with attack strength (ρ=+0.668, p=0.0065) — DRO's fairness is a function of the radius/attack MATCH.
 
 Source files: `results/attack_strength.json`, `results/radius_sensitivity.json`, canonical (read-only).
