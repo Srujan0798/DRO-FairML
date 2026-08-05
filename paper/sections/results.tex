@@ -237,6 +237,22 @@ claim $k$-insensitivity as a verified result here.  Default $k{=}5$ is
 used consistently for all IF-attack cells in
 \texttt{results/canonical\_tau1.json}.
 
+\paragraph{$K_{\mathrm{inner}}$ sensitivity (Kuldeep's Q10, resolved).}
+Kuldeep asked whether $K_{\mathrm{inner}}{=}5$ is acceptable for CPU
+feasibility, citing an early ``virtually identical to $K{=}10$'' check
+whose underlying data was later found unreliable and dropped. A clean,
+complete ablation ($K_{\mathrm{inner}}\in\{5,20\}$ against the canonical
+$K{=}10$, all three datasets, $\alpha\in\{0.1,...,0.4\}$, $n{=}6$;
+\texttt{results/kinner\_ablation\_summary.md}) answers this properly:
+the effect is small but \emph{not} uniformly negligible --- 5 of 30
+tested cells show a statistically significant $K_{\mathrm{inner}}$
+effect on DP, though the largest observed shift is
+$|\Delta\mathrm{DP}|{=}0.0011$, well below the effect sizes that drive
+any headline claim in this paper. $K_{\mathrm{inner}}{=}10$ (the paper's
+mandatory setting) is used throughout the canonical grid; $K{=}5$ would
+not materially change the reported conclusions but is not claimed to be
+statistically indistinguishable in every cell.
+
 \paragraph{Empirical radii (Q5).}
 The bias-corrected clean-proportion formula
 $\hat\pi_{j,\mathrm{clean}}=(\hat\pi_j-\alpha)/(1-2\alpha)$ is an
