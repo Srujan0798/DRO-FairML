@@ -417,6 +417,59 @@ metrics were degenerate ($\approx10^{-10}$).
 \end{figure}
 
 % ─────────────────────────────────────────────────────────────────────────────
+\section{Augmented-Lagrangian Constraint Enforcement (DRO-FAIR-AL)}
+\label{sec:report-al}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\textbf{Diagnosis.} The dual step's geometric decay
+($\mathrm{lr}_\lambda\cdot0.95^{\mathrm{epoch}}$) caps $\lambda$'s total
+accumulation over 60 epochs at $\approx0.1$ regardless of $\lambda_{\max}$.
+Measured on Adult $\alpha{=}0.2$ seed 0: $\lambda_{\mathrm{dp}}$ peaks at
+\textbf{0.0119} against a ceiling of $1.5$, and the fairness penalty
+$\lambda\cdot g$ peaks at \textbf{0.0029} against a training loss of
+$0.538$ --- about $0.5\%$ of the loss. This is why raising $\lambda_{\max}$
+$1.5\to2.0$ was a byte-identical no-op (\S\ref{sec:results-al} of the paper;
+Future Work item (iii) below): the ceiling was never binding.
+
+\textbf{Fix.} Add the classical augmented-Lagrangian quadratic penalty:
+$\mathcal{L}_{\mathrm{AL}} = \mathcal{L}_{\mathrm{tilt}} + \lambda g +
+\tfrac{\mu}{2}g^2$ per constraint. $\mu{=}0$ recovers the canonical
+objective exactly (unit-tested bit-identical), so all results elsewhere in
+this report are unaffected.
+
+\textbf{Result (Adult, DP attack, $n{=}6$, seed-paired Wilcoxon).} A
+90-run $\mu$-sensitivity sweep found $\mu{=}20$ maximises DP reduction while
+staying safely clear of the constant-predictor floor:
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+$\alpha$ & DP: Naive$\to$DRO$\to$AL & $p$ & acc: DRO$\to$AL & margin vs.\ Naive \\
+\midrule
+0.0 & $0.1491\to0.1426\to\mathbf{0.0260}$ & 0.0156 & $0.8147\to0.7966$ & $+0.0064\to\mathbf{+0.1230}$ (19.2$\times$) \\
+0.2 & $0.2452\to0.2334\to\mathbf{0.0682}$ & 0.0156 & $0.7586\to0.7783$ & $+0.0119\to\mathbf{+0.1771}$ (14.9$\times$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Scope, stated directly.} A pre-registered $\alpha{=}0$ falsification
+control found AL reduces DP \emph{more} without corruption than under
+attack, so this is a general fairness-optimisation fix, not a
+corruption-robustness mechanism. At $\alpha{=}0.4$, no $\mu\in\{0.5,1,2,5,10,20\}$
+is safe --- the most aggressive value gave the best-looking DP number in the
+whole study ($-80.7\%$) while accuracy collapsed to $0.3495$, below chance.
+Credit is not rescued by any tested $\mu$. AL is recommended for
+\textbf{Adult, $\alpha\le0.2$ only}; both boundaries are reported as findings.
+Supplementary evidence at $\mu{=}5$ (the originally-discovered value): DP win
+transfers to the Combined attack ($-46.8\%$, $p{=}0.0156$, accuracy
+\emph{improving}); LSAC collapses under AL as it already does under DRO
+(\S\ref{sec:lsac-degen} -- pre-existing degeneracy, not a new failure).
+Full derivation, pre-registration, and all raw results:
+\texttt{docs/superpowers/specs/2026-08-05-augmented-lagrangian-design.md},
+\texttt{results/aug\_lagrangian\_extended\_summary.md},
+\texttt{results/mu\_sensitivity\_summary.md}.
+
+% ─────────────────────────────────────────────────────────────────────────────
 \section{Reduction Summary}
 % ─────────────────────────────────────────────────────────────────────────────
 

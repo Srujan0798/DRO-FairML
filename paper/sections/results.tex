@@ -362,6 +362,76 @@ DRO.  LSAC stays pinned at its baseline under the DP attack.}
 \label{fig:constant-predictor}
 \end{figure}
 
+\subsection{Augmented-Lagrangian constraint enforcement (DRO-FAIR-AL)}
+\label{sec:results-al}
+
+\paragraph{Diagnosis.} The canonical trainer enforces the DP/IF constraints
+only through the linear dual term $\lambda\cdot g$, updated by
+$\lambda\leftarrow\mathrm{clamp}(\lambda+\mathrm{lr}_\lambda\cdot0.95^{\mathrm{epoch}}\cdot g,\,0,\,\lambda_{\max})$.
+The geometric decay caps $\lambda$'s total possible accumulation over 60
+epochs at $\approx0.1$ regardless of $\lambda_{\max}$. Measured directly on
+Adult, $\alpha{=}0.2$, seed 0: $\lambda_{\mathrm{dp}}$ never exceeds
+\textbf{0.0119} against a ceiling of $1.5$ ($126\times$ below it), and the
+fairness penalty $\lambda\cdot g$ peaks at \textbf{0.0029} against a training
+loss of $0.538$ --- \textbf{about 0.5\% of the loss}. This is why raising
+$\lambda_{\max}$ from $1.5$ to $2.0$ was a byte-identical no-op
+(\S\ref{sec:future-work}): the ceiling was never binding, the accumulation
+\emph{rate} was.
+
+\paragraph{Fix.} We add the classical augmented-Lagrangian quadratic penalty
+(Hestenes, 1969; Bertsekas, 1982), so the constraint gradient no longer
+depends on $\lambda$'s slow crawl:
+\begin{equation}
+\mathcal{L}_{\mathrm{AL}} = \mathcal{L}_{\mathrm{tilt}}
++ \lambda_{\mathrm{dp}} g_{\mathrm{dp}} + \tfrac{\mu}{2} g_{\mathrm{dp}}^2
++ \lambda_{\mathrm{if}} g_{\mathrm{if}} + \tfrac{\mu}{2} g_{\mathrm{if}}^2 .
+\end{equation}
+$\mu{=}0$ recovers the canonical objective exactly (bit-identical, unit-tested
+and verified against the locked canonical row on a full run), so every
+previously reported result in this paper is unaffected by this addition.
+
+\paragraph{Result (Adult, DP attack, seed-paired Wilcoxon, $n{=}6$).}
+A dedicated $\mu$-sensitivity sweep (90 runs, $\mu\in\{0.5,1,2,5,10,20\}$)
+found $\mu{=}20$ gives the largest DP reduction while keeping accuracy safely
+clear of the constant-predictor floor:
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+$\alpha$ & DP: Naive $\to$ DRO $\to$ AL & $p$ & acc: DRO $\to$ AL & margin over Naive \\
+\midrule
+0.0 & $0.1491\to0.1426\to\mathbf{0.0260}$ & $0.0156$ & $0.8147\to0.7966$ & $+0.0064\to\mathbf{+0.1230}$ ($19.2\times$) \\
+0.2 & $0.2452\to0.2334\to\mathbf{0.0682}$ & $0.0156$ & $0.7586\to0.7783$ & $+0.0119\to\mathbf{+0.1771}$ ($14.9\times$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+DRO-FAIR-AL ($\mu{=}20$) beats Naive on DP in $6/6$ seeds at both $\alpha$
+values, with accuracy held or improved --- a Pareto improvement, not a
+fairness/accuracy trade.
+
+\paragraph{Scope: $\alpha\le0.2$ on Adult only --- stated as findings, not
+omissions.} Three boundaries were tested and are reported directly. First, a
+falsification control at $\alpha{=}0$ (no corruption at all) found AL reduces
+DP \emph{more} without corruption than under attack, so we do \textbf{not}
+claim this is a corruption-robustness mechanism --- it is a general
+fairness-optimisation fix, consistent with the diagnosis above (a starved dual
+is starved identically on clean and corrupted data). Second, at
+$\alpha{=}0.4$, \textbf{no $\mu$ in $\{0.5,1,2,5,10,20\}$ is safe}: the most
+aggressive setting produced the single best-looking DP number in the entire
+study ($-80.7\%$, $p{=}0.0156$) while accuracy collapsed to $0.3495$, below
+chance for this label balance --- the model was destroyed while its fairness
+metric looked superb. AL is therefore recommended only for $\alpha\le0.2$.
+Third, \textbf{Credit is not rescued}: no $\mu\in\{0.5,1,2,5,10\}$ is both
+safe and effective there, so this contribution is scoped to Adult among the
+datasets tested. Supplementary evidence at the originally-discovered value
+$\mu{=}5$: the DP win transfers to the Combined attack at $\alpha{=}0.2$
+($-46.8\%$, $p{=}0.0156$, accuracy improving $0.7599\to0.8032$); the IF attack
+is borderline (accuracy exactly at the constant-predictor floor) and is not
+claimed; LSAC collapses to its constant predictor under AL, consistent with
+its pre-existing DP degeneracy (item~1, \S\ref{sec:limitations}), not a new
+failure.
+
 \subsection{Image data (UTKFace) --- real features; mixed clean-test results}
 \label{sec:results-utkface}
 

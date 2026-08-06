@@ -118,6 +118,15 @@ and shifts DP by $O(10^{-7})$, so \emph{no DP conclusion in this paper
 depends on the fix}; only the IF column of the DP/COMBINED rows is
 affected, and it is withdrawn rather than restated. The IF-attack rows,
 where the metric is non-degenerate, are unaffected and reported normally.
+
+\item \textbf{DRO-FAIR-AL (\S\ref{sec:results-al}) is scoped to Adult,
+$\alpha\le0.2$.} A pre-registered falsification control found the improvement
+is \emph{not} corruption-specific --- it reduces DP more with no corruption
+than under attack --- so we present it as a general fairness-optimisation fix
+rather than a robustness mechanism. At $\alpha{=}0.4$ no tested $\mu$ avoids
+model collapse (accuracy below chance while DP looks best-in-study), and no
+tested $\mu$ rescues Credit from degeneracy. Both boundaries are reported as
+findings rather than left for a reader to discover.
 \end{enumerate}
 
 \subsection{Future Work}
@@ -180,9 +189,7 @@ and \textbf{doubling $\beta$ to $10$ made DP consistently worse, not
 better} (6/6 configs, $+0.0025$ to $+0.0085$ absolute DP violation,
 accuracy essentially unchanged; \texttt{results/fairness\_aggressiveness\_summary.md}).
 Neither blunt lever widens the margin, which argues \emph{for} a
-smarter mechanism rather than a bigger constant: a softer alternative
---- a quadratic penalty on $\lambda$ in the Lagrangian, i.e.\ an
-augmented-Lagrangian formulation --- replaces the tuned clamp with a
-standard, well-understood stabilization mechanism and remains a natural
-target for follow-up work, informed rather than merely motivated by
-the negative result above.
+smarter mechanism rather than a bigger constant. We implement and evaluate
+exactly that mechanism --- a quadratic penalty on $\lambda$ in the
+Lagrangian, i.e.\ an augmented-Lagrangian formulation --- in
+\S\ref{sec:results-al}; it is no longer future work.
