@@ -110,3 +110,26 @@ first lever.
 - Paper/report integration only after the experiment completes and the
   criterion is evaluated; framed as "proposed improvement + evidence",
   clearly separated from the locked canonical protocol.
+
+---
+
+## Addendum (2026-08-07) — superseded by TASK C
+
+**This section is appended, not edited into the original text above, to
+preserve the pre-registration audit trail.** The μ=5 "conservative arm" /
+μ=10 "aggressive arm" framing in §4 was the best guess available before any
+sensitivity data existed. It has since been superseded by the dedicated
+90-run sweep in
+`docs/superpowers/specs/2026-08-05-mu-sensitivity-prereg.md`
+(results: `results/mu_sensitivity_summary.md`), which found:
+
+- **μ=20** is both safe and more effective than μ=5 at α ∈ {0.0, 0.2} on Adult
+  (DP reduction 70.8–81.7% vs μ=5's 41.8–52.6%, same accuracy safety margin).
+- **No μ tested is safe at α=0.4** — μ=5 was found there to destroy the model
+  (accuracy 0.3495, below chance) while producing the best-looking DP number
+  in the study. This was the finding that made the sensitivity sweep necessary.
+- Credit is not rescued by any μ ∈ {0.5, 1, 2} — AL's claim is Adult-only.
+
+Use μ=20 and the α≤0.2 / Adult-only scope for all downstream work
+(`docs/AGENT_BRIEFS.md`, `docs/TASKS_AL_VALIDATION.md`,
+`docs/MEMO_FOR_ADVISOR.md` carry the current numbers).

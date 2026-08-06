@@ -3,55 +3,92 @@
 Three agents, three lanes, no overlap. Paste the block verbatim into each agent.
 Full detail lives in `docs/TASKS_AL_VALIDATION.md`; these are the dispatch messages.
 
-**Assign in this order.** Agent 1 first (it gates the paper), Agent 3 can start
-immediately in parallel, Agent 2 any time.
+**Status: TASK A and TASK C are DONE** (run directly, not by an agent — the
+machine was idle). Agent 1's original assignment (TASK A) is complete, so
+Agent 1 is reassigned to **TASK C2** below. Agent 2 and Agent 3 keep their
+original assignments, updated with TASK C's corrected μ value.
+
+**Assign in this order.** Agent 2 first (paper integration is now unblocked),
+Agent 3 in parallel, Agent 1 (TASK C2) any time.
 
 ---
 
-## AGENT 1 — "Does the improvement hold up?" (highest priority)
+## COMPLETED — read before assigning anything
 
-> You are working in the DRO-FairML repo at `/Users/srujansai/Desktop/DRO-FairML`.
-> Read `docs/TASKS_AL_VALIDATION.md` first — the top section explains the
-> augmented-Lagrangian (AL) finding you are validating. Then do **TASK A**.
->
-> Context: we found DRO-FAIR's fairness constraint was contributing ~0.5% of the
-> training loss because the dual variable λ never rises above ~0.012 (ceiling
-> 1.5). Adding a quadratic penalty `(μ/2)·g²` fixed it — on Adult α=0.2 the
-> margin over Naive grew 9.2× (0.0119 → 0.1094, p=0.0156, 6/6 seeds) with
-> accuracy *rising* 0.7586 → 0.7944. But that is ONE cell. Your job is to find
-> out whether it generalises or whether we got lucky.
->
-> **Run the α=0 falsification control FIRST.** If AL helps just as much with
-> zero corruption, then it is a generic fairness regulariser and our
-> corruption-robustness framing is wrong. We want to discover that ourselves,
-> not in a viva. Write down what "materially smaller effect" means numerically
-> BEFORE you look at the output.
->
-> Then extend: Adult α ∈ {0.3, 0.4}; LSAC α ∈ {0.1, 0.2} (expect degeneracy —
-> confirm it); attack ∈ {if, combined} on Adult α=0.2. μ=5 only. 6 seeds.
-> Copy `experiments/run_aug_lagrangian.py` to a new script writing to a NEW
-> results file. Do not append to `results/aug_lagrangian.json`.
->
-> **Mandatory checks:** every DP claim must also report accuracy against the
-> constant-predictor floor (Adult 0.7521, Credit 0.7788, LSAC 0.9016). A DP
-> improvement at or below the floor is model collapse, not fairness — label it
-> DEGENERATE. This is exactly how Credit's apparent AL "win" turned out fake.
->
-> Rules: pre-register grid + success criterion before running; report negatives
-> honestly (a clean negative is a completed task, tuning until it wins is not);
-> never write `results/canonical_tau1.json` or `results/utkface_*.json`; use the
-> shared `_AblationLock`; `pytest tests/ -q` green before any commit.
->
-> Deliver: results JSON + summary .md + a one-paragraph plain answer to "does
-> the AL improvement generalise beyond Adult α=0.2?"
+**TASK A** (generalisation, 42/42 runs) found the AL improvement is **real but
+narrower than first thought**:
+- The α=0 falsification control FAILED: AL helps *more* with zero corruption
+  (52.6% DP reduction) than under attack (41.8%). **The corruption-robustness
+  framing is withdrawn.** AL is a general fairness-optimisation fix — the
+  dual-starvation defect it corrects has nothing to do with corruption.
+- Found a new failure mode: at α=0.4, AL (μ=5) gave the best-looking DP number
+  in the whole study (−80.7%, p=0.0156) while accuracy collapsed to 0.3495 —
+  below chance. The model was destroyed while its fairness metric looked superb.
+- COMBINED attack transfers (genuine win, accuracy improves); IF attack is
+  borderline (not claimed); LSAC collapses as predicted.
+- Full detail: `results/aug_lagrangian_extended_summary.md`.
+
+**TASK C** (μ-sensitivity, 90/90 runs), run in direct response to the α=0.4
+failure, found the safe/effective operating range:
+
+| α | recommended μ | DP reduction | accuracy |
+|---|---|---|---|
+| 0.0 | **μ=20** | −81.7% | 0.7966 |
+| 0.2 | **μ=20** | −70.8% | 0.7783 |
+| 0.4 | **none safe** | — | — |
+
+**μ=20 supersedes μ=5 as the recommendation** — larger DP reduction, same
+safety margin. Credit is **not rescued** by any tested μ (0.5, 1, 2) — AL's
+claim is **Adult-only**. DP-vs-μ curves are monotone at every α (clean
+trade-off, not instability). Full detail: `results/mu_sensitivity_summary.md`.
+
+**Use μ=20 and the α≤0.2 / Adult-only scope in everything below.** μ=5 was
+the original discovery value and is cited historically, but is no longer the
+number to build on.
 
 ---
 
-## AGENT 2 — "Why does accuracy go UP?" + paper integration
+## AGENT 1 — TASK C2: does AL compound with the radius finding?
 
 > You are working in the DRO-FairML repo at `/Users/srujansai/Desktop/DRO-FairML`.
-> Read `docs/TASKS_AL_VALIDATION.md` first. Do **TASK B**, then **TASK D**
-> (D only after Agent 1's TASK A finishes — check with the user before starting D).
+> Read `docs/TASKS_AL_VALIDATION.md` first, then the "COMPLETED" section at the
+> top of `docs/AGENT_BRIEFS.md` for full context on TASK A and TASK C, which are
+> both done. Then do **TASK C2**.
+>
+> Context: independently of the AL work, the N1 radius ablation found that
+> 11/15 (dataset, α) cells prefer `radii_scale=2.0` over the canonical 1.0 —
+> the closed-form radius is systematically too small. That is the same
+> diagnosis as AL's finding (starved dual), arriving through a completely
+> different mechanism (undersized uncertainty set). Your job: find out whether
+> the two fixes compound, are redundant, or conflict.
+>
+> **Use μ=20, not μ=5** — TASK C found μ=20 is the safe, more-effective value
+> at α≤0.2 (see the COMPLETED section above for the full table).
+>
+> Run: Adult, α ∈ {0.2, 0.3}, 6 seeds, 2×2 design:
+> `radii_scale ∈ {1.0, 2.0} × aug_lagrangian_mu ∈ {0, 20}`. The canonical and
+> AL-only (μ=20, radii=1.0) arms already exist; add `radii_scale=2.0` alone and
+> the combined arm. Write to a NEW results file, do not append to any existing
+> ablation file.
+>
+> **Pre-register before running:** do you expect compounding (combined beats
+> both singles), redundancy (combined ≈ best single), or conflict? Write it
+> down first. Apply the degeneracy guard (floor 0.7521 for Adult) — a larger
+> radius plus a stronger penalty is exactly the combination most likely to
+> collapse the model, and α=0.3 is already a marginal regime.
+>
+> Deliver: results JSON + `results/al_radius_compound_summary.md` stating which
+> of the three outcomes occurred. "Redundant" is a genuinely interesting,
+> publishable answer, not a failure. `pytest tests/ -q` green before any commit.
+
+---
+
+## AGENT 2 — TASK B: mechanism, then TASK D: paper integration (unblocked now)
+
+> You are working in the DRO-FairML repo at `/Users/srujansai/Desktop/DRO-FairML`.
+> Read `docs/TASKS_AL_VALIDATION.md` first, then the "COMPLETED" section at the
+> top of `docs/AGENT_BRIEFS.md`. Do **TASK B**, then **TASK D** — both are now
+> unblocked (TASK A and TASK C, which gated them, are done).
 >
 > TASK B: a fairness penalty that *improves* accuracy is counter-intuitive and
 > an examiner will ask why. Our hypothesis: under a DP-targeted attack the
@@ -59,8 +96,10 @@ immediately in parallel, Agent 2 any time.
 > penalising that gap hard suppresses the attack's influence — i.e. AL acts as
 > attack-specific denoising. That is a HYPOTHESIS. Test it:
 > 1. `dump_history=True` already exists on `run_single_experiment`. Dump Adult
->    α=0.2 seed 0 for canonical DRO vs AL μ=5; compare `g_dp`, `lambda_dp`,
->    `train_loss`, `val_acc`, `val_dp` trajectories.
+>    α=0.2 seed 0 for canonical DRO vs AL. **Run this at both μ=5 and μ=20** —
+>    μ=20 is the value going into the paper, but μ=5 is the value the original
+>    hypothesis was formed against, so check the mechanism holds at both.
+>    Compare `g_dp`, `lambda_dp`, `train_loss`, `val_acc`, `val_dp` trajectories.
 > 2. Measure directly: accuracy on the CORRUPTED training subset vs the CLEAN
 >    subset, separately, for both models. If the hypothesis holds, AL fits the
 >    corrupted points *less*.
@@ -69,16 +108,29 @@ immediately in parallel, Agent 2 any time.
 >
 > "Mechanism unclear" is an acceptable, honest outcome. A hand-wave is not.
 >
-> TASK D (after A): write the AL section into `paper/sections/results.tex` and
-> the report — the λ-starvation diagnosis with the measured numbers (max λ
-> 0.0119 vs ceiling 1.5; penalty 0.0029 vs loss 0.538), the formula, the Adult
-> table, and the Credit degeneracy caveat given EQUAL prominence, not a
-> footnote. Update Future Work in BOTH paper and report (AL is no longer future
-> work). State that μ=0 recovers the canonical objective exactly so all prior
-> results stand. `make paper && make report`, both PDFs must build.
+> TASK D: write the AL section into `paper/sections/results.tex` and the
+> report. Confirmed via search: neither currently contains any AL numbers —
+> only qualitative "Future Work" mentions (`discussion.tex` ~L184,
+> `report.tex` ~L673). This is a real integration, not an edit of existing
+> numbers. Include:
+> - The λ-starvation diagnosis with measured numbers (max λ 0.0119 vs ceiling
+>   1.5; penalty 0.0029 vs loss 0.538)
+> - The formula, `μ=0` recovers the canonical objective exactly (so all prior
+>   results stand — state this explicitly)
+> - **The Adult table at μ=20** (DP −70.8% to −81.7%, accuracy held or
+>   improved) — not μ=5, which is superseded
+> - **Explicit scope statement: α ≤ 0.2 only.** α=0.4 is reported as "AL is
+>   unsafe here — no μ tested avoids model collapse," stated as a finding, not
+>   hidden in a footnote
+> - **Explicit dataset scope: Adult only.** Credit is not rescued by any μ
+>   tested (0.5, 1, 2, 5, 10, 20) — state this directly
 >
-> Framing requirement: "a proposed improvement with evidence on Adult and an
-> honest negative on Credit/LSAC" — never a universal win.
+> Remove AL from Future Work in both documents (it is no longer future work).
+> `make paper && make report`, both PDFs must build.
+>
+> Framing requirement throughout: "a proposed improvement, precisely scoped,
+> with evidence on Adult α≤0.2 and honest negatives outside that scope" —
+> never a universal win.
 
 ---
 
@@ -91,11 +143,21 @@ immediately in parallel, Agent 2 any time.
 >
 > Your job is to BREAK the augmented-Lagrangian claim, not to confirm it.
 > Finding a real defect is a successful outcome. Recent history justifies the
-> paranoia: a verification pass yesterday found the built PDF was printing
-> "0.0% effect, p=0.016***" — a significance star on floating-point noise.
-> Assume more of that exists.
+> paranoia: a verification pass found the built PDF printing "0.0% effect,
+> p=0.016***" — a significance star on floating-point noise. Assume more exists.
 >
-> Check, from first principles:
+> Your scope now includes **TASK C's rule application**, since μ=20 is the
+> number about to be written into the paper and hasn't been adversarially
+> checked yet:
+> - Read `experiments/summarize_mu_sensitivity.py` (Rules C1–C4) and
+>   `docs/superpowers/specs/2026-08-05-mu-sensitivity-prereg.md`. Recompute the
+>   SAFE/EFFECTIVE table by hand from `results/mu_sensitivity.json` — do not
+>   trust the script's own output.
+> - The α=0.4 "no μ is safe" conclusion rests on μ ∈ {0.5, 1, 2, 5, 10, 20}
+>   all failing. Check each one individually rather than trusting the summary.
+> - Credit's "not rescued" conclusion: same — recompute from raw data.
+>
+> Original scope, unchanged:
 > - Re-derive the gradient of `(μ/2)g²` by hand; confirm the code implements it
 >   and that `g_dp`/`g_if` are genuinely non-negative so no `max(g,0)` is needed.
 > - Verify `μ=0` is byte-identical to pre-change canonical behaviour by checking

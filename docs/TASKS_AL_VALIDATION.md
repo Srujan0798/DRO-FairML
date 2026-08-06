@@ -79,32 +79,23 @@ design + pre-registration in
 
 ---
 
-## TASK A — Does AL generalise, or is it an Adult α=0.2 artifact? (highest priority)
+## TASK A — Does AL generalise, or is it an Adult α=0.2 artifact? ✅ COMPLETE (42/42)
 
-**Why:** the whole claim currently rests on one cell. A reviewer will ask this
-first, and right now we cannot answer it.
+Run directly (not by an agent), pre-registered in
+`docs/superpowers/specs/2026-08-05-al-generalisation-prereg.md`. Full result:
+`results/aug_lagrangian_extended_summary.md`.
 
-**Do:** extend the AL grid along the axes we have not touched.
-- α ∈ {0.0, 0.3, 0.4} on Adult (we only have 0.1, 0.2). α=0.0 is the important
-  control: with no corruption, AL should *not* help much — if it produces a big
-  win at α=0.0 too, then AL is just a generic fairness regulariser and the
-  "corruption-robustness" story is wrong. **This is a falsification test; run it
-  first.**
-- LSAC at α ∈ {0.1, 0.2} (expect degeneracy — confirm and document it).
-- attack ∈ {if, combined} on Adult α=0.2 (currently dp only).
+**Verdict:** the α=0.0 falsification control **FAILED** — AL reduces DP by
+52.6% with zero corruption, *more* than the 41.8% it achieves under attack
+(threshold was 20.9%). **The corruption-robustness framing is withdrawn.** AL
+is a general fairness-optimisation fix: the dual-starvation defect it corrects
+has nothing to do with corruption, so a fix targeting it helps everywhere.
 
-**Grid:** reuse `experiments/run_aug_lagrangian.py` structure, μ=5 only (μ=10
-costs more accuracy for no extra genuine cell). 6 seeds. New output file —
-do not append to `results/aug_lagrangian.json`.
-
-**Success criterion (pre-register before running):** AL's DP improvement over
-canonical DRO holds (p<0.05, non-degenerate) in ≥2 of the new Adult
-corruption cells (α ∈ {0.3, 0.4}), AND the α=0.0 control shows a *materially
-smaller* effect than the α=0.2 cell. State explicitly what "materially smaller"
-means numerically before you look.
-
-**Deliver:** `results/aug_lagrangian_extended{,_summary}.md/json` + one
-paragraph stating plainly whether the improvement generalises.
+Also found: a new failure mode at α=0.4 (μ=5 gave DP −80.7%, p=0.0156 — the
+best number in the study — while accuracy collapsed to 0.3495, below chance),
+which motivated TASK C below. COMBINED attack transfers (genuine win, accuracy
+improves 0.7599→0.8032); IF attack borderline (not claimed); LSAC collapses as
+predicted.
 
 ---
 
@@ -135,21 +126,27 @@ acceptable outcome; a hand-wave is not.
 
 ---
 
-## TASK C — μ sensitivity and the accuracy/fairness frontier
+## TASK C — μ sensitivity and the accuracy/fairness frontier ✅ COMPLETE (90/90)
 
-**Why:** we tested μ ∈ {5, 10} only. We do not know if μ=5 is near-optimal, nor
-where AL starts collapsing models (Credit collapsed at μ=5 already). The paper
-needs a defensible statement about how to choose μ.
+Run directly (not by an agent) in response to TASK A's α=0.4 failure,
+pre-registered in `docs/superpowers/specs/2026-08-05-mu-sensitivity-prereg.md`.
+Full result: `results/mu_sensitivity_summary.md`.
 
-**Do:** Adult + Credit, α=0.2, 6 seeds, μ ∈ {0.5, 1, 2, 20}. Combined with
-existing μ ∈ {5, 10} this gives a 6-point curve. Plot DP and accuracy vs μ with
-the constant-predictor floor drawn on the accuracy axis — the point where each
-dataset's curve crosses the floor *is* the degeneracy threshold, and that is the
-paper-ready figure.
+**Verdict — recommended μ per α (largest tested μ that is both SAFE and
+EFFECTIVE, per Rules C1–C2):**
 
-**Deliver:** `results/mu_sensitivity_summary.md` + the figure + a stated
-recommendation for choosing μ (e.g. "largest μ whose validation accuracy stays
-≥ floor + 0.02"), justified by the curve rather than by the winning number.
+| α | recommended μ | DP reduction | accuracy |
+|---|---|---|---|
+| 0.0 | **μ=20** | −81.7% | 0.7966 |
+| 0.2 | **μ=20** | −70.8% | 0.7783 |
+| 0.4 | **none safe** | — | — (do not use AL) |
+
+μ=20 supersedes μ=5 — strictly larger DP reduction at the same safety margin.
+**Credit is not rescued** by any μ ∈ {0.5, 1, 2} (Rule C3) — AL's claim is
+**Adult-only**. DP-vs-μ curves are monotone at every α (Rule C4) — the α=0.4
+failure is a genuine safety boundary, not optimisation noise.
+
+**Use μ=20 in TASK C2, TASK D, and everywhere else below.**
 
 ---
 
@@ -169,10 +166,11 @@ independent lines of evidence pointing the same way is a much stronger paper
 argument than either alone, and it is worth stating that way.
 
 **Do:** Adult, α ∈ {0.2, 0.3}, 6 seeds, 2×2 design:
-`radii_scale ∈ {1.0, 2.0} × aug_lagrangian_mu ∈ {0, 5}`. The canonical and
-AL-only arms already exist; this adds `radii_scale=2.0` alone and the combined
-arm. Both parameters are already plumbed through `run_single_experiment` — no
-new trainer code needed.
+`radii_scale ∈ {1.0, 2.0} × aug_lagrangian_mu ∈ {0, 20}`. **Use μ=20, not
+μ=5** — TASK C found μ=20 is the safe, more-effective value at α≤0.2. The
+canonical and AL-only (μ=20, radii=1.0) arms already exist; this adds
+`radii_scale=2.0` alone and the combined arm. Both parameters are already
+plumbed through `run_single_experiment` — no new trainer code needed.
 
 **Pre-register:** do the two levers **compound** (combined beats both singles),
 are they **redundant** (combined ≈ best single, meaning they fix the same
@@ -186,25 +184,31 @@ and publishable answer, not a failure.
 
 ---
 
-## TASK D — Paper and report integration (do only after A completes)
+## TASK D — Paper and report integration (unblocked — A and C are both complete)
 
-**Why:** the paper currently has no AL section, and its Future Work still lists
-augmented Lagrangian as an untried idea.
+**Why:** confirmed via search, `paper/sections/results.tex` and `report.tex`
+currently contain **zero** AL numbers — only qualitative "Future Work"
+mentions (`discussion.tex` ~L184, `report.tex` ~L673). This is a full
+integration, not an edit of existing numbers.
 
 **Do:**
 1. New subsection in `paper/sections/results.tex` and the report: the
    λ-starvation diagnosis (with the measured 0.0119 / 0.5%-of-loss numbers),
-   the AL formula, the Adult result table, and the Credit degeneracy caveat
-   given equal prominence — not buried in a footnote.
-2. Update Future Work in **both** `paper/` and `report/` — AL is no longer
-   future work; replace with what Task A/B/C left open.
-3. Method section: state that `μ=0` recovers the canonical objective exactly, so
+   the AL formula, **the Adult result table at μ=20** (not μ=5 — superseded by
+   TASK C), and the Credit-not-rescued / α=0.4-unsafe caveats given equal
+   prominence — not buried in a footnote.
+2. **Explicit scope statement:** α ≤ 0.2 only; α=0.4 reported as "AL is unsafe
+   here — no μ tested avoids model collapse" as a stated finding. Dataset
+   scope: Adult only; Credit not rescued by any μ tested.
+3. Update Future Work in **both** `paper/` and `report/` — AL is no longer
+   future work; replace with what Task B/C2/E leave open.
+4. Method section: state that `μ=0` recovers the canonical objective exactly, so
    every previously reported canonical result stands unchanged.
-4. `make paper && make report`, confirm both PDFs build.
+5. `make paper && make report`, confirm both PDFs build.
 
 **Deliver:** both PDFs rebuilt, committed. **Framing requirement:** present AL as
-"a proposed improvement with evidence on Adult and an honest negative on
-Credit/LSAC", never as a universal win.
+"a proposed improvement, precisely scoped, with evidence on Adult α≤0.2 and
+honest negatives outside that scope" — never a universal win.
 
 ---
 
@@ -213,7 +217,14 @@ Credit/LSAC", never as a universal win.
 **Why:** the user's explicit instruction is that this be checked bit-by-bit as a
 new validator would, because basic things have been missed before.
 
-**Do:** with fresh eyes and no stake in the result, try to *break* the AL claim:
+**Do:** with fresh eyes and no stake in the result, try to *break* the AL claim.
+Scope now includes TASK C's rule application, since μ=20 is about to go into
+the paper:
+- Read `experiments/summarize_mu_sensitivity.py` (Rules C1–C4) and recompute
+  the SAFE/EFFECTIVE table by hand from `results/mu_sensitivity.json` — don't
+  trust the script's own printed output. The α=0.4 "no μ is safe" conclusion
+  rests on all of μ ∈ {0.5, 1, 2, 5, 10, 20} failing; check each individually.
+  Same for Credit's "not rescued" conclusion.
 - Re-derive `(μ/2)g²`'s gradient by hand; confirm the code implements it and
   that `g_dp`/`g_if` are genuinely non-negative so no `max(g,0)` is needed.
 - Verify `μ=0` is byte-identical to pre-change canonical output by checking out
@@ -267,12 +278,14 @@ Limitations text at that point to say the gap is closed.
 
 ## Suggested assignment
 
+**A and C are done** (run directly, machine was idle — see their sections
+above). Current assignment:
+
 | Agent | Tasks | Rationale |
 |---|---|---|
-| Agent 1 (CPU/experiments) | A, then C | Both are compute grids on the same machinery; A gates the paper claim. |
-| Agent 2 (analysis) | B, then D | Mechanism work feeds directly into how D writes it up. |
-| Agent 3 (independent) | E | Must not have run A–D, or the review is not independent. |
+| Agent 1 (CPU/experiments) | C2 | Reassigned from A (now complete); compound test uses μ=20 from C. |
+| Agent 2 (analysis) | B, then D | Both now unblocked; mechanism work feeds directly into how D writes it up. |
+| Agent 3 (independent) | E | Must not have run B/C2/D, or the review is not independent. Scope now includes reviewing TASK C's rule application. |
 
-**Sequencing:** A is blocking for D. B and C can run in parallel with A but
-must queue behind the ablation lock. E can start immediately — it reviews what
-already exists.
+**Sequencing:** D is unblocked (A and C are both done). B and C2 can run in
+parallel, queued behind the ablation lock. E can start immediately.

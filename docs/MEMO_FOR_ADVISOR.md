@@ -53,16 +53,21 @@ total_loss = L_tilt + λ_dp·g_dp + (μ/2)·g_dp²  +  λ_if·g_if + (μ/2)·g_i
 result stands unchanged** (unit-tested as bit-identical, and verified against the
 locked canonical row on a full run).
 
-## 3. Result — Adult, α=0.2, μ=5, n=6 seeds, seed-paired Wilcoxon
+## 3. Result — Adult, α=0.2, **μ=20** (corrected by TASK C), n=6 seeds, seed-paired Wilcoxon
 
-| | Naive | DRO (current) | **DRO-FAIR-AL** |
+| | Naive | DRO (current) | **DRO-FAIR-AL μ=20** |
 |---|---|---|---|
-| DP violation | 0.2452 | 0.2334 | **0.1358** (p=0.0156) |
-| accuracy | — | 0.7586 | **0.7944** |
-| margin over Naive | — | +0.0119 | **+0.1094 — 9.2× larger** |
+| DP violation | 0.2452 | 0.2334 | **0.0682** (p=0.0156) |
+| accuracy | — | 0.7586 | **0.7783** |
+| margin over Naive | — | +0.0119 | **+0.1771 — 14.9× larger** |
 
-Beats Naive on DP in **6/6 seeds**, and accuracy *rises* (constant-predictor
-floor is 0.7521). This is a Pareto improvement, not a fairness/accuracy trade.
+*(First demonstrated at μ=5: DP 0.1358, accuracy 0.7944, margin 9.2×. TASK C's
+90-run μ-sensitivity sweep, §5b, found μ=20 is both safe and strictly more
+effective — μ=5 is superseded as the recommendation.)*
+
+Beats Naive on DP in **6/6 seeds**, and accuracy remains well above the
+constant-predictor floor (0.7521). This is a Pareto improvement, not a
+fairness/accuracy trade.
 
 ## 4. What does **not** work — stated up front
 
@@ -115,6 +120,28 @@ constant predictor. Reported as collapse, not as a win.
 improved. Everything else is either an already-excluded regime or an honest
 negative.
 
+## 5b. μ-sensitivity sweep (TASK C, complete, 90/90 runs) — answers (ii) above
+
+Pre-registered in `docs/superpowers/specs/2026-08-05-mu-sensitivity-prereg.md`,
+run and analyzed mechanically by `experiments/summarize_mu_sensitivity.py`.
+This is the direct response to the α=0.4 destruction found above: it maps
+where μ is safe, and produces one number per α instead of one guess.
+
+| α | recommended μ | DP reduction vs canonical DRO | p | accuracy |
+|---|---|---|---|---|
+| 0.0 | **μ=20** | −81.7% | 0.0156 | 0.7966 |
+| 0.2 | **μ=20** | −70.8% | 0.0156 | 0.7783 |
+| 0.4 | **none** | — | — | **do not use AL — no μ tested is safe** |
+
+Two further findings from the same sweep: **Credit is not rescued** — no
+μ ∈ {0.5, 1, 2} is both safe and effective there, so AL's claim stays
+**Adult-only** among the datasets tested. And the DP-vs-μ curves are monotone
+at every α (no optimisation instability) — the α=0.4 failure is a genuine
+safety boundary, not noise.
+
+**This changes §3's number:** μ=20, not μ=5, is the correct headline result
+and the correct value to write into the paper.
+
 ## 5. A second, independent finding pointing the same way
 
 The radius ablation (180/180 runs) answers Kuldeep's original May-29 question:
@@ -135,15 +162,22 @@ single hyperparameter story.
 ## 6. Two things needing your decision
 
 **(a) Should the augmented Lagrangian go into the submission, and under which
-framing?** The generalisation test is now done (§5a), so this is a real choice
-rather than a pending question. Our recommendation: **include it**, framed as a
-*fairness-optimisation* fix rather than a robustness one, scoped explicitly to
-α ≤ 0.2, and accompanied by the α=0.4 instability as a stated limitation. It is
-a principled, one-line change to your Lagrangian with a measured 42–53% DP
-reduction behind it and accuracy that holds or improves. If you would rather
-keep the submission's scope unchanged, the alternative is to report it as a
-Future Work item with the evidence attached — but we think it is strong enough
-to stand in the paper.
+framing?** Both the generalisation test (§5a) and the μ-sensitivity sweep (§5b)
+are now done, so this is a fully specified recommendation, not an open
+question. **Include it, with these exact parameters:**
+- **μ=20**, framed as a *fairness-optimisation* fix, not a robustness one
+- **Scope: α ≤ 0.2 only.** α=0.4 is stated as "do not use AL" — no μ tested is
+  safe there, and that boundary is itself reported as a finding, not hidden.
+- **Dataset scope: Adult only.** Credit is not rescued by any tested μ; that
+  limitation is stated directly rather than omitted.
+
+It is a principled, one-line change to your Lagrangian with a measured
+70.8–81.7% DP reduction (Adult, α≤0.2) and accuracy that holds or improves,
+plus an honestly-mapped safety boundary — which is itself a defensible
+contribution. If you would rather keep the submission's scope unchanged, the
+alternative is to report it as a Future Work item with the evidence attached —
+but we think it is strong enough, and now precise enough, to stand in the
+paper.
 
 **(b) A reproducibility gap we found and want to close.**
 `results/canonical_tau1.json` was generated before a k-NN metric fix landed, so

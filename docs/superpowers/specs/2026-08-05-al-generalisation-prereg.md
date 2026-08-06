@@ -4,6 +4,14 @@
 Date: 2026-08-05. Parent design:
 `docs/superpowers/specs/2026-08-05-augmented-lagrangian-design.md`.
 
+> **Status (2026-08-07): COMPLETE, 42/42.** This ran at μ=5 exactly as
+> specified below — that value is correct and unedited here for audit
+> purposes. Its α=0.4 finding (μ=5 destroys the model) motivated a follow-up
+> sensitivity sweep which found μ=20 is the better value at α≤0.2; see the
+> addendum in `2026-08-05-augmented-lagrangian-design.md` and
+> `docs/superpowers/specs/2026-08-05-mu-sensitivity-prereg.md`. Results:
+> `results/aug_lagrangian_extended_summary.md`.
+
 ## What we are testing
 
 DRO-FAIR-AL is proven on exactly one cell (Adult, α=0.2, μ=5): DP
