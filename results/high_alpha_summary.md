@@ -17,9 +17,9 @@ Canonical τ=1.0 (read-only, from `results/canonical_tau1.json`):
 | α | method | n | acc | dp |
 |---|---|---|---|---|
 | 0.3 | dro | 6 | 0.6755 | 0.2614 |
-| 0.3 | naive | 6 | 0.6669 | 0.2848 |
+| 0.3 | naive | 10 | 0.6700 | 0.2850 |
 | 0.4 | dro | 6 | 0.5607 | 0.2855 |
-| 0.4 | naive | 6 | 0.5512 | 0.3140 |
+| 0.4 | naive | 10 | 0.5523 | 0.3132 |
 
 STEP 1 cells (τ ∈ {2,5,20}, Adult, dp, α∈{0.3,0.4}, 6 seeds, 2 methods). ✓ = DRO acc > 0.7521 (Adult constant predictor).
 
@@ -48,9 +48,9 @@ lr_lambda=0.01 (canonical 5e-3), Adult, dp, α∈{0.3,0.4}, 6 seeds, 2 methods. 
 | α | method | n | acc | dp | Δacc vs canonical | Δdp vs canonical |
 |---|---|---|---|---|---|---|
 | 0.3 | dro | 6 | 0.6770 | 0.2577 | +0.0015 | -0.0036 |
-| 0.3 | naive | 6 | 0.6664 | 0.2804 | -0.0005 | -0.0044 |
+| 0.3 | naive | 6 | 0.6664 | 0.2804 | -0.0036 | -0.0046 |
 | 0.4 | dro | 6 | 0.5580 | 0.2799 | -0.0027 | -0.0056 |
-| 0.4 | naive | 6 | 0.5501 | 0.3114 | -0.0010 | -0.0026 |
+| 0.4 | naive | 6 | 0.5501 | 0.3114 | -0.0022 | -0.0018 |
 
 **Verdict (STEP 2):** 
 lr_lambda=0.01 **raises** DRO α=0.3 acc to 0.6770 (canonical 0.6755); but still below 0.7521 (constant predictor).
