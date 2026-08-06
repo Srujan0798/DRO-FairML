@@ -411,7 +411,7 @@ values, with accuracy held or improved --- a Pareto improvement, not a
 fairness/accuracy trade.
 
 \paragraph{Scope: $\alpha\le0.2$ on Adult only --- stated as findings, not
-omissions.} Three boundaries were tested and are reported directly. First, a
+omissions.} Four boundaries were tested and are reported directly. First, a
 falsification control at $\alpha{=}0$ (no corruption at all) found AL reduces
 DP \emph{more} without corruption than under attack, so we do \textbf{not}
 claim this is a corruption-robustness mechanism --- it is a general
@@ -430,7 +430,14 @@ $\mu{=}5$: the DP win transfers to the Combined attack at $\alpha{=}0.2$
 is borderline (accuracy exactly at the constant-predictor floor) and is not
 claimed; LSAC collapses to its constant predictor under AL, consistent with
 its pre-existing DP degeneracy (item~1, \S\ref{sec:limitations}), not a new
-failure.
+failure. Fourth, \textbf{AL does not compound with the independently-found
+radius under-calibration} (a separate ablation finding that $\rho$ should be
+larger than the canonical closed form on most cells): combining $\mu{=}20$
+with $\mathrm{radii\_scale}{=}2.0$ at $\alpha{=}0.2$ collapses accuracy to
+$0.7561$, at the degeneracy threshold, turning its $-94.0\%$ DP number into
+constant-predictor collapse rather than a stronger result. The two fixes each
+correct the objective independently; stacking them over-corrects. $\mu{=}20$
+at the canonical radius remains the recommendation.
 
 \subsection{Image data (UTKFace) --- real features; mixed clean-test results}
 \label{sec:results-utkface}

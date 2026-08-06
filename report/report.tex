@@ -458,8 +458,14 @@ attack, so this is a general fairness-optimisation fix, not a
 corruption-robustness mechanism. At $\alpha{=}0.4$, no $\mu\in\{0.5,1,2,5,10,20\}$
 is safe --- the most aggressive value gave the best-looking DP number in the
 whole study ($-80.7\%$) while accuracy collapsed to $0.3495$, below chance.
-Credit is not rescued by any tested $\mu$. AL is recommended for
-\textbf{Adult, $\alpha\le0.2$ only}; both boundaries are reported as findings.
+Credit is not rescued by any tested $\mu$. A further test found AL
+\textbf{conflicts} rather than compounds with a separately-observed radius
+under-calibration (most cells prefer $\mathrm{radii\_scale}{=}2.0$ over the
+canonical $1.0$): stacking $\mu{=}20$ with the larger radius collapses
+accuracy to $0.7561$ at $\alpha{=}0.2$, at the degeneracy threshold, turning
+its apparent $-94.0\%$ DP number into constant-predictor collapse rather than
+a stronger result. AL is recommended for \textbf{Adult, $\alpha\le0.2$, the
+canonical radius, only}; all three boundaries are reported as findings.
 Supplementary evidence at $\mu{=}5$ (the originally-discovered value): DP win
 transfers to the Combined attack ($-46.8\%$, $p{=}0.0156$, accuracy
 \emph{improving}); LSAC collapses under AL as it already does under DRO

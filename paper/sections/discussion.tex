@@ -120,13 +120,17 @@ affected, and it is withdrawn rather than restated. The IF-attack rows,
 where the metric is non-degenerate, are unaffected and reported normally.
 
 \item \textbf{DRO-FAIR-AL (\S\ref{sec:results-al}) is scoped to Adult,
-$\alpha\le0.2$.} A pre-registered falsification control found the improvement
-is \emph{not} corruption-specific --- it reduces DP more with no corruption
-than under attack --- so we present it as a general fairness-optimisation fix
-rather than a robustness mechanism. At $\alpha{=}0.4$ no tested $\mu$ avoids
-model collapse (accuracy below chance while DP looks best-in-study), and no
-tested $\mu$ rescues Credit from degeneracy. Both boundaries are reported as
-findings rather than left for a reader to discover.
+$\alpha\le0.2$, canonical radius.} A pre-registered falsification control
+found the improvement is \emph{not} corruption-specific --- it reduces DP more
+with no corruption than under attack --- so we present it as a general
+fairness-optimisation fix rather than a robustness mechanism. At
+$\alpha{=}0.4$ no tested $\mu$ avoids model collapse (accuracy below chance
+while DP looks best-in-study), and no tested $\mu$ rescues Credit from
+degeneracy. A further pre-registered test found AL \textbf{conflicts} rather
+than compounds with the separately-observed radius under-calibration
+(\S\ref{sec:results-al}): stacking $\mu{=}20$ with a larger radius collapses
+accuracy at $\alpha{=}0.2$. All three boundaries are reported as findings
+rather than left for a reader to discover.
 \end{enumerate}
 
 \subsection{Future Work}

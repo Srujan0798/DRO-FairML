@@ -150,7 +150,28 @@ failure is a genuine safety boundary, not optimisation noise.
 
 ---
 
-## TASK C2 — Compound AL with a larger radius (the second under-enforcement lever)
+## TASK C2 — Compound AL with a larger radius ✅ COMPLETE (18/18 new, 48/48 total)
+
+Dispatched via opencode to an isolated worktree, merged after independent
+verification (the razor-thin degeneracy call — mean accuracy 0.756127 vs
+threshold 0.7571 — was recomputed by hand from raw JSON before merging).
+Full result: `results/al_radius_compound_summary.md`.
+
+**Verdict: CONFLICT, not compound or redundant.** At the scoped cell
+(Adult, α=0.2), combining μ=20 with `radii_scale=2.0` collapses accuracy to
+0.7561 — at the degeneracy threshold (3 of 6 seeds land at or below the
+floor itself). Its apparent DP number (−94.0%) is constant-predictor
+collapse, not fairness. AL-only (μ=20, canonical radius) remains the
+genuine win (DP −70.8%, accuracy 0.7783); radius-only is inert on Adult/DP
+(+1.8%). **The two fixes each correct the objective independently; stacking
+them over-corrects.** This disagreed with the pre-registered prediction
+(redundant was expected) — the degenerate counter-hypothesis flagged in the
+pre-registration is what actually occurred.
+
+**Written into the paper and report** (TASK D): μ=20 at the canonical radius
+is the recommendation; do not combine with the larger radius.
+
+*Original brief, for reference:*
 
 **Why:** the N1 radius ablation (now complete, 180/180) found that **11 of 15
 (dataset, α) cells prefer `radii_scale=2.0` over the canonical 1.0**, and that
@@ -278,14 +299,14 @@ Limitations text at that point to say the gap is closed.
 
 ## Suggested assignment
 
-**A and C are done** (run directly, machine was idle — see their sections
-above). Current assignment:
+**A, B, C, C2, and D are all done** (A/B/C run directly; C2 dispatched to an
+isolated worktree and merged after independent verification; D written
+directly into the paper and report — see their sections above and
+`docs/PROJECT_COMPLETION_CHECKLIST.md`). Only **E** remains open.
 
 | Agent | Tasks | Rationale |
 |---|---|---|
-| Agent 1 (CPU/experiments) | C2 | Reassigned from A (now complete); compound test uses μ=20 from C. |
-| Agent 2 (analysis) | B, then D | Both now unblocked; mechanism work feeds directly into how D writes it up. |
-| Agent 3 (independent) | E | Must not have run B/C2/D, or the review is not independent. Scope now includes reviewing TASK C's rule application. |
+| Agent 3 (independent) | **E — the only open task** | Must not have run A/B/C/C2/D, or the review is not independent. Scope includes reviewing TASK C's μ=20 rule application AND TASK C2's razor-thin degeneracy call (mean acc 0.756127 vs threshold 0.7571). |
 
-**Sequencing:** D is unblocked (A and C are both done). B and C2 can run in
-parallel, queued behind the ablation lock. E can start immediately.
+**Sequencing:** nothing blocks E. It is the last gate before this is fully
+submission-ready.
