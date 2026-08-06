@@ -60,10 +60,16 @@ def cell(al_rows, ref, ds, attack, alpha):
     p = 1.0 if np.allclose(d - a, 0) else wilcoxon(d, a, alternative='greater').pvalue
     mean_dro, mean_al = float(d.mean()), float(a.mean())
     R = 100 * (mean_dro - mean_al) / mean_dro if mean_dro > 1e-12 else 0.0
-    degen = float(np.mean(al_acc)) <= CONST_FLOOR[ds] + FLOOR_MARGIN
+    floor = CONST_FLOOR[ds] + FLOOR_MARGIN
+    degen = float(np.mean(al_acc)) <= floor
+    # Canonical DRO can be below the floor too (the paper already excludes
+    # alpha>=0.3 on Adult/Credit for exactly this reason). Flagging only AL
+    # there would misattribute a pre-existing regime failure to AL.
+    dro_degen = float(np.mean(dro_acc)) <= floor
     return dict(ds=ds, attack=attack, alpha=alpha, n=len(d), dp_dro=mean_dro,
                 dp_al=mean_al, R=R, p=float(p), acc_dro=float(np.mean(dro_acc)),
-                acc_al=float(np.mean(al_acc)), degen=degen,
+                acc_al=float(np.mean(al_acc)), degen=degen, dro_degen=dro_degen,
+                acc_delta=float(np.mean(al_acc)) - float(np.mean(dro_acc)),
                 sig=(p < 0.05), genuine=(p < 0.05 and not degen))
 
 
@@ -87,8 +93,14 @@ def main():
             L.append(f"| {ds} | {atk} | {a} | — | *incomplete* | | | | | | | |")
             continue
         cells[(ds, atk, a)] = c
-        verdict = ("**DEGENERATE**" if c['degen'] else
-                   ("genuine win" if c['genuine'] else "no sig. win"))
+        if c['degen'] and c['dro_degen']:
+            verdict = "both below floor (excluded regime)"
+        elif c['degen']:
+            verdict = "**AL DEGENERATE**"
+        elif c['genuine']:
+            verdict = "genuine win"
+        else:
+            verdict = "no sig. win"
         L.append(f"| {ds} | {atk} | {a} | {c['n']} | {c['dp_dro']:.4f} | "
                  f"{c['dp_al']:.4f} | {c['R']:+.1f}% | {c['p']:.4f}"
                  f"{'*' if c['sig'] else ''} | {c['acc_dro']:.4f} | "
@@ -116,12 +128,23 @@ def main():
     hi = [cells.get(('adult', 'dp', a)) for a in (0.3, 0.4)]
     if all(hi):
         ok = all(c['genuine'] for c in hi)
-        L.append(f"\n**Rule 2 — higher corruption.** Adult α=0.3 "
-                 f"{'genuine' if hi[0]['genuine'] else 'NOT genuine'} "
-                 f"(p={hi[0]['p']:.4f}), α=0.4 "
-                 f"{'genuine' if hi[1]['genuine'] else 'NOT genuine'} "
-                 f"(p={hi[1]['p']:.4f}) → "
-                 + ("**win HOLDS at higher α**" if ok else "**does NOT hold at higher α**"))
+        L.append(f"\n**Rule 2 — higher corruption.** α=0.3 p={hi[0]['p']:.4f}, "
+                 f"acc {hi[0]['acc_al']:.4f} (DRO {hi[0]['acc_dro']:.4f}); "
+                 f"α=0.4 p={hi[1]['p']:.4f}, acc {hi[1]['acc_al']:.4f} "
+                 f"(DRO {hi[1]['acc_dro']:.4f}) → "
+                 + ("**win HOLDS at higher α**" if ok
+                    else "**does NOT hold at higher α — the DP gains there are "
+                         "not usable improvements**"))
+        if hi[1]['acc_delta'] < -0.1:
+            L.append(f"\n> **Instability warning (new failure mode).** At α=0.4 "
+                     f"AL's accuracy is {hi[1]['acc_al']:.4f} against canonical "
+                     f"DRO's {hi[1]['acc_dro']:.4f} — a drop of "
+                     f"{hi[1]['acc_delta']:+.4f}. That is far below the "
+                     f"constant-predictor floor and below chance for this label "
+                     f"balance: μ=5 destabilises training at heavy corruption "
+                     f"rather than merely degrading it. Any recommendation for "
+                     f"μ must therefore be corruption-dependent (see TASK C), "
+                     f"and μ=5 must not be presented as a universal default.")
 
     atks = [cells.get(('adult', atk, 0.2)) for atk in ('if', 'combined')]
     if all(atks):
