@@ -159,9 +159,15 @@ Full result: `results/al_radius_compound_summary.md`.
 
 **Verdict: CONFLICT, not compound or redundant.** At the scoped cell
 (Adult, α=0.2), combining μ=20 with `radii_scale=2.0` collapses accuracy to
-0.7561 — at the degeneracy threshold (3 of 6 seeds land at or below the
-floor itself). Its apparent DP number (−94.0%) is constant-predictor
-collapse, not fairness. AL-only (μ=20, canonical radius) remains the
+0.7561 — below the degeneracy threshold (floor+0.005 = 0.7571); 3 of 6 seeds
+sit at or below that threshold, and one (seed 3) is at the floor itself
+(0.752128). Its apparent DP number (−94.0%) is constant-predictor
+collapse, not fairness. **Independently reviewed (TASK E):** every number
+above reproduced exactly from raw JSON, but the qualitative CONFLICT verdict
+would flip under a 0.0 margin instead of +0.005 (mean crosses back above the
+exact floor) — the margin is pre-registered and methodologically sound, but
+its magnitude has no independent justification and several verdicts (this
+one, Credit's non-rescue) sit close to it. See `docs/AL_REVIEW.md` D5. AL-only (μ=20, canonical radius) remains the
 genuine win (DP −70.8%, accuracy 0.7783); radius-only is inert on Adult/DP
 (+1.8%). **The two fixes each correct the objective independently; stacking
 them over-corrects.** This disagreed with the pre-registered prediction

@@ -65,9 +65,14 @@ locked canonical row on a full run).
 90-run μ-sensitivity sweep, §5b, found μ=20 is both safe and strictly more
 effective — μ=5 is superseded as the recommendation.)*
 
-Beats Naive on DP in **6/6 seeds**, and accuracy remains well above the
-constant-predictor floor (0.7521). This is a Pareto improvement, not a
-fairness/accuracy trade.
+Beats Naive on DP in **6/6 seeds**. **Correction, added after an independent
+review (§7):** the mean accuracy (0.7783) is above the floor, but one of the
+six seeds (seed 3) is a full constant-negative predictor — accuracy exactly
+the test majority rate, hidden by the mean. This is not the clean Pareto
+improvement we first reported; it's a real DP win with a genuine per-seed
+accuracy risk. At α=0 the accuracy cost is worse: it drops in **all 6
+seeds** (0.8147→0.7966), even though DP improves *more* there than under
+attack.
 
 ## 4. What does **not** work — stated up front
 
@@ -162,22 +167,29 @@ single hyperparameter story.
 ## 6. Two things needing your decision
 
 **(a) Should the augmented Lagrangian go into the submission, and under which
-framing?** Both the generalisation test (§5a) and the μ-sensitivity sweep (§5b)
-are now done, so this is a fully specified recommendation, not an open
-question. **Include it, with these exact parameters:**
+framing?** The generalisation test (§5a), the μ-sensitivity sweep (§5b), the
+radius-compound test (§5), and an independent adversarial review (§7) are all
+now done. **Include it, with these exact parameters and this exact framing:**
 - **μ=20**, framed as a *fairness-optimisation* fix, not a robustness one
-- **Scope: α ≤ 0.2 only.** α=0.4 is stated as "do not use AL" — no μ tested is
-  safe there, and that boundary is itself reported as a finding, not hidden.
-- **Dataset scope: Adult only.** Credit is not rescued by any tested μ; that
-  limitation is stated directly rather than omitted.
+- **Scope: α ≤ 0.2 only.** α=0.4 is "do not use AL" — no μ tested is safe
+  there. **Canonical radius only** — combining with the separately-found
+  radius fix (`radii_scale=2.0`) conflicts, not compounds.
+- **Dataset scope: Adult only.** Credit is not rescued by any tested μ.
+- **Accuracy claim, corrected per §7: not "holds or improves."** At α=0.2 the
+  6-seed mean improves but one seed fully collapses to the constant
+  predictor. At α=0 accuracy drops in every seed. State it as "a genuine DP
+  reduction with a real, seed-dependent accuracy cost," not a free Pareto
+  win.
 
 It is a principled, one-line change to your Lagrangian with a measured
-70.8–81.7% DP reduction (Adult, α≤0.2) and accuracy that holds or improves,
-plus an honestly-mapped safety boundary — which is itself a defensible
-contribution. If you would rather keep the submission's scope unchanged, the
-alternative is to report it as a Future Work item with the evidence attached —
-but we think it is strong enough, and now precise enough, to stand in the
-paper.
+70.8–81.7% mean DP reduction (Adult, α≤0.2), an honestly-mapped safety
+boundary, and — now — an independent review that tried to break it and
+mostly couldn't. That combination (a real effect, precisely scoped, with its
+own limits stated) is a more defensible contribution than an overstated one
+would have been. If you would rather keep the submission's scope unchanged,
+report it as Future Work with the evidence attached — but we think it is
+strong enough, precisely enough scoped, and now independently checked, to
+stand in the paper as written.
 
 **(b) A reproducibility gap we found and want to close.**
 `results/canonical_tau1.json` was generated before a k-NN metric fix landed, so
@@ -194,6 +206,45 @@ Re-running the grid under the corrected metric costs roughly one overnight run
 (~6 hours) and would close the gap entirely. **We recommend doing it** — the DP
 results provably do not move, so there is no risk to the headline claims, and it
 turns a disclosed limitation into a non-issue.
+
+## 7. Independent adversarial review — what we asked someone with no stake to try to break
+
+Before finalising, we dispatched a genuinely independent review: a fresh
+process with no memory of any of the work above, instructed to try to break
+the claim rather than confirm it, and to recompute every number from raw
+data rather than trust our summaries. Full evidence: `docs/AL_REVIEW.md`.
+
+**Confirmed correct, re-derived from scratch:** the AL gradient implementation
+(no sign error, no double-counting); μ=0 is a byte-identical no-op end-to-end
+(checked out the parent commit, reran, matched to full float precision); the
+headline Wilcoxon p=0.015625; the λ-starvation diagnosis (max λ=0.0119 vs
+ceiling 1.5, 0.54% of the loss); no code-path leakage between μ=0 and μ>0;
+the α=0.4/Credit/radius-compound boundaries.
+
+**Real defects found, now corrected everywhere above:**
+- **"Accuracy held or improved" was false at α=0.** All 6 seeds lose accuracy
+  (0.8147→0.7966). We had written a blanket Pareto claim covering both α
+  values; it only held for one of them.
+- **A per-seed collapse was hidden by the mean at α=0.2.** One of six seeds
+  (seed 3) is a full constant-negative predictor. Direct reruns across seeds
+  0–3 show this is general at μ=20, not specific to that seed — the honest
+  mechanism description is "AL pushes predictions toward the majority
+  class," not "AL denoises the attack."
+- **Two minor precision issues**: our "3/6 seeds at the floor" language
+  conflated the floor with the floor+0.005 threshold (only 1/6 is at the
+  floor itself); the LSAC constant-predictor constant (0.9016) is the test-
+  split majority, not the training majority (0.9019) — defensible but the
+  provenance wasn't stated.
+- **One epistemic caveat worth your awareness**: the +0.005 safety margin
+  used throughout is pre-registered (methodologically sound — fixed before
+  data) but its magnitude has no independent justification, and a few
+  verdicts (Credit's non-rescue, the radius-compound CONFLICT call) sit close
+  to it. Under a 0.0 margin instead, two of those would flip.
+
+We're telling you about a review that caught our own mistake rather than one
+that found nothing, because that's the point of running it — and because the
+corrected version above is what we're actually recommending, not the
+original overstated one.
 
 ---
 

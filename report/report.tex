@@ -438,8 +438,8 @@ objective exactly (unit-tested bit-identical), so all results elsewhere in
 this report are unaffected.
 
 \textbf{Result (Adult, DP attack, $n{=}6$, seed-paired Wilcoxon).} A
-90-run $\mu$-sensitivity sweep found $\mu{=}20$ maximises DP reduction while
-staying safely clear of the constant-predictor floor:
+90-run $\mu$-sensitivity sweep found $\mu{=}20$ maximises the 6-seed-mean DP
+reduction while keeping the mean accuracy above the safety threshold:
 
 \begin{center}
 \begin{tabular}{lrrrr}
@@ -470,6 +470,22 @@ Supplementary evidence at $\mu{=}5$ (the originally-discovered value): DP win
 transfers to the Combined attack ($-46.8\%$, $p{=}0.0156$, accuracy
 \emph{improving}); LSAC collapses under AL as it already does under DRO
 (\S\ref{sec:lsac-degen} -- pre-existing degeneracy, not a new failure).
+
+\textbf{Independent review (\texttt{docs/AL\_REVIEW.md}).} A separate
+adversarial pass -- fresh, no history on this project, re-deriving every
+number from raw JSON and live reruns rather than trusting the summaries
+above -- confirmed the core statistics (DP reduction, $p{=}0.015625$, the
+$\mu{=}0$ no-op, the $\lambda$-starvation diagnosis, no code-path leakage)
+but found the accuracy framing overstated: at $\alpha{=}0$ accuracy
+\emph{drops} in all 6 seeds ($0.8147\to0.7966$), not ``held or improved'';
+and at $\alpha{=}0.2$ one of the six seeds ($\mu{=}20$, seed 3) is a full
+constant-negative predictor (accuracy exactly the test majority rate),
+hidden by the 6-seed mean. Direct per-seed reruns (seeds 0--3) confirm this
+predicted-positive-rate collapse is general at $\mu{=}20$, not specific to
+one seed -- \emph{AL pushing predictions toward the majority class} is the
+accurate mechanism, not attack-specific denoising alone. The DP result and
+its significance stand; the accuracy side is a genuine, seed-dependent cost
+in places, reported here rather than smoothed into an aggregate mean.
 Full derivation, pre-registration, and all raw results:
 \texttt{docs/superpowers/specs/2026-08-05-augmented-lagrangian-design.md},
 \texttt{results/aug\_lagrangian\_extended\_summary.md},

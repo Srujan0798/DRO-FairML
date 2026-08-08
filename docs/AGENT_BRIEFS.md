@@ -1,8 +1,12 @@
-# Ready-to-paste agent brief
+# DRO-FAIR-AL — status record (no dispatch remaining)
 
-**Status: A, B, C, C2, and D are all DONE.** Only **TASK E** (independent
-adversarial review) remains before this is submission-ready. Full detail in
-`docs/TASKS_AL_VALIDATION.md`; this is the one dispatch message left.
+**All six tasks (A, B, C, C2, D, E) are DONE.** Nothing left to assign. This
+file is now a record of what each task found, kept for anyone who needs the
+history without re-reading every commit. Full detail in
+`docs/TASKS_AL_VALIDATION.md` and `docs/AL_REVIEW.md`. The one remaining
+decision (whether AL ships in the submission at this scope, and whether to
+re-run the canonical grid) is Prof. Manisha's, in
+`docs/MEMO_FOR_ADVISOR.md`.
 
 ---
 
@@ -32,11 +36,29 @@ floor, but the margin is thinner on individual seeds than the mean suggests.
 **TASK C2** (AL × radius compound, 18 new runs, dispatched to an isolated
 worktree, merged after independent verification): **CONFLICT, not compound
 or redundant.** Combining μ=20 with `radii_scale=2.0` at α=0.2 collapses
-accuracy to 0.7561 — right at the degeneracy threshold, 3/6 seeds at or
-below the floor itself. Its apparent −94.0% DP number is constant-predictor
-collapse, not fairness. μ=20 at the **canonical radius** is the
-recommendation; do not combine with the larger radius.
-`results/al_radius_compound_summary.md`.
+accuracy to 0.7561 — below the degeneracy threshold (0.7571); 3/6 seeds sit
+at or below that threshold, one (seed 3) at the exact floor. Its apparent
+−94.0% DP number is constant-predictor collapse, not fairness. μ=20 at the
+**canonical radius** is the recommendation; do not combine with the larger
+radius. `results/al_radius_compound_summary.md`.
+
+**TASK E** (independent adversarial review, `docs/AL_REVIEW.md`): the fresh
+reviewer confirmed the core claim — DP reduction, Wilcoxon p=0.0156, μ=0
+no-op, λ-starvation diagnosis, no leakage, all α=0.4/Credit/radius-compound
+boundaries — and found real framing defects in how it was written up:
+- **"Accuracy held or improved / Pareto"** is false at α=0.0: all 6 seeds
+  *lose* accuracy (0.8147→0.7966). True only at α=0.2 (aggregate improves,
+  but see next point).
+- **Seed 3 at μ=20, α=0.2 is a full constant-negative predictor** — its
+  accuracy (0.752128) is the test majority rate exactly, hidden by the
+  6-seed mean (0.7783). Direct per-seed reruns (seeds 0–3) confirm this
+  positive-rate collapse is **general, not seed-0-specific**: "AL pushes
+  toward the majority class" is the accurate mechanism description, not
+  "AL denoises the attack" (the TASK B framing, now superseded).
+- The `+0.005` degeneracy margin is pre-registered but arbitrary; several
+  verdicts (Credit's non-rescue, the C2 CONFLICT call) sit close to it.
+All corrected in the paper, report, and this file. Full evidence and two
+more minor findings in `docs/AL_REVIEW.md`.
 
 **TASK D** (paper + report integration): both PDFs now contain the AL
 section — diagnosis, formula, the μ=20 result table, and all four scope
@@ -50,48 +72,8 @@ compile. `paper/sections/results.tex` §Augmented-Lagrangian,
 **Use μ=20, Adult, α≤0.2, canonical radius (`radii_scale=1.0`) as the scope
 in everything.** μ=5 and any radius/μ combination are superseded.
 
----
-
-## TASK E — Independent adversarial review (the one open task)
-
-> You are working in the DRO-FairML repo at `/Users/srujansai/Desktop/DRO-FairML`.
-> Read the COMPLETED section above, then `docs/TASKS_AL_VALIDATION.md`'s TASK E
-> section. You did not run A/B/C/C2/D — that is what makes this review
-> independent. Do not re-derive their conclusions by reading their summaries;
-> verify them from raw data.
->
-> Your job is to BREAK the claim, not confirm it. Finding a real defect is a
-> successful outcome. Recent history justifies the paranoia: a verification
-> pass earlier in this project found the built PDF printing a significance
-> star on floating-point noise. Assume more exists.
->
-> **Specific things to check, in addition to the general scope in
-> TASKS_AL_VALIDATION.md:**
-> - **TASK C's μ=20 rule application.** Read
->   `experiments/summarize_mu_sensitivity.py` (Rules C1–C4) and recompute the
->   SAFE/EFFECTIVE table by hand from `results/mu_sensitivity.json` — don't
->   trust the script's printed output. The "no μ safe at α=0.4" conclusion
->   rests on μ ∈ {0.5,1,2,5,10,20} all failing; check each individually.
-> - **TASK C2's degeneracy call is razor-thin** — mean accuracy 0.756127
->   against threshold 0.7571, a gap of 0.001. Recompute this yourself from
->   `results/al_radius_compound.json` (already done once independently before
->   merging, but a second check by someone with no stake in the result is
->   exactly what this task is for). Check whether the per-seed accuracies
->   (3 of 6 at or below the floor itself) change the read.
-> - **TASK B's mechanism caveat**: does the near-zero positive-prediction
->   rate at μ=20 (seed 0) generalize to other seeds, or is it seed-specific?
->   This bears directly on whether "denoising" is the right description of
->   what μ=20 actually does.
-> - Re-derive `(μ/2)g²`'s gradient by hand; confirm `g_dp`/`g_if` are
->   genuinely non-negative so no `max(g,0)` is needed.
-> - Verify `μ=0` is byte-identical to pre-change canonical behaviour by
->   checking out the parent commit and diffing a full run — don't trust the
->   unit test alone.
-> - Recompute the Wilcoxon tests by hand from raw JSON for at least the
->   headline Adult α=0.2 cell; confirm seed pairing and one-sided direction.
-> - Recompute the constant-predictor floors (0.7521 / 0.7788 / 0.9016) —
->   don't trust the constants.
-> - Look for leakage: does AL see anything canonical DRO does not?
->
-> Deliver `docs/AL_REVIEW.md`: confirmed-correct items, plus any defects
-> found, with severity. Be blunt.
+**TASK E** (independent adversarial review — see the record above): ran to
+completion in a fresh, independent `opencode` process with no memory of
+A/B/C/C2/D, exactly as the brief below required. Confirmed the core claim,
+found the framing defects now folded into this file, the paper, and the
+report. Nothing further to dispatch here.

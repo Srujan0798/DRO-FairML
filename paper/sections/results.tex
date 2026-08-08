@@ -388,7 +388,13 @@ depends on $\lambda$'s slow crawl:
 \end{equation}
 $\mu{=}0$ recovers the canonical objective exactly (bit-identical, unit-tested
 and verified against the locked canonical row on a full run), so every
-previously reported result in this paper is unaffected by this addition.
+previously reported result in this paper is unaffected by this addition. We
+add only the quadratic penalty to the loss; the dual update itself (the
+geometric-decay rule diagnosed above) is left unchanged. This is a
+penalty-only variant, not the full classical method, which also updates the
+dual via the augmented gradient --- precise terminology matters here since
+the dual's slow crawl is exactly the defect being worked around, not fixed
+at its source.
 
 \paragraph{Result (Adult, DP attack, seed-paired Wilcoxon, $n{=}6$).}
 A dedicated $\mu$-sensitivity sweep (90 runs, $\mu\in\{0.5,1,2,5,10,20\}$)
@@ -407,8 +413,23 @@ $\alpha$ & DP: Naive $\to$ DRO $\to$ AL & $p$ & acc: DRO $\to$ AL & margin over 
 \end{center}
 
 DRO-FAIR-AL ($\mu{=}20$) beats Naive on DP in $6/6$ seeds at both $\alpha$
-values, with accuracy held or improved --- a Pareto improvement, not a
-fairness/accuracy trade.
+values. The accuracy picture differs by $\alpha$ and is stated precisely
+rather than as a blanket Pareto claim: at $\alpha{=}0.2$ the aggregate
+accuracy \emph{improves} ($0.7586\to0.7783$), but at $\alpha{=}0$ it
+\emph{drops} in all 6 seeds ($0.8147\to0.7966$) even though DP improves
+more there than under attack --- a DP-reduction-at-accuracy-cost result at
+$\alpha{=}0$, not a Pareto improvement. Even at $\alpha{=}0.2$ the 6-seed
+mean masks a per-seed risk: one seed (3 of 6) collapses to the exact
+constant-negative predictor ($\mathrm{acc}{=}0.7521$, the test majority
+rate), and predicted-positive-rate reruns across seeds 0--3 confirm this is
+a general property of $\mu{=}20$, not an isolated outlier --- the mechanism
+is more accurately described as \emph{AL pushing predictions toward the
+majority class} than as attack-specific denoising. Both the DP reduction and
+this per-seed accuracy risk were independently re-derived from raw data by a
+separate adversarial review (\texttt{docs/AL\_REVIEW.md}) that confirmed the
+core statistics and flagged this exact framing gap; the accuracy side is a
+genuine cost in some regimes, not a free improvement, and is reported as
+such.
 
 \paragraph{Scope: $\alpha\le0.2$ on Adult only --- stated as findings, not
 omissions.} Four boundaries were tested and are reported directly. First, a
