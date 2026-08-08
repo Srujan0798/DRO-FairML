@@ -31,21 +31,24 @@ _LOCKED_SCIENCE = {
 
 # Config tuple schema (in order): dataset, alpha, seed, method, attack, k_inner,
 # pgd_steps, tau, lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type,
-# attack_k, [radii_scale, radii_clamp]. The last two are OPTIONAL for backward
-# compatibility with Wave 1 drivers that use 14-tuples; when absent they default to
-# (1.0, None) so the canonical closed-form radii are unchanged. Agent L2 (LSAC
-# degeneracy fix) supplies the 16-tuple to thread the per-group radius clamp
-# through to DroFairTrainer._compute_radii without disturbing other agents.
+# attack_k, [radii_scale, radii_clamp], [aug_lagrangian_mu]. The last three are
+# OPTIONAL for backward compatibility with Wave 1 drivers that use 14-tuples;
+# when absent they default to (1.0, None, 0.0) so the canonical closed-form
+# radii are unchanged and the AL quadratic penalty is an exact no-op. Agent L2
+# (LSAC degeneracy fix) supplies the 16-tuple to thread the per-group radius
+# clamp. TASK C (mu sensitivity) supplies the 17-tuple to thread aug_lagrangian_mu.
 _KEY_FIELDS = ['dataset', 'alpha', 'seed', 'method', 'attack', 'k_inner', 'pgd_steps',
                'tau', 'lambda_init', 'lr_lambda', 'radii_mode', 'coordinated',
-               'corruptor_type', 'attack_k', 'radii_scale', 'radii_clamp']
+               'corruptor_type', 'attack_k', 'radii_scale', 'radii_clamp',
+               'aug_lagrangian_mu']
 
 
 def _worker(cfg):
     """Module-level worker (must be importable by spawn). No globals — fully self-contained.
 
-    Accepts either a 14-tuple (Wave 1 drivers; radii_scale=1.0, radii_clamp=None)
-    or a 16-tuple (Agent L2 passes the per-group radius clamp). Backward-compatible.
+    Accepts a 14-tuple (Wave 1 drivers), 16-tuple (Agent L2 radius clamp), or
+    17-tuple (TASK C aug_lagrangian_mu). Backward-compatible: trailing fields
+    default to radii_scale=1.0, radii_clamp=None, aug_lagrangian_mu=0.0.
     """
     import torch
     torch.set_num_threads(1)
@@ -53,11 +56,16 @@ def _worker(cfg):
     if len(cfg) == 14:
         (ds, a, s, m, attack, k_inner, pgd_steps, tau,
          lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type, attack_k) = cfg
-        radii_scale, radii_clamp = 1.0, None
-    else:
+        radii_scale, radii_clamp, aug_lagrangian_mu = 1.0, None, 0.0
+    elif len(cfg) == 16:
         (ds, a, s, m, attack, k_inner, pgd_steps, tau,
          lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type, attack_k,
          radii_scale, radii_clamp) = cfg
+        aug_lagrangian_mu = 0.0
+    else:
+        (ds, a, s, m, attack, k_inner, pgd_steps, tau,
+         lambda_init, lr_lambda, radii_mode, coordinated, corruptor_type, attack_k,
+         radii_scale, radii_clamp, aug_lagrangian_mu) = cfg
     return run_single_experiment(
         ds, a, s, attack, m, device="cpu", verbose=False,
         epochs=60, k_inner=k_inner, pgd_steps=pgd_steps,
@@ -65,6 +73,7 @@ def _worker(cfg):
         coordinated=coordinated, n_seeds_planned=6,
         corruptor_type=corruptor_type, lr_lambda=lr_lambda, attack_k=attack_k,
         radii_scale=radii_scale, radii_clamp=radii_clamp,
+        aug_lagrangian_mu=aug_lagrangian_mu,
     )
 
 
@@ -75,7 +84,8 @@ def _key(r):
             r.get('radii_mode'), r.get('coordinated'),
             r.get('corruptor_type', 'adversarial'),
             r.get('attack_k', 5),
-            r.get('radii_scale', 1.0), r.get('radii_clamp', None))
+            r.get('radii_scale', 1.0), r.get('radii_clamp', None),
+            r.get('aug_lagrangian_mu', 0.0))
 
 
 def missing_configs(rows, configs):
@@ -83,9 +93,12 @@ def missing_configs(rows, configs):
     out = []
     seen = set()
     for c in configs:
-        # Normalize to a 16-element dict by padding missing trailing fields with
-        # their defaults so 14-tuple configs key identically to legacy rows.
-        pad = list(c) + [1.0, None][len(c):]
+        # Normalize to a len(_KEY_FIELDS)-element dict by padding missing
+        # trailing fields with their defaults so shorter-tuple configs key
+        # identically to legacy rows. Defaults: radii_scale=1.0,
+        # radii_clamp=None, aug_lagrangian_mu=0.0.
+        defaults = [1.0, None, 0.0]
+        pad = list(c) + defaults[len(c) - 14:] if len(c) < len(_KEY_FIELDS) else list(c)
         k = _key(dict(zip(_KEY_FIELDS, pad)))
         if k in have or k in seen:
             continue
