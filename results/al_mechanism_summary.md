@@ -1,19 +1,91 @@
-# TASK B — mechanism: does AL suppress the corrupted points? (Adult, α=0.2, seed 0)
+# TASK B — mechanism study: why does accuracy go UP under AL?
 
-Hypothesis: AL penalises the DP gap hard enough to suppress the attacked 
-points' influence on training, fitting them LESS than canonical DRO does. 
-If true, acc_on_corrupted should be LOWER (or grow less) for AL than canonical, 
-while acc_on_clean stays comparable or improves.
+**Cell:** adult, alpha=0.2, seed=0, attack=dp | canonical mu=0.0 vs AL mu=5.0
+**Epochs:** 60 | K_inner=10 | PGD steps=20
 
-| trainer | μ | n_corrupted | n_clean | acc on corrupted subset | acc on clean subset | pos rate by group |
-|---|---|---|---|---|---|---|
-| canonical_DRO | 0.0 | 5878 | 23515 | 0.5126 | 0.8118 | {0: 0.16432881355285645, 1: 0.5387714505195618} |
-| AL_mu5 | 5.0 | 5878 | 23515 | 0.1803 | 0.8421 | {0: 0.003393665188923478, 1: 0.36298272013664246} |
-| AL_mu20 | 20.0 | 5878 | 23515 | 0.1776 | 0.7643 | {0: 0.0, 1: 0.04431909695267677} |
+## 1. Corrupted-vs-clean accuracy (the key measurement)
 
-## Verdict
-**Hypothesis SUPPORTED, with a caveat that matters for μ selection.** Both AL variants fit the corrupted subset far less than canonical DRO (corrupted-subset accuracy: canonical 0.5126 vs μ=5 0.1803 vs μ=20 0.1776) — the model is actively resisting the adversarial label pattern on those specific points, not just uniformly under-fitting. Clean-subset accuracy at μ=5 *improves* (0.8118→0.8421), which is clean support for denoising as the mechanism.
+Corrupted samples: 5878/29393 (20.0% of training data)
 
-**At μ=20 the picture is more mixed than "denoising" alone explains.** Predicted-positive rate collapses to {group 0: 0.0%, group 1: 4.4%} — the model predicts negative almost everywhere. Adult's constant-negative-predictor accuracy is **0.7522** (computed directly from the training labels), essentially identical to μ=20's clean-subset accuracy here (**0.7643**). On this specific seed, μ=20 is sitting close to constant-predictor behavior, not a nuanced fairness-aware classifier — DP is trivially small when almost nobody is predicted positive in either group, independent of whether the classification is meaningful.
+| subset | canonical DRO | AL DRO | Delta (AL - canonical) |
+|---|---|---|---|
+| **corrupted** | 0.5126 | 0.1803 | **-0.3323** |
+| **clean** | 0.8118 | 0.8421 | +0.0303 |
+| overall | 0.7520 | 0.7098 | -0.0422 |
 
-This does not contradict TASK C's finding that μ=20 is SAFE in aggregate (6-seed mean accuracy 0.7783 at α=0.2, comfortably above the 0.7526 floor+margin) — the other seeds must be pulling the mean well clear of collapse. But it means **the aggregate safety margin is thinner on individual seeds than the mean suggests**, and μ=20's mechanism is partly "suppress positive predictions toward the majority class," not purely "ignore the corrupted points while classifying normally elsewhere." This is exactly the kind of per-seed behavior TASK E's independent review should check directly rather than trusting the 6-seed mean alone.
+**Interpretation:** AL fits corrupted points LESS (Delta = -0.3323), while clean-subset accuracy improves (Delta = +0.0303).
+
+## 2. g_dp trajectory (does AL suppress g faster?)
+
+- canonical final g_dp: 0.2438
+- AL final g_dp: 0.0941
+- AL suppresses g_dp by: 0.1497
+
+![g_dp trajectory](figures/al_mechanism_g_dp.png)
+
+## 3. lambda_dp trajectory (does AL lambda grow larger?)
+
+- canonical max lambda_dp: 0.011925
+- AL max lambda_dp: 0.005914
+  (ceiling = 1.5; both starved — lambda*g peak ~ 0.0021 vs 0.0005)
+
+![lambda_dp trajectory](figures/al_mechanism_lambda_dp.png)
+
+## 4. val_acc trajectory (when does AL pull ahead?)
+
+- canonical final val_acc: 0.7499
+- AL final val_acc: 0.8073
+- AL improves val_acc by: +0.0575
+
+![val_acc trajectory](figures/al_mechanism_val_acc.png)
+
+## 5. Prediction distribution shift (fraction predicted positive per group)
+
+### Training (corrupted) data
+
+| group | canonical DRO | AL DRO | Delta |
+|---|---|---|---|
+| Group 0 | 0.1643 | 0.0034 | -0.1609 |
+| Group 1 | 0.5388 | 0.3630 | -0.1758 |
+
+### Test (clean) data
+
+| group | canonical DRO | AL DRO | Delta |
+|---|---|---|---|
+| Group 0 | 0.0191 | 0.0031 | -0.0160 |
+| Group 1 | 0.5313 | 0.3397 | -0.1916 |
+
+![group fractions](figures/al_mechanism_group_fractions.png)
+
+## 6. Verdict
+
+**SUPPORTED: AL fits the corrupted points LESS than canonical DRO (Delta acc_corrupted = -0.3323), consistent with 'AL suppresses attacked points' denoising.**
+
+### Reasoning
+
+The denoising hypothesis predicts AL should fit corrupted points less. Measured Delta acc_corrupted = -0.3323.
+
+- Delta acc_corrupted < 0: AL denoises the attack (fits corrupted points less).
+- Delta acc_corrupted ~ 0: mechanism unclear.
+- Delta acc_corrupted > 0: opposite to denoising.
+
+**Clean-subset accuracy Delta = +0.0303**: AL improves clean accuracy, suggesting it does not merely sacrifice corrupted points.
+
+### Nuance: denoising or majority-class shift?
+
+The data support "AL suppresses attacked points," but the prediction distribution
+shift (Plot 5) shows the mechanism is better described as **pushing predictions
+toward the majority class** (negative): fraction predicted positive drops from
+0.54 -> 0.36 (Group 1) and 0.02 -> 0.003 (Group 0) on test data. This is the
+same mechanism the independent review (MEMO_FOR_ADVISOR section 7) flagged: AL
+does not selectively "denoise" corrupted points — it globally shrinks the
+positive rate, which suppresses the group gap because the DP attack works by
+inflating that gap. The two descriptions are consistent (the attack's corrupted
+points are exactly the ones the gap depends on), but "majority-class shift" is
+the more precise mechanism. At mu=5 the shift is mild (val_acc 0.8073, well
+above the 0.7521 floor); at larger mu it risks collapse to the constant
+predictor.
+
+---
+
+*Generated by experiments/summarize_mechanism.py | 2026-08-08 23:46:25*
