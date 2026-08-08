@@ -43,3 +43,15 @@ inner max ascends $\nabla g$ (not $\lambda\nabla g$).
 Statistical significance uses Wilcoxon signed-rank test on per-seed
 DP (or IF) deltas.  No oracle information (true per-group corruption
 rates / mask) is ever passed to the trainer.
+
+\textbf{Augmented-Lagrangian variant.}
+The trainer optionally adds a quadratic penalty
+$\tfrac{\mu}{2}g_{\mathrm{dp}}^{2}+\tfrac{\mu}{2}g_{\mathrm{if}}^{2}$ to
+the Lagrangian (a penalty-only augmented Lagrangian; see
+\S\ref{sec:results-al}), controlled by \texttt{aug\_lagrangian\_mu}.
+$\mu{=}0$ recovers the canonical objective
+\emph{exactly} --- verified bit-identical against the locked canonical
+rows on a full end-to-end run --- so \emph{every} result reported in
+this paper's canonical tables is obtained at $\mu{=}0$ and is
+unaffected by the AL variant.  The $\mu{>}0$ experiments are reported
+separately in \S\ref{sec:results-al}.

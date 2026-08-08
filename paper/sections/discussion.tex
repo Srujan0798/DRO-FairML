@@ -179,21 +179,45 @@ independent, principled mechanisms failing cleanly is stronger evidence
 that the degeneracy is structural --- the imbalance itself, not an
 estimation artifact --- than either attempt alone.
 
-\textbf{Principled dual-variable stabilization.} The dual step uses a
-hard clamp $\lambda\le\lambda_{\max}{=}1.5$ (tuned empirically; the
-paper's usual setting is $2.0$) to prevent $\lambda$-runaway under high
-temperature. We tested whether simply raising this cap, or sharpening
-the tilted-risk concentration $\beta$, could make DRO's fairness margin
-over Naive larger rather than just present (Adult, DP attack,
-$\alpha\in\{0.1,0.2\}$, $n{=}3$): \textbf{raising $\lambda_{\max}$ to
-$2.0$ was a complete no-op} (6/6 configs byte-identical to the
-$\lambda_{\max}{=}1.5$ canonical run --- the dual variable never
-reaches the cap at this $\alpha$ range, so it is not the bottleneck),
-and \textbf{doubling $\beta$ to $10$ made DP consistently worse, not
-better} (6/6 configs, $+0.0025$ to $+0.0085$ absolute DP violation,
-accuracy essentially unchanged; \texttt{results/fairness\_aggressiveness\_summary.md}).
-Neither blunt lever widens the margin, which argues \emph{for} a
-smarter mechanism rather than a bigger constant. We implement and evaluate
-exactly that mechanism --- a quadratic penalty on $\lambda$ in the
-Lagrangian, i.e.\ an augmented-Lagrangian formulation --- in
-\S\ref{sec:results-al}; it is no longer future work.
+\textbf{Dual-variable stabilization --- tested, then resolved.} The
+dual step uses a hard clamp $\lambda\le\lambda_{\max}{=}1.5$ (tuned
+empirically; the paper's usual setting is $2.0$) to prevent
+$\lambda$-runaway under high temperature. We tested whether simply
+raising this cap, or sharpening the tilted-risk concentration $\beta$,
+could make DRO's fairness margin over Naive larger rather than just
+present (Adult, DP attack, $\alpha\in\{0.1,0.2\}$, $n{=}3$):
+\textbf{raising $\lambda_{\max}$ to $2.0$ was a complete no-op} (6/6
+configs byte-identical to the $\lambda_{\max}{=}1.5$ canonical run ---
+the dual variable never reaches the cap at this $\alpha$ range, so it is
+not the bottleneck), and \textbf{doubling $\beta$ to $10$ made DP
+consistently worse, not better} (6/6 configs, $+0.0025$ to $+0.0085$
+absolute DP violation, accuracy essentially unchanged;
+\texttt{results/fairness\_aggressiveness\_summary.md}).  Neither blunt
+lever widens the margin.  We diagnose the underlying defect as
+$\lambda$-starvation --- the geometrically-decaying dual learning rate
+caps $\lambda$'s total accumulation at $\approx0.1$, so the fairness
+penalty never exceeds $\approx0.5\%$ of the loss
+(\S\ref{sec:results-al}) --- and resolve it with a penalty-only
+augmented Lagrangian ($\mu{=}20$, canonical radius) in
+\S\ref{sec:results-al}.  This resolves the headline mechanism; what it
+leaves open is scoped and listed next.
+
+\textbf{Open extensions of the augmented Lagrangian.}
+The AL formulation of \S\ref{sec:results-al} is demonstrated on a single
+dataset (Adult), a single corruption regime ($\alpha\le0.2$), and a
+single radius choice.  Three concrete next steps follow.  \emph{(i)
+Adaptive $\mu$ scheduling}: the safe $\mu$ is a function of $\alpha$
+(TASK~C --- $\mu{=}20$ is safe at $\alpha\le0.2$ but collapses the
+model at $\alpha{=}0.4$), so a schedule that decays $\mu$ as $\alpha$
+grows would extend the method's usable range without a separate sweep
+per corruption level.  \emph{(ii) Multi-group / multi-attribute
+settings}: all current AL results are on a binary protected attribute;
+the per-group DP generalises to $K{>}2$ groups, but whether the same
+$\mu$ is safe when several group-rate gaps are penalised simultaneously
+is untested.  \emph{(iii) Understanding the AL $\times$ radius
+conflict}: stacking $\mu{=}20$ with the larger radius that the radius
+ablation independently prefers (\S\ref{sec:results-al}) collapses
+accuracy rather than compounding the gain --- the mechanism of that
+conflict (shared gradient direction? shared effective constraint
+sharpness?) is not yet diagnosed and is a prerequisite for any attempt
+to combine the two fixes.

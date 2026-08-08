@@ -744,12 +744,31 @@ a complete no-op (6/6 configs byte-identical --- the dual variable never
 reaches the cap at $\alpha\le0.2$), and doubling $\beta$ to $10$ made DP
 consistently \emph{worse} (6/6 configs, $+0.0025$ to $+0.0085$ absolute).
 Neither blunt lever widens DRO's margin over Naive; full data in
-\texttt{results/fairness\_aggressiveness\_summary.md}. This motivates
-\textbf{(iv) augmented-Lagrangian dual stabilization} instead of a bigger
-constant: replacing the tuned $\lambda_{\max}$ hard clamp with a quadratic
-penalty on $\lambda$ is a standard mechanism, informed by (iii)'s negative
-result rather than merely proposed alongside it. Full discussion:
-\texttt{paper/sections/discussion.tex} (Future Work subsection).
+\texttt{results/fairness\_aggressiveness\_summary.md}. We diagnose the
+underlying defect as $\lambda$-starvation --- the geometrically-decaying
+dual learning rate caps $\lambda$'s total accumulation at $\approx0.1$,
+so the fairness penalty never exceeds $\approx0.5\%$ of the loss
+(\S\ref{sec:report-al}) --- and resolve it with a penalty-only
+augmented Lagrangian ($\mu{=}20$, canonical radius) in
+\S\ref{sec:report-al}. This resolves the headline mechanism; what it
+leaves open is scoped and listed next.
+
+\textbf{(iv) Open extensions of the augmented Lagrangian.} The AL
+formulation of \S\ref{sec:report-al} is demonstrated on a single
+dataset (Adult), a single corruption regime ($\alpha\le0.2$), and a
+single radius choice. Three concrete next steps follow.
+\emph{Adaptive $\mu$ scheduling}: the safe $\mu$ is a function of
+$\alpha$ ($\mu{=}20$ is safe at $\alpha\le0.2$ but collapses the model
+at $\alpha{=}0.4$), so a schedule that decays $\mu$ as $\alpha$ grows
+would extend the method's usable range without a separate sweep per
+corruption level. \emph{Multi-group / multi-attribute settings}: all
+current AL results are on a binary protected attribute; whether the same
+$\mu$ is safe when several group-rate gaps are penalised simultaneously
+is untested. \emph{Understanding the AL $\times$ radius conflict}:
+stacking $\mu{=}20$ with the larger radius that the radius ablation
+independently prefers collapses accuracy rather than compounding the gain
+(\S\ref{sec:report-al}) --- the mechanism of that conflict is not yet
+diagnosed.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Theoretical Verification}
