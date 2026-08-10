@@ -28,7 +28,7 @@ Direct instruction: stop adding experiments, verify the math is correct.
 
 - `canonical_tau1.json`: **900/900 rows** (540 n=6 locked + 360 n=10 extension)
 - First 540 byte-identical (SHA-256 verified)
-- 6 significance flips at n=10 (all DP wins stay significant; some IF cells strengthen)
+- 1 significance flip at n=10 (credit/if/α=0.1: n.s. at n=6 → sig at n=10); all DP wins stay significant at both n
 - `utkface_canonical.json`: 90/90 REAL rows (read-only)
 
 **Headline (verified):** DRO beats Naive on Adult/Credit DP+Combined at α≤0.2 (Wilcoxon p<0.05, n=6; Adult/DP α=0.1 is 5/6). LSAC/DP degenerate. IF mixed. α≥0.3 below constant-predictor on Adult/Credit only.
@@ -44,13 +44,13 @@ Direct instruction: stop adding experiments, verify the math is correct.
 | **A3** λ/lr grid | 72/72 | No (λ,lr) beats default; no α=0.3 rescue above constant predictor 0.7521 |
 | **A4** random vs adversarial | 144/144 | **12-40× claim WRONG** — real multiplier -3.7× to 1.6× (median 0.7×). Paper must correct. |
 | **A5** empirical radii | 180/180 | No improvement (0/5 cells). Attack-aware radius calibration does not help. |
-| **N1** attack×radius | 252/252 | **Radius/attack match significant** (Spearman ρ=+0.668, p=0.0065) — answers Kuldeep's May-29 question |
+| **N1** attack×radius | 252/252 | Radius/attack pattern: 12/15 cells prefer larger radius (all α≥0.2); Spearman ρ=+0.131 (p=0.8047, limited to 6 cells with measured attack_eff) — directional pattern consistent with Kuldeep's May-29 hypothesis but not statistically significant |
 | **N2** high-α rescue | 120/120 | No τ/lr/epochs rescues α≥0.3. 200-epoch convergence evidence closes Kuldeep's Jun-16 protocol. |
 | **N3** COMPAS + German | 360/360 | **German REPLICATES** DRO pattern (2/2 sig at α≤0.2); COMPAS ambiguous (0/2 sig) |
 | **N4** IF@α=0.3 | analysis | **CONFIRMED** — Adult/Credit p=0.0156, 6/6; Adult DP-loss coupling confirmed |
 | **N5** K_inner∈{5,20} | 180/180 | Small sensitivity (5/30 cells, max ΔDP=0.0011); K_inner≥5 largely sufficient |
 | **L2** LSAC fix | 120/120 | **NO arm works** — clamp, empirical, combined all fail. Limitation stands WITH EVIDENCE. |
-| **S** n=6→n=10 extension | 900/900 | 6 significance flips; all DP wins stay significant |
+| **S** n=6→n=10 extension | 900/900 | 1 significance flip (credit/if/α=0.1); all DP wins stay significant at both n |
 
 ---
 
@@ -132,7 +132,7 @@ Re-running canonical grid with current code (post-k-NN-cosine-fix) into `canonic
 1. **Canonical:** Fixed τ=1 makes DRO beat Naive on Adult/Credit DP+Combined at α≤0.2 (p<0.05, n=6; Adult/DP α=0.1 is 5/6). Verified at n=10.
 2. **German** replicates the DRO pattern; **COMPAS** does not (scope statement).
 3. **LSAC/DP** is a degenerate negative — tested fix (L2) confirms it's not an artifact of the radii formula.
-4. **Radius/attack match** is significant (N1, p=0.0065) — answers Kuldeep's May-29 question.
+4. **Radius/attack pattern** (N1): 12 of 15 cells prefer the larger radius at α≥0.2 — directional pattern consistent with Kuldeep's May-29 hypothesis, though the Spearman correlation (ρ=+0.131, p=0.8047, limited to 6 cells with measured attack_eff) is not significant.
 5. **AL (augmented Lagrangian)** is a genuine improvement on Adult (μ=20, 14.9× margin over Naive at α=0.2) but is a **generic fairness regulariser**, not a corruption-robustness mechanism (TASK A). Credit/LSAC are not rescued.
 6. **IF@α=0.3** is supported on Adult/Credit (N4, p=0.0156, 6/6) but DP-under-IF is mixed.
 

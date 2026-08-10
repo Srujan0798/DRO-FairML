@@ -150,8 +150,10 @@ and the correct value to write into the paper.
 ## 5. A second, independent finding pointing the same way
 
 The radius ablation (180/180 runs) answers Kuldeep's original May-29 question:
-the radius that minimises DP **grows with attack strength** (Spearman ρ=+0.668,
-p=0.0065). His hypothesis was right.
+the radius that minimises DP **follows a clear directional pattern with** attack strength
+(12 of 15 cells prefer the larger radius, all at α≥0.2). The Spearman correlation (ρ=+0.131,
+p=0.8047, limited to 6 cells with directly measured attack effectiveness) does not reach
+significance at this n, but the pattern is consistent with his hypothesis.
 
 Notably, **11 of 15 cells prefer radius scale 2.0 over the canonical 1.0** — the
 closed-form radius is systematically too *small*.

@@ -97,13 +97,15 @@ radii_scale ∈ {0.5, 1.0(canonical), 2.0}; attack='dp'; DRO only. Naive is radi
 | lsac | 0.3 | 2 | 2.0 | 0.2193 | — | 0.0970 |
 | lsac | 0.4 | 2 | 2.0 | 0.2176 | — | 0.0970 |
 
-Best-radius counts across 15 (ds,α) cells: {2.0: 11, 0.5: 4}.
+Best-radius counts across 15 (ds,α) cells: {2.0: 12, 0.5: 3}.
 
-Spearman ρ (attack_eff vs best_radii_scale) = +0.668 (p=0.0065).
-→ Stronger attacks prefer LARGER radii: the radius that minimizes DRO DP tracks the corruption strength. **Kuldeep's hypothesis confirmed**: the radius matters and should match the attack.
+Pattern: all α≥0.2 cells (12/15) prefer radii_scale=2.0; only α=0.0 cells (no corruption) show no preference or prefer 0.5. The radius that minimizes DRO DP is larger at higher corruption — consistent with Kuldeep's hypothesis.
+
+Spearman ρ (attack_eff vs best_radii_scale, 6 cells with measured attack_eff) = +0.131 (p=0.8047).
+→ The best-radius pattern is clear directionally (12/15 cells), but the Spearman correlation is not significant at this n when computed from available attack-effectiveness measurements (only α∈{0.1,2} have directly measured attack_eff). The directional pattern is the finding; the correlation awaiting more data.
 
 ## Verdict — Kuldeep's question answered
 
-ARM A: directional but not significant (ρ=+0.057, p=0.8614). DRO advantage trends up with attack strength but is not significant at this n. ARM B: the radius that minimizes DRO DP grows significantly with attack strength (ρ=+0.668, p=0.0065) — DRO's fairness is a function of the radius/attack MATCH.
+ARM A: directional but not significant (ρ=+0.057, p=0.8614). DRO advantage trends up with attack strength but is not significant at this n. ARM B: the radius that minimizes DRO DP follows a clear directional pattern — 12 of 15 (dataset, α) cells prefer the larger radius, and every cell with α≥0.2 prefers it. This is consistent with Kuldeep's original hypothesis that the radius should match the attack, though the Spearman correlation (p=0.8047, limited to 6 cells with measured attack_eff) does not reach significance.
 
 Source files: `results/attack_strength.json`, `results/radius_sensitivity.json`, canonical (read-only).

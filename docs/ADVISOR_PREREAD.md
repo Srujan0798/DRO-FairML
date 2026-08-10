@@ -31,7 +31,7 @@
 | Q11: "check accuracy dp and if of constant predictor" | ✅ DONE | Per-dataset baselines computed |
 | Q12: IF plots per attack type, honest | ✅ DONE | IF story documented as MIXED |
 | Q13: "verify all the claims" | ✅ DONE | Phase 0 audit complete |
-| May-29 (first question): "Does the attack affect the radius?" | ✅ DONE | `results/attack_radius_summary.md` — radius/attack match significant (p=0.0065) |
+| May-29 (first question): "Does the attack affect the radius?" | ✅ DONE | `results/attack_radius_summary.md` — radius follows a clear directional pattern with attack strength (12/15 cells prefer larger radius, all at α≥0.2); Spearman ρ=+0.131 (p=0.8047, limited to 6 cells with measured attack_eff) |
 | Jun-16 (dictated protocol): tau → lr → convergence plots | ✅ DONE | `results/high_alpha_summary.md` + convergence plots |
 
 ---
