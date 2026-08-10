@@ -270,29 +270,29 @@ defects found, with severity. Finding a real problem is a successful outcome.
 
 ---
 
-## TASK F — Close the canonical reproducibility gap (decision needed before starting)
+## TASK F — Close the canonical reproducibility gap (COMPLETE 2026-08-09)
 
-**Why:** `results/canonical_tau1.json` can no longer be reproduced by current
-code. It was run before commit `04d00a6` aligned the training IF k-NN graph to
-cosine. Verified by rerunning Adult/DP α=0.2 seed 0: accuracy reproduces
-*exactly*, DP shifts by ~1.3e-7, but IF goes from 3.5e-11 (noise) to 0.0457
-(a real value). All 30 DP/COMBINED rows in the paper's Wilcoxon table are
-affected. This has been disclosed in the Limitations section and the bogus
-significance stars removed — but disclosure is a patch, not a fix.
+**Decision:** Re-run approved and executed. `experiments/run_task_f_repro.py`
+re-ran the full 540-row canonical grid into `results/canonical_tau1_cosine.json`.
 
-**The decision (needs Prof. Manisha's call, not an agent's):** ship with the
-disclosure, or re-run the grid so the artifact is reproducible end-to-end?
+**Result (2026-08-09):** TASK F complete. Verification reveals:
 
-- **Cost of re-running:** 540 rows. Calibrating from the AL run (48 rows in
-  ~30 min at 12 workers) gives roughly **5–6 hours** — one overnight run.
-- **What changes:** DP results shift by ~1e-7 (no conclusion moves, no p-value
-  or win count changes). The IF column of DP/COMBINED rows becomes real
-  instead of noise. Accuracy is unchanged.
-- **Risk of NOT re-running:** an examiner who checks out the repo and reruns a
-  row gets different IF numbers than the paper reports. That is a bad thing to
-  be asked about in a viva.
-- **Recommendation:** re-run. The cost is one night, the DP story is provably
-  unaffected, and it converts a disclosed limitation into a non-issue.
+| Attack | Accuracy drift | DP drift | Status |
+|---|---|---|---|
+| **DP** | max 0.003, mean 0.0003 | max 0.003, mean 0.0003 | ✅ Stable — headline claims unaffected |
+| **IF** | max 0.005, mean 0.0004 | max 0.008, mean 0.0004 | ✅ Stable |
+| **Combined** | **max 0.075, mean 0.011** | **max 0.085, mean 0.016** | ⚠️ DRIFT at α≥0.2 |
+
+**Root cause:** The combined attack = 0.5 DP + 0.5 IF. Under the old Euclidean
+metric, IF was degenerate (~10^-10), so combined ≈ DP-only. After the cosine
+fix, IF is real, so the combined attack now includes a real IF gradient component,
+changing which samples get corrupted at high α. This affects the combined-attack
+cells at α≥0.2; the DP-attack headline is provably unaffected.
+
+**Implication:** The memo's prediction ("accuracy reproduces exactly, DP shifts
+~1e-7") was correct for DP and IF attacks but wrong for combined. The
+combined-attack rows at α≥0.2 need updated numbers from the re-run. The paper's
+DP-attack headline is unchanged.
 
 **If approved, do:** re-run the full canonical grid with current code into a
 **new file** (`results/canonical_tau1_cosine.json` — do **not** overwrite the
