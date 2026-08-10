@@ -1,7 +1,7 @@
 # DRO-FairML — Project STATUS (single source of truth)
 
-_Last updated: 2026-08-04 ~23:20 IST (A3 λ-grid **COMPLETE 72/72**; N2 high-α next in orchestrator; concurrent oversubscribe jobs still live — do not pkill). Supersedes all prior STATUS / handoff docs.
-**CLEAR:** canonical grid **540/540** (IF 180); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3; Adult/DP α=0.1 = **5/6**.
+_Last updated: 2026-08-10 (SUBMISSION-DAY FINAL). All tasks complete: canonical grid 540+900, all 12 Wave-1 ablations, AL validation A–F, TASK F reproducibility re-run, GPU lane U1–U3, paper+report rebuilt. One human decision pending (see §10). See `docs/SUBMISSION_READY.md` for the final verdict._
+**CLEAR:** canonical grid **900/900** (540 n=6 locked + n=10 extension); UTKFace **90/90 REAL**; paper figures/tables; IF metric wins Adult/Credit incl. α=0.3; Adult/DP α=0.1 = **5/6** (marginal — 4/6 under corrected-metric re-run, see §10).
 
 ## 1. What this project is
 Implement **DRO-FAIR** (min-max Lagrangian with corruption-calibrated TV uncertainty
@@ -115,4 +115,33 @@ make results && make deliverables   # regenerate tables + figures
 - **Ops fix (late tick):** `scripts/u12_puller.sh` + `flair2_u12_status.sh` had U3 target **24** (stale) and false-positive process alive flags (checker argv self-match). Corrected to **12** + pgrep bracket detection so puller can finalize/exit. Docs `WAVE1_LIVE_PROGRESS.md` / `UTKFACE_STATUS.md` synced. GPUs idle; no U1/U2/U3 workers.
 - **ATTENTION (Grok mistake, 2026-08-05 ~23:01):** During commit hygiene, `git checkout -- results/canonical_tau1.json` restored **HEAD** (252 137 B, **568** rows) over a larger **uncommitted** working-tree file (~517 230 B, **900** rows seen at tick start). Recovery failed (no git object, no /tmp snapshot of the 900-row file). Current disk file = committed baseline only. **GLM / Mac writer:** if that 900-row expansion was progressive fill, re-run/resume from your writer — Grok must not touch this file again.
 - Do not rewrite `canonical_tau1.json` / `utkface_canonical.json`.
+
+## 10. Final state (2026-08-10, submission day)
+
+Everything is done except one human decision. **See `docs/SUBMISSION_READY.md`**
+for the complete final verdict and `results/task_f_verification_summary.md`
+for TASK F details.
+
+- **TASK F (reproducibility re-run): COMPLETE.** `results/canonical_tau1_cosine.json`
+  540/540 rows. IF column fixed: noise in 360/540 → real in 540/540. DP/IF
+  attacks stable (max drift < 0.008). Combined attack drifts at α≥0.2
+  (acc max 7.5%, DP max 8.5%) — the corrected IF metric changes which samples
+  the combined attack corrupts.
+- **Two n=6 significance flips in the re-run data** (verified with the repo's
+  own `compute_wilcoxon`): `adult/dp/α=0.1` 5/6→4/6 (p=0.031→0.109) and
+  `lsac/combined/α=0.1` 6/6→4/6 (p=0.016→0.078). Paper/report disclose both as
+  marginal. All other cells keep significance.
+- **Corrected this week (committed):** 12–40× random-vs-adversarial claim
+  (real −3.7× to 1.6×); N1 ρ=0.668→ρ=0.131 (directional, not sig); S flip
+  count 6→1; the false "reproduces accuracy exactly / DP shifts O(10⁻⁷)"
+  reproducibility sentence replaced with real TASK F deltas.
+- **Builds:** `make paper` 393 KiB ✅ · `make report` 320 KiB ✅ · `pytest tests/ -q`
+  101 passed ✅ · `make validate` PASS (6/9 DP wins, gate ≥6/9) ✅
+- **Pending human decision (Prof. Manisha):** paper reports the locked grid;
+  the two α=0.1 cells are flagged marginal. Choose (a) keep locked data with
+  caveat disclosed (current) or (b) adopt the re-run file — do not submit
+  without this call.
+- **Constraints still in force:** do not touch `results/canonical_tau1.json`,
+  `results/utkface_canonical.json`; do not merge `canonical_tau1_cosine.json`
+  into either. Private repo, no publicity without PI approval.
 - **Next:** U4 CelebA optional stretch only; paper/report integration is a separate pass (do not re-edit tex unless Finding 3 cosine sentence missing — already present).

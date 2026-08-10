@@ -112,12 +112,23 @@ of $\approx10^{-11}$ --- floating-point noise, not a measured quantity.
 We therefore report no IF effect size or $p$-value for those rows
 (Table~\ref{tab:wilcoxon-full}); quoting a Wilcoxon result computed on
 noise would be meaningless, and doing so had previously produced two
-spuriously ``significant'' cells with a $0.0\%$ effect size. Re-running
-the affected rows under the corrected metric reproduces accuracy exactly
-and shifts DP by $O(10^{-7})$, so \emph{no DP conclusion in this paper
-depends on the fix}; only the IF column of the DP/COMBINED rows is
-affected, and it is withdrawn rather than restated. The IF-attack rows,
-where the metric is non-degenerate, are unaffected and reported normally.
+spuriously ``significant'' cells with a $0.0\%$ effect size. We re-ran
+the full 540-row grid under the corrected metric
+(\texttt{results/canonical\_tau1\_cosine.json}). The IF column is now a
+real measurement (noise in $360/540$ rows before, real value in all
+$540/540$ after). The DP- and IF-attack rows reproduce closely (max
+$|\Delta \mathrm{acc}| \le 0.005$, max $|\Delta \mathrm{DP}| \le 0.008$),
+with every significant cell except one retaining significance: the honest
+$5/6$ Adult/DP $\alpha{=}0.1$ cell drops to $4/6$ ($p{=}0.031\to0.109$).
+The COMBINED-attack rows drift at $\alpha \ge 0.2$ (max $|\Delta
+\mathrm{acc}| = 0.075$, max $|\Delta \mathrm{DP}| = 0.085$) because the
+corrected metric changes which samples the combined attack corrupts;
+LSAC/Combined $\alpha{=}0.1$ drops from $6/6$ to $4/6$
+($p{=}0.016\to0.078$). The DP- and Combined-attack headline cells on
+Adult/Credit at $\alpha\le0.2$ remain significant, but the two $\alpha{=}0.1$
+cells just noted are sensitive to the metric fix; we report the locked
+grid here and flag both as marginal rather than restating them as clean
+$6/6$ wins.
 
 \item \textbf{DRO-FAIR-AL (\S\ref{sec:results-al}) is scoped to Adult,
 $\alpha\le0.2$, canonical radius.} A pre-registered falsification control

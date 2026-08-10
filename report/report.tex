@@ -718,6 +718,22 @@ confirm the radii remain sufficient on all three tabular datasets.
   in \texttt{results/utkface\_canonical.json}.  Clean-test DP is mixed
   (strongest significant DRO DP wins at high $\alpha$); do not equate with
   Adult/Credit $\alpha\le0.2$.  Synthetic smoke claims remain withdrawn.
+\item \textbf{Reproducibility re-run under the corrected (cosine) IF metric.}
+  The locked grid predates a $k$-NN metric alignment; its DP/COMBINED rows
+  record an IF violation of $\approx10^{-11}$ (noise, not a measurement), so
+  no IF effect size is quoted there. A full 540-row re-run under the
+  corrected metric
+  (\texttt{results/canonical\_tau1\_cosine.json}) makes the IF column a real
+  measurement and reproduces the DP- and IF-attack rows closely (max
+  $|\Delta \mathrm{acc}|\le0.005$, max $|\Delta \mathrm{DP}|\le0.008$),
+  but two $n{=}6$ cells lose significance in the re-run: Adult/DP
+  $\alpha{=}0.1$ ($5/6$, $p{=}0.031\to4/6$, $p{=}0.109$) and LSAC/Combined
+  $\alpha{=}0.1$ ($6/6$, $p{=}0.016\to4/6$, $p{=}0.078$). Combined-attack
+  rows drift at $\alpha\ge0.2$ (max $|\Delta \mathrm{acc}|=0.075$, max
+  $|\Delta \mathrm{DP}|=0.085$) because the corrected metric changes which
+  samples the combined attack corrupts. This report keeps the locked grid
+  as its source; the two $\alpha{=}0.1$ cells are flagged as marginal rather
+  than clean wins. Full details: \texttt{results/task\_f\_verification\_summary.md}.
 \end{enumerate}
 
 \subsection{Future Work}

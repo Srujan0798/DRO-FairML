@@ -275,24 +275,41 @@ defects found, with severity. Finding a real problem is a successful outcome.
 **Decision:** Re-run approved and executed. `experiments/run_task_f_repro.py`
 re-ran the full 540-row canonical grid into `results/canonical_tau1_cosine.json`.
 
-**Result (2026-08-09):** TASK F complete. Verification reveals:
+**Result (2026-08-09/10):** TASK F complete. Independent verification
+(`results/task_f_verification_summary.md`) reveals:
 
 | Attack | Accuracy drift | DP drift | Status |
 |---|---|---|---|
-| **DP** | max 0.003, mean 0.0003 | max 0.003, mean 0.0003 | ✅ Stable — headline claims unaffected |
+| **DP** | max 0.003, mean 0.0003 | max 0.003, mean 0.0003 | ⚠️ Mostly stable — **but adult/dp/α=0.1 flips** |
 | **IF** | max 0.005, mean 0.0004 | max 0.008, mean 0.0004 | ✅ Stable |
-| **Combined** | **max 0.075, mean 0.011** | **max 0.085, mean 0.016** | ⚠️ DRIFT at α≥0.2 |
+| **Combined** | **max 0.075, mean 0.011** | **max 0.085, mean 0.016** | ⚠️ DRIFT at α≥0.2 + **lsac/combined/α=0.1 flips** |
 
 **Root cause:** The combined attack = 0.5 DP + 0.5 IF. Under the old Euclidean
 metric, IF was degenerate (~10^-10), so combined ≈ DP-only. After the cosine
 fix, IF is real, so the combined attack now includes a real IF gradient component,
 changing which samples get corrupted at high α. This affects the combined-attack
-cells at α≥0.2; the DP-attack headline is provably unaffected.
+cells at α≥0.2.
+
+**Significance flips found by recomputing Wilcoxon (n=6) on the re-run data:**
+
+| Cell | Old (locked) | New (re-run) |
+|---|---|---|
+| adult / dp / α=0.1 | 5/6, p=0.0312, sig | **4/6, p=0.1094, NOT sig** |
+| lsac / combined / α=0.1 | 6/6, p=0.0156, sig | **4/6, p=0.0781, NOT sig** |
+
+All other cells keep their significance status. adult/dp/α=0.1 was already the
+documented honest 5/6 borderline cell; the tiny naive-DP drift (seed 1 crossing
+the DRO value) tips it to 4/6.
 
 **Implication:** The memo's prediction ("accuracy reproduces exactly, DP shifts
-~1e-7") was correct for DP and IF attacks but wrong for combined. The
-combined-attack rows at α≥0.2 need updated numbers from the re-run. The paper's
-DP-attack headline is unchanged.
+~1e-7") was correct for IF-attack rows and the IF-column fix, but wrong for the
+combined-attack rows (real drift at α≥0.2) AND for the borderline
+adult/dp/α=0.1 cell (now non-significant at n=6). The earlier
+"DP-attack headline is provably unaffected" phrasing in this doc was **too
+strong** — the α=0.1 cell is a genuine flip, so both α=0.1 cells must be
+re-qualified in the paper regardless of which file is adopted. Paper's
+`discussion.tex` reproducibility note and `paper/main.pdf` now state this
+honestly; see `results/task_f_verification_summary.md`.
 
 **If approved, do:** re-run the full canonical grid with current code into a
 **new file** (`results/canonical_tau1_cosine.json` — do **not** overwrite the
