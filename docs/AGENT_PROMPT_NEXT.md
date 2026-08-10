@@ -40,7 +40,7 @@ python3 -c "import json; print(len(json.load(open('results/canonical_tau1_cosine
 Don't re-verify all 12 — pick the ones the paper's headline depends on most,
 and recompute from raw JSON rather than reading the summary `.md` files:
 
-- **N1 (attack × radius match, Spearman ρ=+0.668, p=0.0065)** — this answers
+- **N1 (attack × radius pattern, directional, 12/15 cells prefer larger radius)** — consistent with Kuldeep's May-29 hypothesis
   Kuldeep's original question and is cited as a standalone finding. Recompute
   the correlation yourself from `results/` (find the N1 result file via
   `grep -rl "N1" results/*.md`).
@@ -48,7 +48,7 @@ and recompute from raw JSON rather than reading the summary `.md` files:
   down from a stated 12-40× claim)** — this is flagged in the final report as
   a claim the paper had to walk back. Confirm the corrected range is what's
   actually in `paper/sections/*.tex` now, not the old 12-40× number.
-- **S (n=6→n=10 extension, "6 significance flips, all DP wins stay
+- **S (n=6→n=10 extension, 1 significance flip, all DP wins stay significant)**
   significant")** — recompute the Wilcoxon at n=10 for at least the Adult
   DP α=0.2 cell yourself and confirm the flip count.
 
